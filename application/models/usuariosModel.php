@@ -14,11 +14,20 @@ class usuariosModel extends CI_Model {
 		return $query->result();
 	}
 
+<<<<<<< HEAD
 	public function getUsers()
 	{
 		$query = $this->db->get('usuarios'); 
 		return $query->result();
 	}
+=======
+	public function login($numEmpleado,$password)
+	{
+		$query = $this->db->query("SELECT *  FROM usuarios WHERE numEmpleado='$numEmpleado' AND password='$password'");
+		return $query->result();
+	}
+
+>>>>>>> aad9840c701c211851bdc2e09ae4c55b3e51b764
 
 	public function citas()
 	{
