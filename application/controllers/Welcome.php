@@ -8,6 +8,9 @@ class Welcome extends CI_Controller {
 		parent::__construct();
 		$this->load->database('default');
 		$this->load->model('usuariosModel');
+		header('Access-Control-Allow-Origin: *');
+		header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
+		header('Access-Control-Allow-Headers: Content-Type');
 	}
 	public function index()
 	{
@@ -17,6 +20,16 @@ class Welcome extends CI_Controller {
 
 	public function usuarios(){
 		$data['data'] = $this->usuariosModel->usuarios();
+		echo json_encode($data);
+	}
+
+	public function citas(){
+		$data['data'] = $this->usuariosModel->citas();
+		echo json_encode($data);
+	}
+
+	public function especialistas(){
+		$data['data'] = $this->usuariosModel->especialistas();
 		echo json_encode($data);
 	}
 }
