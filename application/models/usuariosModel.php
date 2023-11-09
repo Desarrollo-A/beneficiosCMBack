@@ -15,5 +15,11 @@ class usuariosModel extends CI_Model {
 		return $query->result();
 	}
 
+	public function login($numEmpleado,$password)
+	{
+		$query = $this->db->query("SELECT *  FROM usuarios WHERE numEmpleado='$numEmpleado' AND password='$password'");
+		return $query->result();
+	}
+
 
 }

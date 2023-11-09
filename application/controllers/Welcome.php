@@ -19,4 +19,9 @@ class Welcome extends CI_Controller {
 		$data['data'] = $this->usuariosModel->usuarios();
 		echo json_encode($data);
 	}
+	public function login(){
+		echo "llego aca";
+		$data['data'] = $this->usuariosModel->usuarios();
+		echo json_encode($data);
+	}
 }
