@@ -8,18 +8,6 @@ class dashModel extends CI_Model {
 		parent::__construct();
 	}
 
-    public function usr_count()
-	{
-		$query = $this->db-> query("SELECT COUNT(*) AS [usuarios] FROM usuarios");
-		return $query->result();
-	}
-
-    public function citas_count()
-	{
-		$query = $this->db-> query("SELECT COUNT(*) AS [citas] FROM citas");
-		return $query->result();
-	}
-
     public function citas_count_status()
 	{
 		$query = $this->db-> query("SELECT o.nombre as estatus, COUNT(o.nombre) AS total
