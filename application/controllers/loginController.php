@@ -45,11 +45,10 @@ class loginController extends CI_Controller {
 	public function addRegistroEmpleado(){
 		$mensaje = "";
 		$datos = $_POST;
-		//var_dump($datos);
 		$datosEmpleado = json_decode(file_get_contents('php://input'));
-		var_dump($datosEmpleado);
-		
-
+		$resultado = $this->usuariosModel->addRegistroEmpleado($datosEmpleado);
+		//cachar la respuesta del servidor un 1 o 0 en caso de error
+		echo json_encode(array("data" => $datosEmpleado, "estatus" => 1, "mensaje" => "Te has registrado con éxito" ));
 		//return ["estatus" => 1, "mensaje" => $mensaje];
 	}
 	public function me(){
