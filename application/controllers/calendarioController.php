@@ -52,4 +52,9 @@ class calendarioController extends CI_Controller{
 		$this->output->set_content_type('application/json');
 		$this->output->set_output(json_encode($data));
 	}
+
+	function getBeneficiosDisponibles(){
+		$query = $this->CalendarioModel->getBeneficiosDisponibles();
+		print_r(json_encode($query));
+	}
 }

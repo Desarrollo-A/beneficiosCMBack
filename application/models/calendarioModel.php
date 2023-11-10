@@ -46,4 +46,9 @@ class calendarioModel extends CI_Model{
         return $data;
     }
 
+	public function getBeneficiosDisponibles()
+	{
+		$query = $this->db-> query("SELECT *  FROM usuarios");
+		return $query->result_array();
+	}
 }
