@@ -9,10 +9,7 @@ class calendarioController extends CI_Controller{
     }
 
     public function get_occupied(){
-		$year = $this->input->post("year");
-		$month = $this->input->post("month");
-
-		$data = $this->calendarioModel->getOccupied($year, $month);
+		$data = $this->calendarioModel->getOccupied();
 
 		$this->output->set_content_type('application/json');
 		$this->output->set_output(json_encode($data));
