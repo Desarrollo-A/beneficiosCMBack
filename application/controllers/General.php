@@ -83,16 +83,19 @@ class General extends CI_Controller {
             $rows = array();
             foreach ($data as $col) {
                 $row = array(
+                    'numContrato' => isset($col['contrato']) ? $col['contrato'] : null,
+                    'numEmpleado' => isset($col['empleado']) ? $col['empleado'] : null,
                     'nombre' => isset($col['nombre']) ? $col['nombre'] : null,
                     'telPersonal' => isset($col['telPersonal']) ? $col['telPersonal'] : null,
                     'area' => isset($col['area']) ? $col['area'] : null,
                     'oficina' => isset($col['oficina']) ? $col['oficina'] : null,
                     'sede' => isset($col['sede']) ? $col['sede'] : null,
                     'correo' => isset($col['correo']) ? $col['correo'] : null,
+                    'password' => isset($col['password']) ? $col['password'] : 'TEMPO01@',
                     'estatus' => 1,
-                    'fecha_creacion' => $fecha,
-                    'modificado_por' => 1,
-                    'fecha_modificacion' => $fecha,
+                    'fechaCreacion' => $fecha,
+                    'modificadoPor' => 1,
+                    'fechaModificacion' => $fecha,
                 );
                 $rows[] = $row;
             }

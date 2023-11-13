@@ -11,9 +11,10 @@ class loginController extends CI_Controller {
 		header('Access-Control-Allow-Origin: *');
         header('Access-Control-Allow-Headers: Content-Type,Origin, authorization, X-API-KEY,X-Requested-With,Accept,Access-Control-Request-Method');
         header('Access-Control-Allow-Method: GET, POST, PUT, DELETE,OPTION');
-        parent::__construct();
-        $urls = array('192.168.30.128/auth/jwt/login','localhost','http://localhost','http://192.168.30.128/auth/jwt/login','192.168.30.128','http://192.168.30.128:3030','127.0.0.1','https://rh.gphsis.com','rh.gphsis.com','https://maderascrm.gphsis.com','maderascrm.gphsis.com');
+
+        $urls = array('192.168.30.128/auth/jwt/login','localhost','http://localhost','http://localhost:3030','http://192.168.30.128/auth/jwt/login','192.168.30.128','http://192.168.30.128:3030','127.0.0.1','https://rh.gphsis.com','rh.gphsis.com','https://maderascrm.gphsis.com','maderascrm.gphsis.com');
         date_default_timezone_set('America/Mexico_City');
+
         if(isset($this->input->request_headers()['origin']))
             $origin = $this->input->request_headers()['origin'];
         else if(array_key_exists('HTTP_ORIGIN',$_SERVER))
@@ -29,12 +30,12 @@ class loginController extends CI_Controller {
             $this->load->model(array('usuariosModel'));
 			$this->load->library(array('session'));
 
-
         } else {
             die ("Access Denied");     
             exit;  
         }
 	}
+
 	public function index()
 	{
 		
@@ -44,6 +45,7 @@ class loginController extends CI_Controller {
 		$data['data'] = $this->usuariosModel->usuarios();
 		echo json_encode($data);
 	}
+	
 	public function login(){
 		session_destroy();
 		$datosEmpleado = json_decode( file_get_contents('php://input') );

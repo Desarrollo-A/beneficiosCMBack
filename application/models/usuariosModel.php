@@ -14,34 +14,16 @@ class usuariosModel extends CI_Model {
 		return $query->result();
 	}
 
-<<<<<<< HEAD
 	public function getUsers()
 	{
 		$query = $this->db->get('usuarios'); 
 		return $query->result();
 	}
-=======
+	
 	public function login($numEmpleado,$password)
 	{
 		$query = $this->db->query("SELECT *  FROM usuarios WHERE numEmpleado='$numEmpleado' AND password='$password'");
 		return $query->result();
-	}
-
->>>>>>> aad9840c701c211851bdc2e09ae4c55b3e51b764
-
-	public function citas()
-	{
-		$query = $this->db->query("SELECT ct.idCita, ct.idEspecialista , ct.idPaciente, ct.idPaciente, ct.estatus as area, ct.fechaInicio as fechaInicio, ct.fechaFinal as fechaFinal,
-        o.nombre as estatus
-        FROM citas ct
-        INNER JOIN opcionesPorCatalogo o ON o.idOpcion = ct.estatus");
-		return $query->result();
-	}
-
-	public function especialistas()
-	{
-		$query = $this->db->query("SELECT * FROM opcionesporcatalogo WHERE idCatalogo = 1");
-        return $query->result();
 	}
 
 	public function getAreas()
