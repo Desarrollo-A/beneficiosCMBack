@@ -6,7 +6,7 @@ class calendarioController extends CI_Controller{
         parent::__construct();
 
         $this->load->model('calendarioModel');
-    }
+	}
 
     public function get_occupied(){
 		$data = $this->calendarioModel->getOccupied();
@@ -54,7 +54,7 @@ class calendarioController extends CI_Controller{
 	}
 
 	function getBeneficiosDisponibles(){
-		$query = $this->CalendarioModel->getBeneficiosDisponibles();
+		$query = $this->calendarioModel->getBeneficiosDisponibles();
 		print_r(json_encode($query));
 	}
 }

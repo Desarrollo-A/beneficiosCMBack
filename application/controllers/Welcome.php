@@ -80,5 +80,9 @@ class Welcome extends CI_Controller {
 		$data['data'] = $this->dashModel->citas_anual($dt);
 		echo json_encode($data);
 	}
+	function getBeneficiosDisponibles(){
+		$query = $this->CalendarioModel->getBeneficiosDisponibles();
+		print_r(json_encode($query));
+	}
 }
 
