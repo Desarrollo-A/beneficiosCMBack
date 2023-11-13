@@ -12,7 +12,7 @@ class loginController extends CI_Controller {
         header('Access-Control-Allow-Headers: Content-Type,Origin, authorization, X-API-KEY,X-Requested-With,Accept,Access-Control-Request-Method');
         header('Access-Control-Allow-Method: GET, POST, PUT, DELETE,OPTION');
         parent::__construct();
-        $urls = array('192.168.30.128/auth/jwt/login','localhost','http://localhost','http://192.168.30.128/auth/jwt/login','192.168.30.128','http://192.168.30.128:3030','127.0.0.1','https://rh.gphsis.com','rh.gphsis.com','https://maderascrm.gphsis.com','maderascrm.gphsis.com');
+        $urls = array('192.168.30.128/auth/jwt/login','localhost','http://localhost:3030','http://192.168.30.128/auth/jwt/login','192.168.30.128','http://192.168.30.128:3030','127.0.0.1','https://rh.gphsis.com','rh.gphsis.com','https://maderascrm.gphsis.com','maderascrm.gphsis.com');
         date_default_timezone_set('America/Mexico_City');
         if(isset($this->input->request_headers()['origin']))
             $origin = $this->input->request_headers()['origin'];
@@ -28,8 +28,6 @@ class loginController extends CI_Controller {
             $this->load->helper(array('form','funciones'));
             $this->load->model(array('usuariosModel'));
 			$this->load->library(array('session'));
-
-
         } else {
             die ("Access Denied");     
             exit;  
@@ -43,6 +41,31 @@ class loginController extends CI_Controller {
 	public function usuarios(){
 		$data['data'] = $this->usuariosModel->usuarios();
 		echo json_encode($data);
+	}
+	public function addRegistroEmpleado(){
+		$mensaje = "";
+		$datos = $_POST;
+		//var_dump($datos);
+		$datosEmpleado = json_decode(file_get_contents('php://input'));
+		var_dump($datosEmpleado);
+		
+
+		//return ["estatus" => 1, "mensaje" => $mensaje];
+	}
+	public function me(){
+		$datosSession = json_decode( file_get_contents('php://input'));
+		//var_dump($datosSession);
+		//echo $datosSession->token;
+		$arraySession = explode('.',$datosSession->token);
+		//var_dump($arraySession);
+		$datosUser = json_decode(base64_decode($arraySession[2]));
+		echo json_encode(array('user' => $datosUser,
+									'result' => 1));
+	}
+
+	public function logout()
+	{
+		$this->session->sess_destroy();
 	}
 	public function login(){
 		session_destroy();
@@ -70,9 +93,21 @@ class loginController extends CI_Controller {
 				'correo' 		    	=> 		$data[0]->correo,
 			);
 			session_start();
+			date_default_timezone_set('America/Mexico_City');
+			$time = time();
+                    $dataTimeToken = array(
+						"userId"=>$data[0]->numContrato,
+                        "iat" => $time, // Tiempo en que inició el token
+                        "exp" => $time + (24 * 60 * 60), // Tiempo en el que expirará el token (24 horas)
+                    );
+					//var_dump($dataTimeToken);
+			$tokenPart1 = base64_encode(json_encode(array("alg" => "HS256", "typ"=>"JWT")));
+			$tokenPart2 = base64_encode(json_encode(array("numEmpleado" => $data[0]->numEmpleado, "iat" => $time,"exp" => $time + (24 * 60 * 60))));
+			$tokenPart3 = base64_encode(json_encode($data[0]));
+			$datosSesion['token'] = $tokenPart1.'.'.$tokenPart2;
 			$this->session->set_userdata($datosSesion);
-			echo json_encode(array('response' => $data,
-									'message' => 'OK' ,
+			echo json_encode(array('user' => $data[0],
+									'accessToken' => $tokenPart1.'.'.$tokenPart2.'.'.$tokenPart3,
 									'result' => 1));
 		}
 	}
