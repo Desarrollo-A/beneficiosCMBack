@@ -8,13 +8,25 @@ class reportesModel extends CI_Model {
 		parent::__construct();
 	}
 
-    public function citas()
+    public function citas($dt)
 	{
-		$query = $this->db-> query("SELECT ct.idCita, ct.idEspecialista , ct.idPaciente, ct.idPaciente, ct.estatus as area, ct.fechaInicio as fechaInicio, ct.fechaFinal as fechaFinal,
-		o.nombre as estatus
-		FROM citas ct
-		INNER JOIN opcionesPorCatalogo o ON o.idOpcion = ct.estatus");
-		return $query->result();
+		if($dt == 'Reporte General'){
+
+			$query = $this->db-> query("SELECT ct.idCita, ct.idEspecialista , ct.idPaciente, ct.idPaciente, ct.estatus as area, ct.fechaInicio as fechaInicio, ct.fechaFinal as fechaFinal,
+			o.nombre as estatus
+			FROM citas ct
+			INNER JOIN opcionesPorCatalogo o ON o.idOpcion = ct.estatus");
+			return $query->result();
+
+		}else{
+
+			$query = $this->db-> query("SELECT ct.idCita, ct.idEspecialista , ct.idPaciente, ct.idPaciente, ct.estatus as area, ct.fechaInicio as fechaInicio, ct.fechaFinal as fechaFinal,
+			o.nombre as estatus
+			FROM citas ct
+			INNER JOIN opcionesPorCatalogo o ON o.idOpcion = ct.estatus WHERE ct.estatus = 7");
+			return $query->result();
+
+		}
 	}
 
 }

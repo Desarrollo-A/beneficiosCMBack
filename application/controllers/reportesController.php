@@ -19,7 +19,8 @@ class reportesController extends CI_Controller {
 	}
 
 	public function citas(){
-		$data['data'] = $this->reportesModel->citas();
+		$dt = $this->input->post('ReportData', true);
+		$data['data'] = $this->reportesModel->citas($dt);
 		echo json_encode($data);
 	}
 
