@@ -45,19 +45,20 @@ class dashboardController extends CI_Controller {
 	}
 
 	public function estatus_fecha_asistencia(){
-		$dt = $this->input->post('dt', true);
+
+		$dt = $this->input->post('yearData', true);
 		$data['data'] = $this->dashModel->estatus_fecha_asistencia($dt);
 		echo json_encode($data);
 	}
 
 	public function estatus_fecha_cancelada(){
-		$dt = $this->input->post('dt', true);
+		$dt = $this->input->post('yearData', true);
 		$data['data'] = $this->dashModel->estatus_fecha_cancelada($dt);
 		echo json_encode($data);
 	}
 
 	public function estatus_fecha_penalizada(){
-		$dt = $this->input->post('dt', true);
+		$dt = $this->input->post('yearData', true);
 		$data['data'] = $this->dashModel->estatus_fecha_penalizada($dt);
 		echo json_encode($data);
 	}
