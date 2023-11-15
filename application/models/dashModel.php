@@ -10,12 +10,12 @@ class dashModel extends CI_Model {
 
     public function citas_count_status()
 	{
-		$query = $this->db-> query("SELECT o.nombre as estatus, COUNT(o.nombre) AS total
-        FROM citas ct
-        INNER JOIN 
-        opcionesPorCatalogo o ON o.idOpcion = ct.estatus
-        GROUP BY o.nombre
-        HAVING COUNT(o.nombre)>0");
+		$query = $this->db-> query("SELECT op.nombre as estatus, COUNT(op.nombre) AS total
+		FROM catalogos ca
+		INNER JOIN opcionesPorCatalogo op ON op.idCatalogo = ca.idCatalogo AND ca.idCatalogo = 2
+		INNER JOIN citas ct ON ct.estatus = op.idOpcion 
+		GROUP BY op.nombre
+		HAVING COUNT(op.nombre)>0");
 		return $query->result();
 	}
 
@@ -23,23 +23,25 @@ class dashModel extends CI_Model {
 	{
 		$query = $this->db-> query("SELECT COUNT(*) total
 		FROM opcionesPorCatalogo 
-		WHERE idOpcion >= 5 AND idOpcion <= 7");
+		WHERE idCatalogo = 2");
 		return $query->result();
 	}
 
 	public function estatus_fecha_asistencia($year)
 	{
 		$query = $this->db-> query("SELECT
-		DATEPART(MONTH, fechaModificacion) AS mes,
-		COUNT(*) AS cantidad, o.nombre AS nombre
+		DATEPART(MONTH, ct.fechaModificacion) AS mes,
+		COUNT(*) AS cantidad, op.nombre AS nombre
 	FROM
-		citas ct
+		catalogos ca
 	INNER JOIN 
-		opcionesPorCatalogo o ON o.idOpcion = ct.estatus
+		opcionesPorCatalogo op ON op.idCatalogo = ca.idCatalogo AND ca.idCatalogo = 2
+	INNER JOIN 
+		citas ct ON ct.estatus = op.idOpcion 
 	WHERE
-		DATEPART(YEAR, fechaModificacion) = ? AND ct.estatus = 5
+		DATEPART(YEAR, fechaModificacion) = ? AND ct.estatus = 1
 	GROUP BY
-		DATEPART(MONTH, fechaModificacion), o.nombre
+		DATEPART(MONTH, fechaModificacion), op.nombre
 	ORDER BY
 		Mes", $year);
 
@@ -49,16 +51,18 @@ class dashModel extends CI_Model {
 	public function estatus_fecha_cancelada($year)
 	{
 		$query = $this->db-> query("SELECT
-		DATEPART(MONTH, fechaModificacion) AS mes,
-		COUNT(*) AS cantidad, o.nombre AS nombre
+		DATEPART(MONTH, ct.fechaModificacion) AS mes,
+		COUNT(*) AS cantidad, op.nombre AS nombre
 	FROM
-		citas ct
+		catalogos ca
 	INNER JOIN 
-		opcionesPorCatalogo o ON o.idOpcion = ct.estatus
+		opcionesPorCatalogo op ON op.idCatalogo = ca.idCatalogo AND ca.idCatalogo = 2
+	INNER JOIN 
+		citas ct ON ct.estatus = op.idOpcion 
 	WHERE
-		DATEPART(YEAR, fechaModificacion) = ? AND ct.estatus = 6
+		DATEPART(YEAR, fechaModificacion) = ? AND ct.estatus = 2
 	GROUP BY
-		DATEPART(MONTH, fechaModificacion), o.nombre
+		DATEPART(MONTH, fechaModificacion), op.nombre
 	ORDER BY
 		Mes", $year);
 
@@ -68,16 +72,18 @@ class dashModel extends CI_Model {
 	public function estatus_fecha_penalizada($year)
 	{
 		$query = $this->db-> query("SELECT
-		DATEPART(MONTH, fechaModificacion) AS mes,
-		COUNT(*) AS cantidad, o.nombre AS nombre
+		DATEPART(MONTH, ct.fechaModificacion) AS mes,
+		COUNT(*) AS cantidad, op.nombre AS nombre
 	FROM
-		citas ct
+		catalogos ca
 	INNER JOIN 
-		opcionesPorCatalogo o ON o.idOpcion = ct.estatus
+		opcionesPorCatalogo op ON op.idCatalogo = ca.idCatalogo AND ca.idCatalogo = 2
+	INNER JOIN 
+		citas ct ON ct.estatus = op.idOpcion 
 	WHERE
-		DATEPART(YEAR, fechaModificacion) = ? AND ct.estatus = 7
+		DATEPART(YEAR, fechaModificacion) = ? AND ct.estatus = 3
 	GROUP BY
-		DATEPART(MONTH, fechaModificacion), o.nombre
+		DATEPART(MONTH, fechaModificacion), op.nombre
 	ORDER BY
 		Mes", $year);
 

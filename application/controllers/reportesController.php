@@ -28,4 +28,13 @@ class reportesController extends CI_Controller {
 		$data['data'] = $this->especialistasModel->especialistas();
 		echo json_encode($data);
 	}
+
+	public function observacion(){
+
+		$idCita= $this->input->post('data[idCita]', true);
+		$descripcion= $this->input->post('data[descripcion]', true);
+		
+		$data['data'] = $this->reportesModel->observacion($idCita, $descripcion);
+		echo json_encode($data);
+	}
 }
