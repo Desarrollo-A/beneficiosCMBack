@@ -1,11 +1,11 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class calendarioController extends CI_Controller{
+class CalendarioController extends CI_Controller{
     public function __construct(){
-        parent::__construct();
-
+		parent::__construct();
         $this->load->model('calendarioModel');
+		$this->load->library('session');
 	}
 
     public function get_occupied(){
@@ -54,7 +54,16 @@ class calendarioController extends CI_Controller{
 	}
 
 	function getBeneficiosDisponibles(){
-		$query = $this->calendarioModel->getBeneficiosDisponibles();
-		print_r(json_encode($query));
+		$datosEmpleado = json_decode(file_get_contents('php://input'));
+		print_r($datosEmpleado);
+		echo '<br><br>';
+		print_r($this->session->userdata());
+
+		exit;
+    	$dataButton = $this->calendarioModel->revisaCitas();
+		$data['beneficios'] = $this->calendarioModel->getBeneficiosDisponibles();
+		print_r(json_encode($data));
 	}
+
+
 }

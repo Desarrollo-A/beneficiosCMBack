@@ -48,7 +48,20 @@ class calendarioModel extends CI_Model{
 
 	public function getBeneficiosDisponibles()
 	{
-		$query = $this->db-> query("SELECT *  FROM usuarios");
+		$query = $this->db-> query("
+		SELECT * FROM opcionesPorCatalogo opc WHERE opc.idOpcion NOT IN(
+			SELECT opc.idOpcion FROM opcionesPorCatalogo opc
+			INNER JOIN usuarios u ON u.idArea = opc.idOpcion
+			JOIN citas ct ON u.idUsuario = ct.idEspecialista
+			WHERE opc.idCatalogo=1) 
+		AND idCatalogo=1");
 		return $query->result_array();
 	}
+
+	function revisaCitas(){
+		print_r($this->session->userdata('id_usuario'));
+		exit;
+	}
+
+
 }
