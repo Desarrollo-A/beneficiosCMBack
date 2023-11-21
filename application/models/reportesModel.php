@@ -30,11 +30,4 @@ class reportesModel extends CI_Model {
 		}
 	}
 
-	public function observacion($idCita, $descripcion)
-	{
-			$query = $this->db-> query("UPDATE citas SET observaciones = '$descripcion', modificadoPor = 1 WHERE idCita = $idCita");
-			
-            return true;
-	}
-
 }

@@ -101,15 +101,17 @@ class dashModel extends CI_Model {
 	{
 		$query =$this->db->query("SELECT
 		DATEPART(MONTH, fechaModificacion) AS mes,
-		COUNT(*) AS cantidad, o.nombre AS nombre
+		COUNT(*) AS cantidad, op.nombre AS nombre
 	FROM
-		citas ct
+		catalogos ca
 	INNER JOIN 
-		opcionesPorCatalogo o ON o.idOpcion = ct.estatus
+		opcionesPorCatalogo op ON op.idCatalogo = ca.idCatalogo AND ca.idCatalogo = 2
+	INNER JOIN 
+		citas ct ON ct.estatus = op.idOpcion
 	WHERE
 		DATEPART(YEAR, fechaModificacion) = ?
 	GROUP BY
-		DATEPART(MONTH, fechaModificacion), o.nombre
+		DATEPART(MONTH, fechaModificacion), op.nombre
 	ORDER BY
 		Mes", $year);
 
