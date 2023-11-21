@@ -101,7 +101,6 @@ class calendarioController extends CI_Controller{
 
 		$id_unico = $request->id_unico;
 		// $id_unico = $this->input->post('id_unico', true);
-		var_dump($id_unico);
 
 		$delete = $this->calendarioModel->deleteOccupied($id_unico);
 
@@ -110,8 +109,8 @@ class calendarioController extends CI_Controller{
 			$data["message"] = "Se ha eliminado el horario";
 		}
 		else{
-			$data["status"] = true;
-			$data["message"] = "No se ha eliminado el horario";
+			$data["status"] = false;
+			$data["message"] = "No se puede eliminar el horario";
 		}
 
 		$this->output->set_content_type('application/json');
