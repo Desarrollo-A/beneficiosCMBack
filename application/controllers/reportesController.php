@@ -11,6 +11,7 @@ class reportesController extends CI_Controller {
 		$this->load->model('usuariosModel');
 		$this->load->model('reportesModel');
 		$this->load->model('especialistasModel');
+		$this->load->model('generalModel');
 	}
 
 	public function usuarios(){
@@ -27,5 +28,27 @@ class reportesController extends CI_Controller {
 	public function especialistas(){
 		$data['data'] = $this->especialistasModel->especialistas();
 		echo json_encode($data);
+	}
+
+	public function observacion(){
+
+		$idCita= $this->input->post('data[idCita]', true);
+		$descripcion= $this->input->post('data[descripcion]', true);
+
+		if( !empty($idCita) && !empty($descripcion) )
+		{
+			$data = array(
+				"observaciones" => $descripcion,
+				"modificadoPor" => 1,
+			);
+			
+			$response=$this->generalModel->updateRecord('citas', $data, 'idCita', $idCita);
+			echo json_encode(array("estatus" => 200, "mensaje" => "Observación Registrada!" ));
+				
+		}else{
+
+			echo json_encode(array("estatus" => -5));
+
+		}			
 	}
 }
