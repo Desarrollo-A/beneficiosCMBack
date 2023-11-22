@@ -5,8 +5,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class loginController extends CI_Controller {
 
+
 	public function __construct()
 	{
+
 		parent::__construct();
 		header('Access-Control-Allow-Origin: *');
         header('Access-Control-Allow-Headers: Content-Type,Origin, authorization, X-API-KEY,X-Requested-With,Accept,Access-Control-Request-Method');
