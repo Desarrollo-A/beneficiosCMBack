@@ -31,6 +31,20 @@ class generalModel extends CI_Model {
 		$query = $this->db-> query("SELECT * FROM opcionesporcatalogo WHERE idCatalogo = 1");
 		return $query->result();
 	}
+	public function agregarRegistro($table, $data) { 
+        if ($data != '' && $data != null) {
+			$this->db->db_debug = false;
+            $response = $this->db->insert($table, $data);
+            if (!$response){
+				$error = $this->db->error();
+                return $error;
+			}
+            else{
+				return true ;
+			}
+        } else
+            return false;
+    } 
 
     public function insertBatch($table, $data)
     {
