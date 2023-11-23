@@ -31,18 +31,41 @@ class generalModel extends CI_Model {
 		$query = $this->db-> query("SELECT * FROM opcionesporcatalogo WHERE idCatalogo = 1");
 		return $query->result();
 	}
-
-	public function updateRecord($table, $data, $key, $value)
-    {
+	public function agregarRegistro($table, $data) { 
         if ($data != '' && $data != null) {
-            $response = $this->db->update($table, $data, "$key = '$value'");
-            if ($response)
-                return true;
-            else
-                return false;
-        } else{
+			$this->db->db_debug = false;
+            $response = $this->db->insert($table, $data);
+            if (!$response){
+				$error = $this->db->error();
+                return $error;
+			}
+            else{
+				return true ;
+			}
+        } else
             return false;
-        }
-    }
+    } 
 
+    public function insertBatch($table, $data)
+    {
+        try {
+            $this->db->trans_begin();
+            $this->db->insert_batch($table, $data);
+    
+            if ($this->db->trans_status() === FALSE) {
+                $this->db->trans_rollback();
+                throw new Exception("Error en la transacción de la base de datos.");
+            } else {
+                $this->db->trans_commit();
+                $response['result'] = true;
+                $response['msg'] = "¡Listado insertado exitosamente!";
+            }
+        } catch (Exception $e) {
+            $this->db->trans_rollback();
+            $response['result'] = false;
+            $response['msg'] = "Error en la inserción de datos: " . $e->getMessage();
+        }
+    
+        return $response['result'];
+    }
 }
