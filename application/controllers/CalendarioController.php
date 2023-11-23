@@ -54,14 +54,10 @@ class CalendarioController extends CI_Controller{
 	}
 
 	function getBeneficiosDisponibles(){
-		$datosEmpleado = json_decode(file_get_contents('php://input'));
-		print_r($datosEmpleado);
-		echo '<br><br>';
-		print_r($this->session->userdata());
-
-		exit;
-    	$dataButton = $this->calendarioModel->revisaCitas();
-		$data['beneficios'] = $this->calendarioModel->getBeneficiosDisponibles();
+    	$id_usuario = $this->session->userdata('id_usuario');
+    	$dataButton = $this->calendarioModel->revisaCitas($id_usuario);
+		$data['statusButton'] = (count($dataButton)>=2) ? true : false;
+		$data['beneficios'] = $this->calendarioModel->getBeneficiosDisponibles($id_usuario);
 		print_r(json_encode($data));
 	}
 

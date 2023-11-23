@@ -36,7 +36,11 @@ class loginController extends CI_Controller {
 	}
 	public function index()
 	{
-		
+		print_r(session_status());
+		echo '<br>';
+		print_r($_SESSION);
+		echo '<br>';
+		print_r($this->session->userdata());
 	}
 
 	public function usuarios(){
@@ -66,6 +70,14 @@ class loginController extends CI_Controller {
 
 	public function logout()
 	{
+		print_r(session_status());
+		echo '<br>';
+		print_r($_SESSION);
+		echo'<br>';
+		session_destroy();
+		echo'<br>';
+		print_r(session_status());
+		exit;
 		$this->session->sess_destroy();
 	}
 	public function login(){

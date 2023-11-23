@@ -6,7 +6,7 @@
  *
  * This content is released under the MIT License (MIT)
  *
- * Copyright (c) 2019 - 2022, CodeIgniter Foundation
+ * Copyright (c) 2014 - 2018, British Columbia Institute of Technology
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,9 +29,8 @@
  * @package	CodeIgniter
  * @author	EllisLab Dev Team
  * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (https://ellislab.com/)
- * @copyright	Copyright (c) 2014 - 2019, British Columbia Institute of Technology (https://bcit.ca/)
- * @copyright	Copyright (c) 2019 - 2022, CodeIgniter Foundation (https://codeigniter.com/)
- * @license	https://opensource.org/licenses/MIT	MIT License
+ * @copyright	Copyright (c) 2014 - 2018, British Columbia Institute of Technology (http://bcit.ca/)
+ * @license	http://opensource.org/licenses/MIT	MIT License
  * @link	https://codeigniter.com
  * @since	Version 1.0.0
  * @filesource
@@ -47,7 +46,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @subpackage	Libraries
  * @category	Libraries
  * @author		EllisLab Dev Team
- * @link		https://codeigniter.com/userguide3/libraries/email.html
+ * @link		https://codeigniter.com/user_guide/libraries/email.html
  */
 class CI_Email {
 
@@ -70,35 +69,35 @@ class CI_Email {
 	 *
 	 * @var	string	'mail', 'sendmail' or 'smtp'
 	 */
-	public $protocol	= 'mail';		// mail/sendmail/smtp
+	public $protocol	= 'smtp';		// mail/sendmail/smtp
 
 	/**
 	 * STMP Server host
 	 *
 	 * @var	string
 	 */
-	public $smtp_host	= '';
+	public $smtp_host	= 'smtp.gmail.com';
 
 	/**
 	 * SMTP Username
 	 *
 	 * @var	string
 	 */
-	public $smtp_user	= '';
+	public $smtp_user	= 'noreply@ciudadmaderas.com';
 
 	/**
 	 * SMTP Password
 	 *
 	 * @var	string
 	 */
-	public $smtp_pass	= '';
+	public $smtp_pass	= 'Marzo2019@';
 
 	/**
 	 * SMTP Server port
 	 *
 	 * @var	int
 	 */
-	public $smtp_port	= 25;
+	public $smtp_port	= 465;
 
 	/**
 	 * SMTP connection timeout in seconds
@@ -119,7 +118,7 @@ class CI_Email {
 	 *
 	 * @var	string	empty, 'tls' or 'ssl'
 	 */
-	public $smtp_crypto	= '';
+	public $smtp_crypto	= 'ssl';
 
 	/**
 	 * Whether to apply word-wrapping to the message body.
@@ -141,7 +140,7 @@ class CI_Email {
 	 *
 	 * @var	string	'text' or 'html'
 	 */
-	public $mailtype	= 'text';
+	public $mailtype	= 'html';
 
 	/**
 	 * Character set (default: utf-8)
@@ -178,7 +177,7 @@ class CI_Email {
 	 * @link	http://www.ietf.org/rfc/rfc822.txt
 	 * @var	string	"\r\n" or "\n"
 	 */
-	public $newline		= "\n";			// Default newline. "\r\n" or "\n" (Use "\r\n" to comply with RFC 822)
+	public $newline		= "\r\n";			// Default newline. "\r\n" or "\n" (Use "\r\n" to comply with RFC 822)
 
 	/**
 	 * CRLF character sequence
@@ -398,7 +397,7 @@ class CI_Email {
 		$this->initialize($config);
 		$this->_safe_mode = ( ! is_php('5.4') && ini_get('safe_mode'));
 
-		isset(self::$func_overload) OR self::$func_overload = ( ! is_php('8.0') && extension_loaded('mbstring') && @ini_get('mbstring.func_overload'));
+		isset(self::$func_overload) OR self::$func_overload = (extension_loaded('mbstring') && ini_get('mbstring.func_overload'));
 
 		log_message('info', 'Email Class Initialized');
 	}
@@ -820,7 +819,7 @@ class CI_Email {
 	 * @param	string
 	 * @return	CI_Email
 	 */
-	public function set_mailtype($type = 'text')
+	public function set_mailtype($type = 'html')
 	{
 		$this->mailtype = ($type === 'html') ? 'html' : 'text';
 		return $this;
