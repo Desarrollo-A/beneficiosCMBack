@@ -1,14 +1,14 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class calendarioController extends CI_Controller{
+class CalendarioController extends CI_Controller{
     public function __construct(){
-        parent::__construct();
-
+		parent::__construct();
         $this->load->model('calendarioModel');
-    }
+		$this->load->library('session');
+	}
 
-    public function get_occupied(){
+	public function get_occupied(){
 		$year = $this->input->post("year");
 		$month = $this->input->post("month");
 		$id_usuario = $this->input->post("idUsuario");
@@ -116,5 +116,17 @@ class calendarioController extends CI_Controller{
 
 		$this->output->set_content_type('application/json');
 		$this->output->set_output(json_encode($data));
+	}
+
+	function getBeneficiosDisponibles(){
+		$datosEmpleado = json_decode(file_get_contents('php://input'));
+		print_r($datosEmpleado);
+		echo '<br><br>';
+		print_r($this->session->userdata());
+
+		exit;
+    	$dataButton = $this->calendarioModel->revisaCitas();
+		$data['beneficios'] = $this->calendarioModel->getBeneficiosDisponibles();
+		print_r(json_encode($data));
 	}
 }

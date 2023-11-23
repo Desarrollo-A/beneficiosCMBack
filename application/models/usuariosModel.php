@@ -8,10 +8,15 @@ class usuariosModel extends CI_Model {
 		parent::__construct();
 	}
 
-
     public function usuarios()
 	{
-		$query = $this->db-> query("SELECT *  FROM usuarios");
+		$query = $this->db-> query("SELECT *FROM usuarios");
+		return $query->result();
+	}
+
+	public function getUsers()
+	{
+		$query = $this->db->get('usuarios'); 
 		return $query->result();
 	}
 
@@ -21,5 +26,9 @@ class usuariosModel extends CI_Model {
 		return $query->result();
 	}
 
-
+	public function getAreas()
+	{
+		$query = $this->db->distinct()->select('area')->get('usuarios');
+        return $query->result();
+	}
 }
