@@ -12,6 +12,10 @@ class reportesController extends CI_Controller {
 		$this->load->model('reportesModel');
 		$this->load->model('especialistasModel');
 		$this->load->model('generalModel');
+
+		header('Access-Control-Allow-Origin: *');
+        header('Access-Control-Allow-Headers: Content-Type,Origin, authorization, X-API-KEY,X-Requested-With,Accept,Access-Control-Request-Method');
+        header('Access-Control-Allow-Method: GET, POST, PUT, DELETE,OPTION');
 	}
 
 	public function usuarios(){
@@ -21,6 +25,7 @@ class reportesController extends CI_Controller {
 
 	public function citas(){
 		$dt = $this->input->post('ReportData', true);
+		/* var_dump(); */
 		$data['data'] = $this->reportesModel->citas($dt);
 		echo json_encode($data);
 	}
@@ -32,9 +37,9 @@ class reportesController extends CI_Controller {
 
 	public function observacion(){
 
-		$idCita= $this->input->post('data[idCita]', true);
-		$descripcion= $this->input->post('data[descripcion]', true);
-
+		$idCita= $this->input->post('idCita');
+		$descripcion= $this->input->post('descripcion');
+		
 		if( !empty($idCita) && !empty($descripcion) )
 		{
 			$data = array(

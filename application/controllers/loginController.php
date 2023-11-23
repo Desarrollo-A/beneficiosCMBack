@@ -84,7 +84,6 @@ class loginController extends CI_Controller {
 				'numContrato'           =>      $data[0]->numContrato,
 				'nombre' 		        => 		$data[0]->nombre,
 				'telPersonal' 		    => 		$data[0]->telPersonal,
-				'telOficina' 		    => 		$data[0]->telOficina,
 				'area' 		        	=> 		$data[0]->area,
 				'puesto' 		        => 		$data[0]->puesto,
 				'oficina' 		        => 		$data[0]->oficina,
