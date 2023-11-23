@@ -1,24 +1,22 @@
 <?php
+
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Welcome extends CI_Controller {
+class dashboardController extends CI_Controller {
 
 	public function __construct()
 	{
 		parent::__construct();
+		header('Access-Control-Allow-Origin: *');
 		$this->load->database('default');
 		$this->load->model('usuariosModel');
-		$this->load->model('citasModel');
+		$this->load->model('reportesModel');
 		$this->load->model('especialistasModel');
 		$this->load->model('dashModel');
-		
-		header('Access-Control-Allow-Origin: *');
-		header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
-		header('Access-Control-Allow-Headers: Content-Type');
 	}
 	public function index()
 	{
-		
+		$this->usuarios();
 	}
 
 	public function usuarios(){
@@ -27,23 +25,12 @@ class Welcome extends CI_Controller {
 	}
 
 	public function citas(){
-		$data['data'] = $this->usuariosModel->citas();
-		$data['data'] = $this->citasModel->citas();
+		$data['data'] = $this->reportesModel->citas();
 		echo json_encode($data);
 	}
 
 	public function especialistas(){
 		$data['data'] = $this->especialistasModel->especialistas();
-		echo json_encode($data);
-	}
-
-	public function usr_count(){
-		$data['data'] = $this->dashModel->usr_count();
-		echo json_encode($data);
-	}
-
-	public function citas_count(){
-		$data['data'] = $this->dashModel->citas_count();
 		echo json_encode($data);
 	}
 
@@ -58,19 +45,20 @@ class Welcome extends CI_Controller {
 	}
 
 	public function estatus_fecha_asistencia(){
-		$dt = $this->input->post('dt', true);
+
+		$dt = $this->input->post('yearData', true);
 		$data['data'] = $this->dashModel->estatus_fecha_asistencia($dt);
 		echo json_encode($data);
 	}
 
 	public function estatus_fecha_cancelada(){
-		$dt = $this->input->post('dt', true);
+		$dt = $this->input->post('yearData', true);
 		$data['data'] = $this->dashModel->estatus_fecha_cancelada($dt);
 		echo json_encode($data);
 	}
 
 	public function estatus_fecha_penalizada(){
-		$dt = $this->input->post('dt', true);
+		$dt = $this->input->post('yearData', true);
 		$data['data'] = $this->dashModel->estatus_fecha_penalizada($dt);
 		echo json_encode($data);
 	}
@@ -85,9 +73,4 @@ class Welcome extends CI_Controller {
 		$data['data'] = $this->dashModel->citas_anual($dt);
 		echo json_encode($data);
 	}
-	function getBeneficiosDisponibles(){
-		$query = $this->CalendarioModel->getBeneficiosDisponibles();
-		print_r(json_encode($query));
-	}
 }
-

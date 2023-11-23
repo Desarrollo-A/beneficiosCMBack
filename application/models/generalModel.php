@@ -8,6 +8,44 @@ class generalModel extends CI_Model {
 		parent::__construct();
 	}
 
+    public function usuarios()
+	{
+		$query = $this->db-> query("SELECT *  FROM usuarios");
+		return $query->result();
+	}
+
+    public function usr_count()
+	{
+		$query = $this->db-> query("SELECT COUNT(*) AS [usuarios] FROM usuarios");
+		return $query->result();
+	}
+
+    public function citas_count()
+	{
+		$query = $this->db-> query("SELECT COUNT(*) AS [citas] FROM citas");
+		return $query->result();
+	}
+
+    public function especialistas()
+	{
+		$query = $this->db-> query("SELECT * FROM opcionesporcatalogo WHERE idCatalogo = 1");
+		return $query->result();
+	}
+	public function agregarRegistro($table, $data) { 
+        if ($data != '' && $data != null) {
+			$this->db->db_debug = false;
+            $response = $this->db->insert($table, $data);
+            if (!$response){
+				$error = $this->db->error();
+                return $error;
+			}
+            else{
+				return true ;
+			}
+        } else
+            return false;
+    } 
+
     public function insertBatch($table, $data)
     {
         try {
@@ -30,18 +68,4 @@ class generalModel extends CI_Model {
     
         return $response['result'];
     }
-    
-    public function updateRecord($table, $data, $key, $value)
-    {
-        if ($data != '' && $data != null) {
-            $response = $this->db->update($table, $data, "$key = '$value'");
-            if ($response)
-                return true;
-            else
-                return false;
-        } else{
-            return false;
-        }
-    }
-
 }
