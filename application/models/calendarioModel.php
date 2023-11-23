@@ -3,8 +3,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class calendarioModel extends CI_Model{
 
-    public function getOccupied($year, $month){
-        if($year != null){
+    public function getOccupied($year, $month, $id_usuario){
             $query = $this->db->query("SELECT 
                                     idUnico as id, 
                                     titulo as title,
@@ -16,19 +15,15 @@ class calendarioModel extends CI_Model{
                                         WHERE
                                             YEAR(fechaOcupado) = ?
                                         AND
-                                            MONTH(fechaOcupado) = ?", array($year, $month));
-        }
-        else{
-            $query = $this->db->query("SELECT 
-                                    idUnico as id, 
-                                    titulo as title,
-                                    concat(fechaOcupado, ' ', horaInicio) as 'start',
-                                    concat(fechaOcupado, ' ', horaFinal) as 'end',
-                                    fechaOcupado as occupied
-                                        FROM 
-                                            horariosOcupados");
-        }
-        
+                                            MONTH(fechaOcupado) = ?
+                                        AND
+                                            idEspecialista = ?", 
+                                        array(
+                                            $year, 
+                                            $month,
+                                            $id_usuario
+                                        )
+                                    );     
         
         if($query-> num_rows() > 0){
             $data["events"] = $query->result();
