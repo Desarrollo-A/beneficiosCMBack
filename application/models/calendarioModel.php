@@ -9,7 +9,8 @@ class calendarioModel extends CI_Model{
                                     titulo as title,
                                     concat(fechaOcupado, ' ', horaInicio) as 'start',
                                     concat(fechaOcupado, ' ', horaFinal) as 'end',
-                                    fechaOcupado as occupied
+                                    fechaOcupado as occupied,
+                                    'red' as 'color'
                                         FROM 
                                             horariosOcupados
                                         WHERE
@@ -23,10 +24,37 @@ class calendarioModel extends CI_Model{
                                             $month,
                                             $id_usuario
                                         )
-                                    );     
+                                    );
+
+            $query_citas = $this->db->query("SELECT
+                                    CAST(idCita AS VARCHAR(36))  AS id, 
+                                    observaciones AS title,
+                                    fechaInicio AS 'start',
+                                    fechaFinal AS 'end',
+                                    fechaInicio AS occupied,
+                                    'green' AS 'color',
+                                    'cita' AS 'type'
+                                        FROM 
+                                            citas
+                                        WHERE
+                                            YEAR(fechaInicio) = ?
+                                        AND
+                                            MONTH(fechaInicio) = ?
+                                        AND
+                                            idEspecialista = ?
+                                        AND 
+                                            estatus = 1",
+                                        array(
+                                            $year, 
+                                            $month,
+                                            $id_usuario
+                                        )
+                                    );
+                                    
+                                         
         
-        if($query-> num_rows() > 0){
-            $data["events"] = $query->result();
+        if($query-> num_rows() > 0 || $query_citas -> num_rows() > 0){
+            $data["events"] = array_merge($query->result(), $query_citas->result());
         }
         else{
             $data["events"] = array('');
@@ -117,6 +145,18 @@ class calendarioModel extends CI_Model{
             $data["status"] = false;
 
         return $data;
+    }
+
+    public function deleteDate($id){
+        $query = $this->db->query("UPDATE citas SET estatus = 0 WHERE idCita = ? ", $id);
+
+        if($this->db->affected_rows() > 0)
+            $data["status"] = true;
+        else
+            $data["status"] = false;
+
+        return $data;
+        
     }
 
 }

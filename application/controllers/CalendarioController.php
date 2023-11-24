@@ -69,12 +69,6 @@ class CalendarioController extends CI_Controller{
 		$titulo = $request->titulo;
 		$id_unico = $request->id_unico;
 
-		// $hora_inicio = $this->input->post("hora_inicio", true);
-		// $hora_final = $this->input->post("hora_final", true);
-		// $fecha_modificacion = date("Y-m-d H:i:s");
-		// $titulo = $this->input->post("titulo", true);
-		// $id_unico = $this->input->post('id_unico', true);
-
 		$save = $this->calendarioModel->updateOccupied(
 			$hora_inicio, 
 			$hora_final,
@@ -101,7 +95,6 @@ class CalendarioController extends CI_Controller{
 		$request = json_decode($stream_clean);
 
 		$id_unico = $request->id_unico;
-		// $id_unico = $this->input->post('id_unico', true);
 
 		$delete = $this->calendarioModel->deleteOccupied($id_unico);
 
@@ -115,6 +108,23 @@ class CalendarioController extends CI_Controller{
 		}
 
 		$this->output->set_content_type('application/json');
+		$this->output->set_output(json_encode($data));
+	}
+
+	public function delete_date(){
+		$id = $this->input->post("id");
+		$delete = $this->calendarioModel->deleteDate($id);
+
+		if($delete["status"]){
+			$data["status"] = true;
+			$data["message"] = "Se ha cancelado la cita";
+		}
+		else{
+			$data["status"] = false;
+			$data["message"] = "No se ha cancelado la cita";
+		}
+
+		$this->output->set_content_type("application/json");
 		$this->output->set_output(json_encode($data));
 	}
 
