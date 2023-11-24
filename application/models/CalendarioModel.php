@@ -3,6 +3,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class calendarioModel extends CI_Model{
 
+    
     public function getOccupied($year, $month){
         if($year != null){
             $query = $this->db->query("SELECT 
