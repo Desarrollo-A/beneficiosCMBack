@@ -1,39 +1,61 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class calendarioModel extends CI_Model{
+class CalendarioModel extends CI_Model{
 
-    
-    public function getOccupied($year, $month){
-        if($year != null){
+    public function getOccupied($year, $month, $id_usuario){
             $query = $this->db->query("SELECT 
                                     idUnico as id, 
                                     titulo as title,
                                     concat(fechaOcupado, ' ', horaInicio) as 'start',
                                     concat(fechaOcupado, ' ', horaFinal) as 'end',
-                                    fechaOcupado as occupied
+                                    fechaOcupado as occupied,
+                                    'red' as 'color'
                                         FROM 
                                             horariosOcupados
                                         WHERE
                                             YEAR(fechaOcupado) = ?
                                         AND
-                                            MONTH(fechaOcupado) = ?", array($year, $month));
-        }
-        else{
-            $query = $this->db->query("SELECT 
-                                    idUnico as id, 
-                                    titulo as title,
-                                    concat(fechaOcupado, ' ', horaInicio) as 'start',
-                                    concat(fechaOcupado, ' ', horaFinal) as 'end',
-                                    fechaOcupado as occupied
+                                            MONTH(fechaOcupado) = ?
+                                        AND
+                                            idEspecialista = ?", 
+                                        array(
+                                            $year, 
+                                            $month,
+                                            $id_usuario
+                                        )
+                                    );
+
+            $query_citas = $this->db->query("SELECT
+                                    CAST(idCita AS VARCHAR(36))  AS id, 
+                                    observaciones AS title,
+                                    fechaInicio AS 'start',
+                                    fechaFinal AS 'end',
+                                    fechaInicio AS occupied,
+                                    'green' AS 'color',
+                                    'cita' AS 'type'
                                         FROM 
-                                            horariosOcupados");
-        }
+                                            citas
+                                        WHERE
+                                            YEAR(fechaInicio) = ?
+                                        AND
+                                            MONTH(fechaInicio) = ?
+                                        AND
+                                            idEspecialista = ?
+                                        AND 
+                                            estatus = 1",
+                                        array(
+                                            $year, 
+                                            $month,
+                                            $id_usuario
+                                        )
+                                    );
+                                    
+                                         
         
-        
-        if($query-> num_rows() > 0){
-            $data["events"] = $query->result();
-        }
+        if($query-> num_rows() > 0 || $query_citas -> num_rows() > 0){
+            $data["events"] = array_merge($query->result(), $query_citas->result());
+        } 
         else{
             $data["events"] = array('');
         }
@@ -125,4 +147,15 @@ class calendarioModel extends CI_Model{
         return $data;
     }
 
+    public function deleteDate($id){
+        $query = $this->db->query("UPDATE citas SET estatus = 0 WHERE idCita = ? ", $id);
+
+        if($this->db->affected_rows() > 0)
+            $data["status"] = true;
+        else
+            $data["status"] = false;
+
+        return $data;
+        
+    }
 }
