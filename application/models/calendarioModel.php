@@ -55,7 +55,7 @@ class calendarioModel extends CI_Model{
         
         if($query-> num_rows() > 0 || $query_citas -> num_rows() > 0){
             $data["events"] = array_merge($query->result(), $query_citas->result());
-        }
+        } 
         else{
             $data["events"] = array('');
         }
