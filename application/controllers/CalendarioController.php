@@ -44,17 +44,8 @@ class CalendarioController extends CI_Controller{
 			$id_unico
 		);
 
-		if($save["status"]){
-			$data["status"] = true;
-			$data["message"] = "Se ha guardado el horario";
-		}
-		else{
-			$data["status"] = false;
-			$data["message"] = "Error al guardar el horario";
-		}
-
 		$this->output->set_content_type('application/json');
-		$this->output->set_output(json_encode($data));
+		$this->output->set_output(json_encode($save));
 	}
 
 	public function update_occupied(){
@@ -68,26 +59,19 @@ class CalendarioController extends CI_Controller{
 		$fecha_modificacion = date("Y-m-d H:i:s");
 		$titulo = $request->titulo;
 		$id_unico = $request->id_unico;
+		$fecha_ocupado = $request->fechaOcupado;
 
 		$save = $this->calendarioModel->updateOccupied(
 			$hora_inicio, 
 			$hora_final,
 			$fecha_modificacion, 
 			$titulo, 
-			$id_unico
+			$id_unico,
+			$fecha_ocupado
 		);
 
-		if($save["status"]){
-			$data["status"] = true;
-			$data["message"] = "Se ha guardado el horario";
-		}
-		else{
-			$data["status"] = false;
-			$data["message"] = "Error al guardar el horario";
-		}
-
 		$this->output->set_content_type('application/json');
-		$this->output->set_output(json_encode($data));
+		$this->output->set_output(json_encode($save));
 	}
 
 	public function delete_occupied(){
