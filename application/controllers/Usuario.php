@@ -152,4 +152,17 @@ class Usuario extends CI_Controller {
 		$this->output->set_content_type("application/json");
 		$this->output->set_output(json_encode($response));
 	}
+
+	public function getNameUser(){
+		$rs = $this->usuariosModel->getNameUser();
+		$data['result'] = count($rs) > 0; 
+		if ($data['result']) {
+			$data['msg'] = '¡Listado de usuarios cargado exitosamente!';
+			$data['data'] = $rs; 
+		}else {
+			$data['msg'] = '¡No existen registros!';
+		}
+		$this->output->set_content_type("application/json");
+        $this->output->set_output(json_encode($data));
+	}
 }
