@@ -123,4 +123,18 @@ class CalendarioController extends CI_Controller{
 		$data['beneficios'] = $this->calendarioModel->getBeneficiosDisponibles();
 		print_r(json_encode($data));
 	}
+
+	public function getBeneficiosPorSede(){
+		$sede = $this->input->post('sede');
+		$rs = $this->calendarioModel->getBeneficiosPorSede($sede);
+		$data['result'] = count($rs) > 0; 
+		if ($data['result']) {
+			$data['msg'] = '¡Listado de beneficios cargado exitosamente!';
+			$data['data'] = $rs; 
+		}else {
+			$data['msg'] = '¡No existen registros!';
+		}
+		$this->output->set_content_type("application/json");
+        $this->output->set_output(json_encode($data));
+	}
 }

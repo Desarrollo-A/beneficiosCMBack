@@ -202,4 +202,15 @@ class CalendarioModel extends CI_Model{
         return $data;
         
     }
+
+    public function getBeneficiosPorSede($sede)
+	{
+        $query = $this->db->query("SELECT DISTINCT u.area
+        FROM usuarios AS U
+        INNER JOIN sedes AS S ON S.abreviacion = U.sede
+        RIGHT JOIN atencionXSede AS AXS ON AXS.idEspecialista = U.idUsuario
+        WHERE AXS.estatus = 1 AND S.estatus = 1 AND U.estatus = 1
+        AND S.abreviacion = 'SLP'");
+		return $query->result();
+	}
 }
