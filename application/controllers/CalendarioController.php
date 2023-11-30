@@ -112,6 +112,31 @@ class CalendarioController extends CI_Controller{
 		$this->output->set_output(json_encode($data));
 	}
 
+	function create_appointment(){
+		$idEspecialista = $this->input->post("idEspecialista", true);
+		$idPaciente = $this->input->post("idPaciente", true);
+		$fechaInicio = $this->input->post("fechaInicio", true);
+		$fechaFinal = $this->input->post("fechaFinal", true);
+		$creadoPor = $this->input->post("creadoPor", true);
+		$fechaModificacion = date("Y-m-d H:i:s");
+		$observaciones = $this->input->post("observaciones", true);
+		$modificadoPor = $this->input->post("idEspecialista", true);
+
+		$create = $this->calendarioModel->createAppointment(
+			$idEspecialista, 
+			$idPaciente, 
+			$fechaInicio, 
+			$fechaFinal, 
+			$creadoPor, 
+			$fechaModificacion, 
+			$observaciones,
+			$modificadoPor	
+		);
+
+		$this->output->set_content_type("application/json");
+		$this->output->set_output(json_encode($create));
+	}
+
 	function getBeneficiosDisponibles(){
 		$datosEmpleado = json_decode(file_get_contents('php://input'));
 		print_r($datosEmpleado);

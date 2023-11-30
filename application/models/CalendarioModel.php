@@ -213,4 +213,22 @@ class CalendarioModel extends CI_Model{
         AND S.abreviacion = 'SLP'");
 		return $query->result();
 	}
+    
+    public function createAppointment($idEspecialista, $idPaciente, $fechaInicio, $fechaFinal, $creadoPor, $fechaModificacion, $observaciones,$modificadoPor){
+        $this->db->query("INSERT INTO citas VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", array(
+            $idEspecialista, $idPaciente, 1, $fechaInicio, $fechaFinal, $creadoPor, $fechaModificacion, $observaciones,$modificadoPor
+        ));
+
+        if($this->db->affected_rows() > 0){
+            $data["status"] = true;
+            $data["message"] = "Se ha agendado a cita";
+        }   
+        else{
+            $data["status"] = false;
+            $data["message"] = "No se ha guardado el horario";
+        }
+
+        return $data;
+    }
+    
 }
