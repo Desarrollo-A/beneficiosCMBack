@@ -63,9 +63,9 @@ class CalendarioModel extends CI_Model{
         return $data;
     }
 
-    public function saveOccupied($fecha, $hora_inicio, $hora_final, $id_especialista, $creado_por, $fecha_modificacion, $fecha_creacion, $titulo, $id_unico) {
-        $hora_final_resta = date('H:i:s', strtotime($hora_final . '-1 minute'));
-        $hora_inicio_suma = date('H:i:s', strtotime($hora_inicio . '+1 minute'));
+    public function saveOccupied($data) {
+        $hora_final_resta = date('H:i:s', strtotime($data["hora_final"] . '-1 minute'));
+        $hora_inicio_suma = date('H:i:s', strtotime($data["hora_inicio"] . '+1 minute'));
     
         try {
             $check = $this->db->query(
@@ -73,11 +73,13 @@ class CalendarioModel extends CI_Model{
                                                   OR (fechaOcupado = ? AND horaFinal BETWEEN ? AND ?)
                                                   OR (fechaOcupado = ? AND ? BETWEEN horaInicio AND horaFinal) 
                                                   OR (fechaOcupado = ? AND ? BETWEEN horaInicio AND horaFinal)",
-                array($fecha, $hora_inicio_suma, $hora_final_resta, 
-                      $fecha, $hora_inicio_suma, $hora_final_resta, 
-                      $fecha, $hora_inicio_suma, 
-                      $fecha, $hora_final_resta)
-                                    );
+                array(
+                    $data["fecha"], $hora_inicio_suma, $hora_final_resta, 
+                    $data["fecha"], $hora_inicio_suma, $hora_final_resta, 
+                    $data["fecha"], $hora_inicio_suma, 
+                    $data["fecha"], $hora_final_resta
+                    )
+                );
             
             if ($check->num_rows() > 0) {
                 $data["status"] = false;
@@ -85,8 +87,32 @@ class CalendarioModel extends CI_Model{
             } 
             else {
                 $query = $this->db->query(
-                    "INSERT INTO horariosOcupados (fechaOcupado, horaInicio, horaFinal, idEspecialista, creadoPor, fechaModificacion, fechaCreacion, titulo, idUnico) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                    array($fecha, $hora_inicio, $hora_final, $id_especialista, $creado_por, $fecha_modificacion, $fecha_creacion, $titulo, $id_unico)
+                    "INSERT 
+                        INTO 
+                            horariosOcupados 
+                                (
+                                    fechaOcupado, 
+                                    horaInicio, 
+                                    horaFinal, 
+                                    idEspecialista, 
+                                    creadoPor, 
+                                    fechaModificacion, 
+                                    fechaCreacion, 
+                                    titulo, 
+                                    idUnico
+                                )
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    array(
+                        $data["fecha"], 
+                        $data["hora_inicio"], 
+                        $data["hora_final"], 
+                        $data["id_usuario"], 
+                        $data["id_usuario"], 
+                        date("Y-m-d H:i:s"), 
+                        date("Y-m-d H:i:s"), 
+                        $data["titulo"], 
+                        $data["id_unico"]
+                        )
                 );
     
                 if ($this->db->affected_rows() > 0) {
@@ -123,9 +149,9 @@ class CalendarioModel extends CI_Model{
 	}
 
 
-    public function updateOccupied($hora_inicio, $hora_final, $fecha_modificacion, $titulo, $id_unico, $fecha_ocupado){
-        $hora_final_resta = date('H:i:s', strtotime($hora_final . '-1 minute'));
-        $hora_inicio_suma = date('H:i:s', strtotime($hora_inicio . '+1 minute'));
+    public function updateOccupied($data){
+        $hora_final_resta = date('H:i:s', strtotime($data["hora_final"] . '-1 minute'));
+        $hora_inicio_suma = date('H:i:s', strtotime($data["hora_inicio"] . '+1 minute'));
 
         try{
             $check = $this->db->query(
@@ -135,11 +161,11 @@ class CalendarioModel extends CI_Model{
                                                   OR (fechaOcupado = ? AND ? BETWEEN horaInicio AND horaFinal) 
                                                   OR (fechaOcupado = ? AND ? BETWEEN horaInicio AND horaFinal))
                                                   AND idUnico != ?",
-                array($fecha_ocupado, $hora_inicio_suma, $hora_final_resta, 
-                      $fecha_ocupado, $hora_inicio_suma, $hora_final_resta, 
-                      $fecha_ocupado, $hora_inicio_suma, 
-                      $fecha_ocupado, $hora_final_resta,
-                      $id_unico)
+                array($data["fecha_ocupado"], $hora_inicio_suma, $hora_final_resta, 
+                      $data["fecha_ocupado"], $hora_inicio_suma, $hora_final_resta, 
+                      $data["fecha_ocupado"], $hora_inicio_suma, 
+                      $data["fecha_ocupado"], $hora_final_resta,
+                      $data["id_unico"])
                                     );
             if($check->num_rows() > 0){
                 $data["status"] = false;
@@ -158,7 +184,7 @@ class CalendarioModel extends CI_Model{
                         WHERE
                             idUnico = ?", 
                         array(
-                            $hora_inicio, $hora_final, $fecha_modificacion, $titulo, $fecha_ocupado, $id_unico
+                            $data["hora_inicio"], $data["hora_final"], date("Y-m-d H:i:s"), $data["titulo"], $data["fecha_ocupado"], $data["id_unico"]
                         )
                     );
         
@@ -183,10 +209,14 @@ class CalendarioModel extends CI_Model{
     public function deleteOccupied($id_unico){
         $this->db->query("DELETE FROM horariosOcupados where idUnico = ?", $id_unico);
 
-        if($this->db->affected_rows() > 0)
+        if($this->db->affected_rows() > 0){
             $data["status"] = true;
-        else
+            $data["message"] = "Se ha eliminado el horario";
+        }
+        else{
             $data["status"] = false;
+            $data["message"] = "No se puede eliminar el horario";
+        }   
 
         return $data;
     }
@@ -194,18 +224,30 @@ class CalendarioModel extends CI_Model{
     public function deleteDate($id){
         $query = $this->db->query("UPDATE citas SET estatus = 0 WHERE idCita = ? ", $id);
 
-        if($this->db->affected_rows() > 0)
+        if($this->db->affected_rows() > 0){
             $data["status"] = true;
-        else
+            $data["message"] = "Se ha cancelado la cita";
+        }
+        else{
             $data["status"] = false;
+            $data["message"] = "No se ha cancelado la cita";
+        }
 
         return $data;
-        
     }
 
-    public function createAppointment($idEspecialista, $idPaciente, $fechaInicio, $fechaFinal, $creadoPor, $fechaModificacion, $observaciones,$modificadoPor){
-        $this->db->query("INSERT INTO citas VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", array(
-            $idEspecialista, $idPaciente, 1, $fechaInicio, $fechaFinal, $creadoPor, $fechaModificacion, $observaciones,$modificadoPor
+    public function createAppointment($data){
+        $this->db->query("INSERT INTO citas VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", 
+        array(
+            $data["idEspecialista"], 
+            $data["idPaciente"], 
+            1, 
+            $data["fechaInicio"], 
+            $data["fechaFinal"], 
+            $data["creadoPor"], 
+            date("Y-m-d H:i:s"), 
+            $data["observaciones"],
+            $data["modificadoPor"]
         ));
 
         if($this->db->affected_rows() > 0){
