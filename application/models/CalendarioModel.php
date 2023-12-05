@@ -6,52 +6,65 @@ class CalendarioModel extends CI_Model
 
     public function getOccupied($year, $month, $id_usuario)
     {
+        $month_1 = ($month - 1) === 0 ? 12 : ($month - 1);
+        $month_2 = ($month + 1) > 12 ? 1 : ($month + 1);
+        
+        $year_1 =  intval($month) === 1 ? $year - 1 : $year;
+        $year_2 =  intval($month) === 12 ? $year + 1 : $year;
+        
         $query = $this->db->query(
             "SELECT 
-                                    idUnico as id, 
-                                    titulo as title,
-                                    concat(fechaOcupado, ' ', horaInicio) as 'start',
-                                    concat(fechaOcupado, ' ', horaFinal) as 'end',
-                                    fechaOcupado as occupied,
-                                    'red' as 'color'
-                                        FROM 
-                                            horariosOcupados
-                                        WHERE
-                                            YEAR(fechaOcupado) = ?
-                                        AND
-                                            MONTH(fechaOcupado) = ?
-                                        AND
-                                            idEspecialista = ?",
+                idUnico as id, 
+                titulo as title,
+                concat(fechaOcupado, ' ', horaInicio) as 'start',
+                concat(fechaOcupado, ' ', horaFinal) as 'end',
+                fechaOcupado AS occupied,
+                'red' AS 'color'
+                    FROM 
+                        horariosOcupados
+                    WHERE
+                        YEAR(fechaOcupado) in(?, ?)
+                    AND
+                        MONTH(fechaOcupado) in (?, ?, ?)
+                    AND
+                        idEspecialista = ?
+                    AND 
+                        estatus = ?",
             array(
-                $year,
+                $year_1,
+                $year_2,
+                $month_1,
                 $month,
-                $id_usuario
+                $month_2,
+                $id_usuario,
+                1
             )
         );
 
         $query_citas = $this->db->query(
             "SELECT
-                                    CAST(idCita AS VARCHAR(36))  AS id, 
-                                    observaciones AS title,
-                                    fechaInicio AS 'start',
-                                    fechaFinal AS 'end',
-                                    fechaInicio AS occupied,
-                                    'green' AS 'color',
-                                    'cita' AS 'type'
-                                        FROM 
-                                            citas
-                                        WHERE
-                                            YEAR(fechaInicio) = ?
-                                        AND
-                                            MONTH(fechaInicio) = ?
-                                        AND
-                                            idEspecialista = ?
-                                        AND 
-                                            estatus = 1",
+                CAST(idCita AS VARCHAR(36))  AS id, 
+                observaciones AS title,
+                fechaInicio AS 'start',
+                fechaFinal AS 'end',
+                fechaInicio AS occupied,
+                'green' AS 'color',
+                'cita' AS 'type'
+                    FROM 
+                        citas
+                    WHERE
+                        YEAR(fechaInicio) = ?
+                    AND
+                        MONTH(fechaInicio) = ?
+                    AND
+                        idEspecialista = ?
+                    AND 
+                        estatus = ?",
             array(
                 $year,
                 $month,
-                $id_usuario
+                $id_usuario,
+                1
             )
         );
 
@@ -81,13 +94,15 @@ class CalendarioModel extends CI_Model
                     OR (fechaOcupado = ? AND ? BETWEEN horaInicio AND horaFinal) 
                     OR (fechaOcupado = ? AND ? BETWEEN horaInicio AND horaFinal)
                 )
-                    AND idEspecialista = ?",
+                    AND idEspecialista = ?
+                    AND estatus = ?",
                 array(
                     $data["fecha"], $hora_inicio_suma, $hora_final_resta,
                     $data["fecha"], $hora_inicio_suma, $hora_final_resta,
                     $data["fecha"], $hora_inicio_suma,
                     $data["fecha"], $hora_final_resta,
-                    $data["id_usuario"]
+                    $data["id_usuario"],
+                    1
                 )
             );
 
@@ -100,13 +115,14 @@ class CalendarioModel extends CI_Model
                     OR (? BETWEEN fechaInicio AND fechaFinal)
                 )
                     AND idEspecialista = ?
-                    AND estatus = 1",
+                    AND estatus = ?",
                 array(
                     $fecha_inicio_suma, $fecha_final_resta,
                     $fecha_inicio_suma, $fecha_final_resta,
                     $fecha_inicio_suma,
                     $fecha_final_resta,
                     $data["id_especialista"],
+                    1
                 )
             );
 
@@ -193,14 +209,16 @@ class CalendarioModel extends CI_Model
                                 OR (fechaOcupado = ? AND ? BETWEEN horaInicio AND horaFinal) 
                                 OR (fechaOcupado = ? AND ? BETWEEN horaInicio AND horaFinal))
                                 AND idUnico != ?
-                                AND idEspecialista = ?",
+                                AND idEspecialista = ?
+                                AND estatus = ?",
                 array(
                     $data["fecha_ocupado"], $hora_inicio_suma, $hora_final_resta,
                     $data["fecha_ocupado"], $hora_inicio_suma, $hora_final_resta,
                     $data["fecha_ocupado"], $hora_inicio_suma,
                     $data["fecha_ocupado"], $hora_final_resta,
                     $data["id_unico"],
-                    $data["id_usuario"]
+                    $data["id_usuario"],
+                    1
                 )
             );
             $check_appointment = $this->db->query(
@@ -210,13 +228,14 @@ class CalendarioModel extends CI_Model
                     OR (? BETWEEN fechaInicio AND fechaFinal)
                     OR (? BETWEEN fechaInicio AND fechaFinal))
                     AND idEspecialista = ?
-                    AND estatus = 1",
+                    AND estatus = ?",
                 array(
                     $fecha_inicio_suma, $fecha_final_resta,
                     $fecha_inicio_suma, $fecha_final_resta,
                     $fecha_inicio_suma,
                     $fecha_final_resta,
                     $data["id_especialista"],
+                    1
                 )
             );
             if ($check_occupied->num_rows() > 0 || $check_appointment->num_rows() > 0) {
@@ -257,7 +276,7 @@ class CalendarioModel extends CI_Model
 
     public function deleteOccupied($id_unico)
     {
-        $this->db->query("DELETE FROM horariosOcupados where idUnico = ?", $id_unico);
+        $this->db->query("UPDATE horariosOcupados SET estatus = ? where idUnico = ?", array(0, $id_unico));
 
         if ($this->db->affected_rows() > 0) {
             $data["status"] = true;
@@ -300,13 +319,15 @@ class CalendarioModel extends CI_Model
                                 OR (fechaOcupado = ? AND horaFinal BETWEEN ? AND ?)
                                 OR (fechaOcupado = ? AND ? BETWEEN horaInicio AND horaFinal) 
                                 OR (fechaOcupado = ? AND ? BETWEEN horaInicio AND horaFinal))
-                        AND idEspecialista = ?",
+                        AND idEspecialista = ?
+                        AND estatus = ?",
                 array(
                     $data["fechaOcupado"], $hora_inicio_suma, $hora_final_resta,
                     $data["fechaOcupado"], $hora_inicio_suma, $hora_final_resta,
                     $data["fechaOcupado"], $hora_inicio_suma,
                     $data["fechaOcupado"], $hora_final_resta,
-                    $data["idEspecialista"]
+                    $data["idEspecialista"],
+                    1
                 )
             );
 
@@ -318,14 +339,15 @@ class CalendarioModel extends CI_Model
                                 OR (? BETWEEN fechaInicio AND fechaFinal))
                         AND idEspecialista = ?
                         AND idPaciente = ?
-                        AND estatus = 1",
+                        AND estatus = ?",
                 array(
                     $fecha_inicio_suma, $fecha_final_resta,
                     $fecha_inicio_suma, $fecha_final_resta,
                     $fecha_inicio_suma,
                     $fecha_final_resta,
                     $data["idEspecialista"],
-                    $data["idPaciente"]
+                    $data["idPaciente"],
+                    1
                 )
             );
 
@@ -384,13 +406,15 @@ class CalendarioModel extends CI_Model
                                 OR (fechaOcupado = ? AND horaFinal BETWEEN ? AND ?)
                                 OR (fechaOcupado = ? AND ? BETWEEN horaInicio AND horaFinal) 
                                 OR (fechaOcupado = ? AND ? BETWEEN horaInicio AND horaFinal))
-                        AND idEspecialista = ?",
+                        AND idEspecialista = ?
+                        AND estatus = ?",
                 array(
                     $fechaOcupado, $hora_inicio_suma, $hora_final_resta,
                     $fechaOcupado, $hora_inicio_suma, $hora_final_resta,
                     $fechaOcupado, $hora_inicio_suma,
                     $fechaOcupado, $hora_final_resta,
-                    $data["idEspecialista"]
+                    $data["idEspecialista"],
+                    1
                 )
             );
 
@@ -472,14 +496,16 @@ class CalendarioModel extends CI_Model
                     OR (? BETWEEN horaInicio AND horaFinal)
                 )
                     AND fechaOcupado = ?
-                    AND idEspecialista = ?",
+                    AND idEspecialista = ?
+                    AND estatus = ?",
                 array(
                     $hora_inicio_suma, $hora_final_resta,
                     $hora_inicio_suma, $hora_final_resta,
                     $hora_inicio_suma,
                     $hora_final_resta,
                     $fecha,
-                    $data["idEspecialista"]
+                    $data["idEspecialista"],
+                    1
                 )
             );
 

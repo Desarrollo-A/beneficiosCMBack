@@ -67,13 +67,37 @@ class CalendarioController extends CI_Controller{
 
 	function update_on_drop(){
 		$data = $this->input->post("data", true);
+		$oldStart = $data["oldStart"];
+		$start = $data["start"];
+		// Obtén la zona horaria actual
+$currentTimeZone = new DateTimeZone('America/Mexico_City');
+
+// Crea un objeto DateTime con la zona horaria actual
+$currentDateTime = new DateTime('now', $currentTimeZone);
+
+// Imprime el offset de la zona horaria actual
+$offset = $currentDateTime->format('Y/m/d');
+
+
 		
-		if($data["tipo"] === "cita"){
-			$update = $this->calendarioModel->onDropAppointment($data);
-		}
-		else{
-			$update = $this->calendarioModel->onDropOccupied($data);
-		}
+		if($oldStart > $offset){
+			if($start > $offset){
+				if($data["tipo"] === "cita"){
+					$update = $this->calendarioModel->onDropAppointment($data);
+				}
+				else{
+					$update = $this->calendarioModel->onDropOccupied($data);
+				}
+			}
+			else{
+				$update["status"] = false;
+				$update["message"] = "No se pueden mover las fechas a un dia anterior o actual";
+			}
+		  }
+		  else{
+			$update["status"] = false;
+			$update["message"] = "Las citas u horarios pasados no se pueden mover";
+		  } 
 
 		$this->output->set_content_type("application/json");
 		$this->output->set_output(json_encode($update));
