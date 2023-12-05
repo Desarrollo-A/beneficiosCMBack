@@ -40,7 +40,6 @@ class CalendarioController extends CI_Controller{
 	}
 
 	public function delete_occupied(){
-
 		$id_unico = $this->input->post("data", true);
 		
 		$delete = $this->calendarioModel->deleteOccupied($id_unico);
@@ -64,6 +63,20 @@ class CalendarioController extends CI_Controller{
 
 		$this->output->set_content_type("application/json");
 		$this->output->set_output(json_encode($create));
+	}
+
+	function update_on_drop(){
+		$data = $this->input->post("data", true);
+		
+		if($data["tipo"] === "cita"){
+			$update = $this->calendarioModel->onDropAppointment($data);
+		}
+		else{
+			$update = $this->calendarioModel->onDropOccupied($data);
+		}
+
+		$this->output->set_content_type("application/json");
+		$this->output->set_output(json_encode($update));
 	}
 
 	function getBeneficiosDisponibles(){
