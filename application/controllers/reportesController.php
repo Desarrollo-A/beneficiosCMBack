@@ -24,7 +24,7 @@ class reportesController extends CI_Controller {
 	}
 
 	public function citas(){
-		$dt = $this->input->post('ReportData', true);
+		$dt = $this->input->post('dataValue', true);
 		/* var_dump(); */
 		$data['data'] = $this->reportesModel->citas($dt);
 		echo json_encode($data);
@@ -39,7 +39,7 @@ class reportesController extends CI_Controller {
 
 		$idCita= $this->input->post('idCita');
 		$descripcion= $this->input->post('descripcion');
-		
+
 		if( !empty($idCita) && !empty($descripcion) )
 		{
 			$data = array(

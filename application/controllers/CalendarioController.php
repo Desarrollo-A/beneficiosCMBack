@@ -117,7 +117,7 @@ class CalendarioController extends CI_Controller{
 		$this->output->set_output(json_encode($data));
 	}
 
-	function getBeneficiosDisponibles(){
+/* 	function getBeneficiosDisponibles(){
 		$datosEmpleado = json_decode(file_get_contents('php://input'));
 		print_r($datosEmpleado);
 		echo '<br><br>';
@@ -127,5 +127,18 @@ class CalendarioController extends CI_Controller{
     	$dataButton = $this->calendarioModel->revisaCitas();
 		$data['beneficios'] = $this->calendarioModel->getBeneficiosDisponibles();
 		print_r(json_encode($data));
+	} */
+
+	function getBeneficiosDisponibles(){
+/* 		$datosEmpleado = json_decode(file_get_contents('php://input'));
+		print_r($datosEmpleado);
+		echo '<br><br>';
+		print_r($this->session->userdata());
+
+		exit; */
+    	/* $dataButton = $this->calendarioModel->revisaCitas(); */
+		$data['beneficios'] = $this->calendarioModel->getBeneficiosDisponibles();
+		json_encode($data);
 	}
+
 }

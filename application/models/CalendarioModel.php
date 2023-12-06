@@ -72,8 +72,7 @@ class calendarioModel extends CI_Model{
 
     public function getBeneficiosDisponibles()
 	{
-		$query = $this->db-> query("
-		SELECT * FROM opcionesPorCatalogo opc WHERE opc.idOpcion NOT IN(
+		$query = $this->db-> query("SELECT * FROM opcionesPorCatalogo opc WHERE opc.idOpcion NOT IN(
 			SELECT opc.idOpcion FROM opcionesPorCatalogo opc
 			INNER JOIN usuarios u ON u.idArea = opc.idOpcion
 			JOIN citas ct ON u.idUsuario = ct.idEspecialista

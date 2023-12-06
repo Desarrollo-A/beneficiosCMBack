@@ -8,7 +8,7 @@ class dashModel extends CI_Model {
 		parent::__construct();
 	}
 
-    public function citas_count_status()
+    public function citasCountStatus()
 	{
 		$query = $this->db-> query("SELECT op.nombre as estatus, COUNT(op.nombre) AS total
 		FROM catalogos ca
@@ -19,7 +19,7 @@ class dashModel extends CI_Model {
 		return $query->result();
 	}
 
-	public function total_status_citas()
+	public function totalStatusCitas()
 	{
 		$query = $this->db-> query("SELECT COUNT(*) total
 		FROM opcionesPorCatalogo 
@@ -27,7 +27,7 @@ class dashModel extends CI_Model {
 		return $query->result();
 	}
 
-	public function estatus_fecha_asistencia($year)
+	public function estatusFechaAsistencia($year)
 	{
 		$query = $this->db-> query("SELECT
 		DATEPART(MONTH, ct.fechaModificacion) AS mes,
@@ -48,7 +48,7 @@ class dashModel extends CI_Model {
 		return $query->result();
 	}
 
-	public function estatus_fecha_cancelada($year)
+	public function estatusFechaCancelada($year)
 	{
 		$query = $this->db-> query("SELECT
 		DATEPART(MONTH, ct.fechaModificacion) AS mes,
@@ -69,7 +69,7 @@ class dashModel extends CI_Model {
 		return $query->result();
 	}
 
-	public function estatus_fecha_penalizada($year)
+	public function estatusFechaPenalizada($year)
 	{
 		$query = $this->db-> query("SELECT
 		DATEPART(MONTH, ct.fechaModificacion) AS mes,
@@ -90,14 +90,14 @@ class dashModel extends CI_Model {
 		return $query->result();
 	}
 
-	public function fecha_minima()
+	public function fechaMinima()
 	{
 		$query =$this->db->query("SELECT DATEPART(YEAR, MIN(fechaModificacion)) AS year FROM citas");
 
 		return $query->result();
 	}
 
-	public function citas_anual($year)
+	public function citasAnual($year)
 	{
 		$query =$this->db->query("SELECT
 		DATEPART(MONTH, fechaModificacion) AS mes,
