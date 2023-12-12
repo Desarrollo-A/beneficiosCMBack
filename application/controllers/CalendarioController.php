@@ -151,15 +151,66 @@ class CalendarioController extends CI_Controller{
 
 	public function getBeneficiosPorSede(){
 		$sede = $this->input->post('sede');
-		$rs = $this->calendarioModel->getBeneficiosPorSede($sede);
-		$data['result'] = count($rs) > 0; 
-		if ($data['result']) {
-			$data['msg'] = '¡Listado de beneficios cargado exitosamente!';
-			$data['data'] = $rs; 
+		
+		$response['result'] = isset($sede);
+		if ($response['result']) {
+			$rs = $this->calendarioModel->getBeneficiosPorSede($sede);
+			$data['result'] = count($rs) > 0; 
+			if ($data['result']) {
+				$response['msg'] = '¡Listado de beneficios cargado exitosamente!';
+				$response['data'] = $rs; 
+			}else {
+				$response['msg'] = '¡No existen registros!';
+			}
 		}else {
-			$data['msg'] = '¡No existen registros!';
+			$response['msg'] = "¡Parametros invalidos!";
 		}
+		
 		$this->output->set_content_type("application/json");
-        $this->output->set_output(json_encode($data));
+        $this->output->set_output(json_encode($response));
+	}
+
+	public function getEspecialistaPorBeneficioYSede(){
+		$sede = $this->input->post('sede');
+		$beneficio = $this->input->post('beneficio');
+
+		$response['result'] = isset($sede, $beneficio);
+		if ($response['result']) {
+			$rs = $this->calendarioModel->getEspecialistaPorBeneficioYSede($sede, $beneficio);
+			$data['result'] = count($rs) > 0; 
+			if ($data['result']) {
+				$response['msg'] = '¡Listado de especialistas cargado exitosamente!';
+				$response['data'] = $rs; 
+			}else {
+				$response['msg'] = '¡No existen registros!';
+			}
+		}else {
+            $response['msg'] = "¡Parametros invalidos!";
+        }
+
+		$this->output->set_content_type("application/json");
+        $this->output->set_output(json_encode($response));
+	}
+
+	public function getModalidadesEspecialista(){
+		$sede = $this->input->post('sede');
+		$especialista = $this->input->post('especialista');
+
+		$response['result'] = isset($sede, $especialista);
+		if ($response['result']) {
+			$rs = $this->calendarioModel->getModalidadesEspecialista($sede, $especialista);
+			$data['result'] = count($rs) > 0; 
+			if ($data['result']) {
+				$response['msg'] = '¡Listado de modalidades cargado exitosamente!';
+				$response['data'] = $rs; 
+			}else {
+				$response['msg'] = '¡No existen registros!';
+			}
+		}else {
+            $response['msg'] = "¡Parametros invalidos!";
+        }
+
+		$this->output->set_content_type("application/json");
+        $this->output->set_output(json_encode($response));
 	}
 }

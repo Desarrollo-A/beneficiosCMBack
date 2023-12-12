@@ -203,17 +203,6 @@ class CalendarioModel extends CI_Model{
         
     }
 
-    public function getBeneficiosPorSede($sede)
-	{
-        $query = $this->db->query("SELECT DISTINCT u.area
-        FROM usuarios AS U
-        INNER JOIN sedes AS S ON S.abreviacion = U.sede
-        RIGHT JOIN atencionXSede AS AXS ON AXS.idEspecialista = U.idUsuario
-        WHERE AXS.estatus = 1 AND S.estatus = 1 AND U.estatus = 1
-        AND S.abreviacion = 'SLP'");
-		return $query->result();
-	}
-    
     public function createAppointment($idEspecialista, $idPaciente, $fechaInicio, $fechaFinal, $creadoPor, $fechaModificacion, $observaciones,$modificadoPor){
         $this->db->query("INSERT INTO citas VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", array(
             $idEspecialista, $idPaciente, 1, $fechaInicio, $fechaFinal, $creadoPor, $fechaModificacion, $observaciones,$modificadoPor
@@ -231,4 +220,53 @@ class CalendarioModel extends CI_Model{
         return $data;
     }
     
+    public function getBeneficiosPorSede($sede)
+	{
+        $query = $this->db->query("SELECT DISTINCT  u.puesto as id, p.puesto
+            FROM usuarios AS u 
+            RIGHT JOIN atencionXSede AS AXS ON AXS.idEspecialista = U.idUsuario
+            INNER JOIN opcionesPorCatalogo AS oxc ON oxc.idOpcion= axs.tipoCita
+            INNER JOIN sedes AS S ON S.idSede = U.sede
+            LEFT JOIN oficinas as o ON o.idoficina = axs.idOficina
+            INNER JOIN puestos AS p ON p.idPuesto = u.puesto
+            FULL JOIN sedes AS se ON se.idSede = o.idSede
+            WHERE u.estatus = 1 AND s.estatus = 1 AND axs.estatus = 1  AND u.idRol = 3 AND oxc.idCatalogo = 5
+            and axs.idSede = ?", $sede);
+
+        return $query->result();
+	}
+
+    public function getEspecialistaPorBeneficioYSede($sede, $beneficio)
+    {
+        $query = $this->db->query("SELECT u.idUsuario as id, u.nombre AS especialista
+            FROM usuarios AS u 
+            RIGHT JOIN atencionXSede AS AXS ON AXS.idEspecialista = U.idUsuario
+            INNER JOIN opcionesPorCatalogo AS oxc ON oxc.idOpcion= axs.tipoCita
+            INNER JOIN sedes AS S ON S.idSede = U.sede
+            LEFT JOIN oficinas as o ON o.idoficina = axs.idOficina
+            INNER JOIN puestos AS p ON p.idPuesto = u.puesto
+            FULL JOIN sedes AS se ON se.idSede = o.idSede
+            WHERE u.estatus = 1 AND s.estatus = 1 AND axs.estatus = 1  AND u.idRol = 3 AND oxc.idCatalogo = 5
+            AND axs.idSede = ? AND u.puesto = ?", array($sede, $beneficio));
+
+        return $query->result();
+    }
+
+    public function getModalidadesEspecialista($sede, $especialista)
+    {
+        $query = $this->db->query("SELECT u.idUsuario as id, u.puesto as idPuesto, p.puesto, u.nombre AS especilista,
+            axs.idAtencionXSede, axs.idSede AS idSedeAtiende, se.sede as lugarAtiende, axs.idOficina as oficinaAtiende, 
+            axs.tipoCita, oxc.nombre AS modalidad, o.ubicación as ubicacionOficina
+            FROM usuarios AS u 
+            RIGHT JOIN atencionXSede AS AXS ON AXS.idEspecialista = U.idUsuario
+            INNER JOIN opcionesPorCatalogo AS oxc ON oxc.idOpcion= axs.tipoCita
+            INNER JOIN sedes AS S ON S.idSede = U.sede
+            LEFT JOIN oficinas as o ON o.idoficina = axs.idOficina
+            INNER JOIN puestos AS p ON p.idPuesto = u.puesto
+            FULL JOIN sedes AS se ON se.idSede = o.idSede
+            WHERE u.estatus = 1 AND s.estatus = 1 AND axs.estatus = 1  AND u.idRol = 3 AND oxc.idCatalogo = 5
+            AND axs.idSede = ? AND u.idUsuario = ?", array($sede, $especialista));
+
+        return $query->result();
+    }
 }
