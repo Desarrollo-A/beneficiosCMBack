@@ -47,7 +47,7 @@ class encuestasModel extends CI_Model {
 
     public function getEncuesta($dt)
     {
-        $query = $this->db-> query("SELECT * FROM encuestasCreadas WHERE idEncuesta =1");
+        $query = $this->db-> query("SELECT * FROM encuestasCreadas WHERE idEncuesta =$dt");
 		return $query->result();
     }
 
@@ -85,5 +85,48 @@ class encuestasModel extends CI_Model {
         INNER JOIN respuestasGenerales rp ON rp.grupo = op.idOpcion
         WHERE idOpcion = 4");
 		return $query->result();
+    }
+
+    public function getEncNotificacion($dt)
+    {
+        $query_especialistas = $this->db->query("SELECT DISTINCT ct.idEspecialista
+            FROM usuarios us
+            INNER JOIN citas ct ON ct.idPaciente = us.idUsuario
+            WHERE ct.estatus = 4 AND us.idUsuario = 28");
+
+        $resultado = $query_especialistas->result();
+
+        $resultados_encuestas = array();
+
+        foreach ($resultado as $especialista) {
+            $idEspecialista = $especialista->idEspecialista;
+
+            $query = $this->db->query("SELECT us.puesto, ps.puesto, idEncuesta, ec.pregunta, ec.respuestas FROM usuarios us 
+                INNER JOIN encuestasCreadas ec ON ec.idArea = us.puesto
+                INNER JOIN puestos ps ON ps.idPuesto = ec.idArea
+                WHERE us.idUsuario = $idEspecialista");
+
+            $resultados_encuestas[] = $query->result();
+        }
+
+        return $resultados_encuestas;
+
+    }
+
+    public function getPuestos(){
+        $query = $this->db->query("SELECT * FROM puestos WHERE idPuesto = 537 OR idPuesto = 686 OR idPuesto = 158 OR idPuesto = 585");
+
+        return $query->result();
+    }
+
+    public function encuestaContestada(){
+        $query = $this->db->query("SELECT 
+        CASE
+            WHEN EXISTS (SELECT 1 FROM encuestasContestadas WHERE idEncuesta = 1 AND idUsuario = 1) THEN 1
+            ELSE 0
+        END AS Resultado;
+    ");
+
+        return $query->result();
     }
 }

@@ -37,14 +37,17 @@ class encuestasController extends CI_Controller {
 					break; 
 				}
 			}
+			/* var_dump($items); */
 
 			if ($datosValidos) {
 
 				foreach ($items as $item) {
 					$pregunta = $item["pregunta"];
 					$resp = $item["resp"];
+					$idUsuario = $item["idUsuario"];
+					$idEncuesta = $item["idEncuesta"];
 
-					$query = $this->db->query("INSERT INTO encuestasContestadas (pregunta, respuesta, idEspecialista, fechaCreacion) VALUES (?, ?, 1, GETDATE() )", array($pregunta, $resp ));
+					$query = $this->db->query("INSERT INTO encuestasContestadas (pregunta, respuesta, idEspecialista, fechaCreacion, idUsuario, idEncuesta) VALUES (?, ?, 1, GETDATE(), ?, ? )", array($pregunta, $resp, $idUsuario, $idEncuesta ));
 				}
 
 				$this->db->trans_complete();
@@ -149,6 +152,24 @@ class encuestasController extends CI_Controller {
 		echo json_encode($data);
 	}
 
+	public function getEncNotificacion(){
 
+		$dt = $this->input->post('dataValue', true);
+
+		$data['data'] = $this->encuestasModel->getEncNotificacion($dt);
+		echo json_encode($data);
+	}
+
+	public function getPuestos(){
+		$data['data'] = $this->encuestasModel->getPuestos();
+		echo json_encode($data);
+	}
+
+	public function encuestaConstestada(){
+		$dt = $this->input->post('dataValue', true);
+
+		$data['data'] = $this->encuestasModel->encuestaConstestada($dt);
+		echo json_encode($data);
+	}
 
 }
