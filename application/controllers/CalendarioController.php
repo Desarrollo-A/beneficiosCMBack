@@ -10,19 +10,57 @@ class CalendarioController extends CI_Controller{
 		date_default_timezone_set('America/Mexico_City');
 	}
 
-	public function get_occupied(){
-		$year = $this->input->post("year");
-		$month = $this->input->post("month");
-		$id_usuario = $this->input->post("idUsuario");
+	public function getOccupied(){
 
-		$data = $this->calendarioModel->getOccupied($year, $month, $id_usuario);
+		$data = $this->input->post("dataValue", true);
+		$year = $data["year"];
+		$month = $data["month"];
+		$id_usuario = $data["idUsuario"];
+
+		$dates = [
+			"month_1" => $month_1 = ($month - 1) === 0 ? 12 : ($month - 1),
+        	"month_2" => $month_2 = ($month + 1) > 12 ? 1 : ($month + 1),
+        	"year_1" => $year_1 =  intval($month) === 1 ? $year - 1 : $year,
+        	"year_2" => $year_2 =  intval($month) === 12 ? $year + 1 : $year
+		];
+		
+		$data = $this->calendarioModel->getOccupied($year, $month, $id_usuario, $dates);
 
 		$this->output->set_content_type('application/json');
 		$this->output->set_output(json_encode($data));
 	}
+	
+	public function get1(){
 
-	public function save_occupied(){
-		$data = $this->input->post("data");
+		$data = $this->input->post("dataValue", true);
+		$year = $data["year"];
+		$month = $data["month"];
+		$id_usuario = $data["idUsuario"];
+
+		$dates = [
+			"month_1" => $month_1 = ($month - 1) === 0 ? 12 : ($month - 1),
+        	"month_2" => $month_2 = ($month + 1) > 12 ? 1 : ($month + 1),
+        	"year_1" => $year_1 =  intval($month) === 1 ? $year - 1 : $year,
+        	"year_2" => $year_2 =  intval($month) === 12 ? $year + 1 : $year
+		];
+		
+		$data1 = $this->calendarioModel->get1($year, $month, $id_usuario, $dates);
+		$data2 = $this->calendarioModel->get2($year, $month, $id_usuario, $dates);
+
+		if ($data1->num_rows() > 0 || $data2->num_rows() > 0) {
+            $dataa["events"] = array_merge($data1->result(), $data2->result());
+        } 
+        else {
+            $dataa["events"] = array('');
+        }
+
+		$this->output->set_content_type('application/json');
+		$this->output->set_output(json_encode($dataa));
+	}
+
+
+	public function saveOccupied(){
+		$data = $this->input->post("dataValue");
 
 		$save = $this->calendarioModel->saveOccupied($data);
 
@@ -33,10 +71,27 @@ class CalendarioController extends CI_Controller{
 	public function update_occupied(){
 		$data = $this->input->post("data", true);
 
-		$save = $this->calendarioModel->updateOccupied($data);
+		$start = $data["start"];
+		$oldStart = $data["oldStart"];
+		$current = new DateTime();
+		$now = $current->format('Y/m/d');
+
+		if($oldStart > $now){
+			if($start > $now){
+				$update = $this->calendarioModel->updateOccupied($data);
+			}
+			else{
+				$update["status"] = false;
+				$update["message"] = "No se pueden mover las fechas a un dia anterior o actual";
+			}
+		}
+		else{
+			$update["status"] = false;
+			$update["message"] = "Las citas u horarios pasados no se pueden mover";
+		} 
 
 		$this->output->set_content_type('application/json');
-		$this->output->set_output(json_encode($save));
+		$this->output->set_output(json_encode($update));
 	}
 
 	public function delete_occupied(){
@@ -69,19 +124,11 @@ class CalendarioController extends CI_Controller{
 		$data = $this->input->post("data", true);
 		$oldStart = $data["oldStart"];
 		$start = $data["start"];
-		// Obtén la zona horaria actual
-$currentTimeZone = new DateTimeZone('America/Mexico_City');
-
-// Crea un objeto DateTime con la zona horaria actual
-$currentDateTime = new DateTime('now', $currentTimeZone);
-
-// Imprime el offset de la zona horaria actual
-$offset = $currentDateTime->format('Y/m/d');
-
-
+		$current = new DateTime();
+		$now = $current->format('Y/m/d');
 		
-		if($oldStart > $offset){
-			if($start > $offset){
+		if($oldStart > $now){
+			if($start > $now){
 				if($data["tipo"] === "cita"){
 					$update = $this->calendarioModel->onDropAppointment($data);
 				}

@@ -4,77 +4,69 @@ defined('BASEPATH') or exit('No direct script access allowed');
 class CalendarioModel extends CI_Model
 {
 
-    public function getOccupied($year, $month, $id_usuario)
+    public function getOccupied($year, $month, $id_usuario, $dates)
     {
-        $month_1 = ($month - 1) === 0 ? 12 : ($month - 1);
-        $month_2 = ($month + 1) > 12 ? 1 : ($month + 1);
-        
-        $year_1 =  intval($month) === 1 ? $year - 1 : $year;
-        $year_2 =  intval($month) === 12 ? $year + 1 : $year;
-        
         $query = $this->db->query(
-            "SELECT 
-                idUnico as id, 
-                titulo as title,
-                concat(fechaOcupado, ' ', horaInicio) as 'start',
-                concat(fechaOcupado, ' ', horaFinal) as 'end',
-                fechaOcupado AS occupied,
-                'red' AS 'color'
-                    FROM 
-                        horariosOcupados
-                    WHERE
-                        YEAR(fechaOcupado) in(?, ?)
-                    AND
-                        MONTH(fechaOcupado) in (?, ?, ?)
-                    AND
-                        idEspecialista = ?
-                    AND 
-                        estatus = ?",
-            array(
-                $year_1,
-                $year_2,
-                $month_1,
-                $month,
-                $month_2,
-                $id_usuario,
-                1
-            )
+            "SELECT idUnico as id, titulo as title, concat(fechaOcupado, ' ', horaInicio) as 'start', concat(fechaOcupado, ' ', horaFinal) as 'end',
+            fechaOcupado AS occupied, 'red' AS 'color'
+            FROM horariosOcupados 
+            WHERE YEAR(fechaOcupado) in(?, ?) 
+            AND MONTH(fechaOcupado) in (?, ?, ?)
+            AND idEspecialista = ?  
+            AND estatus = ?",
+            array( $dates["year_1"], $dates["year_2"], $dates["month_1"], $month, $dates["month_2"], $id_usuario, 1 )
         );
 
         $query_citas = $this->db->query(
-            "SELECT
-                CAST(idCita AS VARCHAR(36))  AS id, 
-                observaciones AS title,
-                fechaInicio AS 'start',
-                fechaFinal AS 'end',
-                fechaInicio AS occupied,
-                'green' AS 'color',
-                'cita' AS 'type'
-                    FROM 
-                        citas
-                    WHERE
-                        YEAR(fechaInicio) = ?
-                    AND
-                        MONTH(fechaInicio) = ?
-                    AND
-                        idEspecialista = ?
-                    AND 
-                        estatus = ?",
-            array(
-                $year,
-                $month,
-                $id_usuario,
-                1
-            )
+            "SELECT CAST(idCita AS VARCHAR(36))  AS id,  observaciones AS title, fechaInicio AS 'start', fechaFinal AS 'end', 
+            fechaInicio AS occupied, 'green' AS 'color', 'cita' AS 'type'
+            FROM citas
+            WHERE YEAR(fechaInicio) = ?
+            AND MONTH(fechaInicio) = ?
+            AND idEspecialista = ?
+            AND estatus = ?",
+            array( $year, $month, $id_usuario, 1 )
         );
 
         if ($query->num_rows() > 0 || $query_citas->num_rows() > 0) {
             $data["events"] = array_merge($query->result(), $query_citas->result());
-        } else {
+        } 
+        else {
             $data["events"] = array('');
         }
 
         return $data;
+    }
+
+    public function get1($year, $month, $id_usuario, $dates)
+    {
+        $query = $this->db->query(
+            "SELECT idUnico as id, titulo as title, concat(fechaOcupado, ' ', horaInicio) as 'start', concat(fechaOcupado, ' ', horaFinal) as 'end',
+            fechaOcupado AS occupied, 'red' AS 'color'
+            FROM horariosOcupados 
+            WHERE YEAR(fechaOcupado) in(?, ?) 
+            AND MONTH(fechaOcupado) in (?, ?, ?)
+            AND idEspecialista = ?  
+            AND estatus = ?",
+            array( $dates["year_1"], $dates["year_2"], $dates["month_1"], $month, $dates["month_2"], $id_usuario, 1 )
+        );
+        return $query;
+    }
+
+    public function get2($year, $month, $id_usuario, $dates)
+    {
+        $query = $this->db->query(
+            "SELECT CAST(idCita AS VARCHAR(36))  AS id,  observaciones AS title, fechaInicio AS 'start', fechaFinal AS 'end', 
+            fechaInicio AS occupied, 'green' AS 'color', 'cita' AS 'type'
+            FROM citas
+            WHERE YEAR(fechaInicio) = ?
+            AND MONTH(fechaInicio) = ?
+            AND idEspecialista = ?
+            AND estatus = ?",
+            array( $year, $month, $id_usuario, 1 )
+        );
+
+        return $query;
     }
 
     public function saveOccupied($data)
@@ -129,22 +121,10 @@ class CalendarioModel extends CI_Model
             if ($check_occupied->num_rows() > 0 || $check_appointment->num_rows() > 0) {
                 $data["status"] = false;
                 $data["message"] = "El horario ya ha sido ocupado";
-            } else {
+            } 
+            else {
                 $query = $this->db->query(
-                    "INSERT 
-                        INTO 
-                            horariosOcupados 
-                                (
-                                    fechaOcupado, 
-                                    horaInicio, 
-                                    horaFinal, 
-                                    idEspecialista, 
-                                    creadoPor, 
-                                    fechaModificacion, 
-                                    fechaCreacion, 
-                                    titulo, 
-                                    idUnico
-                                )
+                    "INSERT INTO horariosOcupados (fechaOcupado, horaInicio, horaFinal, idEspecialista, creadoPor, fechaModificacion, fechaCreacion, titulo, idUnico)
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     array(
                         $data["fecha"],
@@ -162,12 +142,14 @@ class CalendarioModel extends CI_Model
                 if ($this->db->affected_rows() > 0) {
                     $data["status"] = true;
                     $data["message"] = "Se ha guardado el horario";
-                } else {
+                } 
+                else {
                     $data["status"] = false;
                     $data["message"] = "Error al guardar el horario";
                 }
             }
-        } catch (Exception $e) {
+        } 
+        catch (Exception $e) {
             $data["status"] = false;
             $data["message"] = "Error al guardar eh horario";
         }
@@ -335,8 +317,7 @@ class CalendarioModel extends CI_Model
                 "SELECT *FROM citas WHERE
                                 ((fechaInicio BETWEEN ? AND ?)
                                 OR (fechaFinal BETWEEN ? AND ?)
-                                OR (? BETWEEN fechaInicio AND fechaFinal)
-                                OR (? BETWEEN fechaInicio AND fechaFinal))
+                                O R (? BETWEEN fechaInicio AND fechaFinal))
                         AND idEspecialista = ?
                         AND idPaciente = ?
                         AND estatus = ?",
