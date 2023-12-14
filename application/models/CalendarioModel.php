@@ -306,7 +306,8 @@ class CalendarioModel extends CI_Model
     
     public function getBeneficiosPorSede($sede)
 	{
-        $query = $this->db->query("SELECT DISTINCT  u.puesto as id, p.puesto
+        $query = $this->db->query(
+            "SELECT DISTINCT u.puesto as id, p.puesto
             FROM usuarios AS u 
             RIGHT JOIN atencionXSede AS AXS ON AXS.idEspecialista = U.idUsuario
             INNER JOIN opcionesPorCatalogo AS oxc ON oxc.idOpcion= axs.tipoCita
@@ -315,14 +316,16 @@ class CalendarioModel extends CI_Model
             INNER JOIN puestos AS p ON p.idPuesto = u.puesto
             FULL JOIN sedes AS se ON se.idSede = o.idSede
             WHERE u.estatus = 1 AND s.estatus = 1 AND axs.estatus = 1  AND u.idRol = 3 AND oxc.idCatalogo = 5
-            and axs.idSede = ?", $sede);
+            and axs.idSede = ?", $sede
+        );
 
-        return $query->result();
+        return $query;
 	}
 
     public function getEspecialistaPorBeneficioYSede($sede, $beneficio)
     {
-        $query = $this->db->query("SELECT u.idUsuario as id, u.nombre AS especialista
+        $query = $this->db->query(
+            "SELECT u.idUsuario as id, u.nombre AS especialista
             FROM usuarios AS u 
             RIGHT JOIN atencionXSede AS AXS ON AXS.idEspecialista = U.idUsuario
             INNER JOIN opcionesPorCatalogo AS oxc ON oxc.idOpcion= axs.tipoCita
@@ -331,14 +334,16 @@ class CalendarioModel extends CI_Model
             INNER JOIN puestos AS p ON p.idPuesto = u.puesto
             FULL JOIN sedes AS se ON se.idSede = o.idSede
             WHERE u.estatus = 1 AND s.estatus = 1 AND axs.estatus = 1  AND u.idRol = 3 AND oxc.idCatalogo = 5
-            AND axs.idSede = ? AND u.puesto = ?", array($sede, $beneficio));
+            AND axs.idSede = ? AND u.puesto = ?", array($sede, $beneficio)
+        );
 
-        return $query->result();
+        return $query;
     }
 
     public function getModalidadesEspecialista($sede, $especialista)
     {
-        $query = $this->db->query("SELECT u.idUsuario as id, u.puesto as idPuesto, p.puesto, u.nombre AS especilista,
+        $query = $this->db->query(
+            "SELECT u.idUsuario as id, u.puesto as idPuesto, p.puesto, u.nombre AS especilista,
             axs.idAtencionXSede, axs.idSede AS idSedeAtiende, se.sede as lugarAtiende, axs.idOficina as oficinaAtiende, 
             axs.tipoCita, oxc.nombre AS modalidad, o.ubicación as ubicacionOficina
             FROM usuarios AS u 
@@ -351,9 +356,8 @@ class CalendarioModel extends CI_Model
             WHERE u.estatus = 1 AND s.estatus = 1 AND axs.estatus = 1  AND u.idRol = 3 AND oxc.idCatalogo = 5
             AND axs.idSede = ? AND u.idUsuario = ?", array($sede, $especialista));
 
-        return $query->result();
+        return $query;
     }
-}
 
     public function createAppointment($data)
     {

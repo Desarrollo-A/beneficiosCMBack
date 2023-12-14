@@ -6,6 +6,7 @@ class CalendarioController extends CI_Controller{
 		parent::__construct();
 
         $this->load->model('calendarioModel');
+		$this->load->model('generalModel');
 		$this->load->library('session');
 		date_default_timezone_set('America/Mexico_City');
 	}
@@ -70,15 +71,13 @@ class CalendarioController extends CI_Controller{
 		$oldStart = $data["oldStart"];
 		$start = $data["start"];
 		// Obtén la zona horaria actual
-$currentTimeZone = new DateTimeZone('America/Mexico_City');
+		$currentTimeZone = new DateTimeZone('America/Mexico_City');
 
-// Crea un objeto DateTime con la zona horaria actual
-$currentDateTime = new DateTime('now', $currentTimeZone);
+		// Crea un objeto DateTime con la zona horaria actual
+		$currentDateTime = new DateTime('now', $currentTimeZone);
 
-// Imprime el offset de la zona horaria actual
-$offset = $currentDateTime->format('Y/m/d');
-
-
+		// Imprime el offset de la zona horaria actual
+		$offset = $currentDateTime->format('Y/m/d');
 		
 		if($oldStart > $offset){
 			if($start > $offset){
@@ -116,11 +115,11 @@ $offset = $currentDateTime->format('Y/m/d');
 	}
 
 	public function getBeneficiosPorSede(){
-		$sede = $this->input->post('sede');
+		$sede = $this->input->post('dataValue[sede]');
 		
 		$response['result'] = isset($sede);
 		if ($response['result']) {
-			$rs = $this->calendarioModel->getBeneficiosPorSede($sede);
+			$rs = $this->calendarioModel->getBeneficiosPorSede($sede)->result();
 			$data['result'] = count($rs) > 0; 
 			if ($data['result']) {
 				$response['msg'] = '¡Listado de beneficios cargado exitosamente!';
@@ -137,12 +136,12 @@ $offset = $currentDateTime->format('Y/m/d');
 	}
 
 	public function getEspecialistaPorBeneficioYSede(){
-		$sede = $this->input->post('sede');
-		$beneficio = $this->input->post('beneficio');
+		$sede = $this->input->post('dataValue[sede]');
+		$beneficio = $this->input->post('dataValue[beneficio]');
 
 		$response['result'] = isset($sede, $beneficio);
 		if ($response['result']) {
-			$rs = $this->calendarioModel->getEspecialistaPorBeneficioYSede($sede, $beneficio);
+			$rs = $this->calendarioModel->getEspecialistaPorBeneficioYSede($sede, $beneficio)->result();
 			$data['result'] = count($rs) > 0; 
 			if ($data['result']) {
 				$response['msg'] = '¡Listado de especialistas cargado exitosamente!';
@@ -159,12 +158,12 @@ $offset = $currentDateTime->format('Y/m/d');
 	}
 
 	public function getModalidadesEspecialista(){
-		$sede = $this->input->post('sede');
-		$especialista = $this->input->post('especialista');
+		$sede = $this->input->post('dataValue[sede]');
+		$especialista = $this->input->post('dataValue[especialista]');
 
 		$response['result'] = isset($sede, $especialista);
 		if ($response['result']) {
-			$rs = $this->calendarioModel->getModalidadesEspecialista($sede, $especialista);
+			$rs = $this->calendarioModel->getModalidadesEspecialista($sede, $especialista)->result();
 			$data['result'] = count($rs) > 0; 
 			if ($data['result']) {
 				$response['msg'] = '¡Listado de modalidades cargado exitosamente!';
@@ -179,4 +178,5 @@ $offset = $currentDateTime->format('Y/m/d');
 		$this->output->set_content_type("application/json");
         $this->output->set_output(json_encode($response));
 	}
+
 }
