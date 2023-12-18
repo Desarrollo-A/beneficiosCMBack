@@ -69,7 +69,7 @@ class CalendarioModel extends CI_Model
                 $dataValue["fecha_ocupado"], $hora_inicio_suma, $hora_final_resta,
                 $dataValue["fecha_ocupado"], $hora_inicio_suma,
                 $dataValue["fecha_ocupado"], $hora_final_resta,
-                $dataValue["id_unico"],
+                $dataValue["id"],
                 $dataValue["id_usuario"],
                 1
             )
@@ -92,7 +92,7 @@ class CalendarioModel extends CI_Model
                 $fecha_inicio_suma, $fecha_final_resta,
                 $fecha_inicio_suma,
                 $fecha_final_resta,
-                $dataValue["id_especialista"],
+                $dataValue["id_usuario"],
                 1
             )
         );
@@ -140,185 +140,5 @@ class CalendarioModel extends CI_Model
     {
         print_r($this->session->userdata('id_usuario'));
         exit;
-    }
-
-    public function onDropAppointment($data)
-    {
-        $fecha_final_resta = date('Y/m/d H:i:s', strtotime($data["fechaFinal"] . '-1 minute'));
-        $fecha_inicio_suma = date('Y/m/d H:i:s', strtotime($data["fechaInicio"] . '+1 minute'));
-
-        $hora_final_resta = date('H:i:s', strtotime($data["fechaFinal"] . '-1 minute'));
-        $hora_inicio_suma = date('H:i:s', strtotime($data["fechaInicio"] . '+1 minute'));
-
-        $fechaOcupado = date('Y/m/d', strtotime($data["fechaInicio"]));
-
-        $fecha_final = date('Y/m/d H:i:s', strtotime($data["fechaFinal"]));
-        $fecha_inicio = date('Y/m/d H:i:s', strtotime($data["fechaInicio"]));
-
-        try {
-            $check_occupied = $this->db->query(
-                "SELECT *FROM horariosOcupados WHERE 
-                                ((fechaOcupado = ? AND horaInicio BETWEEN ? AND ?) 
-                                OR (fechaOcupado = ? AND horaFinal BETWEEN ? AND ?)
-                                OR (fechaOcupado = ? AND ? BETWEEN horaInicio AND horaFinal) 
-                                OR (fechaOcupado = ? AND ? BETWEEN horaInicio AND horaFinal))
-                        AND idEspecialista = ?
-                        AND estatus = ?",
-                array(
-                    $fechaOcupado, $hora_inicio_suma, $hora_final_resta,
-                    $fechaOcupado, $hora_inicio_suma, $hora_final_resta,
-                    $fechaOcupado, $hora_inicio_suma,
-                    $fechaOcupado, $hora_final_resta,
-                    $data["idEspecialista"],
-                    1
-                )
-            );
-
-            $check_appointment = $this->db->query(
-                "SELECT *FROM citas WHERE
-                (
-                    (fechaInicio BETWEEN ? AND ?)
-                    OR (fechaFinal BETWEEN ? AND ?)
-                    OR (? BETWEEN fechaInicio AND fechaFinal)
-                    OR (? BETWEEN fechaInicio AND fechaFinal)
-                )
-                    AND idEspecialista = ?
-                    AND estatus = 1",
-                array(
-                    $fecha_inicio_suma, $fecha_final_resta,
-                    $fecha_inicio_suma, $fecha_final_resta,
-                    $fecha_inicio_suma,
-                    $fecha_final_resta,
-                    $data["idEspecialista"],
-                )
-            );
-
-            if ($check_appointment->num_rows() > 0 || $check_occupied->num_rows() > 0) {
-                $data["status"] = false;
-                $data["message"] = "El horario ya ha sido ocupado";
-            } 
-            else {
-                $this->db->query(
-                    "UPDATE 
-                        citas 
-                        SET 
-                            fechaInicio = ?,
-                            fechaFinal = ? 
-                        WHERE
-                            idCita = ?",
-                    array(
-                        $fecha_inicio,
-                        $fecha_final,
-                        $data["id"]
-                    )
-                );
-
-                if ($this->db->affected_rows() > 0) {
-                    $data["status"] = true;
-                    $data["message"] = "Se ha guardado el horario";
-                } else {
-                    $data["status"] = false;
-                    $data["message"] = "No se ha guardado el horario";
-                }
-            }
-        }
-        catch (Exception $e) {
-            $data["status"] = false;
-            $data["message"] = "Error al guardar";
-        }
-
-        return $data;
-    }
-
-    public function onDropOccupied($data)
-    {
-        $hora_final_resta = date('H:i:s', strtotime($data["fechaFinal"] . '-1 minute'));
-        $hora_inicio_suma = date('H:i:s', strtotime($data["fechaInicio"] . '+1 minute'));
-
-        $hora_final = date('H:i:s', strtotime($data["fechaFinal"]));
-        $hora_inicio = date('H:i:s', strtotime($data["fechaInicio"]));
-        $fecha = date('Y/m/d ', strtotime($data["fechaInicio"]));
-        
-        $fecha_final_resta = date('Y/m/d H:i:s', strtotime($data["fechaFinal"] . '-1 minute'));
-        $fecha_inicio_suma = date('Y/m/d H:i:s', strtotime($data["fechaInicio"] . '+1 minute'));
-
-        try {
-            $check_occupied = $this->db->query(
-                "SELECT *FROM horariosOcupados WHERE 
-                (
-                    (horaInicio BETWEEN ? AND ?)
-                    OR (horaFinal BETWEEN ? AND ?)
-                    OR (? BETWEEN horaInicio AND horaFinal) 
-                    OR (? BETWEEN horaInicio AND horaFinal)
-                )
-                    AND fechaOcupado = ?
-                    AND idEspecialista = ?
-                    AND estatus = ?",
-                array(
-                    $hora_inicio_suma, $hora_final_resta,
-                    $hora_inicio_suma, $hora_final_resta,
-                    $hora_inicio_suma,
-                    $hora_final_resta,
-                    $fecha,
-                    $data["idEspecialista"],
-                    1
-                )
-            );
-
-            $check_appointment = $this->db->query(
-                "SELECT *FROM citas WHERE
-                (
-                    (fechaInicio BETWEEN ? AND ?)
-                    OR (fechaFinal BETWEEN ? AND ?)
-                    OR (? BETWEEN fechaInicio AND fechaFinal)
-                    OR (? BETWEEN fechaInicio AND fechaFinal)
-                )
-                    AND idEspecialista = ?
-                    AND estatus = 1",
-                array(
-                    $fecha_inicio_suma, $fecha_final_resta,
-                    $fecha_inicio_suma, $fecha_final_resta,
-                    $fecha_inicio_suma,
-                    $fecha_final_resta,
-                    $data["idEspecialista"],
-                )
-            );
-
-            if ($check_occupied->num_rows() > 0 || $check_appointment->num_rows() > 0) {
-                $data["status"] = false;
-                $data["message"] = "El horario ya ha sido ocupado";
-            } else {
-                $this->db->query(
-                    "UPDATE 
-                                    horariosOcupados 
-                                        SET 
-                                            fechaOcupado = ?,
-                                            horaInicio = ?,
-                                            horaFinal = ? 
-                                        WHERE
-                                            idUnico = ?
-                                        ",
-                    array(
-                        $fecha,
-                        $hora_inicio,
-                        $hora_final,
-                        $data["id"]
-                    )
-                );
-
-                if ($this->db->affected_rows() > 0) {
-                    $data["status"] = true;
-                    $data["message"] = "Se ha guardado el horario";
-                } else {
-                    $data["status"] = false;
-                    $data["message"] = "No se ha guardado el horario";
-                }
-            }
-        } catch (Exception $e) {
-            $data["status"] = false;
-            $data["message"] = "Error al guardar";
-        }
-
-        return $data;
-    }
+    }  
 }

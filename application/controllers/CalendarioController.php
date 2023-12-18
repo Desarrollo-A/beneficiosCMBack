@@ -10,26 +10,6 @@ class CalendarioController extends CI_Controller{
 		$this->load->library('session');
 		date_default_timezone_set('America/Mexico_City');
 	}
-
-	public function getOccupied(){
-
-		$data = $this->input->post("dataValue", true);
-		$year = $data["year"];
-		$month = $data["month"];
-		$id_usuario = $data["idUsuario"];
-
-		$dates = [
-			"month_1" => $month_1 = ($month - 1) === 0 ? 12 : ($month - 1),
-        	"month_2" => $month_2 = ($month + 1) > 12 ? 1 : ($month + 1),
-        	"year_1" => $year_1 =  intval($month) === 1 ? $year - 1 : $year,
-        	"year_2" => $year_2 =  intval($month) === 12 ? $year + 1 : $year
-		];
-		
-		$data = $this->calendarioModel->getOccupied($year, $month, $id_usuario, $dates);
-
-		$this->output->set_content_type('application/json');
-		$this->output->set_output(json_encode($data));
-	}
 	
 	public function getAllEvents(){
 
@@ -87,23 +67,23 @@ class CalendarioController extends CI_Controller{
 				$addRecord = $this->generalModel->addRecord("horariosOcupados", $values);
 
 				if ($addRecord) {
-                    $data["status"] = true;
-                    $data["message"] = "Se ha guardado el horario";
+                    $data["result"] = true;
+                    $data["msg"] = "Se ha guardado el horario";
                 } 
                 else {
-                    $data["status"] = false;
-                    $data["message"] = "Error al guardar el horario";
+                    $data["result"] = false;
+                    $data["msg"] = "Error al guardar el horario";
                 }
 			}
 			else{
-				$data["status"] = false;
-				$data["message"] = "El horario ya ha sido ocupado";
+				$data["result"] = false;
+				$data["msg"] = "El horario ya ha sido ocupado";
 			}
 
 		}
 		catch(Exception $e){
-			$data["status"] = false;
-            $data["message"] = "Error al guardar eh horario";
+			$data["result"] = false;
+            $data["msg"] = "Error";
 		}
 
 		$this->output->set_content_type('application/json');
@@ -112,7 +92,6 @@ class CalendarioController extends CI_Controller{
 
 	public function updateOccupied(){
 		$dataValue = $this->input->post("dataValue", true);
-		$idUnico = $dataValue["id_unico"];
 		$start = $dataValue["start"]; // datos para la validación de no mover una eveneto pasado de su dia
 		$oldStart = $dataValue["oldStart"];
 		$current = new DateTime();
@@ -125,14 +104,14 @@ class CalendarioController extends CI_Controller{
         $fecha_inicio_suma = date('Y/m/d H:i:s', strtotime($dataValue["fecha_inicio"] . '+1 minute'));
 
 		if($start < $now){
-			$reponse["status"] = false;
-			$response["message"] = "No se pueden mover las fechas a un dia anterior o actual";
+			$reponse["result"] = false;
+			$response["msg"] = "No se pueden mover las fechas a un dia anterior o actual";
 			return;
 		}
 		
 		if($oldStart < $now){
-			$response["status"] = false;
-			$response["message"] = "Las citas u horarios pasados no se pueden mover";
+			$response["result"] = false;
+			$response["msg"] = "Las citas u horarios pasados no se pueden mover";
 			return;
 		}
 
@@ -149,24 +128,24 @@ class CalendarioController extends CI_Controller{
 			$check_appointment = $this->calendarioModel->checkAppointment($dataValue, $fecha_inicio_suma, $fecha_final_resta);
 
 			if ($check_occupiedId->num_rows() > 0 || $check_appointment->num_rows() > 0) {
-                $response["status"] = false;
-                $response["message"] = "El horario ya ha sido ocupado";
+                $response["result"] = false;
+                $response["msg"] = "El horario ya ha sido ocupado";
             } 
 			else {
-				$updateRecord = $this->generalModel->updateRecord("horariosOcupados", $values, "idUnico", $dataValue["id_unico"]);
+				$updateRecord = $this->generalModel->updateRecord("horariosOcupados", $values, "idUnico", $dataValue["id"]);
 
                 if ($updateRecord) {
-                    $response["status"] = true;
-                    $response["message"] = "Se ha guardado el horario";
+                    $response["result"] = true;
+                    $response["msg"] = "Se ha guardado el horario";
                 } else {
-                    $response["status"] = false;
-                    $response["message"] = "Error al guardar el horario";
+                    $response["result"] = false;
+                    $response["msg"] = "Error al guardar el horario";
                 }
             }
 		}
 		catch(EXCEPTION $e){
-			$response["status"] = false;
-            $response["message"] = "Error en la consulta: " . $e->getMessage();
+			$response["result"] = false;
+            $response["msg"] = "Error";
 		}
 
 		$this->output->set_content_type('application/json');
@@ -183,11 +162,11 @@ class CalendarioController extends CI_Controller{
 		$updateRecord = $this->generalModel->updateRecord("horariosOcupados", $values, "idUnico", $id_unico);
 
 		if ($updateRecord) {
-            $response["status"] = true;
-            $response["message"] = "Se ha eliminado el horario";
+            $response["result"] = true;
+            $response["msg"] = "Se ha eliminado el horario";
         } else {
-            $response["status"] = false;
-            $response["message"] = "No se puede eliminar el horario";
+            $response["result"] = false;
+            $response["msg"] = "No se puede eliminar el horario";
         }
 
 		$this->output->set_content_type('application/json');
@@ -220,25 +199,25 @@ class CalendarioController extends CI_Controller{
 			$check_occupied = $this->calendarioModel->checkOccupied($dataValue, $hora_inicio_suma, $hora_final_resta);
 
 			if ($check_appointment->num_rows() > 0 || $check_occupied->num_rows() > 0) {
-                $response["status"] = false;
-                $response["message"] = "El horario ya ha sido ocupado";
+                $response["result"] = false;
+                $response["msg"] = "El horario ya ha sido ocupado";
             } 
 			else {
 				$addRecord = $this->generalModel->addRecord("citas", $values);
 
                 if ($addRecord) {
-                    $response["status"] = true;
-                    $response["message"] = "Se ha agendado a cita";
+                    $response["result"] = true;
+                    $response["msg"] = "Se ha agendado a cita";
                 } 
 				else {
-                    $response["status"] = false;
-                    $response["message"] = "No se ha guardado la cita";
+                    $response["result"] = false;
+                    $response["msg"] = "No se ha guardado la cita";
                 }
             }
 		}
 		catch(EXCEPTION $e){
-			$response["status"] = false;
-            $response["message"] = "Error al guardar la cita";
+			$response["result"] = false;
+            $response["msg"] = "Error";
 		}
 
 		$this->output->set_content_type("application/json");
@@ -255,45 +234,141 @@ class CalendarioController extends CI_Controller{
 		$updateRecord = $this->generalModel->updateRecord("citas", $values, "idCita", $id);
 
 		if ($updateRecord) {
-            $response["status"] = true;
-            $response["message"] = "Se ha cancelado la cita";
-        } else {
-            $response["status"] = false;
-            $response["message"] = "No se puede cancelar la cita";
+            $response["result"] = true;
+            $response["msg"] = "Se ha cancelado la cita";
+        } 
+		else {
+            $response["result"] = false;
+            $response["msg"] = "No se puede cancelar la cita";
         }
 
 		$this->output->set_content_type("application/json");
 		$this->output->set_output(json_encode($response));
 	}
 
-	function update_on_drop(){
-		$data = $this->input->post("dataValue", true);
-		$oldStart = $dataValue["oldStart"];
-		$start = $dataValue["start"];
+	function appointmentDrop(){
+		$dataValue = $this->input->post("dataValue", true);
+		$start = $dataValue["start"]; // datos para la validación de no mover una eveneto pasado de su dia
+		$oldStart = $dataValue["old_start"];
 		$current = new DateTime();
 		$now = $current->format('Y/m/d');
-		
-		if($oldStart > $now){
-			if($start > $now){
-				if($data["tipo"] === "cita"){
-					$update = $this->calendarioModel->onDropAppointment($data);
-				}
-				else{
-					$update = $this->calendarioModel->onDropOccupied($data);
-				}
-			}
-			else{
-				$update["status"] = false;
-				$update["message"] = "No se pueden mover las fechas a un dia anterior o actual";
-			}
-		}
-		else{
-			$update["status"] = false;
-			$update["message"] = "Las citas u horarios pasados no se pueden mover";
-		} 
 
-		$this->output->set_content_type("application/json");
-		$this->output->set_output(json_encode($update));
+        $fecha_final_resta = date('Y/m/d H:i:s', strtotime($dataValue["fecha_final"] . '-1 minute'));
+        $fecha_inicio_suma = date('Y/m/d H:i:s', strtotime($dataValue["fecha_inicio"] . '+1 minute'));
+
+        $hora_final_resta = date('H:i:s', strtotime($dataValue["fecha_final"] . '-1 minute'));
+        $hora_inicio_suma = date('H:i:s', strtotime($dataValue["fecha_inicio"] . '+1 minute'));
+
+		if($start < $now){
+			$reponse["result"] = false;
+			$response["msg"] = "No se pueden mover las fechas a un dia anterior o actual";
+			return;
+		}
+		
+		if($oldStart < $now){
+			$response["result"] = false;
+			$response["msg"] = "Las citas u horarios pasados no se pueden mover";
+			return;
+		}
+
+		try{
+			$values = [
+				"fechaInicio" => $dataValue["fecha_inicio"],
+				"fechaFinal" => $dataValue["fecha_final"],
+				"fechaModificacion" => $now,
+				"modificadoPor" => $dataValue["id_usuario"]
+			];
+			
+			$check_occupied = $this->calendarioModel->checkOccupied($dataValue, $hora_inicio_suma ,$hora_final_resta);
+			$check_appointment = $this->calendarioModel->checkAppointment($dataValue, $fecha_inicio_suma, $fecha_final_resta);
+
+			if ($check_occupied->num_rows() > 0 || $check_appointment->num_rows() > 0) {
+                $response["result"] = false;
+                $response["msg"] = "El horario ya ha sido ocupado";
+            } 
+			else {
+				$updateRecord = $this->generalModel->updateRecord("citas", $values, "idCita", $dataValue["id"]);
+
+                if ($updateRecord) {
+                    $response["result"] = true;
+                    $response["msg"] = "Se ha guardado la cita";
+                } else {
+                    $response["result"] = false;
+                    $response["msg"] = "Error al guardar la cita";
+                }
+            }
+		}
+		catch(EXCEPTION $e){
+			$response["result"] = false;
+            $response["msg"] = "Error";
+		}
+
+		$this->output->set_content_type('application/json');
+		$this->output->set_output(json_encode($response));
+	}
+
+	function occupiedDrop(){
+		$dataValue = $this->input->post("dataValue", true);
+		$start = $dataValue["start"]; // datos para la validación de no mover una eveneto pasado de su dia
+		$oldStart = $dataValue["old_start"];
+		$current = new DateTime();
+		$now = $current->format('Y/m/d');
+
+        $fecha_final_resta = date('Y/m/d H:i:s', strtotime($dataValue["fecha_final"] . '-1 minute'));
+        $fecha_inicio_suma = date('Y/m/d H:i:s', strtotime($dataValue["fecha_inicio"] . '+1 minute'));
+
+        $hora_final_resta = date('H:i:s', strtotime($dataValue["fecha_final"] . '-1 minute'));
+        $hora_inicio_suma = date('H:i:s', strtotime($dataValue["fecha_inicio"] . '+1 minute'));
+
+		$hora_final = date('H:i:s', strtotime($dataValue["fecha_final"]));
+        $hora_inicio = date('H:i:s', strtotime($dataValue["fecha_inicio"]));
+
+		if($start < $now){
+			$reponse["result"] = false;
+			$response["msg"] = "No se pueden mover las fechas a un dia anterior o actual";
+			return;
+		}
+		
+		if($oldStart < $now){
+			$response["result"] = false;
+			$response["msg"] = "Las citas u horarios pasados no se pueden mover";
+			return;
+		}
+
+		try{
+			$values = [
+				"fechaOcupado" => $dataValue["fecha"],
+				"horaInicio" => $hora_inicio,
+				"horaFinal" => $hora_final,
+				"fechaModificacion" => $now
+			];
+			
+			$check_occupied = $this->calendarioModel->checkOccupied($dataValue, $hora_inicio_suma ,$hora_final_resta);
+			$check_appointment = $this->calendarioModel->checkAppointment($dataValue, $fecha_inicio_suma, $fecha_final_resta);
+
+			if ($check_occupied->num_rows() > 0 || $check_appointment->num_rows() > 0) {
+                $response["result"] = false;
+                $response["msg"] = "El horario ya ha sido ocupado";
+            } 
+			else {
+				$updateRecord = $this->generalModel->updateRecord("horariosOcupados", $values, "idUnico", $dataValue["id"]);
+
+                if ($updateRecord) {
+                    $response["result"] = true;
+                    $response["msg"] = "Se ha guardado la cita";
+                } else {
+                    $response["result"] = false;
+                    $response["msg"] = "Error al guardar la cita";
+                }
+            }
+		}
+		catch(EXCEPTION $e){
+			$response["result"] = false;
+            $response["msg"] = "Error";
+		}
+
+		$this->output->set_content_type('application/json');
+		$this->output->set_output(json_encode($response));
 	}
 
 	function getBeneficiosDisponibles(){
