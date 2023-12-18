@@ -3,6 +3,35 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class CalendarioModel extends CI_Model
 {
+    public function getAppointment($year, $month, $id_usuario, $dates){
+        $query = $this->db->query(
+            "SELECT CAST(idCita AS VARCHAR(36))  AS id,  observaciones AS title, fechaInicio AS 'start', fechaFinal AS 'end', 
+            fechaInicio AS occupied, 'green' AS 'color', 'cita' AS 'type'
+            FROM citas
+            WHERE YEAR(fechaInicio) = ?
+            AND MONTH(fechaInicio) = ?
+            AND idEspecialista = ?
+            AND estatus = ?",
+            array( $year, $month, $id_usuario, 1 )
+        );
+
+        return $query;
+    }
+
+    public function getAppointmentsByUser($year, $month, $id_usuario){
+        $query = $this->db->query(
+            "SELECT CAST(idCita AS VARCHAR(36)) AS id, observaciones AS title, fechaInicio AS 'start', fechaFinal AS 'end', 
+            fechaInicio AS occupied, estatus 
+            FROM citas
+            WHERE YEAR(fechaInicio) = ?
+            AND MONTH(fechaInicio) = ?
+            AND idPaciente = ?
+            AND estatus = ?",
+            array( $year, $month, $id_usuario, 1 )
+        );
+
+        return $query;
+    }
 
     public function getOccupied($year, $month, $id_usuario)
     {

@@ -120,8 +120,8 @@ class CalendarioController extends CI_Controller{
 		$response['result'] = isset($sede);
 		if ($response['result']) {
 			$rs = $this->calendarioModel->getBeneficiosPorSede($sede)->result();
-			$data['result'] = count($rs) > 0; 
-			if ($data['result']) {
+			$response['result'] = count($rs) > 0; 
+			if ($response['result']) {
 				$response['msg'] = '¡Listado de beneficios cargado exitosamente!';
 				$response['data'] = $rs; 
 			}else {
@@ -142,8 +142,8 @@ class CalendarioController extends CI_Controller{
 		$response['result'] = isset($sede, $beneficio);
 		if ($response['result']) {
 			$rs = $this->calendarioModel->getEspecialistaPorBeneficioYSede($sede, $beneficio)->result();
-			$data['result'] = count($rs) > 0; 
-			if ($data['result']) {
+			$response['result'] = count($rs) > 0; 
+			if ($response['result']) {
 				$response['msg'] = '¡Listado de especialistas cargado exitosamente!';
 				$response['data'] = $rs; 
 			}else {
@@ -164,8 +164,8 @@ class CalendarioController extends CI_Controller{
 		$response['result'] = isset($sede, $especialista);
 		if ($response['result']) {
 			$rs = $this->calendarioModel->getModalidadesEspecialista($sede, $especialista)->result();
-			$data['result'] = count($rs) > 0; 
-			if ($data['result']) {
+			$response['result'] = count($rs) > 0; 
+			if ($response['result']) {
 				$response['msg'] = '¡Listado de modalidades cargado exitosamente!';
 				$response['data'] = $rs; 
 			}else {
@@ -175,6 +175,29 @@ class CalendarioController extends CI_Controller{
             $response['msg'] = "¡Parametros invalidos!";
         }
 
+		$this->output->set_content_type("application/json");
+        $this->output->set_output(json_encode($response));
+	}
+
+	public function getAppointmentsByUser() {
+		$year = $this->input->post('dataValue[year]');
+		$month = $this->input->post('dataValue[month]');
+		$idUsuario = $this->input->post('dataValue[idUsuario]');
+
+		$response['result'] = isset($year, $month, $idUsuario);
+		if ($response['result']) {
+			$rs = $this->calendarioModel->getAppointmentsByUser($year, $month, $idUsuario)->result();
+			$response['result'] = count($rs) > 0; 
+			if ($response['result']) {
+				$response['msg'] = '¡Listado de citas cargadas exitosamente!';
+				$response['data'] = $rs; 
+			}else {
+				$response['msg'] = '¡No existen registros!';
+			}
+		}else {
+			$response['msg'] = "¡Parametros invalidos!";
+		}
+		
 		$this->output->set_content_type("application/json");
         $this->output->set_output(json_encode($response));
 	}
