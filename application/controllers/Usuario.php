@@ -154,7 +154,9 @@ class Usuario extends CI_Controller {
 	}
 
 	public function getNameUser(){
-		$rs = $this->usuariosModel->getNameUser();
+		$idEspecialista = $this->input->post("dataValue", true);
+
+		$rs = $this->usuariosModel->getNameUser($idEspecialista);
 		$data['result'] = count($rs) > 0; 
 		if ($data['result']) {
 			$data['msg'] = '¡Listado de usuarios cargado exitosamente!';
