@@ -8,7 +8,7 @@ class CalendarioModel extends CI_Model
             "SELECT idUnico as id, titulo as title, concat(fechaOcupado, ' ', horaInicio) as 'start', concat(fechaOcupado, ' ', horaFinal) as 'end',
             fechaOcupado AS occupied, 'red' AS 'color'
             FROM horariosOcupados 
-            WHERE YEAR(fechaOcupado) in(?, ?)
+            WHERE YEAR(fechaOcupado) in (?, ?)
             AND MONTH(fechaOcupado) in (?, ?, ?)
             AND idEspecialista = ?  
             AND estatus = ?",
@@ -22,11 +22,11 @@ class CalendarioModel extends CI_Model
             "SELECT CAST(idCita AS VARCHAR(36))  AS id,  observaciones AS title, fechaInicio AS 'start', fechaFinal AS 'end', 
             fechaInicio AS occupied, 'green' AS 'color', 'cita' AS 'type'
             FROM citas
-            WHERE YEAR(fechaInicio) = ?
-            AND MONTH(fechaInicio) = ?
+            WHERE YEAR(fechaInicio) in (?, ?)
+            AND MONTH(fechaInicio) in (?, ?, ?)
             AND idEspecialista = ?
             AND estatus = ?",
-            array( $year, $month, $id_usuario, 1 )
+            array( $dates["year_1"], $dates["year_2"], $dates["month_1"], $month, $dates["month_2"], $id_usuario, 1 )
         );
 
         return $query;

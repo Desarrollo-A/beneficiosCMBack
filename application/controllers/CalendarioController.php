@@ -40,6 +40,7 @@ class CalendarioController extends CI_Controller{
 
 	public function saveOccupied(){
 		$dataValue = $this->input->post("dataValue");
+		$now = date('Y/m/d H:i:s', time());
 
 		$hora_final_resta = date('H:i:s', strtotime($dataValue["hora_final"] . '-1 minute'));
         $hora_inicio_suma = date('H:i:s', strtotime($dataValue["hora_inicio"] . '+1 minute'));
@@ -58,36 +59,39 @@ class CalendarioController extends CI_Controller{
 			"titulo" => $dataValue["titulo"], 
 			"idUnico" => $dataValue["id_unico"]
 		];
-		
+
+		if($dataValue["fecha_inicio"] > $now)
+			$pass = true;
+
 		try{
 			$check_occupied = $this->calendarioModel->checkOccupied($dataValue, $hora_inicio_suma ,$hora_final_resta);
 			$check_appointment = $this->calendarioModel->checkAppointment($dataValue, $fecha_inicio_suma, $fecha_final_resta);
 			
-			if ($check_occupied->num_rows() < 1 && $check_appointment->num_rows() < 1) {
+			if ($check_occupied->num_rows() < 1 && $check_appointment->num_rows() < 1 && isset($pass) ) {
 				$addRecord = $this->generalModel->addRecord("horariosOcupados", $values);
 
 				if ($addRecord) {
-                    $data["result"] = true;
-                    $data["msg"] = "Se ha guardado el horario";
+                    $response["result"] = true;
+                    $response["msg"] = "Se ha guardado el horario";
                 } 
                 else {
-                    $data["result"] = false;
-                    $data["msg"] = "Error al guardar el horario";
+                    $response["result"] = false;
+                    $response["msg"] = "Error al guardar el horario";
                 }
 			}
 			else{
-				$data["result"] = false;
-				$data["msg"] = "El horario ya ha sido ocupado";
+				$response["result"] = false;
+				$response["msg"] = "El horario ya ha sido ocupado";
 			}
 
 		}
 		catch(Exception $e){
-			$data["result"] = false;
-            $data["msg"] = "Error";
+			$response["result"] = false;
+            $response["msg"] = "Error";
 		}
 
 		$this->output->set_content_type('application/json');
-		$this->output->set_output(json_encode($data));
+		$this->output->set_output(json_encode($response));
 	}
 
 	public function updateOccupied(){
@@ -106,15 +110,16 @@ class CalendarioController extends CI_Controller{
 		if($start < $now){
 			$reponse["result"] = false;
 			$response["msg"] = "No se pueden mover las fechas a un dia anterior o actual";
-			return;
+
+			if($oldStart < $now){
+				$response["result"] = false;
+				$response["msg"] = "Las citas u horarios pasados no se pueden mover";
+			}
+
+			$this->output->set_content_type('application/json');
+			$this->output->set_output(json_encode($response));
 		}
 		
-		if($oldStart < $now){
-			$response["result"] = false;
-			$response["msg"] = "Las citas u horarios pasados no se pueden mover";
-			return;
-		}
-
 		try{
 			$values = [
 				"horaInicio" => $dataValue["hora_inicio"], 
@@ -175,12 +180,16 @@ class CalendarioController extends CI_Controller{
 
 	function createAppointment(){
 		$dataValue = $this->input->post("dataValue", true);
+		$now = date('Y/m/d H:i:s', time());
 
 		$hora_final_resta = date('H:i:s', strtotime($dataValue["fecha_final"] . '-1 minute'));
         $hora_inicio_suma = date('H:i:s', strtotime($dataValue["fecha_inicio"] . '+1 minute'));
 
         $fecha_final_resta = date('Y/m/d H:i:s', strtotime($dataValue["fecha_final"] . '-1 minute'));
         $fecha_inicio_suma = date('Y/m/d H:i:s', strtotime($dataValue["fecha_inicio"] . '+1 minute'));
+
+		if($dataValue["fecha_inicio"] > $now)
+			$pass = true;
 
 		try{
 			$values = [
@@ -198,7 +207,7 @@ class CalendarioController extends CI_Controller{
 			$check_appointment = $this->calendarioModel->checkAppointmentId($dataValue, $fecha_inicio_suma, $fecha_final_resta);
 			$check_occupied = $this->calendarioModel->checkOccupied($dataValue, $hora_inicio_suma, $hora_final_resta);
 
-			if ($check_appointment->num_rows() > 0 || $check_occupied->num_rows() > 0) {
+			if ($check_appointment->num_rows() > 0 || $check_occupied->num_rows() > 0 || !isset($pass)) {
                 $response["result"] = false;
                 $response["msg"] = "El horario ya ha sido ocupado";
             } 
