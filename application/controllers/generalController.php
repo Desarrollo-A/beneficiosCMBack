@@ -21,13 +21,13 @@ class generalController extends CI_Controller {
 		echo json_encode($data);
 	}
 
-    public function usr_count(){
-		$data['data'] = $this->generalModel->usr_count();
+    public function usrCount(){
+		$data['data'] = $this->generalModel->usrCount();
 		echo json_encode($data);
 	}
 
-    public function citas_count(){
-		$data['data'] = $this->generalModel->citas_count();
+    public function citasCount(){
+		$data['data'] = $this->generalModel->citasCount();
 		echo json_encode($data);
 	}
 }

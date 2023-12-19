@@ -10,7 +10,7 @@ class reportesModel extends CI_Model {
 
     public function citas($dt)
 	{
-		if($dt == 'Reporte General'){
+		if($dt === 'Reporte General'){
 
 			$query = $this->db-> query("SELECT  ct.idCita, ct.idEspecialista , ct.idPaciente, ct.idPaciente, ct.estatus as area, ct.fechaInicio as fechaInicio, ct.fechaFinal as fechaFinal,
 			op.nombre as estatus, observaciones FROM catalogos ca 

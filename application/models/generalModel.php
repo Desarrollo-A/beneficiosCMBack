@@ -14,13 +14,13 @@ class generalModel extends CI_Model {
 		return $query->result();
 	}
 
-    public function usr_count()
+    public function usrCount()
 	{
 		$query = $this->db-> query("SELECT COUNT(*) AS [usuarios] FROM usuarios");
 		return $query->result();
 	}
 
-    public function citas_count()
+    public function citasCount()
 	{
 		$query = $this->db-> query("SELECT COUNT(*) AS [citas] FROM citas");
 		return $query->result();
