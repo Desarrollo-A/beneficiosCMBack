@@ -34,43 +34,43 @@ class dashboardController extends CI_Controller {
 		echo json_encode($data);
 	}
 
-	public function citas_count_status(){
-		$data['data'] = $this->dashModel->citas_count_status();
+	public function citasCountStatus(){
+		$data['data'] = $this->dashModel->citasCountStatus();
 		echo json_encode($data);
 	}
 
-	public function total_status_citas(){
-		$data['data'] = $this->dashModel->total_status_citas();
+	public function totalStatusCitas(){
+		$data['data'] = $this->dashModel->totalStatusCitas();
 		echo json_encode($data);
 	}
 
-	public function estatus_fecha_asistencia(){
+	public function estatusFechaAsistencia(){
 
-		$dt = $this->input->post('yearData', true);
-		$data['data'] = $this->dashModel->estatus_fecha_asistencia($dt);
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->dashModel->estatusFechaAsistencia($dt);
 		echo json_encode($data);
 	}
 
-	public function estatus_fecha_cancelada(){
-		$dt = $this->input->post('yearData', true);
-		$data['data'] = $this->dashModel->estatus_fecha_cancelada($dt);
+	public function estatusFechaCancelada(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->dashModel->estatusFechaCancelada($dt);
 		echo json_encode($data);
 	}
 
-	public function estatus_fecha_penalizada(){
-		$dt = $this->input->post('yearData', true);
-		$data['data'] = $this->dashModel->estatus_fecha_penalizada($dt);
+	public function estatusFechaPenalizada(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->dashModel->estatusFechaPenalizada($dt);
 		echo json_encode($data);
 	}
 
-	public function fecha_minima(){
-		$data['data'] = $this->dashModel->fecha_minima();
+	public function fechaMinima(){
+		$data['data'] = $this->dashModel->fechaMinima();
 		echo json_encode($data);
 	}
 
-	public function citas_anual(){
-		$dt = $this->input->post('dt', true);
-		$data['data'] = $this->dashModel->citas_anual($dt);
+	public function citasAnual(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->dashModel->citasAnual($dt);
 		echo json_encode($data);
 	}
 }
