@@ -3,7 +3,44 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class CalendarioModel extends CI_Model
 {
-    public function getOccupied($year, $month, $id_usuario, $dates){
+    public function getAppointment($year, $month, $id_usuario, $dates){
+        $query = $this->db->query(
+            "SELECT CAST(idCita AS VARCHAR(36))  AS id,  observaciones AS title, fechaInicio AS 'start', fechaFinal AS 'end', 
+            fechaInicio AS occupied, 'green' AS 'color', 'cita' AS 'type'
+            FROM citas
+            WHERE YEAR(fechaInicio) = ?
+            AND MONTH(fechaInicio) = ?
+            AND idEspecialista = ?
+            AND estatus = ?",
+            array( $year, $month, $id_usuario, 1 )
+        );
+
+        return $query;
+    }
+
+    public function getAppointmentsByUser($year, $month, $id_usuario){
+        $query = $this->db->query(
+            "SELECT CAST(idCita AS VARCHAR(36)) AS id, observaciones AS title, fechaInicio AS 'start', fechaFinal AS 'end', 
+            fechaInicio AS occupied, estatus 
+            FROM citas
+            WHERE YEAR(fechaInicio) = ?
+            AND MONTH(fechaInicio) = ?
+            AND idPaciente = ?
+            AND estatus = ?",
+            array( $year, $month, $id_usuario, 1 )
+        );
+
+        return $query;
+    }
+
+    public function getOccupied($year, $month, $id_usuario)
+    {
+        $month_1 = ($month - 1) === 0 ? 12 : ($month - 1);
+        $month_2 = ($month + 1) > 12 ? 1 : ($month + 1);
+        
+        $year_1 =  intval($month) === 1 ? $year - 1 : $year;
+        $year_2 =  intval($month) === 12 ? $year + 1 : $year;
+        
         $query = $this->db->query(
             "SELECT idUnico as id, titulo as title, concat(fechaOcupado, ' ', horaInicio) as 'start', concat(fechaOcupado, ' ', horaFinal) as 'end',
             fechaOcupado AS occupied, 'red' AS 'color'

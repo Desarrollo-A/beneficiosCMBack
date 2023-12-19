@@ -391,4 +391,93 @@ class CalendarioController extends CI_Controller{
 		$data['beneficios'] = $this->calendarioModel->getBeneficiosDisponibles();
 		print_r(json_encode($data));
 	}
+
+	public function getBeneficiosPorSede(){
+		$sede = $this->input->post('dataValue[sede]');
+		
+		$response['result'] = isset($sede);
+		if ($response['result']) {
+			$rs = $this->calendarioModel->getBeneficiosPorSede($sede)->result();
+			$response['result'] = count($rs) > 0; 
+			if ($response['result']) {
+				$response['msg'] = '¡Listado de beneficios cargado exitosamente!';
+				$response['data'] = $rs; 
+			}else {
+				$response['msg'] = '¡No existen registros!';
+			}
+		}else {
+			$response['msg'] = "¡Parametros invalidos!";
+		}
+		
+		$this->output->set_content_type("application/json");
+        $this->output->set_output(json_encode($response));
+	}
+
+	public function getEspecialistaPorBeneficioYSede(){
+		$sede = $this->input->post('dataValue[sede]');
+		$beneficio = $this->input->post('dataValue[beneficio]');
+
+		$response['result'] = isset($sede, $beneficio);
+		if ($response['result']) {
+			$rs = $this->calendarioModel->getEspecialistaPorBeneficioYSede($sede, $beneficio)->result();
+			$response['result'] = count($rs) > 0; 
+			if ($response['result']) {
+				$response['msg'] = '¡Listado de especialistas cargado exitosamente!';
+				$response['data'] = $rs; 
+			}else {
+				$response['msg'] = '¡No existen registros!';
+			}
+		}else {
+            $response['msg'] = "¡Parametros invalidos!";
+        }
+
+		$this->output->set_content_type("application/json");
+        $this->output->set_output(json_encode($response));
+	}
+
+	public function getModalidadesEspecialista(){
+		$sede = $this->input->post('dataValue[sede]');
+		$especialista = $this->input->post('dataValue[especialista]');
+
+		$response['result'] = isset($sede, $especialista);
+		if ($response['result']) {
+			$rs = $this->calendarioModel->getModalidadesEspecialista($sede, $especialista)->result();
+			$response['result'] = count($rs) > 0; 
+			if ($response['result']) {
+				$response['msg'] = '¡Listado de modalidades cargado exitosamente!';
+				$response['data'] = $rs; 
+			}else {
+				$response['msg'] = '¡No existen registros!';
+			}
+		}else {
+            $response['msg'] = "¡Parametros invalidos!";
+        }
+
+		$this->output->set_content_type("application/json");
+        $this->output->set_output(json_encode($response));
+	}
+
+	public function getAppointmentsByUser() {
+		$year = $this->input->post('dataValue[year]');
+		$month = $this->input->post('dataValue[month]');
+		$idUsuario = $this->input->post('dataValue[idUsuario]');
+
+		$response['result'] = isset($year, $month, $idUsuario);
+		if ($response['result']) {
+			$rs = $this->calendarioModel->getAppointmentsByUser($year, $month, $idUsuario)->result();
+			$response['result'] = count($rs) > 0; 
+			if ($response['result']) {
+				$response['msg'] = '¡Listado de citas cargadas exitosamente!';
+				$response['data'] = $rs; 
+			}else {
+				$response['msg'] = '¡No existen registros!';
+			}
+		}else {
+			$response['msg'] = "¡Parametros invalidos!";
+		}
+		
+		$this->output->set_content_type("application/json");
+        $this->output->set_output(json_encode($response));
+	}
+
 }
