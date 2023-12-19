@@ -53,7 +53,7 @@ class encuestasModel extends CI_Model {
 
     public function getResp1()
     {
-        $query = $this->db-> query("SELECT  rp.respuesta AS value, rp.respuesta AS label FROM catalogos ca 
+        $query = $this->db-> query("SELECT  rp.idRespuestaGeneral AS value, rp.respuesta AS label, rp.tipo  FROM catalogos ca 
         INNER JOIN opcionesPorCatalogo op ON op.idCatalogo = ca.idCatalogo AND ca.idCatalogo = 4
         INNER JOIN respuestasGenerales rp ON rp.grupo = op.idOpcion
         WHERE idOpcion = 1");
@@ -62,7 +62,7 @@ class encuestasModel extends CI_Model {
 
     public function getResp2()
     {
-        $query = $this->db-> query("SELECT  rp.respuesta AS value, rp.respuesta AS label FROM catalogos ca 
+        $query = $this->db-> query("SELECT  rp.idRespuestaGeneral AS value, rp.respuesta AS label, rp.tipo  FROM catalogos ca 
         INNER JOIN opcionesPorCatalogo op ON op.idCatalogo = ca.idCatalogo AND ca.idCatalogo = 4
         INNER JOIN respuestasGenerales rp ON rp.grupo = op.idOpcion
         WHERE idOpcion = 2");
@@ -71,7 +71,7 @@ class encuestasModel extends CI_Model {
 
     public function getResp3()
     {
-        $query = $this->db-> query("SELECT  rp.respuesta AS value, rp.respuesta AS label FROM catalogos ca 
+        $query = $this->db-> query("SELECT  rp.idRespuestaGeneral AS value, rp.respuesta AS label, rp.tipo  FROM catalogos ca 
         INNER JOIN opcionesPorCatalogo op ON op.idCatalogo = ca.idCatalogo AND ca.idCatalogo = 4
         INNER JOIN respuestasGenerales rp ON rp.grupo = op.idOpcion
         WHERE idOpcion = 3");
@@ -80,7 +80,7 @@ class encuestasModel extends CI_Model {
 
     public function getResp4()
     {
-        $query = $this->db-> query("SELECT  rp.respuesta AS value, rp.respuesta AS label FROM catalogos ca 
+        $query = $this->db-> query("SELECT  rp.idRespuestaGeneral AS value, rp.respuesta AS label, rp.tipo  FROM catalogos ca 
         INNER JOIN opcionesPorCatalogo op ON op.idCatalogo = ca.idCatalogo AND ca.idCatalogo = 4
         INNER JOIN respuestasGenerales rp ON rp.grupo = op.idOpcion
         WHERE idOpcion = 4");
@@ -90,26 +90,71 @@ class encuestasModel extends CI_Model {
     public function getEncNotificacion($dt)
     {
         $query_especialistas = $this->db->query("SELECT DISTINCT ct.idEspecialista
-            FROM usuarios us
-            INNER JOIN citas ct ON ct.idPaciente = us.idUsuario
-            WHERE ct.estatus = 4 AND us.idUsuario = 28");
+        FROM usuarios us
+        INNER JOIN citas ct ON ct.idPaciente = us.idUsuario
+        WHERE ct.estatus = 4 AND us.idUsuario = $dt AND ct.fechaFinal BETWEEN '2023-11-01' AND '2023-12-05'");
 
-        $resultado = $query_especialistas->result();
-
-        $resultados_encuestas = array();
-
-        foreach ($resultado as $especialista) {
-            $idEspecialista = $especialista->idEspecialista;
-
-            $query = $this->db->query("SELECT us.puesto, ps.puesto, idEncuesta, ec.pregunta, ec.respuestas FROM usuarios us 
-                INNER JOIN encuestasCreadas ec ON ec.idArea = us.puesto
-                INNER JOIN puestos ps ON ps.idPuesto = ec.idArea
-                WHERE us.idUsuario = $idEspecialista");
-
-            $resultados_encuestas[] = $query->result();
+        $idEspecialistas = [];
+        foreach ($query_especialistas->result() as $row) {
+            $idEspecialistas[] = $row->idEspecialista;
         }
 
-        return $resultados_encuestas;
+        $query_encuestas = $this->db->query("SELECT DISTINCT idEncuesta, ps.puesto
+            FROM usuarios us 
+            INNER JOIN encuestasCreadas ec ON ec.idArea = us.puesto
+            INNER JOIN puestos ps ON ps.idPuesto = ec.idArea
+            WHERE us.idUsuario IN (" . implode(',', $idEspecialistas) . ") AND ec.estatus = 1");
+
+        $idEcuestas = [];
+        foreach ($query_encuestas->result() as $row) {
+            $idEcuestas[] = $row->idEncuesta;
+        }
+
+        $query_encuestasC = $this->db->query("SELECT * FROM encuestasContestadas WHERE idEncuesta IN (" . implode(',', $idEcuestas) . ") AND idUsuario = 1");
+
+        $idEnc = [0];
+        foreach ($query_encuestasC->result() as $row) {
+            $idEnc[] = $row->idEncuesta;
+        }
+
+        $query_enc = $this->db->query("SELECT DISTINCT idEncuesta, ps.puesto
+        FROM usuarios us 
+        INNER JOIN encuestasCreadas ec ON ec.idArea = us.puesto
+        INNER JOIN puestos ps ON ps.idPuesto = ec.idArea
+        WHERE us.idUsuario IN (" . implode(',', $idEspecialistas) . ") AND ec.estatus = 1 AND idEncuesta NOT IN (" . implode(',', $idEnc) . ")");
+
+        $result_encuestas = $query_enc->result_array();
+
+        return $result_encuestas;
+    }
+
+    public function getEcuestaValidacion($dt){
+
+        $dataArray = $dt;
+
+        $jsonString = json_encode($dataArray);
+
+        $idEncuesta = $dataArray[0];
+        $idUsuario = $dataArray[1];
+
+        $query_v1 = $this->db->query("SELECT DISTINCT ct.idEspecialista
+        FROM usuarios us
+        INNER JOIN citas ct ON ct.idPaciente = us.idUsuario
+        WHERE ct.estatus = 4 AND us.idUsuario = $idUsuario AND ct.fechaFinal BETWEEN '2023-11-01' AND '2023-12-05'");
+
+        if ($query_v1->num_rows() > 0) {
+
+            $query_v2 = $this->db->query("SELECT * FROM encuestasContestadas WHERE idEncuesta = $idEncuesta AND idUsuario = $idUsuario");
+
+            if ($query_v2->num_rows() > 0) {
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+
+            return false;
+        }
 
     }
 

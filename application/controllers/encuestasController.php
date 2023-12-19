@@ -37,19 +37,26 @@ class encuestasController extends CI_Controller {
 					break; 
 				}
 			}
-			/* var_dump($items); */
+			$idPregunta = 0; 
 
 			if ($datosValidos) {
 
 				foreach ($items as $item) {
+
+					$idPregunta++;
+
 					$pregunta = $item["pregunta"];
 					$resp = $item["resp"];
 					$idUsuario = $item["idUsuario"];
 					$idEncuesta = $item["idEncuesta"];
+					$idArea = $item["idArea"];
 
-					$query = $this->db->query("INSERT INTO encuestasContestadas (pregunta, respuesta, idEspecialista, fechaCreacion, idUsuario, idEncuesta) VALUES (?, ?, 1, GETDATE(), ?, ? )", array($pregunta, $resp, $idUsuario, $idEncuesta ));
+					$query = $this->db->query("INSERT INTO encuestasContestadas (idPregunta, idRespuesta, idEspecialista, idArea, idEncuesta, fechaCreacion, idUsuario ) VALUES (?, ?, 1, ?, ?, GETDATE(), ?)", array($idPregunta, $resp, $idArea, $idEncuesta, $idUsuario ));
+					
+					$queryPreguntasGeneradas = $this->db->query("INSERT INTO preguntasGeneradas (idPregunta, pregunta, estatus, abierta, especialidad, idEncuesta) VALUES (?, ?, 1, 1, ?, ?)", array($idPregunta, $pregunta, $idArea, $idEncuesta ));
+				
 				}
-
+				
 				$this->db->trans_complete();
 
 				if ($this->db->trans_status() === FALSE) {
@@ -95,7 +102,6 @@ class encuestasController extends CI_Controller {
 			}
 
 			if ($datosValidos) {
-				
 
 				foreach ($items as $item) {
 					$pregunta = $item["pregunta"];
@@ -157,6 +163,14 @@ class encuestasController extends CI_Controller {
 		$dt = $this->input->post('dataValue', true);
 
 		$data['data'] = $this->encuestasModel->getEncNotificacion($dt);
+		echo json_encode($data);
+	}
+
+	public function getEcuestaValidacion(){
+
+		$dt = $this->input->post('dataValue', true);
+
+		$data['data'] = $this->encuestasModel->getEcuestaValidacion($dt);
 		echo json_encode($data);
 	}
 
