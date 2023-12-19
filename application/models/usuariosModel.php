@@ -31,4 +31,10 @@ class usuariosModel extends CI_Model {
 		$query = $this->db->distinct()->select('area')->get('usuarios');
         return $query->result();
 	}
+
+	public function getNameUser()
+	{
+		$query = $this->db->query("SELECT idUsuario, nombre FROM usuarios");
+		return $query->result();
+	}
 }

@@ -18,7 +18,7 @@ class Welcome extends CI_Controller {
 	}
 	public function index()
 	{
-		$this->usuarios();
+		
 	}
 
 	public function usuarios(){
