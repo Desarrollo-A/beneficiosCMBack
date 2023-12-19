@@ -3,21 +3,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class CalendarioModel extends CI_Model
 {
-    public function getAppointment($year, $month, $id_usuario, $dates){
-        $query = $this->db->query(
-            "SELECT CAST(idCita AS VARCHAR(36))  AS id,  observaciones AS title, fechaInicio AS 'start', fechaFinal AS 'end', 
-            fechaInicio AS occupied, 'green' AS 'color', 'cita' AS 'type'
-            FROM citas
-            WHERE YEAR(fechaInicio) = ?
-            AND MONTH(fechaInicio) = ?
-            AND idEspecialista = ?
-            AND estatus = ?",
-            array( $year, $month, $id_usuario, 1 )
-        );
-
-        return $query;
-    }
-
     public function getAppointmentsByUser($year, $month, $id_usuario){
         $query = $this->db->query(
             "SELECT CAST(idCita AS VARCHAR(36)) AS id, observaciones AS title, fechaInicio AS 'start', fechaFinal AS 'end', 
@@ -311,7 +296,7 @@ class CalendarioModel extends CI_Model
     public function getEspecialistaPorBeneficioYSede($sede, $beneficio)
     {
         $query = $this->db->query(
-            "SELECT u.idUsuario as id, u.nombre AS especialista
+            "SELECT DISTINCT u.idUsuario as id, u.nombre AS especialista
             FROM usuarios AS u 
             RIGHT JOIN atencionXSede AS AXS ON AXS.idEspecialista = U.idUsuario
             INNER JOIN opcionesPorCatalogo AS oxc ON oxc.idOpcion= axs.tipoCita
