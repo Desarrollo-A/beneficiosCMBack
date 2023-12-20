@@ -4,7 +4,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 class CalendarioModel extends CI_Model
 {
 
-    public function getAppointmentsByUser($year, $month, $id_usuario){
+    public function getAppointmentsByUser($year, $month, $idUsuario){
         $query = $this->db->query(
             "SELECT CAST(idCita AS VARCHAR(36)) AS id, observaciones AS title, fechaInicio AS 'start', fechaFinal AS 'end', 
             fechaInicio AS occupied, estatus 
@@ -13,20 +13,13 @@ class CalendarioModel extends CI_Model
             AND MONTH(fechaInicio) = ?
             AND idPaciente = ?
             AND estatus = ?",
-            array( $year, $month, $id_usuario, 1 )
+            array( $year, $month, $idUsuario, 1 )
         );
 
         return $query;
     }
 
-    public function getOccupied($year, $month, $id_usuario, $dates)
-    {
-        $month_1 = ($month - 1) === 0 ? 12 : ($month - 1);
-        $month_2 = ($month + 1) > 12 ? 1 : ($month + 1);
-        
-        $year_1 =  intval($month) === 1 ? $year - 1 : $year;
-        $year_2 =  intval($month) === 12 ? $year + 1 : $year;
-        
+    public function getOccupied($year, $month, $idUsuario, $dates){
         $query = $this->db->query(
             "SELECT idUnico as id, titulo as title, concat(fechaOcupado, ' ', horaInicio) as 'start', concat(fechaOcupado, ' ', horaFinal) as 'end',
             fechaOcupado AS occupied, 'red' AS 'color'
@@ -35,12 +28,12 @@ class CalendarioModel extends CI_Model
             AND MONTH(fechaOcupado) in (?, ?, ?)
             AND idEspecialista = ?  
             AND estatus = ?",
-            array( $dates["year_1"], $dates["year_2"], $dates["month_1"], $month, $dates["month_2"], $id_usuario, 1 )
+            array( $dates["year1"], $dates["year2"], $dates["month1"], $month, $dates["month2"], $idUsuario, 1 )
         );
         return $query;
     }
 
-    public function getAppointment($year, $month, $id_usuario, $dates){
+    public function getAppointment($year, $month, $idUsuario, $dates){
         $query = $this->db->query(
             "SELECT CAST(idCita AS VARCHAR(36))  AS id,  observaciones AS title, fechaInicio AS 'start', fechaFinal AS 'end', 
             fechaInicio AS occupied, 'green' AS 'color', 'cita' AS 'type'
@@ -49,7 +42,7 @@ class CalendarioModel extends CI_Model
             AND MONTH(fechaInicio) in (?, ?, ?)
             AND idEspecialista = ?
             AND estatus = ?",
-            array( $dates["year_1"], $dates["year_2"], $dates["month_1"], $month, $dates["month_2"], $id_usuario, 1 )
+            array( $dates["year1"], $dates["year2"], $dates["month1"], $month, $dates["month2"], $idUsuario, 1 )
         );
 
         return $query;

@@ -16,17 +16,17 @@ class CalendarioController extends CI_Controller{
 		$dataValue = $this->input->post("dataValue", true);
 		$year = $dataValue["year"];
 		$month = $dataValue["month"];
-		$id_usuario = $dataValue["idUsuario"];
+		$idUsuario = $dataValue["idUsuario"];
 
 		$dates = [
-			"month_1" => $month_1 = ($month - 1) === 0 ? 12 : ($month - 1),
-        	"month_2" => $month_2 = ($month + 1) > 12 ? 1 : ($month + 1),
-        	"year_1" => $year_1 =  intval($month) === 1 ? $year - 1 : $year,
-        	"year_2" => $year_2 =  intval($month) === 12 ? $year + 1 : $year
+			"month1" => $month1 = ($month - 1) === 0 ? 12 : ($month - 1),
+        	"month2" => $month2 = ($month + 1) > 12 ? 1 : ($month + 1),
+        	"year1" => $year1 =  intval($month) === 1 ? $year - 1 : $year,
+        	"year2" => $year2 =  intval($month) === 12 ? $year + 1 : $year
 		];
 		
-		$occupied = $this->calendarioModel->getOccupied($year, $month, $id_usuario, $dates);
-		$appointment = $this->calendarioModel->getAppointment($year, $month, $id_usuario, $dates);
+		$occupied = $this->calendarioModel->getOccupied($year, $month, $idUsuario, $dates);
+		$appointment = $this->calendarioModel->getAppointment($year, $month, $idUsuario, $dates);
 
 		if ($occupied->num_rows() > 0 || $appointment->num_rows() > 0) 
             $data["events"] = array_merge($occupied->result(), $appointment->result());
@@ -37,16 +37,15 @@ class CalendarioController extends CI_Controller{
 		$this->output->set_output(json_encode($data));
 	}
 
-
 	public function saveOccupied(){
 		$dataValue = $this->input->post("dataValue");
 		$now = date('Y/m/d H:i:s', time());
 
-		$hora_final_resta = date('H:i:s', strtotime($dataValue["hora_final"] . '-1 minute'));
-        $hora_inicio_suma = date('H:i:s', strtotime($dataValue["hora_inicio"] . '+1 minute'));
+		$horaFinalResta = date('H:i:s', strtotime($dataValue["hora_final"] . '-1 minute'));
+        $horaInicioSuma = date('H:i:s', strtotime($dataValue["hora_inicio"] . '+1 minute'));
 
-        $fecha_final_resta = date('Y/m/d H:i:s', strtotime($dataValue["fecha_final"] . '-1 minute'));
-        $fecha_inicio_suma = date('Y/m/d H:i:s', strtotime($dataValue["fecha_inicio"] . '+1 minute'));
+        $fechaFinalResta = date('Y/m/d H:i:s', strtotime($dataValue["fecha_final"] . '-1 minute'));
+        $fechaInicioSuma = date('Y/m/d H:i:s', strtotime($dataValue["fecha_inicio"] . '+1 minute'));
 
 		$values = [
 			"fechaOcupado" => $dataValue["fecha"], 
@@ -64,8 +63,8 @@ class CalendarioController extends CI_Controller{
 			$pass = true;
 
 		try{
-			$check_occupied = $this->calendarioModel->checkOccupied($dataValue, $hora_inicio_suma ,$hora_final_resta);
-			$check_appointment = $this->calendarioModel->checkAppointment($dataValue, $fecha_inicio_suma, $fecha_final_resta);
+			$check_occupied = $this->calendarioModel->checkOccupied($dataValue, $horaInicioSuma ,$horaFinalResta);
+			$check_appointment = $this->calendarioModel->checkAppointment($dataValue, $fechaInicioSuma, $fechaFinalResta);
 			
 			if ($check_occupied->num_rows() < 1 && $check_appointment->num_rows() < 1 && isset($pass) ) {
 				$addRecord = $this->generalModel->addRecord("horariosOcupados", $values);
@@ -101,11 +100,11 @@ class CalendarioController extends CI_Controller{
 		$current = new DateTime();
 		$now = $current->format('Y/m/d');
 
-		$hora_final_resta = date('H:i:s', strtotime($dataValue["hora_final"] . '-1 minute'));
-        $hora_inicio_suma = date('H:i:s', strtotime($dataValue["hora_inicio"] . '+1 minute'));
+		$horaFinalResta = date('H:i:s', strtotime($dataValue["hora_final"] . '-1 minute'));
+        $horaInicioSuma = date('H:i:s', strtotime($dataValue["hora_inicio"] . '+1 minute'));
 
-        $fecha_final_resta = date('Y/m/d H:i:s', strtotime($dataValue["fecha_final"] . '-1 minute'));
-        $fecha_inicio_suma = date('Y/m/d H:i:s', strtotime($dataValue["fecha_inicio"] . '+1 minute'));
+        $fechaFinalResta = date('Y/m/d H:i:s', strtotime($dataValue["fecha_final"] . '-1 minute'));
+        $fechaInicioSuma = date('Y/m/d H:i:s', strtotime($dataValue["fecha_inicio"] . '+1 minute'));
 
 		if($start < $now){
 			$reponse["result"] = false;
@@ -129,8 +128,8 @@ class CalendarioController extends CI_Controller{
 				"fechaOcupado" => $dataValue["fecha_ocupado"], 
 			];
 			
-			$check_occupiedId = $this->calendarioModel->checkOccupiedId($dataValue, $hora_inicio_suma ,$hora_final_resta);
-			$check_appointment = $this->calendarioModel->checkAppointment($dataValue, $fecha_inicio_suma, $fecha_final_resta);
+			$check_occupiedId = $this->calendarioModel->checkOccupiedId($dataValue, $horaInicioSuma ,$horaFinalResta);
+			$check_appointment = $this->calendarioModel->checkAppointment($dataValue, $fechaInicioSuma, $fechaFinalResta);
 
 			if ($check_occupiedId->num_rows() > 0 || $check_appointment->num_rows() > 0) {
                 $response["result"] = false;
@@ -158,13 +157,13 @@ class CalendarioController extends CI_Controller{
 	}
 
 	public function deleteOccupied(){
-		$id_unico = $this->input->post("dataValue", true);
+		$idUnico = $this->input->post("dataValue", true);
 
 		$values = [
 			"estatus" => 0
 		];
 		
-		$updateRecord = $this->generalModel->updateRecord("horariosOcupados", $values, "idUnico", $id_unico);
+		$updateRecord = $this->generalModel->updateRecord("horariosOcupados", $values, "idUnico", $idUnico);
 
 		if ($updateRecord) {
             $response["result"] = true;
@@ -182,11 +181,11 @@ class CalendarioController extends CI_Controller{
 		$dataValue = $this->input->post("dataValue", true);
 		$now = date('Y/m/d H:i:s', time());
 
-		$hora_final_resta = date('H:i:s', strtotime($dataValue["fecha_final"] . '-1 minute'));
-        $hora_inicio_suma = date('H:i:s', strtotime($dataValue["fecha_inicio"] . '+1 minute'));
+		$horaFinalResta = date('H:i:s', strtotime($dataValue["fecha_final"] . '-1 minute'));
+        $horaInicioSuma = date('H:i:s', strtotime($dataValue["fecha_inicio"] . '+1 minute'));
 
-        $fecha_final_resta = date('Y/m/d H:i:s', strtotime($dataValue["fecha_final"] . '-1 minute'));
-        $fecha_inicio_suma = date('Y/m/d H:i:s', strtotime($dataValue["fecha_inicio"] . '+1 minute'));
+        $fechaFinalResta = date('Y/m/d H:i:s', strtotime($dataValue["fecha_final"] . '-1 minute'));
+        $fechaInicioSuma = date('Y/m/d H:i:s', strtotime($dataValue["fecha_inicio"] . '+1 minute'));
 
 		if($dataValue["fecha_inicio"] > $now)
 			$pass = true;
@@ -203,9 +202,9 @@ class CalendarioController extends CI_Controller{
             	"observaciones" => $dataValue["observaciones"],
             	"modificadoPor" => $dataValue["modificado_por"]
 			];
-						
-			$check_appointment = $this->calendarioModel->checkAppointmentId($dataValue, $fecha_inicio_suma, $fecha_final_resta);
-			$check_occupied = $this->calendarioModel->checkOccupied($dataValue, $hora_inicio_suma, $hora_final_resta);
+			
+			$check_appointment = $this->calendarioModel->checkAppointmentId($dataValue, $fechaInicioSuma, $fechaFinalResta);
+			$check_occupied = $this->calendarioModel->checkOccupied($dataValue, $horaInicioSuma, $horaFinalResta);
 
 			if ($check_appointment->num_rows() > 0 || $check_occupied->num_rows() > 0 || !isset($pass)) {
                 $response["result"] = false;
@@ -380,32 +379,8 @@ class CalendarioController extends CI_Controller{
 		$this->output->set_output(json_encode($response));
 	}
 
-/* 	function getBeneficiosDisponibles(){
-		$datosEmpleado = json_decode(file_get_contents('php://input'));
-		print_r($datosEmpleado);
-		echo '<br><br>';
-		print_r($this->session->userdata());
 
-		exit;
-    	$dataButton = $this->calendarioModel->revisaCitas();
-		$data['beneficios'] = $this->calendarioModel->getBeneficiosDisponibles();
-		print_r(json_encode($data));
-	} */
 
-	function getBeneficiosDisponibles(){
-/* 		$datosEmpleado = json_decode(file_get_contents('php://input'));
-		print_r($datosEmpleado);
-		echo '<br><br>';
-		print_r($this->session->userdata());
-
-		exit; */
-    	/* $dataButton = $this->calendarioModel->revisaCitas(); */
-		$data['beneficios'] = $this->calendarioModel->getBeneficiosDisponibles();
-		json_encode($data);
-	}
-
-<<<<<<< HEAD
-=======
 	public function getBeneficiosPorSede(){
 		$sede = $this->input->post('dataValue[sede]');
 		
@@ -494,5 +469,4 @@ class CalendarioController extends CI_Controller{
         $this->output->set_output(json_encode($response));
 	}
 
->>>>>>> 7dbb84534201e7e2199be803e6670181d1cbdccf
 }
