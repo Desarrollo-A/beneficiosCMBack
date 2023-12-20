@@ -63,17 +63,4 @@ class generalModel extends CI_Model {
             return $this->db->trans_commit();
         }
     }
-
-    public function updateRecord($table, $data, $key, $value)
-    {
-        if ($data != '' && $data != null) {
-            $response = $this->db->update($table, $data, "$key = '$value'");
-            if ($response)
-                return true;
-            else
-                return false;
-        } else{
-            return false;
-        }
-    }
 }

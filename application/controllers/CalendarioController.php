@@ -404,8 +404,6 @@ class CalendarioController extends CI_Controller{
 		json_encode($data);
 	}
 
-<<<<<<< HEAD
-=======
 	public function getBeneficiosPorSede(){
 		$sede = $this->input->post('dataValue[sede]');
 		
@@ -494,5 +492,4 @@ class CalendarioController extends CI_Controller{
         $this->output->set_output(json_encode($response));
 	}
 
->>>>>>> 7dbb84534201e7e2199be803e6670181d1cbdccf
 }
