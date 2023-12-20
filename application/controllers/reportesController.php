@@ -37,8 +37,8 @@ class reportesController extends CI_Controller {
 
 	public function observacion(){
 
-		$idCita= $this->input->post('idCita');
-		$descripcion= $this->input->post('descripcion');
+		$idCita= $this->input->post('dataValue[idCita]');
+		$descripcion= $this->input->post('dataValue[descripcion]');
 
 		if( !empty($idCita) && !empty($descripcion) )
 		{

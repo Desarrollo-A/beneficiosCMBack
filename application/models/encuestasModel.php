@@ -174,4 +174,107 @@ class encuestasModel extends CI_Model {
 
         return $query->result();
     }
+
+    public function encuestaInsert($dt){
+        $items = json_decode($dt);
+
+		$datosValidos = true;
+
+		if (isset($items)) {
+
+			foreach ($items as $item) {
+				if (!isset($item->pregunta, $item->resp) || empty($item->pregunta) 
+				|| is_null($item->resp) || empty($item->resp) || is_null($item->pregunta)) {
+					echo json_encode(array("estatus" => -5, "mensaje" => "Hay preguntas sin contestar!" ));
+					$datosValidos = false;
+					break; 
+				}
+			}
+			$idPregunta = 0; 
+
+			if ($datosValidos) {
+
+				foreach ($items as $item) {
+
+					$idPregunta++;
+
+					$pregunta = $item->pregunta;
+					$resp = $item->resp;
+					$idUsuario = $item->idUsuario;
+					$idEncuesta = $item->idEncuesta;
+					$idArea = $item->idArea;
+
+					$abierta = is_numeric($resp) ? 1 : 0;
+
+					$query = $this->db->query("INSERT INTO encuestasContestadas (idPregunta, idRespuesta, idEspecialista, idArea, idEncuesta, fechaCreacion, idUsuario ) 
+					VALUES (?, ?, 1, ?, ?, GETDATE(), ?)", 
+					array($idPregunta, $resp, $idArea, $idEncuesta, $idUsuario ));
+					
+					$queryPreguntasGeneradas = $this->db->query("INSERT INTO preguntasGeneradas (idPregunta, pregunta, estatus, abierta, especialidad, idEncuesta) 
+					VALUES (?, ?, 1, ?, ?, ?)", 
+					array($idPregunta, $pregunta, $abierta, $idArea, $idEncuesta ));
+				
+				}
+				
+				$this->db->trans_complete();
+
+				if ($this->db->trans_status() === FALSE) {
+					echo "Error al realizar la transacción";
+				} else {
+					echo json_encode(array("estatus" => 200, "mensaje" => "Encuesta enviada exitosamente" ));
+				}
+			}
+		} else {
+			echo json_encode(array("estatus" => -5, "mensaje" => "Error Faltan Datos" ));
+		}
+    }
+
+    public function encuestaCreate($dt){
+        $dataArray = json_decode($dt);
+
+		$datosValidos = true;
+
+		if (isset($dataArray->area) && isset($dataArray->items)) {
+			$area = $dataArray->area;
+			$items = $dataArray->items;
+
+			if (empty($area)) {
+				echo json_encode(array("estatus" => -5, "mensaje" => "Error Hay Campos Vacios" ));
+				$datosValidos = false;
+			}
+
+			foreach ($items as $item) {
+
+				if (!isset($item->pregunta, $item->respuesta) || empty($item->pregunta) 
+				|| is_null($item->respuesta) || empty($item->respuesta) || is_null($item->pregunta)) {
+					echo json_encode(array("estatus" => -5, "mensaje" => "Error Hay campos vacios!" ));
+					$datosValidos = false;
+					break; 
+				}
+			}
+
+			if ($datosValidos) {
+
+				foreach ($items as $item) {
+					$pregunta = $item->pregunta;
+					$respuesta = $item->respuesta;
+					$idEncuesta = $item->idEncuesta;
+
+					$query = $this->db->query("INSERT INTO encuestasCreadas (pregunta, respuestas, idArea, estatus, fechaCreacion, idEncuesta) 
+					VALUES (?, ?, ?, 1, GETDATE(), ?)", 
+					array($pregunta, $respuesta, $area, $idEncuesta));
+				}
+
+				$this->db->trans_complete();
+
+				if ($this->db->trans_status() === FALSE) {
+					echo "Error al realizar la transacción";
+				} else {
+					echo json_encode(array("estatus" => 200, "mensaje" => "Encuesta Creada Correctamente" ));
+				}
+			}
+		} else {
+			echo json_encode(array("estatus" => -5, "mensaje" => "Error Faltan Datos" ));
+		}
+    }
 }
