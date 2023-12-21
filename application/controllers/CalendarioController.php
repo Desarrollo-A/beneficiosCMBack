@@ -7,6 +7,7 @@ class CalendarioController extends CI_Controller{
 
         $this->load->model('calendarioModel');
 		$this->load->model('generalModel');
+		$this->load->model('usuariosModel');
 		$this->load->library('session');
 		date_default_timezone_set('America/Mexico_City');
 	}
@@ -24,7 +25,7 @@ class CalendarioController extends CI_Controller{
         	"year1" => $year1 =  intval($month) === 1 ? $year - 1 : $year,
         	"year2" => $year2 =  intval($month) === 12 ? $year + 1 : $year
 		];
-		
+
 		$occupied = $this->calendarioModel->getOccupied($year, $month, $idUsuario, $dates);
 		$appointment = $this->calendarioModel->getAppointment($year, $month, $idUsuario, $dates);
 
@@ -187,6 +188,8 @@ class CalendarioController extends CI_Controller{
         $fechaFinalResta = date('Y/m/d H:i:s', strtotime($dataValue["fecha_final"] . '-1 minute'));
         $fechaInicioSuma = date('Y/m/d H:i:s', strtotime($dataValue["fecha_inicio"] . '+1 minute'));
 
+		$id_atencion = $this->calendarioModel->getIdAtencion($dataValue);
+
 		if($dataValue["fecha_inicio"] > $now)
 			$pass = true;
 
@@ -200,13 +203,16 @@ class CalendarioController extends CI_Controller{
             	"creadoPor" => $dataValue["creado_por"],
             	"fechaModificacion" => date("Y-m-d H:i:s"),
             	"observaciones" => $dataValue["observaciones"],
-            	"modificadoPor" => $dataValue["modificado_por"]
+            	"modificadoPor" => $dataValue["modificado_por"],
+				"idAtencionXSede" => $id_atencion
 			];
 			
+			
+			$check_user = $this->usuariosModel->checkUser($dataValue["id_paciente"]);
 			$check_appointment = $this->calendarioModel->checkAppointmentId($dataValue, $fechaInicioSuma, $fechaFinalResta);
 			$check_occupied = $this->calendarioModel->checkOccupied($dataValue, $horaInicioSuma, $horaFinalResta);
 
-			if ($check_appointment->num_rows() > 0 || $check_occupied->num_rows() > 0 || !isset($pass)) {
+			if ($check_appointment->num_rows() > 0 || $check_occupied->num_rows() > 0 || !isset($pass) || $check_user->num_rows() > 0) {
                 $response["result"] = false;
                 $response["msg"] = "El horario ya ha sido ocupado";
             } 

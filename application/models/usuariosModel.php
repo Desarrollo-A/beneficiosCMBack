@@ -47,11 +47,13 @@ class usuariosModel extends CI_Model {
 		return $query->result();
 	}
 
-	// public function checkUser($idPaciente){
-	// 	$query = $this->db->query("SELECT idPaciente FROM citas 
-	// 	WHERE estatus != 4 AND idPaciente = 62 GROUP BY idPaciente HAVING COUNT(idPaciente) = ?", 
-	// 	$idPaciente);
+	public function checkUser($idPaciente){
+		$query = $this->db->query(
+			"SELECT idPaciente FROM citas 
+			WHERE estatus = 1 AND idPaciente = ? 
+			GROUP BY idPaciente HAVING COUNT(idPaciente) = ?", 
+			array( $idPaciente, 2 ));
 		
-	// 	return $query;
-	// }
+		return $query;
+	}
 }

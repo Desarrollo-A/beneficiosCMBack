@@ -140,6 +140,18 @@ class CalendarioModel extends CI_Model
         return $query;
     }
 
+    public function getIdAtencion($dataValue){
+        $query = $this->db->query(
+            "SELECT idAtencionXSede FROM atencionXSede 
+            WHERE idEspecialista = ?
+            AND idSede = ( SELECT sede FROM usuarios WHERE idUsuario = ? ) AND estatus = ?", 
+            array($dataValue["id_usuario"], $dataValue["id_usuario"], 1)
+        );
+
+        $result = $query->row()->idAtencionXSede;
+        return $result;
+    }
+
     public function getBeneficiosDisponibles()
     {
         $query = $this->db->query("
@@ -151,15 +163,6 @@ class CalendarioModel extends CI_Model
 		AND idCatalogo=1");
         return $query->result_array();
     }
-
-    function revisaCitas()
-    {
-        print_r($this->session->userdata('id_usuario'));
-        exit;
-    } 
-
-    // **********************************************************
-
     
     public function getBeneficiosPorSede($sede)
 	{
@@ -214,87 +217,5 @@ class CalendarioModel extends CI_Model
             AND axs.idSede = ? AND u.idUsuario = ?", array($sede, $especialista));
 
         return $query;
-    }
-
-    public function createAppointment($data)
-    {
-        $hora_final_resta = date('H:i:s', strtotime($data["fechaFinal"] . '-1 minute'));
-        $hora_inicio_suma = date('H:i:s', strtotime($data["fechaInicio"] . '+1 minute'));
-
-        $fecha_final_resta = date('Y/m/d H:i:s', strtotime($data["fechaFinal"] . '-1 minute'));
-        $fecha_inicio_suma = date('Y/m/d H:i:s', strtotime($data["fechaInicio"] . '+1 minute'));
-
-        try {
-            $check_occupied = $this->db->query(
-                "SELECT *FROM horariosOcupados WHERE 
-                                ((fechaOcupado = ? AND horaInicio BETWEEN ? AND ?) 
-                                OR (fechaOcupado = ? AND horaFinal BETWEEN ? AND ?)
-                                OR (fechaOcupado = ? AND ? BETWEEN horaInicio AND horaFinal) 
-                                OR (fechaOcupado = ? AND ? BETWEEN horaInicio AND horaFinal))
-                        AND idEspecialista = ?
-                        AND estatus = ?",
-                array(
-                    $data["fechaOcupado"], $hora_inicio_suma, $hora_final_resta,
-                    $data["fechaOcupado"], $hora_inicio_suma, $hora_final_resta,
-                    $data["fechaOcupado"], $hora_inicio_suma,
-                    $data["fechaOcupado"], $hora_final_resta,
-                    $data["idEspecialista"],
-                    1
-                )
-            );
-
-            $check_appointment = $this->db->query(
-                "SELECT *FROM citas WHERE
-                                ((fechaInicio BETWEEN ? AND ?)
-                                OR (fechaFinal BETWEEN ? AND ?)
-                                OR (? BETWEEN fechaInicio AND fechaFinal)
-                                OR (? BETWEEN fechaInicio AND fechaFinal))
-                        AND idEspecialista = ?
-                        AND idPaciente = ?
-                        AND estatus = ?",
-                array(
-                    $fecha_inicio_suma, $fecha_final_resta,
-                    $fecha_inicio_suma, $fecha_final_resta,
-                    $fecha_inicio_suma,
-                    $fecha_final_resta,
-                    $data["idEspecialista"],
-                    $data["idPaciente"],
-                    1
-                )
-            );
-
-            if ($check_appointment->num_rows() > 0 || $check_occupied->num_rows() > 0) {
-                $data["status"] = false;
-                $data["message"] = "El horario ya ha sido ocupado";
-            } else {
-                $this->db->query(
-                    "INSERT INTO citas VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                    array(
-                        $data["idEspecialista"],
-                        $data["idPaciente"],
-                        1,
-                        $data["fechaInicio"],
-                        $data["fechaFinal"],
-                        $data["creadoPor"],
-                        date("Y-m-d H:i:s"),
-                        $data["observaciones"],
-                        $data["modificadoPor"]
-                    )
-                );
-
-                if ($this->db->affected_rows() > 0) {
-                    $data["status"] = true;
-                    $data["message"] = "Se ha agendado a cita";
-                } else {
-                    $data["status"] = false;
-                    $data["message"] = "No se ha guardado la cita";
-                }
-            }
-        } catch (Exception $e) {
-            $data["status"] = false;
-            $data["message"] = "Error al guardar la cita";
-        }
-
-        return $data;
     }
 }

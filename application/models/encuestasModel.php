@@ -110,7 +110,7 @@ class encuestasModel extends CI_Model {
             $idEcuestas[] = $row->idEncuesta;
         }
 
-        $query_encuestasC = $this->db->query("SELECT * FROM encuestasContestadas WHERE idEncuesta IN (" . implode(',', $idEcuestas) . ") AND idUsuario = 1");
+        $query_encuestasC = $this->db->query("SELECT * FROM encuestasContestadas WHERE idEncuesta IN (" . implode(',', $idEcuestas) . ") AND idUsuario = $dt");
 
         $idEnc = [0];
         foreach ($query_encuestasC->result() as $row) {
