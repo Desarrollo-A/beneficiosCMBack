@@ -16,7 +16,7 @@ class reportesModel extends CI_Model {
 			op.nombre as estatus, observaciones FROM catalogos ca 
 			INNER JOIN opcionesPorCatalogo op ON op.idCatalogo = ca.idCatalogo AND ca.idCatalogo = 2
 			INNER JOIN citas ct ON ct.estatus = op.idOpcion ");
-			return $query->result();
+			return $query;
 
 		}else{
 
@@ -25,7 +25,7 @@ class reportesModel extends CI_Model {
 				INNER JOIN opcionesPorCatalogo op ON op.idCatalogo = ca.idCatalogo AND ca.idCatalogo = 2
 				INNER JOIN citas ct ON ct.estatus = op.idOpcion 
 				WHERE op.idOpcion = 3");
-			return $query->result();
+			return $query;
 
 		}
 	}
