@@ -178,7 +178,7 @@ class CalendarioController extends CI_Controller{
 		$this->output->set_output(json_encode($response));
 	}
 
-	function createAppointment(){
+	public function createAppointment(){
 		$dataValue = $this->input->post("dataValue", true);
 		$now = date('Y/m/d H:i:s', time());
 
@@ -188,7 +188,7 @@ class CalendarioController extends CI_Controller{
         $fechaFinalResta = date('Y/m/d H:i:s', strtotime($dataValue["fecha_final"] . '-1 minute'));
         $fechaInicioSuma = date('Y/m/d H:i:s', strtotime($dataValue["fecha_inicio"] . '+1 minute'));
 
-		$id_atencion = $this->calendarioModel->getIdAtencion($dataValue);
+		$id_atencion = $this->calendarioModel->getIdAtencion($dataValue)->row()->idAtencionXSede;
 
 		if($dataValue["fecha_inicio"] > $now)
 			$pass = true;
@@ -202,7 +202,7 @@ class CalendarioController extends CI_Controller{
             	"fechaFinal" => $dataValue["fecha_final"],
             	"creadoPor" => $dataValue["creado_por"],
             	"fechaModificacion" => date("Y-m-d H:i:s"),
-            	"observaciones" => $dataValue["observaciones"],
+            	"titulo" => $dataValue["titulo"],
             	"modificadoPor" => $dataValue["modificado_por"],
 				"idAtencionXSede" => $id_atencion
 			];
@@ -242,7 +242,7 @@ class CalendarioController extends CI_Controller{
 		$id = $this->input->post("dataValue", true);
 
 		$values = [
-			"estatus" => 0
+			"estatus" => 2
 		];
 
 		$updateRecord = $this->generalModel->updateRecord("citas", $values, "idCita", $id);
@@ -260,7 +260,7 @@ class CalendarioController extends CI_Controller{
 		$this->output->set_output(json_encode($response));
 	}
 
-	function appointmentDrop(){
+	public function appointmentDrop(){
 		$dataValue = $this->input->post("dataValue", true);
 		$start = $dataValue["start"]; // datos para la validación de no mover una eveneto pasado de su dia
 		$oldStart = $dataValue["old_start"];
@@ -321,7 +321,7 @@ class CalendarioController extends CI_Controller{
 		$this->output->set_output(json_encode($response));
 	}
 
-	function occupiedDrop(){
+	public function occupiedDrop(){
 		$dataValue = $this->input->post("dataValue", true);
 		$start = $dataValue["start"]; // datos para la validación de no mover una eveneto pasado de su dia
 		$oldStart = $dataValue["old_start"];

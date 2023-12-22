@@ -44,7 +44,7 @@ class usuariosModel extends CI_Model {
 			 IN( select distinct idSede from atencionXSede where idEspecialista = ?)",
 			 array( 2, 1, 1, 1, $idEspecialista )
 		);
-		return $query->result();
+		return $query;
 	}
 
 	public function checkUser($idPaciente){

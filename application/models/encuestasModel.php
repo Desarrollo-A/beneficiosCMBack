@@ -95,8 +95,7 @@ class encuestasModel extends CI_Model {
         WHERE ct.estatus = 4 AND us.idUsuario = $dt AND ct.fechaFinal BETWEEN '2023-11-01' AND '2023-12-20'");
 
         if ($query_especialistas->num_rows() > 0) {
-
-        $idEspecialistas = [];
+        
         foreach ($query_especialistas->result() as $row) {
             $idEspecialistas[] = $row->idEspecialista;
         }

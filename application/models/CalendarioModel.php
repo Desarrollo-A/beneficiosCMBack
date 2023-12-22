@@ -35,14 +35,22 @@ class CalendarioModel extends CI_Model
 
     public function getAppointment($year, $month, $idUsuario, $dates){
         $query = $this->db->query(
-            "SELECT CAST(idCita AS VARCHAR(36))  AS id,  observaciones AS title, fechaInicio AS 'start', fechaFinal AS 'end', 
-            fechaInicio AS occupied, 'green' AS 'color', 'cita' AS 'type'
+            "SELECT CAST(idCita AS VARCHAR(36))  AS id,  titulo AS title, fechaInicio AS 'start', fechaFinal AS 'end', 
+            fechaInicio AS occupied, 'green' AS 'color', 'cita' AS 'type',
+            'color' = CASE
+	            WHEN estatus = 0 THEN 'red'
+	            WHEN estatus = 1 THEN 'green'
+	            WHEN estatus = 2 THEN 'red'
+	            WHEN estatus = 3 THEN 'grey'
+	            WHEN estatus = 4 THEN 'green'
+                WHEN estatus > 4 THEN 'pink'
+	        END
             FROM citas
             WHERE YEAR(fechaInicio) in (?, ?)
             AND MONTH(fechaInicio) in (?, ?, ?)
             AND idEspecialista = ?
-            AND estatus = ?",
-            array( $dates["year1"], $dates["year2"], $dates["month1"], $month, $dates["month2"], $idUsuario, 1 )
+            AND estatus IN(?, ?, ?, ?)",
+            array( $dates["year1"], $dates["year2"], $dates["month1"], $month, $dates["month2"], $idUsuario, 1, 2, 3, 4 )
         );
 
         return $query;
@@ -147,9 +155,8 @@ class CalendarioModel extends CI_Model
             AND idSede = ( SELECT sede FROM usuarios WHERE idUsuario = ? ) AND estatus = ?", 
             array($dataValue["id_usuario"], $dataValue["id_usuario"], 1)
         );
-
-        $result = $query->row()->idAtencionXSede;
-        return $result;
+        
+        return $query;
     }
 
     public function getBeneficiosDisponibles()
