@@ -25,20 +25,19 @@ class reportesController extends CI_Controller {
 
 	public function citas(){
 		$dt = $this->input->post('dataValue', true);
-		/* var_dump(); */
-		$data['data'] = $this->reportesModel->citas($dt);
+		$data['data'] = $this->reportesModel->citas($dt)->result();
 		echo json_encode($data);
 	}
 
 	public function especialistas(){
-		$data['data'] = $this->especialistasModel->especialistas();
+		$data['data'] = $this->especialistasModel->especialistas()->result();
 		echo json_encode($data);
 	}
 
 	public function observacion(){
 
-		$idCita= $this->input->post('idCita');
-		$descripcion= $this->input->post('descripcion');
+		$idCita= $this->input->post('dataValue[idCita]');
+		$descripcion= $this->input->post('dataValue[descripcion]');
 
 		if( !empty($idCita) && !empty($descripcion) )
 		{
@@ -48,11 +47,11 @@ class reportesController extends CI_Controller {
 			);
 			
 			$response=$this->generalModel->updateRecord('citas', $data, 'idCita', $idCita);
-			echo json_encode(array("estatus" => 200, "mensaje" => "Observación Registrada!" ));
+			echo json_encode(array("estatus" => true, "msj" => "Observación Registrada!" ));
 				
 		}else{
 
-			echo json_encode(array("estatus" => -5));
+			echo json_encode(array("estatus" => false));
 
 		}			
 	}

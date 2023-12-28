@@ -32,10 +32,29 @@ class usuariosModel extends CI_Model {
         return $query->result();
 	}
 
-	public function getNameUser()
+	public function getNameUser($idEspecialista)
 	{
-		$query = $this->db->query("SELECT idUsuario, nombre FROM usuarios");
-		return $query->result();
+		$query = $this->db->query(
+			"SELECT idUsuario, nombre FROM usuarios
+			 WHERE idRol = ?
+			 AND estatus = ?
+			 AND idUsuario 
+			 NOT IN( SELECT idPaciente FROM citas WHERE estatus = ? GROUP BY idPaciente HAVING COUNT(idPaciente) > ?)
+			 AND sede
+			 IN( select distinct idSede from atencionXSede where idEspecialista = ?)",
+			 array( 2, 1, 1, 1, $idEspecialista )
+		);
+		return $query;
+	}
+
+	public function checkUser($idPaciente){
+		$query = $this->db->query(
+			"SELECT idPaciente FROM citas 
+			WHERE estatus = 1 AND idPaciente = ? 
+			GROUP BY idPaciente HAVING COUNT(idPaciente) = ?", 
+			array( $idPaciente, 2 ));
+		
+		return $query;
 	}
 
 	public function getSpecialistContact($id)

@@ -11,7 +11,7 @@ class especialistasModel extends CI_Model {
     public function especialistas()
 	{
 		$query = $this->db-> query("SELECT * FROM opcionesporcatalogo WHERE idCatalogo = 1");
-		return $query->result();
+		return $query;
 	}
 
 }
