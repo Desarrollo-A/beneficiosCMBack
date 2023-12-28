@@ -178,8 +178,49 @@ class CalendarioController extends CI_Controller{
 		$this->output->set_output(json_encode($response));
 	}
 
-	function createAppointment(){
-		$dataValue = $this->input->post("dataValue", true);
+	public function createAppointmentByColaborator(){
+		$idEspecialista = $this->input->post('dataValue[idEspecialista]');
+		$idPaciente = $this->input->post('dataValue[idPaciente]');
+		$fechaInicio = $this->input->post('dataValue[fechaInicio]');
+		$fechaFinal = $this->input->post('dataValue[fechaFinal]');
+		$creadoPor = $this->input->post('dataValue[creadoPor]');
+		$observaciones = $this->input->post('dataValue[observaciones]');
+		$modificadoPor = $this->input->post('dataValue[modificadoPor]');
+		
+		$response['result'] = isset($idEspecialista, $idPaciente, $fechaInicio, $fechaFinal, $creadoPor, $observaciones, $modificadoPor);
+		if ($response['result']) {
+			$now = date('Y/m/d H:i:s', time());
+
+			$horaFinalResta = date('H:i:s', strtotime($fechaFinal . '-1 minute'));
+			$horaInicioSuma = date('H:i:s', strtotime($fechaInicio . '+1 minute'));
+	
+			$fechaFinalResta = date('Y/m/d H:i:s', strtotime($fechaFinal . '-1 minute'));
+			$fechaInicioSuma = date('Y/m/d H:i:s', strtotime($fechaFinal . '+1 minute'));
+
+			if($dataValue["fecha_inicio"] > $now) $pass = true;
+
+			$values = [
+				"idEspecialista" => $idEspecialista,
+            	"idPaciente" => $dataValue["id_paciente"],
+            	"estatus" => 1,
+            	"fechaInicio" => $dataValue["fecha_inicio"],
+            	"fechaFinal" => $dataValue["fecha_final"],
+            	"creadoPor" => $dataValue["creado_por"],
+            	"fechaModificacion" => date("Y-m-d H:i:s"),
+            	"observaciones" => $dataValue["observaciones"],
+            	"modificadoPor" => $dataValue["modificado_por"]
+			];
+		}else {
+			$response['msg'] = "¡Parametros invalidos!";
+		}
+		
+		$this->output->set_content_type("application/json");
+        $this->output->set_output(json_encode($response));
+
+		// ------------------------------------------------------
+		// AQUI TENGO QUE TERMINAR MI FUNCIÓN Y QUITAR EL RESTO DE CODIGO
+		// ------------------------------------------------------
+
 		$now = date('Y/m/d H:i:s', time());
 
 		$hora_final_resta = date('H:i:s', strtotime($dataValue["fecha_final"] . '-1 minute'));
@@ -232,6 +273,66 @@ class CalendarioController extends CI_Controller{
 		$this->output->set_content_type("application/json");
 		$this->output->set_output(json_encode($response));
 	}
+
+	function createAppointment(){
+        $dataValue = $this->input->post("dataValue", true);
+        $now = date('Y/m/d H:i:s', time());
+
+        $horaFinalResta = date('H:i:s', strtotime($dataValue["fecha_final"] . '-1 minute'));
+        $horaInicioSuma = date('H:i:s', strtotime($dataValue["fecha_inicio"] . '+1 minute'));
+
+        $fechaFinalResta = date('Y/m/d H:i:s', strtotime($dataValue["fecha_final"] . '-1 minute'));
+        $fechaInicioSuma = date('Y/m/d H:i:s', strtotime($dataValue["fecha_inicio"] . '+1 minute'));
+
+        $id_atencion = $this->calendarioModel->getIdAtencion($dataValue)->row()->idAtencionXSede;
+
+        if($dataValue["fecha_inicio"] > $now)
+            $pass = true;
+
+        try{
+            $values = [
+                "idEspecialista" => $dataValue["id_usuario"],
+                "idPaciente" => $dataValue["id_paciente"],
+                "estatus" => 1,
+                "fechaInicio" => $dataValue["fecha_inicio"],
+                "fechaFinal" => $dataValue["fecha_final"],
+                "creadoPor" => $dataValue["creado_por"],
+                "fechaModificacion" => date("Y-m-d H:i:s"),
+                "titulo" => $dataValue["titulo"],
+                "modificadoPor" => $dataValue["modificado_por"],
+                "idAtencionXSede" => $id_atencion,
+            ];
+            
+            
+            $check_user = $this->usuariosModel->checkUser($dataValue["id_paciente"]);
+            $check_appointment = $this->calendarioModel->checkAppointmentId($dataValue, $fechaInicioSuma, $fechaFinalResta);
+            $check_occupied = $this->calendarioModel->checkOccupied($dataValue, $horaInicioSuma, $horaFinalResta);
+
+            if ($check_appointment->num_rows() > 0 || $check_occupied->num_rows() > 0 || !isset($pass) || $check_user->num_rows() > 0) {
+                $response["result"] = false;
+                $response["msg"] = "El horario ya ha sido ocupado";
+            } 
+            else {
+                $addRecord = $this->generalModel->addRecord("citas", $values);
+
+                if ($addRecord) {
+                    $response["result"] = true;
+                    $response["msg"] = "Se ha agendado a cita";
+                } 
+                else {
+                    $response["result"] = false;
+                    $response["msg"] = "No se ha guardado la cita";
+                }
+            }
+        }
+        catch(EXCEPTION $e){
+            $response["result"] = false;
+            $response["msg"] = "Error";
+        }
+
+        $this->output->set_content_type("application/json");
+        $this->output->set_output(json_encode($response));
+    }
 
 	public function cancelAppointment(){
 		$id = $this->input->post("dataValue", true);
@@ -380,32 +481,6 @@ class CalendarioController extends CI_Controller{
 		$this->output->set_output(json_encode($response));
 	}
 
-/* 	function getBeneficiosDisponibles(){
-		$datosEmpleado = json_decode(file_get_contents('php://input'));
-		print_r($datosEmpleado);
-		echo '<br><br>';
-		print_r($this->session->userdata());
-
-		exit;
-    	$dataButton = $this->calendarioModel->revisaCitas();
-		$data['beneficios'] = $this->calendarioModel->getBeneficiosDisponibles();
-		print_r(json_encode($data));
-	} */
-
-	function getBeneficiosDisponibles(){
-/* 		$datosEmpleado = json_decode(file_get_contents('php://input'));
-		print_r($datosEmpleado);
-		echo '<br><br>';
-		print_r($this->session->userdata());
-
-		exit; */
-    	/* $dataButton = $this->calendarioModel->revisaCitas(); */
-		$data['beneficios'] = $this->calendarioModel->getBeneficiosDisponibles();
-		json_encode($data);
-	}
-
-<<<<<<< HEAD
-=======
 	public function getBeneficiosPorSede(){
 		$sede = $this->input->post('dataValue[sede]');
 		
@@ -493,6 +568,4 @@ class CalendarioController extends CI_Controller{
 		$this->output->set_content_type("application/json");
         $this->output->set_output(json_encode($response));
 	}
-
->>>>>>> 7dbb84534201e7e2199be803e6670181d1cbdccf
 }

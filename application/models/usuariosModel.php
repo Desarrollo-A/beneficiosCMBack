@@ -37,4 +37,10 @@ class usuariosModel extends CI_Model {
 		$query = $this->db->query("SELECT idUsuario, nombre FROM usuarios");
 		return $query->result();
 	}
+
+	public function getSpecialistContact($id)
+	{
+		$query = $this->db->query("SELECT nombre, telPersonal, correo FROM usuarios WHERE idUsuario = ?", $id);
+		return $query;
+	}
 }

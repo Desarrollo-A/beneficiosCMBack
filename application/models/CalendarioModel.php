@@ -123,7 +123,7 @@ class CalendarioModel extends CI_Model
         return $query;
     }
 
-    public function checkAppointmentId($dataValue, $fecha_inicio_suma, $fecha_final_resta){
+    public function checkAppointmentId($dataValue, $fechaInicioSuma, $fechaFinalResta){
         $query = $this->db->query(
                 "SELECT *FROM citas WHERE
                 ((fechaInicio BETWEEN ? AND ?)
@@ -134,16 +134,26 @@ class CalendarioModel extends CI_Model
                 AND idPaciente = ?
                 AND estatus = ?",
             array(
-                $fecha_inicio_suma, $fecha_final_resta,
-                $fecha_inicio_suma, $fecha_final_resta,
-                $fecha_inicio_suma,
-                $fecha_final_resta,
+                $fechaInicioSuma, $fechaFinalResta,
+                $fechaInicioSuma, $fechaFinalResta,
+                $fechaInicioSuma, $fechaFinalResta,
                 $dataValue["id_usuario"],
                 $dataValue["id_paciente"],
                 1
             )
         );
 
+        return $query;
+    }
+
+    public function getIdAtencion($dataValue){
+        $query = $this->db->query(
+            "SELECT idAtencionXSede FROM atencionXSede 
+            WHERE idEspecialista = ?
+            AND idSede = ( SELECT sede FROM usuarios WHERE idUsuario = ? ) AND estatus = ?", 
+            array($dataValue["id_usuario"], $dataValue["id_usuario"], 1)
+        );
+        
         return $query;
     }
 
@@ -158,12 +168,6 @@ class CalendarioModel extends CI_Model
 		AND idCatalogo=1");
         return $query->result_array();
     }
-
-    function revisaCitas()
-    {
-        print_r($this->session->userdata('id_usuario'));
-        exit;
-    } 
 
     // **********************************************************
 
