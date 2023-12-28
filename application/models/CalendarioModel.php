@@ -36,7 +36,7 @@ class CalendarioModel extends CI_Model
     public function getAppointment($year, $month, $idUsuario, $dates){
         $query = $this->db->query(
             "SELECT CAST(ct.idCita AS VARCHAR(36))  AS id,  ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
-            ct.fechaInicio AS occupied, 'green' AS 'color', 'cita' AS 'type', ct.estatus, us.nombre,
+            ct.fechaInicio AS occupied, 'green' AS 'color', 'cita' AS 'type', ct.estatus, us.nombre, ct.idPaciente, 
             'color' = CASE
 	            WHEN ct.estatus = 0 THEN 'red'
 	            WHEN ct.estatus = 1 THEN 'green'
@@ -156,16 +156,19 @@ class CalendarioModel extends CI_Model
             OR (fechaFinal BETWEEN ? AND ?)
             OR (? BETWEEN fechaInicio AND fechaFinal)
             OR (? BETWEEN fechaInicio AND fechaFinal))
-            AND idEspecialista = ?
             AND idCita != ?
-            AND estatus = ?",
+            AND ((idPaciente = ?
+            AND estatus = ?)
+            OR (idEspecialista = ? AND estatus IN(?)))",
         array(
             $fecha_inicio_suma, $fecha_final_resta,
             $fecha_inicio_suma, $fecha_final_resta,
             $fecha_inicio_suma,
             $fecha_final_resta,
-            $dataValue["id_usuario"],
             $dataValue["id"],
+            $dataValue["id_paciente"],
+            1,
+            $dataValue["id_usuario"],
             1
         )
     );
