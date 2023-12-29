@@ -22,7 +22,7 @@ class CalendarioModel extends CI_Model
     public function getOccupied($year, $month, $idUsuario, $dates){
         $query = $this->db->query(
             "SELECT idUnico as id, titulo as title, concat(fechaOcupado, ' ', horaInicio) as 'start', concat(fechaOcupado, ' ', horaFinal) as 'end',
-            fechaOcupado AS occupied, 'purple' AS 'color', estatus, 'ocupado' AS 'type'
+            fechaOcupado AS occupied, 'purple' AS 'color', estatus, 'cancel' AS 'type'
             FROM horariosOcupados 
             WHERE YEAR(fechaOcupado) in (?, ?)
             AND MONTH(fechaOcupado) in (?, ?, ?)
@@ -36,7 +36,7 @@ class CalendarioModel extends CI_Model
     public function getAppointment($year, $month, $idUsuario, $dates){
         $query = $this->db->query(
             "SELECT CAST(ct.idCita AS VARCHAR(36))  AS id,  ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
-            ct.fechaInicio AS occupied, 'green' AS 'color', 'cita' AS 'type', ct.estatus, us.nombre, ct.idPaciente, 
+            ct.fechaInicio AS occupied, 'green' AS 'color', 'date' AS 'type', ct.estatus, us.nombre, ct.idPaciente, us.telPersonal,
             'color' = CASE
 	            WHEN ct.estatus = 0 THEN 'red'
 	            WHEN ct.estatus = 1 THEN 'green'

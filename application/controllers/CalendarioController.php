@@ -296,13 +296,27 @@ class CalendarioController extends CI_Controller{
 	}
 
 	public function cancelAppointment(){
-		$id = $this->input->post("dataValue", true);
+		$dataValue = $this->input->post("dataValue", true);
+		$current = new DateTime();
+		$startStamp = $dataValue["startStamp"];
+		$endStamp = $current->format('Y/m/d H:i:s');
+
+		$start = new DateTime($startStamp);
+		$diferencia = $start->diff(new DateTime($endStamp));
+		$estatus = 2;
+		$titulo = "Cita cancelada";
+
+		if($diferencia->d === 0 && $diferencia->h < 3){ // condición para poder saber si se penaliza la cita
+			$estatus = 3;
+			$titulo = "Cita penalizada";
+		}
 
 		$values = [
-			"estatus" => 2
+			"estatus" => $estatus,
+			"titulo" => $titulo
 		];
 
-		$updateRecord = $this->generalModel->updateRecord("citas", $values, "idCita", $id);
+		$updateRecord = $this->generalModel->updateRecord("citas", $values, "idCita", $dataValue["id"]);
 
 		if ($updateRecord) {
             $response["result"] = true;
