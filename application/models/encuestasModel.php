@@ -92,7 +92,7 @@ class encuestasModel extends CI_Model {
         $query_especialistas = $this->db->query("SELECT DISTINCT ct.idEspecialista
         FROM usuarios us
         INNER JOIN citas ct ON ct.idPaciente = us.idUsuario
-        WHERE ct.estatus = 4 AND us.idUsuario = $dt AND ct.fechaFinal BETWEEN '2023-11-01' AND '2023-12-20'");
+        WHERE ct.estatusCita = 4 AND us.idUsuario = $dt AND ct.fechaFinal BETWEEN '2023-11-01' AND '2023-12-20'");
 
         if ($query_especialistas->num_rows() > 0) {
         
