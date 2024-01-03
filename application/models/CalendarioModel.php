@@ -7,12 +7,12 @@ class CalendarioModel extends CI_Model
     public function getAppointmentsByUser($year, $month, $idUsuario){
         $query = $this->db->query(
             "SELECT CAST(idCita AS VARCHAR(36)) AS id, observaciones AS title, fechaInicio AS 'start', fechaFinal AS 'end', 
-            fechaInicio AS occupied, estatus 
+            fechaInicio AS occupied, estatusCita 
             FROM citas
             WHERE YEAR(fechaInicio) = ?
             AND MONTH(fechaInicio) = ?
             AND idPaciente = ?
-            AND estatus = ?",
+            AND estatusCita = ?",
             array( $year, $month, $idUsuario, 1 )
         );
 
@@ -187,17 +187,6 @@ class CalendarioModel extends CI_Model
         return $query;
     }
 
-    public function getIdAtencion($dataValue){
-        $query = $this->db->query(
-            "SELECT idAtencionXSede FROM atencionXSede 
-            WHERE idEspecialista = ?
-            AND idSede = ( SELECT sede FROM usuarios WHERE idUsuario = ? ) AND estatus = ?", 
-            array($dataValue["id_usuario"], $dataValue["id_usuario"], 1)
-        );
-        
-        return $query;
-    }
-
     public function getBeneficiosDisponibles()
     {
         $query = $this->db->query("
@@ -264,6 +253,34 @@ class CalendarioModel extends CI_Model
             FULL JOIN sedes AS se ON se.idSede = o.idSede
             WHERE u.estatus = 1 AND s.estatus = 1 AND axs.estatus = 1  AND u.idRol = 3 AND oxc.idCatalogo = 5
             AND axs.idSede = ? AND u.idUsuario = ?", array($sede, $especialista));
+
+        return $query;
+    }
+
+    public function getOficinaByAtencion($sede, $beneficio, $especialista, $modalidad)
+    {
+        $query = $this->db->query(
+            "SELECT axs.idAtencionXSede, axs.idEspecialista, axs.idSede, axs.tipoCita,  axs.estatus,
+            ofi.idOficina, ofi.oficina, ofi.ubicación
+            from atencionXSede AS axs
+            INNER JOIN oficinas AS ofi ON axs.idOficina = ofi.idOficina
+            WHERE axs.estatus = 1 AND
+            axs.idSede = ? AND axs.idEspecialista = ? AND axs.tipoCita = ?", array($sede, $especialista, $modalidad)
+        );
+
+        return $query;
+    }
+
+    public function getHorariosDisponibles($sede, $beneficio, $especialista, $modalidad)
+    {
+        $query = $this->db->query(
+            "SELECT axs.idAtencionXSede, axs.idEspecialista, axs.idSede, axs.tipoCita,  axs.estatus,
+            ofi.idOficina, ofi.oficina, ofi.ubicación
+            from atencionXSede AS axs
+            INNER JOIN oficinas AS ofi ON axs.idOficina = ofi.idOficina
+            WHERE axs.estatus = 1 AND
+            axs.idSede = ? AND axs.idEspecialista = ? AND axs.tipoCita = ?", array($sede, $especialista, $modalidad)
+        );
 
         return $query;
     }

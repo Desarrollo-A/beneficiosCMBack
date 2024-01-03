@@ -631,4 +631,39 @@ class CalendarioController extends CI_Controller{
         $this->output->set_output(json_encode($response));
 	}
 
+	public function getOficinaByAtencion() {
+		$sede = $this->input->post('dataValue[sede]');
+		$beneficio = $this->input->post('dataValue[beneficio]');
+		$especialista = $this->input->post('dataValue[especialista]');
+		$modalidad = $this->input->post('dataValue[modalidad]');
+
+		$rs = $this->calendarioModel->getOficinaByAtencion($sede, $beneficio, $especialista, $modalidad)->result();
+		$response['result'] = count($rs) > 0;
+		if ($response['result']) {
+			$response['msg'] = '¡Datos de oficina cargados exitosamente!';
+			$response['data'] = $rs;
+		}else {
+			$response['msg'] = '¡No existen registros!';
+		}
+		$this->output->set_content_type("application/json");
+        $this->output->set_output(json_encode($response));
+	}
+
+	public function getHorariosDisponibles() {
+		$sede = $this->input->post('dataValue[sede]');
+		$beneficio = $this->input->post('dataValue[beneficio]');
+		$especialista = $this->input->post('dataValue[especialista]');
+		$modalidad = $this->input->post('dataValue[modalidad]');
+
+		$rs = $this->calendarioModel->getHorariosDisponibles($sede, $beneficio, $especialista, $modalidad)->result();
+		$response['result'] = count($rs) > 0;
+		if ($response['result']) {
+			$response['msg'] = '¡Datos de oficina cargados exitosamente!';
+			$response['data'] = $rs;
+		}else {
+			$response['msg'] = '¡No existen registros!';
+		}
+		$this->output->set_content_type("application/json");
+        $this->output->set_output(json_encode($response));
+	}
 }
