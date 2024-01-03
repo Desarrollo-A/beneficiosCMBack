@@ -347,7 +347,7 @@ class CalendarioController extends CI_Controller{
 				"modificadoPor" => $dataValue["idUsuario"]
 			];
 			
-			$check_occupied = $this->calendarioModel->checkOccupied($dataValue, $fechaInicioSuma ,$horaFinalResta);
+			$check_occupied = $this->calendarioModel->checkOccupied($dataValue, $fechaInicioSuma ,$fechaFinalResta);
 			$check_appointment = $this->calendarioModel->checkAppointmentNormal($dataValue, $fechaInicioSuma, $fechaFinalResta);
 
 			if ($check_occupied->num_rows() > 0 || $check_appointment->num_rows() > 0) {
@@ -387,14 +387,14 @@ class CalendarioController extends CI_Controller{
 
 		if($start < $now){
 			$reponse["result"] = false;
-			$response["msg"] = "No se pueden mover las fechas a un dia anterior o actual";
-			return;
+			$response["msg"] = "No se pueden mover las fechas a un dia anterior";
+			return $response;
 		}
 		
 		if($oldStart < $now){
 			$response["result"] = false;
 			$response["msg"] = "Las citas u horarios pasados no se pueden mover";
-			return;
+			return $response;
 		}
 
 		try{
@@ -404,7 +404,7 @@ class CalendarioController extends CI_Controller{
 				"fechaModificacion" => $now
 			];
 			
-			$checkOccupied = $this->calendarioModel->checkOccupied($dataValue, $fechaInicioSuma ,$fechaFinalResta);
+			$checkOccupied = $this->calendarioModel->checkOccupiedId($dataValue, $fechaInicioSuma ,$fechaFinalResta);
 			$checkAppointment = $this->calendarioModel->checkAppointmentNormal($dataValue, $fechaInicioSuma, $fechaFinalResta);
 
 			if ($checkOccupied->num_rows() > 0 || $checkAppointment->num_rows() > 0) {
