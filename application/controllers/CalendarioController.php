@@ -42,29 +42,25 @@ class CalendarioController extends CI_Controller{
 		$dataValue = $this->input->post("dataValue");
 		$now = date('Y/m/d H:i:s', time());
 
-		$horaFinalResta = date('H:i:s', strtotime($dataValue["hora_final"] . '-1 minute'));
-        $horaInicioSuma = date('H:i:s', strtotime($dataValue["hora_inicio"] . '+1 minute'));
-
-        $fechaFinalResta = date('Y/m/d H:i:s', strtotime($dataValue["fecha_final"] . '-1 minute'));
-        $fechaInicioSuma = date('Y/m/d H:i:s', strtotime($dataValue["fecha_inicio"] . '+1 minute'));
+        $fechaFinalResta = date('Y/m/d H:i:s', strtotime($dataValue["fechaFinal"] . '-1 minute'));
+        $fechaInicioSuma = date('Y/m/d H:i:s', strtotime($dataValue["fechaInicio"] . '+1 minute'));
 
 		$values = [
-			"fechaOcupado" => $dataValue["fecha"], 
-			"horaInicio" => $dataValue["hora_inicio"], 
-			"horaFinal" => $dataValue["hora_final"], 
-			"idEspecialista" => $dataValue["id_usuario"], 
-			"creadoPor" => $dataValue["id_usuario"], 
+			"idEspecialista" => $dataValue["idUsuario"], 
+			"fechaInicio" => $dataValue["fechaInicio"], 
+			"fechaFinal" => $dataValue["fechaFinal"], 
+			"creadoPor" => $dataValue["idUsuario"], 
 			"fechaModificacion" => date("Y-m-d H:i:s"), 
 			"fechaCreacion" => date("Y-m-d H:i:s"), 
 			"titulo" => $dataValue["titulo"], 
-			"idUnico" => $dataValue["id_unico"]
+			"idUnico" => $dataValue["idUnico"]
 		];
 
-		if($dataValue["fecha_inicio"] > $now)
+		if($dataValue["fechaInicio"] > $now)
 			$pass = true;
 
 		try{
-			$check_occupied = $this->calendarioModel->checkOccupied($dataValue, $horaInicioSuma ,$horaFinalResta);
+			$check_occupied = $this->calendarioModel->checkOccupied($dataValue, $fechaInicioSuma ,$fechaFinalResta);
 			$check_appointment = $this->calendarioModel->checkAppointmentNormal($dataValue, $fechaInicioSuma, $fechaFinalResta);
 			
 			if ($check_occupied->num_rows() < 1 && $check_appointment->num_rows() < 1 && isset($pass) ) {
@@ -96,16 +92,13 @@ class CalendarioController extends CI_Controller{
 
 	public function updateOccupied(){
 		$dataValue = $this->input->post("dataValue", true);
-		$start = $dataValue["start"]; // datos para la validación de no mover una eveneto pasado de su dia
+		$start = $dataValue["fechaInicio"]; // datos para la validación de no mover una eveneto pasado de su dia
 		$oldStart = $dataValue["oldStart"];
 		$current = new DateTime();
 		$now = $current->format('Y/m/d');
 
-		$horaFinalResta = date('H:i:s', strtotime($dataValue["hora_final"] . '-1 minute'));
-        $horaInicioSuma = date('H:i:s', strtotime($dataValue["hora_inicio"] . '+1 minute'));
-
-        $fechaFinalResta = date('Y/m/d H:i:s', strtotime($dataValue["fecha_final"] . '-1 minute'));
-        $fechaInicioSuma = date('Y/m/d H:i:s', strtotime($dataValue["fecha_inicio"] . '+1 minute'));
+		$fechaInicioSuma = date('Y/m/d H:i:s', strtotime($dataValue["fechaInicio"] . '+1 minute'));
+        $fechaFinalResta = date('Y/m/d H:i:s', strtotime($dataValue["fechaFinal"] . '-1 minute'));
 
 		if($start < $now){
 			$reponse["result"] = false;
@@ -122,14 +115,13 @@ class CalendarioController extends CI_Controller{
 		
 		try{
 			$values = [
-				"horaInicio" => $dataValue["hora_inicio"], 
-				"horaFinal" => $dataValue["hora_final"], 
+				"fechaInicio" => $dataValue["fechaInicio"], 
+				"fechaFinal" => $dataValue["fechaFinal"], 
 				"fechaModificacion" => date("Y-m-d H:i:s"), 
-				"titulo" => $dataValue["titulo"], 
-				"fechaOcupado" => $dataValue["fecha_ocupado"], 
+				"titulo" => $dataValue["titulo"],
 			];
 			
-			$check_occupiedId = $this->calendarioModel->checkOccupiedId($dataValue, $horaInicioSuma ,$horaFinalResta);
+			$check_occupiedId = $this->calendarioModel->checkOccupiedId($dataValue, $fechaInicioSuma ,$fechaFinalResta);
 			$check_appointment = $this->calendarioModel->checkAppointmentNormal($dataValue, $fechaInicioSuma, $fechaFinalResta);
 
 			if ($check_occupiedId->num_rows() > 0 || $check_appointment->num_rows() > 0) {
@@ -138,63 +130,6 @@ class CalendarioController extends CI_Controller{
             } 
 			else {
 				$updateRecord = $this->generalModel->updateRecord("horariosOcupados", $values, "idUnico", $dataValue["id"]);
-
-                if ($updateRecord) {
-                    $response["result"] = true;
-                    $response["msg"] = "Horario actualizado";
-                } else {
-                    $response["result"] = false;
-                    $response["msg"] = "Error al guardar";
-                }
-            }
-		}
-		catch(EXCEPTION $e){
-			$response["result"] = false;
-            $response["msg"] = "Error";
-		}
-
-		$this->output->set_content_type('application/json');
-		$this->output->set_output(json_encode($response));
-	}
-
-	public function updateAppointment(){
-		$dataValue = $this->input->post("dataValue", true);
-		$start = $dataValue["start"]; // datos para la validación de no mover una eveneto pasado de su dia
-		$current = new DateTime();
-		$now = $current->format('Y/m/d');
-
-		$horaFinalResta = date('H:i:s', strtotime($dataValue["hora_final"] . '-1 minute'));
-        $horaInicioSuma = date('H:i:s', strtotime($dataValue["hora_inicio"] . '+1 minute'));
-
-        $fechaFinalResta = date('Y/m/d H:i:s', strtotime($dataValue["fecha_final"] . '-1 minute'));
-        $fechaInicioSuma = date('Y/m/d H:i:s', strtotime($dataValue["fecha_inicio"] . '+1 minute'));
-
-		if($start < $now){
-			$reponse["result"] = false;
-			$response["msg"] = "No se pueden mover las fechas a un dia anterior o actual";
-
-			$this->output->set_content_type('application/json');
-			$this->output->set_output(json_encode($response));
-		}
-		
-		try{
-			$values = [
-				"fechaInicio" => $dataValue["fecha_inicio"], 
-				"fechaFinal" => $dataValue["fecha_final"], 
-				"fechaModificacion" => date("Y-m-d H:i:s"),
-				"modificadoPor" => $dataValue["id_usuario"],
-				"titulo" => $dataValue["titulo"]
-			];
-			
-			$check_occupied = $this->calendarioModel->checkOccupied($dataValue, $horaInicioSuma ,$horaFinalResta);
-			$check_appointmentId = $this->calendarioModel->checkAppointmentId($dataValue, $fechaInicioSuma, $fechaFinalResta);
-
-			if ($check_occupied->num_rows() > 0 || $check_appointmentId->num_rows() > 0) {
-                $response["result"] = false;
-                $response["msg"] = "El horario ya ha sido ocupado";
-            } 
-			else {
-				$updateRecord = $this->generalModel->updateRecord("citas", $values, "idCita", $dataValue["id"]);
 
                 if ($updateRecord) {
                     $response["result"] = true;
@@ -280,35 +215,32 @@ class CalendarioController extends CI_Controller{
 
 		$now = date('Y/m/d H:i:s', time());
 
-		$horaFinalResta = date('H:i:s', strtotime($dataValue["fecha_final"] . '-1 minute'));
-        $horaInicioSuma = date('H:i:s', strtotime($dataValue["fecha_inicio"] . '+1 minute'));
+        $fechaFinalResta = date('Y/m/d H:i:s', strtotime($dataValue["fechaFinal"] . '-1 minute'));
+        $fechaInicioSuma = date('Y/m/d H:i:s', strtotime($dataValue["fechaInicio"] . '+1 minute'));
 
-        $fechaFinalResta = date('Y/m/d H:i:s', strtotime($dataValue["fecha_final"] . '-1 minute'));
-        $fechaInicioSuma = date('Y/m/d H:i:s', strtotime($dataValue["fecha_inicio"] . '+1 minute'));
+		$idAtencion = $this->calendarioModel->getIdAtencion($dataValue)->row()->idAtencionXSede;
 
-		$id_atencion = $this->calendarioModel->getIdAtencion($dataValue)->row()->idAtencionXSede;
-
-		if($dataValue["fecha_inicio"] > $now)
+		if($dataValue["fechaInicio"] > $now)
 			$pass = true;
 
 		try{
 			$values = [
-				"idEspecialista" => $dataValue["id_usuario"],
-            	"idPaciente" => $dataValue["id_paciente"],
-            	"estatus" => 1,
-            	"fechaInicio" => $dataValue["fecha_inicio"],
-            	"fechaFinal" => $dataValue["fecha_final"],
-            	"creadoPor" => $dataValue["creado_por"],
+				"idEspecialista" => $dataValue["idUsuario"],
+            	"idPaciente" => $dataValue["idPaciente"],
+            	"estatusCita" => 1,
+            	"fechaInicio" => $dataValue["fechaInicio"],
+            	"fechaFinal" => $dataValue["fechaFinal"],
+            	"creadoPor" => $dataValue["creadoPor"],
             	"fechaModificacion" => date("Y-m-d H:i:s"),
             	"titulo" => $dataValue["titulo"],
-            	"modificadoPor" => $dataValue["modificado_por"],
-				"idAtencionXSede" => $id_atencion
+            	"modificadoPor" => $dataValue["modificadoPor"],
+				"idAtencionXSede" => $idAtencion
 			];
 			
 			
-			$check_user = $this->usuariosModel->checkUser($dataValue["id_paciente"]);
+			$check_user = $this->usuariosModel->checkUser($dataValue["idPaciente"]);
 			$check_appointment = $this->calendarioModel->checkAppointment($dataValue, $fechaInicioSuma, $fechaFinalResta);
-			$check_occupied = $this->calendarioModel->checkOccupied($dataValue, $horaInicioSuma, $horaFinalResta);
+			$check_occupied = $this->calendarioModel->checkOccupied($dataValue, $fechaInicioSuma, $fechaFinalResta);
 
 			if ($check_appointment->num_rows() > 0 || $check_occupied->num_rows() > 0 || !isset($pass) || $check_user->num_rows() > 0) {
                 $response["result"] = false;
@@ -395,15 +327,83 @@ class CalendarioController extends CI_Controller{
         $this->output->set_content_type("application/json");
         $this->output->set_output(json_encode($response));
     }
+	
+	public function updateAppointment(){
+		$dataValue = $this->input->post("dataValue", true);
+		$start = $dataValue["fechaInicio"]; // datos para la validación de no mover una eveneto pasado de su dia
+		$current = new DateTime();
+		$now = $current->format('Y/m/d');
+
+        $fechaFinalResta = date('Y/m/d H:i:s', strtotime($dataValue["fechaFinal"] . '-1 minute'));
+        $fechaInicioSuma = date('Y/m/d H:i:s', strtotime($dataValue["fechaInicio"] . '+1 minute'));
+
+		if($start < $now){
+			$reponse["result"] = false;
+			$response["msg"] = "No se pueden mover las fechas a un dia anterior o actual";
+
+			$this->output->set_content_type('application/json');
+			$this->output->set_output(json_encode($response));
+		}
+		
+		try{
+			$values = [
+				"fechaInicio" => $dataValue["fechaInicio"], 
+				"fechaFinal" => $dataValue["fechaFinal"], 
+				"fechaModificacion" => date("Y-m-d H:i:s"),
+				"modificadoPor" => $dataValue["idUsuario"],
+				"titulo" => $dataValue["titulo"]
+			];
+			
+			$check_occupied = $this->calendarioModel->checkOccupied($dataValue, $fechaInicioSuma ,$fechaFinalResta);
+			$check_appointmentId = $this->calendarioModel->checkAppointmentId($dataValue, $fechaInicioSuma, $fechaFinalResta);
+
+			if ($check_occupied->num_rows() > 0 || $check_appointmentId->num_rows() > 0) {
+                $response["result"] = false;
+                $response["msg"] = "El horario ya ha sido ocupado";
+            } 
+			else {
+				$updateRecord = $this->generalModel->updateRecord("citas", $values, "idCita", $dataValue["id"]);
+
+                if ($updateRecord) {
+                    $response["result"] = true;
+                    $response["msg"] = "Horario actualizado";
+                } else {
+                    $response["result"] = false;
+                    $response["msg"] = "Error al guardar";
+                }
+            }
+		}
+		catch(EXCEPTION $e){
+			$response["result"] = false;
+            $response["msg"] = "Error";
+		}
+
+		$this->output->set_content_type('application/json');
+		$this->output->set_output(json_encode($response));
+	}
 
 	public function cancelAppointment(){
-		$id = $this->input->post("dataValue", true);
+		$dataValue = $this->input->post("dataValue", true);
+		$current = new DateTime();
+		$startStamp = $dataValue["startStamp"];
+		$endStamp = $current->format('Y/m/d H:i:s');
+
+		$start = new DateTime($startStamp);
+		$diferencia = $start->diff(new DateTime($endStamp));
+		$estatus = 2;
+		$titulo = "Cita cancelada";
+
+		if($diferencia->d === 0 && $diferencia->h < 3){ // condición para poder saber si se penaliza la cita
+			$estatus = 3;
+			$titulo = "Cita penalizada";
+		}
 
 		$values = [
-			"estatus" => 2
+			"estatusCita" => $estatus,
+			"titulo" => $titulo
 		];
 
-		$updateRecord = $this->generalModel->updateRecord("citas", $values, "idCita", $id);
+		$updateRecord = $this->generalModel->updateRecord("citas", $values, "idCita", $dataValue["id"]);
 
 		if ($updateRecord) {
             $response["result"] = true;
@@ -420,16 +420,13 @@ class CalendarioController extends CI_Controller{
 
 	public function appointmentDrop(){
 		$dataValue = $this->input->post("dataValue", true);
-		$start = $dataValue["start"]; // datos para la validación de no mover una eveneto pasado de su dia
-		$oldStart = $dataValue["old_start"];
+		$start = $dataValue["fechaInicio"]; // datos para la validación de no mover una eveneto pasado de su dia
+		$oldStart = $dataValue["oldStart"];
 		$current = new DateTime();
-		$now = $current->format('Y/m/d');
+		$now = $current->format('Y/m/d H:i:s');
 
-        $fecha_final_resta = date('Y/m/d H:i:s', strtotime($dataValue["fecha_final"] . '-1 minute'));
-        $fecha_inicio_suma = date('Y/m/d H:i:s', strtotime($dataValue["fecha_inicio"] . '+1 minute'));
-
-        $hora_final_resta = date('H:i:s', strtotime($dataValue["fecha_final"] . '-1 minute'));
-        $hora_inicio_suma = date('H:i:s', strtotime($dataValue["fecha_inicio"] . '+1 minute'));
+        $fechaFinalResta = date('Y/m/d H:i:s', strtotime($dataValue["fechaFinal"] . '-1 minute'));
+        $fechaInicioSuma = date('Y/m/d H:i:s', strtotime($dataValue["fechaInicio"] . '+1 minute'));
 
 		if($start < $now){
 			$reponse["result"] = false;
@@ -445,14 +442,14 @@ class CalendarioController extends CI_Controller{
 
 		try{
 			$values = [
-				"fechaInicio" => $dataValue["fecha_inicio"],
-				"fechaFinal" => $dataValue["fecha_final"],
+				"fechaInicio" => $dataValue["fechaInicio"],
+				"fechaFinal" => $dataValue["fechaFinal"],
 				"fechaModificacion" => $now,
-				"modificadoPor" => $dataValue["id_usuario"]
+				"modificadoPor" => $dataValue["idUsuario"]
 			];
 			
-			$check_occupied = $this->calendarioModel->checkOccupied($dataValue, $hora_inicio_suma ,$hora_final_resta);
-			$check_appointment = $this->calendarioModel->checkAppointmentNormal($dataValue, $fecha_inicio_suma, $fecha_final_resta);
+			$check_occupied = $this->calendarioModel->checkOccupied($dataValue, $fechaInicioSuma ,$fechaFinalResta);
+			$check_appointment = $this->calendarioModel->checkAppointmentNormal($dataValue, $fechaInicioSuma, $fechaFinalResta);
 
 			if ($check_occupied->num_rows() > 0 || $check_appointment->num_rows() > 0) {
                 $response["result"] = false;
@@ -481,44 +478,37 @@ class CalendarioController extends CI_Controller{
 
 	public function occupiedDrop(){
 		$dataValue = $this->input->post("dataValue", true);
-		$start = $dataValue["start"]; // datos para la validación de no mover una eveneto pasado de su dia
-		$oldStart = $dataValue["old_start"];
+		$start = $dataValue["fechaInicio"]; // datos para la validación de no mover una eveneto pasado de su dia
+		$oldStart = $dataValue["oldStart"];
 		$current = new DateTime();
-		$now = $current->format('Y/m/d');
+		$now = $current->format('Y/m/d H:i:s');
 
-        $fecha_final_resta = date('Y/m/d H:i:s', strtotime($dataValue["fecha_final"] . '-1 minute'));
-        $fecha_inicio_suma = date('Y/m/d H:i:s', strtotime($dataValue["fecha_inicio"] . '+1 minute'));
-
-        $hora_final_resta = date('H:i:s', strtotime($dataValue["fecha_final"] . '-1 minute'));
-        $hora_inicio_suma = date('H:i:s', strtotime($dataValue["fecha_inicio"] . '+1 minute'));
-
-		$hora_final = date('H:i:s', strtotime($dataValue["fecha_final"]));
-        $hora_inicio = date('H:i:s', strtotime($dataValue["fecha_inicio"]));
+        $fechaInicioSuma = date('Y/m/d H:i:s', strtotime($dataValue["fechaInicio"] . '+1 minute'));
+        $fechaFinalResta = date('Y/m/d H:i:s', strtotime($dataValue["fechaFinal"] . '-1 minute'));
 
 		if($start < $now){
 			$reponse["result"] = false;
-			$response["msg"] = "No se pueden mover las fechas a un dia anterior o actual";
-			return;
+			$response["msg"] = "No se pueden mover las fechas a un dia anterior";
+			return $response;
 		}
 		
 		if($oldStart < $now){
 			$response["result"] = false;
 			$response["msg"] = "Las citas u horarios pasados no se pueden mover";
-			return;
+			return $response;
 		}
 
 		try{
 			$values = [
-				"fechaOcupado" => $dataValue["fecha"],
-				"horaInicio" => $hora_inicio,
-				"horaFinal" => $hora_final,
+				"fechaInicio" => $dataValue["fechaInicio"],
+				"fechaFinal" => $dataValue["fechaFinal"],
 				"fechaModificacion" => $now
 			];
 			
-			$check_occupied = $this->calendarioModel->checkOccupied($dataValue, $hora_inicio_suma ,$hora_final_resta);
-			$check_appointment = $this->calendarioModel->checkAppointmentNormal($dataValue, $fecha_inicio_suma, $fecha_final_resta);
+			$checkOccupied = $this->calendarioModel->checkOccupiedId($dataValue, $fechaInicioSuma ,$fechaFinalResta);
+			$checkAppointment = $this->calendarioModel->checkAppointmentNormal($dataValue, $fechaInicioSuma, $fechaFinalResta);
 
-			if ($check_occupied->num_rows() > 0 || $check_appointment->num_rows() > 0) {
+			if ($checkOccupied->num_rows() > 0 || $checkAppointment->num_rows() > 0) {
                 $response["result"] = false;
                 $response["msg"] = "El horario ya ha sido ocupado";
             } 

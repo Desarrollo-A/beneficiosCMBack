@@ -39,7 +39,7 @@ class usuariosModel extends CI_Model {
 			 WHERE idRol = ?
 			 AND estatus = ?
 			 AND idUsuario 
-			 NOT IN( SELECT idPaciente FROM citas WHERE estatus = ? GROUP BY idPaciente HAVING COUNT(idPaciente) > ?)
+			 NOT IN( SELECT idPaciente FROM citas WHERE estatusCita = ? GROUP BY idPaciente HAVING COUNT(idPaciente) > ?)
 			 AND sede
 			 IN( select distinct idSede from atencionXSede where idEspecialista = ?)",
 			 array( 2, 1, 1, 1, $idEspecialista )
@@ -50,7 +50,7 @@ class usuariosModel extends CI_Model {
 	public function checkUser($idPaciente){
 		$query = $this->db->query(
 			"SELECT idPaciente FROM citas 
-			WHERE estatus = 1 AND idPaciente = ? 
+			WHERE estatusCita = 1 AND idPaciente = ? 
 			GROUP BY idPaciente HAVING COUNT(idPaciente) = ?", 
 			array( $idPaciente, 2 ));
 		
