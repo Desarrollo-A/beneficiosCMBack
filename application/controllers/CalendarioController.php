@@ -38,6 +38,46 @@ class CalendarioController extends CI_Controller{
 		$this->output->set_output(json_encode($data));
 	}
 
+	public function getAllEventsWithRange(){
+		$idUsuario = $this->input->post('dataValue[idUsuario]');
+		$fechaInicio = $this->input->post('dataValue[fechaInicio]');
+		$fechaFin = $this->input->post('dataValue[fechaFin]');
+
+		$response['result'] = isset($idUsuario, $fechaInicio, $fechaFin);
+		if ($response['result']) {
+			$occupied = $this->calendarioModel->getOccupiedRange($fechaInicio, $fechaFin, $idUsuario);
+			$appointment = $this->calendarioModel->getAppointmentRange($fechaInicio, $fechaFin, $idUsuario);
+
+			$response['result'] = $occupied->num_rows() > 0 || $appointment->num_rows() > 0;
+			if($response['result']) {
+				$response['msg'] = '¡Eventos cargados exitosamente!';
+				$response['data'] = array_merge($occupied->result(), $appointment->result());
+			}else {
+				$response['msg'] = '¡No existen eventos!';
+			}
+		}else {
+			$response['msg'] = "¡Parametros invalidos!";
+		}
+
+		$this->output->set_content_type('application/json');
+		$this->output->set_output(json_encode($response));
+	}
+
+	public function getHorarioBeneficio(){
+		$beneficio = $this->input->post('dataValue[beneficio]');
+
+		$rs = $this->calendarioModel->getHorarioBeneficio($beneficio)->result();
+		$response['result'] = count($rs) > 0;
+		if ($response['result']) {
+			$response['msg'] = '¡Horario cargado exitosamente!';
+			$response['data'] = $rs;
+		}else {
+			$response['msg'] = '¡No existen horario!';
+		}
+		$this->output->set_content_type("application/json");
+		$this->output->set_output(json_encode($response));
+	}
+
 	public function saveOccupied(){
 		$dataValue = $this->input->post("dataValue");
 		$now = date('Y/m/d H:i:s', time());
@@ -327,7 +367,7 @@ class CalendarioController extends CI_Controller{
         $this->output->set_content_type("application/json");
         $this->output->set_output(json_encode($response));
     }
-	
+
 	public function updateAppointment(){
 		$dataValue = $this->input->post("dataValue", true);
 		$start = $dataValue["fechaInicio"]; // datos para la validación de no mover una eveneto pasado de su dia
@@ -628,24 +668,6 @@ class CalendarioController extends CI_Controller{
 		$modalidad = $this->input->post('dataValue[modalidad]');
 
 		$rs = $this->calendarioModel->getOficinaByAtencion($sede, $beneficio, $especialista, $modalidad)->result();
-		$response['result'] = count($rs) > 0;
-		if ($response['result']) {
-			$response['msg'] = '¡Datos de oficina cargados exitosamente!';
-			$response['data'] = $rs;
-		}else {
-			$response['msg'] = '¡No existen registros!';
-		}
-		$this->output->set_content_type("application/json");
-        $this->output->set_output(json_encode($response));
-	}
-
-	public function getHorariosDisponibles() {
-		$sede = $this->input->post('dataValue[sede]');
-		$beneficio = $this->input->post('dataValue[beneficio]');
-		$especialista = $this->input->post('dataValue[especialista]');
-		$modalidad = $this->input->post('dataValue[modalidad]');
-
-		$rs = $this->calendarioModel->getHorariosDisponibles($sede, $beneficio, $especialista, $modalidad)->result();
 		$response['result'] = count($rs) > 0;
 		if ($response['result']) {
 			$response['msg'] = '¡Datos de oficina cargados exitosamente!';

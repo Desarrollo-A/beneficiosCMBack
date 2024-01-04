@@ -33,6 +33,26 @@ class CalendarioModel extends CI_Model
         return $query;
     }
 
+    public function getOccupiedRange($fechaInicio, $fechaFin, $idUsuario){
+        $query = $this->db->query(
+            "SELECT * FROM horariosOcupados
+            WHERE idEspecialista = ? AND estatus = ?  AND
+            (fechaInicio BETWEEN ? AND ?
+               OR fechaFinal BETWEEN ? AND ?
+               OR (fechaInicio < ? AND fechaFinal > ?));",
+            array( $idUsuario, 1, $fechaInicio, $fechaFin, $fechaInicio, $fechaFin, $fechaInicio, $fechaFin)
+        );
+        return $query;
+    }
+
+    public function getHorarioBeneficio($beneficio){
+        $query = $this->db->query(
+            "SELECT *FROM horariosPorBeneficio WHERE idBeneficio = ?",
+            array($beneficio)
+        );
+        return $query;
+    }
+
     public function getAppointment($year, $month, $idUsuario, $dates){
         $query = $this->db->query(
             "SELECT CAST(ct.idCita AS VARCHAR(36))  AS id,  ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
@@ -52,6 +72,30 @@ class CalendarioModel extends CI_Model
             AND idEspecialista = ?
             AND ct.estatusCita IN(?, ?, ?, ?)",
             array( $dates["year1"], $dates["year2"], $dates["month1"], $month, $dates["month2"], $idUsuario, 1, 2, 3, 4 )
+        );
+
+        return $query;
+    }
+
+    public function getAppointmentRange($fechaInicio, $fechaFin, $idUsuario){
+        $query = $this->db->query(
+            "SELECT CAST(ct.idCita AS VARCHAR(36))  AS id,  ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
+            ct.fechaInicio AS occupied, 'green' AS 'color', 'date' AS 'type', ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal,
+            'color' = CASE
+	            WHEN ct.estatusCita = 0 THEN 'red'
+	            WHEN ct.estatusCita = 1 THEN 'green'
+	            WHEN ct.estatusCita = 2 THEN 'red'
+	            WHEN ct.estatusCita = 3 THEN 'grey'
+	            WHEN ct.estatusCita = 4 THEN 'green'
+                WHEN ct.estatusCita > 4 THEN 'pink'
+	        END
+            FROM citas ct
+            INNER JOIN usuarios us ON us.idUsuario = ct.idPaciente
+            WHERE idEspecialista = ? AND ct.estatusCita IN (?) 
+            AND (fechaInicio BETWEEN ? AND ?
+               OR fechaFinal BETWEEN ? AND ?
+               OR (fechaInicio < ? AND fechaFinal > ?))",
+            array( $idUsuario, 1, $fechaInicio, $fechaFin, $fechaInicio, $fechaFin, $fechaInicio, $fechaFin)
         );
 
         return $query;
