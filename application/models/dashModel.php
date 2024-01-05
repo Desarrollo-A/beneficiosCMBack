@@ -117,4 +117,58 @@ class dashModel extends CI_Model {
 
 		return $query->result();
 	}
+
+	public function getPregunta($dt){
+
+		$query = $this->db-> query("SELECT DISTINCT pg.pregunta, ec.respuestas, pg.idPregunta, ec.idEncuesta  
+		FROM encuestasCreadas ec
+		INNER JOIN preguntasGeneradas pg ON pg.pregunta = ec.pregunta
+		WHERE ec.estatus = 1 AND abierta = 1 AND especialidad = $dt");
+		
+		$result = $query->result(); # added
+
+		if(!empty($result))
+			return $result;
+		else
+		{
+			return false;
+		}
+
+	}
+
+	public function getRespuestas($dt){
+
+		if(!empty ($dt)){
+			$respuestas = $dt[1]["respuestas"];
+
+			$query = $this->db-> query("SELECT STRING_AGG(respuesta, ', ') AS respuestas 
+			FROM respuestasGenerales 
+			WHERE grupo = $respuestas
+			GROUP BY grupo;");
+			return $query->result();
+		}else
+		{
+			return false;
+		}
+	}
+
+	public function getCountRespuestas($dt){
+
+		if(!empty ($dt)){
+
+        $idEncuesta = $dt[2]["idEncuesta"];
+        $idPregunta = $dt[0]["idPregunta"];
+		
+		$query = $this->db-> query("SELECT rg.respuesta, COUNT(*) AS cantidad, (COUNT(*) * 100.0 / SUM(COUNT(*)) OVER ()) AS porcentaje
+		FROM encuestasContestadas ec
+		INNER JOIN respuestasGenerales rg ON rg.idRespuestaGeneral = ec.idRespuesta
+		WHERE ec.idEncuesta = $idEncuesta AND ec.idPregunta = $idPregunta
+		GROUP BY rg.respuesta");
+
+		return $query->result();
+		}else
+		{
+			return false;
+		}
+	}
 }

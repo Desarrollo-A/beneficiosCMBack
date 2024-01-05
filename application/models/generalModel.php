@@ -28,7 +28,7 @@ class generalModel extends CI_Model {
 
     public function especialistas()
 	{
-		$query = $this->db-> query("SELECT * FROM opcionesporcatalogo WHERE idCatalogo = 1");
+		$query = $this->db-> query("SELECT puesto AS nombre FROM puestos WHERE idPuesto = 537 OR idPuesto = 686 OR idPuesto = 158 OR idPuesto = 585");
 		return $query->result();
 	}
 
