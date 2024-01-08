@@ -86,4 +86,33 @@ class encuestasController extends CI_Controller {
 		echo json_encode($data);
 	}
 
+	public function getEncuestasCreadas(){
+
+		$dt = $this->input->post('dataValue', true);
+
+		$data['data'] = $this->encuestasModel->getEncuestasCreadas($dt)->result();
+		echo json_encode($data);
+	}
+
+	public function updateEstatus(){
+
+		$idEncuesta= $this->input->post('dataValue[idEncuesta]');
+		$estatus= $this->input->post('dataValue[estatus]');
+
+		$data = array(
+			"estatus" => $estatus
+		);
+
+		$response=$this->generalModel->updateRecord('encuestasCreadas', $data, 'idEncuesta', $idEncuesta);
+		echo json_encode(array("estatus" => true, "msj" => "Estatus Actualizado!" ));
+				
+	}
+
+	public function getEstatusUno(){
+
+		$dt = $this->input->post('dataValue', true);
+
+		$data['data'] = $this->encuestasModel->getEstatusUno($dt)->result();
+		echo json_encode($data);
+	}
 }

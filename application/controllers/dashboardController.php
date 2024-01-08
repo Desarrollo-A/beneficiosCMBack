@@ -73,4 +73,23 @@ class dashboardController extends CI_Controller {
 		$data['data'] = $this->dashModel->citasAnual($dt);
 		echo json_encode($data);
 	}
+
+	public function getPregunta(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->dashModel->getPregunta($dt);
+		echo json_encode($data);
+	}
+
+	public function getRespuestas(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->dashModel->getRespuestas($dt);
+		echo json_encode($data);
+	}
+
+	public function getCountRespuestas(){
+		$dt = $this->input->post('dataValue', true);
+
+		$data['data'] = $this->dashModel->getCountRespuestas($dt);
+		echo json_encode($data);
+	}
 }

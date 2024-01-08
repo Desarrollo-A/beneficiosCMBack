@@ -38,12 +38,15 @@ class reportesController extends CI_Controller {
 
 		$idCita= $this->input->post('dataValue[idCita]');
 		$descripcion= $this->input->post('dataValue[descripcion]');
+		$estatus= $this->input->post('dataValue[ests]');
+		$modificadoPor= $this->input->post('dataValue[modificadoPor]');
 
 		if( !empty($idCita) && !empty($descripcion) )
 		{
 			$data = array(
 				"observaciones" => $descripcion,
-				"modificadoPor" => 1,
+				"estatus" => $estatus,
+				"modificadoPor" => $modificadoPor,
 			);
 			
 			$response=$this->generalModel->updateRecord('citas', $data, 'idCita', $idCita);
