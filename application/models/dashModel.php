@@ -13,7 +13,7 @@ class dashModel extends CI_Model {
 		$query = $this->db-> query("SELECT op.nombre as estatus, COUNT(op.nombre) AS total
 		FROM catalogos ca
 		INNER JOIN opcionesPorCatalogo op ON op.idCatalogo = ca.idCatalogo AND ca.idCatalogo = 2
-		INNER JOIN citas ct ON ct.estatus = op.idOpcion 
+		INNER JOIN citas ct ON ct.estatusCita = op.idOpcion 
 		GROUP BY op.nombre
 		HAVING COUNT(op.nombre)>0");
 		return $query->result();
@@ -37,9 +37,9 @@ class dashModel extends CI_Model {
 	INNER JOIN 
 		opcionesPorCatalogo op ON op.idCatalogo = ca.idCatalogo AND ca.idCatalogo = 2
 	INNER JOIN 
-		citas ct ON ct.estatus = op.idOpcion 
+		citas ct ON ct.estatusCita = op.idOpcion 
 	WHERE
-		DATEPART(YEAR, fechaModificacion) = ? AND ct.estatus = 1
+		DATEPART(YEAR, fechaModificacion) = ? AND ct.estatusCita = 1
 	GROUP BY
 		DATEPART(MONTH, fechaModificacion), op.nombre
 	ORDER BY
@@ -58,9 +58,9 @@ class dashModel extends CI_Model {
 	INNER JOIN 
 		opcionesPorCatalogo op ON op.idCatalogo = ca.idCatalogo AND ca.idCatalogo = 2
 	INNER JOIN 
-		citas ct ON ct.estatus = op.idOpcion 
+		citas ct ON ct.estatusCita = op.idOpcion 
 	WHERE
-		DATEPART(YEAR, fechaModificacion) = ? AND ct.estatus = 2
+		DATEPART(YEAR, fechaModificacion) = ? AND ct.estatusCita = 2
 	GROUP BY
 		DATEPART(MONTH, fechaModificacion), op.nombre
 	ORDER BY
@@ -79,9 +79,9 @@ class dashModel extends CI_Model {
 	INNER JOIN 
 		opcionesPorCatalogo op ON op.idCatalogo = ca.idCatalogo AND ca.idCatalogo = 2
 	INNER JOIN 
-		citas ct ON ct.estatus = op.idOpcion 
+		citas ct ON ct.estatusCita = op.idOpcion 
 	WHERE
-		DATEPART(YEAR, fechaModificacion) = ? AND ct.estatus = 3
+		DATEPART(YEAR, fechaModificacion) = ? AND ct.estatusCita = 3
 	GROUP BY
 		DATEPART(MONTH, fechaModificacion), op.nombre
 	ORDER BY
@@ -107,7 +107,7 @@ class dashModel extends CI_Model {
 	INNER JOIN 
 		opcionesPorCatalogo op ON op.idCatalogo = ca.idCatalogo AND ca.idCatalogo = 2
 	INNER JOIN 
-		citas ct ON ct.estatus = op.idOpcion
+		citas ct ON ct.estatusCita = op.idOpcion
 	WHERE
 		DATEPART(YEAR, fechaModificacion) = ?
 	GROUP BY
@@ -120,12 +120,12 @@ class dashModel extends CI_Model {
 
 	public function getPregunta($dt){
 
-		$query = $this->db-> query("SELECT DISTINCT pg.pregunta, ec.respuestas, pg.idPregunta, ec.idEncuesta  
+		$query = $this->db-> query("SELECT DISTINCT pg.pregunta, ec.respuestas, pg.idPregunta, ec.idEncuesta, ec.idEncuestaCreada   
 		FROM encuestasCreadas ec
 		INNER JOIN preguntasGeneradas pg ON pg.pregunta = ec.pregunta
 		WHERE ec.estatus = 1 AND abierta = 1 AND especialidad = $dt");
 		
-		$result = $query->result(); # added
+		$result = $query->result();
 
 		if(!empty($result))
 			return $result;

@@ -19,7 +19,7 @@ class reportesModel extends CI_Model {
 			INNER JOIN usuarios pa ON pa.idUsuario = ct.idPaciente
 			INNER JOIN sedes sd ON sd.idSede = us.sede
 			INNER JOIN puestos ps ON ps.idPuesto = us.puesto
-			INNER JOIN opcionesPorCatalogo op ON op.idOpcion = ct.estatus
+			INNER JOIN opcionesPorCatalogo op ON op.idOpcion = ct.estatusCita
 			WHERE op.idCatalogo = 2");
 			return $query;
 
@@ -32,8 +32,8 @@ class reportesModel extends CI_Model {
 			INNER JOIN usuarios pa ON pa.idUsuario = ct.idPaciente
 			INNER JOIN sedes sd ON sd.idSede = us.sede
 			INNER JOIN puestos ps ON ps.idPuesto = us.puesto
-			INNER JOIN opcionesPorCatalogo op ON op.idOpcion = ct.estatus
-			WHERE op.idCatalogo = 2 AND ct.estatus = 3");
+			INNER JOIN opcionesPorCatalogo op ON op.idOpcion = ct.estatusCita
+			WHERE op.idCatalogo = 2 AND ct.estatusCita = 3");
 			return $query;
 
 		}else if($dt === 'justificadas'){
@@ -45,8 +45,8 @@ class reportesModel extends CI_Model {
 			INNER JOIN usuarios pa ON pa.idUsuario = ct.idPaciente
 			INNER JOIN sedes sd ON sd.idSede = us.sede
 			INNER JOIN puestos ps ON ps.idPuesto = us.puesto
-			INNER JOIN opcionesPorCatalogo op ON op.idOpcion = ct.estatus
-			WHERE op.idCatalogo = 2 AND ct.estatus = 5");
+			INNER JOIN opcionesPorCatalogo op ON op.idOpcion = ct.estatusCita
+			WHERE op.idCatalogo = 2 AND ct.estatusCita = 5");
 			return $query;
 
 		}
