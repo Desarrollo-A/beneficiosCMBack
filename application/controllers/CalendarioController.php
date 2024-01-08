@@ -431,16 +431,13 @@ class CalendarioController extends CI_Controller{
 		$start = new DateTime($startStamp);
 		$diferencia = $start->diff(new DateTime($endStamp));
 		$estatus = 2;
-		$titulo = "Cita cancelada";
 
 		if($diferencia->d === 0 && $diferencia->h < 3){ // condición para poder saber si se penaliza la cita
 			$estatus = 3;
-			$titulo = "Cita penalizada";
 		}
 
 		$values = [
 			"estatusCita" => $estatus,
-			"titulo" => $titulo
 		];
 
 		$updateRecord = $this->generalModel->updateRecord("citas", $values, "idCita", $dataValue["id"]);
