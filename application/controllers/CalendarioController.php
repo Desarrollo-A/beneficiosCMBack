@@ -100,10 +100,10 @@ class CalendarioController extends CI_Controller{
 			$pass = true;
 
 		try{
-			$check_occupied = $this->calendarioModel->checkOccupied($dataValue, $fechaInicioSuma ,$fechaFinalResta);
-			$check_appointment = $this->calendarioModel->checkAppointmentNormal($dataValue, $fechaInicioSuma, $fechaFinalResta);
+			$checkOccupied = $this->calendarioModel->checkOccupied($dataValue, $fechaInicioSuma ,$fechaFinalResta);
+			$checkAppointment = $this->calendarioModel->checkAppointmentNormal($dataValue, $fechaInicioSuma, $fechaFinalResta);
 			
-			if ($check_occupied->num_rows() < 1 && $check_appointment->num_rows() < 1 && isset($pass) ) {
+			if ($checkOccupied->num_rows() < 1 && $checkAppointment->num_rows() < 1 && isset($pass) ) {
 				$addRecord = $this->generalModel->addRecord("horariosOcupados", $values);
 
 				if ($addRecord) {
@@ -117,7 +117,14 @@ class CalendarioController extends CI_Controller{
 			}
 			else{
 				$response["result"] = false;
-				$response["msg"] = "Horario no disponible";
+
+				if($check_appointment->num_rows() > 0){
+					$response["msg"] = "El paciente ocupo el horario";
+				}
+				else{
+					$response["msg"] = "Horario no disponible";
+				}
+				
 			}
 
 		}
@@ -161,12 +168,18 @@ class CalendarioController extends CI_Controller{
 				"titulo" => $dataValue["titulo"],
 			];
 			
-			$check_occupiedId = $this->calendarioModel->checkOccupiedId($dataValue, $fechaInicioSuma ,$fechaFinalResta);
-			$check_appointment = $this->calendarioModel->checkAppointmentNormal($dataValue, $fechaInicioSuma, $fechaFinalResta);
+			$checkOccupiedId = $this->calendarioModel->checkOccupiedId($dataValue, $fechaInicioSuma ,$fechaFinalResta);
+			$checkAppointment = $this->calendarioModel->checkAppointmentNormal($dataValue, $fechaInicioSuma, $fechaFinalResta);
 
-			if ($check_occupiedId->num_rows() > 0 || $check_appointment->num_rows() > 0) {
-                $response["result"] = false;
-                $response["msg"] = "El horario ya ha sido ocupado";
+			if ($checkOccupiedId->num_rows() > 0 || $checkAppointment->num_rows() > 0) {
+				$response["result"] = false;
+
+                if($checkAppointment->num_rows() > 0){
+					$response["msg"] = "El paciente ocupo el horario";
+				}
+				else{
+					$response["msg"] = "Horario no disponible";
+				}
             } 
 			else {
 				$updateRecord = $this->generalModel->updateRecord("horariosOcupados", $values, "idUnico", $dataValue["id"]);
@@ -174,7 +187,8 @@ class CalendarioController extends CI_Controller{
                 if ($updateRecord) {
                     $response["result"] = true;
                     $response["msg"] = "Horario actualizado";
-                } else {
+                } 
+				else {
                     $response["result"] = false;
                     $response["msg"] = "Error al guardar";
                 }
@@ -267,7 +281,7 @@ class CalendarioController extends CI_Controller{
 			$values = [
 				"idEspecialista" => $dataValue["idUsuario"],
             	"idPaciente" => $dataValue["idPaciente"],
-            	"estatusCita" => 1,
+            	"estatusCita" => 6,
             	"fechaInicio" => $dataValue["fechaInicio"],
             	"fechaFinal" => $dataValue["fechaFinal"],
             	"creadoPor" => $dataValue["creadoPor"],
@@ -278,13 +292,19 @@ class CalendarioController extends CI_Controller{
 			];
 			
 			
-			$check_user = $this->usuariosModel->checkUser($dataValue["idPaciente"]);
-			$check_appointment = $this->calendarioModel->checkAppointment($dataValue, $fechaInicioSuma, $fechaFinalResta);
-			$check_occupied = $this->calendarioModel->checkOccupied($dataValue, $fechaInicioSuma, $fechaFinalResta);
+			$checkUser = $this->usuariosModel->checkUser($dataValue["idPaciente"]);
+			$checkAppointment = $this->calendarioModel->checkAppointment($dataValue, $fechaInicioSuma, $fechaFinalResta);
+			$checkOccupied = $this->calendarioModel->checkOccupied($dataValue, $fechaInicioSuma, $fechaFinalResta);
 
-			if ($check_appointment->num_rows() > 0 || $check_occupied->num_rows() > 0 || !isset($pass) || $check_user->num_rows() > 0) {
-                $response["result"] = false;
-                $response["msg"] = "El horario ya ha sido ocupado";
+			if ($checkAppointment->num_rows() > 0 || $checkOccupied->num_rows() > 0 || !isset($pass) || $checkUser->num_rows() > 0) {
+				$response["result"] = false;
+
+				if($checkAppointment->num_rows() > 0){
+					$response["msg"] = "El paciente ocupo el horario";
+				}
+				else{
+					$response["msg"] = "Horario no disponible";
+				}
             } 
 			else {
 				$addRecord = $this->generalModel->addRecord("citas", $values);
@@ -394,12 +414,18 @@ class CalendarioController extends CI_Controller{
 				"titulo" => $dataValue["titulo"]
 			];
 			
-			$check_occupied = $this->calendarioModel->checkOccupied($dataValue, $fechaInicioSuma ,$fechaFinalResta);
-			$check_appointmentId = $this->calendarioModel->checkAppointmentId($dataValue, $fechaInicioSuma, $fechaFinalResta);
+			$checkOccupied = $this->calendarioModel->checkOccupied($dataValue, $fechaInicioSuma ,$fechaFinalResta);
+			$checkAppointmentId = $this->calendarioModel->checkAppointmentId($dataValue, $fechaInicioSuma, $fechaFinalResta);
 
-			if ($check_occupied->num_rows() > 0 || $check_appointmentId->num_rows() > 0) {
+			if ($checkOccupied->num_rows() > 0 || $checkAppointmentId->num_rows() > 0) {
                 $response["result"] = false;
-                $response["msg"] = "El horario ya ha sido ocupado";
+
+                if($checkAppointmentId->num_rows() > 0){
+					$response["msg"] = "El paciente ocupo el horario";
+				}
+				else{
+					$response["msg"] = "Horario no disponible";
+				}
             } 
 			else {
 				$updateRecord = $this->generalModel->updateRecord("citas", $values, "idCita", $dataValue["id"]);
@@ -432,7 +458,7 @@ class CalendarioController extends CI_Controller{
 		$diferencia = $start->diff(new DateTime($endStamp));
 		$estatus = 2;
 
-		if($diferencia->d === 0 && $diferencia->h < 3){ // condición para poder saber si se penaliza la cita
+		if(intval($dataValue["estatus"]) === 1 && $diferencia->d === 0 && $diferencia->h < 3){ // condición para poder saber si se penaliza la cita
 			$estatus = 3;
 		}
 
@@ -485,12 +511,17 @@ class CalendarioController extends CI_Controller{
 				"modificadoPor" => $dataValue["idUsuario"]
 			];
 			
-			$check_occupied = $this->calendarioModel->checkOccupied($dataValue, $fechaInicioSuma ,$fechaFinalResta);
-			$check_appointment = $this->calendarioModel->checkAppointmentNormal($dataValue, $fechaInicioSuma, $fechaFinalResta);
+			$checkOccupied = $this->calendarioModel->checkOccupied($dataValue, $fechaInicioSuma ,$fechaFinalResta);
+			$checkAppointment = $this->calendarioModel->checkAppointment($dataValue, $fechaInicioSuma, $fechaFinalResta);
 
-			if ($check_occupied->num_rows() > 0 || $check_appointment->num_rows() > 0) {
+			if ($checkOccupied->num_rows() > 0 || $checkAppointment->num_rows() > 0) {
                 $response["result"] = false;
-                $response["msg"] = "El horario ya ha sido ocupado";
+                if($checkAppointment->num_rows() > 0){
+					$response["msg"] = "El paciente ocupo el horario";
+				}
+				else{
+					$response["msg"] = "Horario no disponible";
+				}
             } 
 			else {
 				$updateRecord = $this->generalModel->updateRecord("citas", $values, "idCita", $dataValue["id"]);
@@ -564,6 +595,34 @@ class CalendarioController extends CI_Controller{
 		catch(EXCEPTION $e){
 			$response["result"] = false;
             $response["msg"] = "Error";
+		}
+
+		$this->output->set_content_type('application/json');
+		$this->output->set_output(json_encode($response));
+	}
+
+	public function endAppointment(){
+		$dataValue = $this->input->post('dataValue');
+
+		$values = [
+			"estatusCita" => 4
+		];
+
+		try{
+			$updateRecord = $this->generalModel->updateRecord("citas", $values, "idCita", $dataValue);
+
+			if($updateRecord){
+				$response["result"] = true;
+				$response["msg"] = "Se ha finalizado la cita";
+			}
+			else{
+				$response["result"] = false;
+				$response["msg"] = "Error al finalizar la cita";
+			}
+		}
+		catch(EXCEPTION $e){
+			$response["result"] = false;
+			$response["msg"] = "Ha ocurrido un error";
 		}
 
 		$this->output->set_content_type('application/json');
@@ -675,4 +734,28 @@ class CalendarioController extends CI_Controller{
 		$this->output->set_content_type("application/json");
         $this->output->set_output(json_encode($response));
 	}
+	public function getReasons(){
+		$puesto = $this->input->post('dataValue', true);
+
+		switch($puesto){
+			case 158:
+				$tipo = 6;
+				break;
+			case 585:
+				$tipo = 7;
+				break;
+			case 537:
+				$tipo = 8;
+				break;
+			case 68:
+				$tipo = 9;
+				break;
+		}
+
+		$get = $this->calendarioModel->getReasons($tipo);
+
+		$this->output->set_content_type('application/json');
+		$this->output->set_output(json_encode($get));
+	}
+
 }

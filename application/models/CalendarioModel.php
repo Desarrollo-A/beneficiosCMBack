@@ -59,19 +59,20 @@ class CalendarioModel extends CI_Model
             ct.fechaInicio AS occupied, 'green' AS 'color', 'date' AS 'type', ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal,
             'color' = CASE
 	            WHEN ct.estatusCita = 0 THEN 'red'
-	            WHEN ct.estatusCita = 1 THEN 'green'
+	            WHEN ct.estatusCita = 1 THEN 'yellow'
 	            WHEN ct.estatusCita = 2 THEN 'red'
 	            WHEN ct.estatusCita = 3 THEN 'grey'
 	            WHEN ct.estatusCita = 4 THEN 'green'
-                WHEN ct.estatusCita > 4 THEN 'pink'
+                WHEN ct.estatusCita = 5 THEN 'pink'
+                WHEN ct.estatusCita = 6 THEN 'blue'
 	        END
             FROM citas ct
             INNER JOIN usuarios us ON us.idUsuario = ct.idPaciente
             WHERE YEAR(fechaInicio) in (?, ?)
             AND MONTH(fechaInicio) in (?, ?, ?)
             AND idEspecialista = ?
-            AND ct.estatusCita IN(?, ?, ?, ?)",
-            array( $dates["year1"], $dates["year2"], $dates["month1"], $month, $dates["month2"], $idUsuario, 1, 2, 3, 4 )
+            AND ct.estatusCita IN(?, ?, ?, ?, ?, ?)",
+            array( $dates["year1"], $dates["year2"], $dates["month1"], $month, $dates["month2"], $idUsuario, 1, 2, 3, 4, 5, 6 )
         );
 
         return $query;
@@ -156,7 +157,7 @@ class CalendarioModel extends CI_Model
             OR (? BETWEEN fechaInicio AND fechaFinal))
             AND ((idPaciente = ?
             AND estatusCita = ?)
-            OR (idEspecialista = ? and estatusCita IN (1)))",
+            OR (idEspecialista = ? and estatusCita IN (?)))",
             array(
                 $fechaInicioSuma, $fechaFinalResta,
                 $fechaInicioSuma, $fechaFinalResta,
@@ -164,7 +165,8 @@ class CalendarioModel extends CI_Model
                 $fechaFinalResta,
                 $dataValue["idPaciente"],
                 1,
-                $dataValue["idUsuario"]
+                $dataValue["idUsuario"],
+                1
             )
         );
         
@@ -327,5 +329,9 @@ class CalendarioModel extends CI_Model
         );
 
         return $query;
+    public function getReasons($puesto){
+        $query = $this->db->query("SELECT *from opcionesPorCatalogo where idCatalogo = ?", $puesto);
+
+        return $query->result();
     }
 }
