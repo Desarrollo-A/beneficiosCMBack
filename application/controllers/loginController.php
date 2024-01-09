@@ -59,7 +59,7 @@ class loginController extends CI_Controller {
 			"area" => $datosEmpleado->area,
 			"puesto" => $datosEmpleado->puesto,
 			"oficina" => $datosEmpleado->nom_oficina,
-			"sede" => $datosEmpleado->sede,
+			"idSede" => $datosEmpleado->sede,
 			"correo" => $datosEmpleado->email_empresarial,
 			"password" => encriptar($datosEmpleado->password),
 			"estatus" => 1,
@@ -112,7 +112,7 @@ class loginController extends CI_Controller {
 				'telPersonal' 		    => 		$data[0]->telPersonal,
 				'puesto' 		        => 		$data[0]->puesto,
 				'oficina' 		        => 		$data[0]->oficina,
-				'sede' 		    		=> 		$data[0]->sede,
+				'sede' 		    		=> 		$data[0]->idSede,
 				'correo' 		    	=> 		$data[0]->correo,
 			);
 			session_start();

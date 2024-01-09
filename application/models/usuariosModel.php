@@ -40,7 +40,7 @@ class usuariosModel extends CI_Model {
 			 AND estatus = ?
 			 AND idUsuario 
 			 NOT IN( SELECT idPaciente FROM citas WHERE estatusCita = ? GROUP BY idPaciente HAVING COUNT(idPaciente) > ?)
-			 AND sede
+			 AND idSede
 			 IN( select distinct idSede from atencionXSede where idEspecialista = ?)",
 			 array( 2, 1, 1, 1, $idEspecialista )
 		);

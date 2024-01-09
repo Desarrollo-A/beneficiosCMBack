@@ -224,7 +224,7 @@ class CalendarioModel extends CI_Model
         $query = $this->db->query(
             "SELECT idAtencionXSede FROM atencionXSede 
             WHERE idEspecialista = ?
-            AND idSede = ( SELECT sede FROM usuarios WHERE idUsuario = ? ) AND estatus = ?", 
+            AND idSede = ( SELECT idSede FROM usuarios WHERE idUsuario = ? ) AND estatus = ?", 
             array($dataValue["idUsuario"], $dataValue["idUsuario"], 1)
         );
         
