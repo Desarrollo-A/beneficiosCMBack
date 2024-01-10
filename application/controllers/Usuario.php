@@ -165,4 +165,31 @@ class Usuario extends CI_Controller {
 		$this->output->set_content_type("application/json");
         $this->output->set_output(json_encode($data));
 	}
+
+	public function decodePass(){
+
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->usuariosModel->decodePass($dt);
+		echo json_encode($data);
+	}
+
+	public function updatePass(){
+
+		$idUsuario = $this->input->post('dataValue[idUsuario]');
+		$password = $this->input->post('dataValue[password]');
+		$newPass= $this->input->post('dataValue[newPassword]');
+
+			if(!empty($newPass))
+			{
+				$data = array(
+					"password" => encriptar($newPass),
+				);
+				
+				$response=$this->generalModel->updateRecord('usuarios', $data, 'idUsuario', $idUsuario);
+				echo json_encode(array("estatus" => true, "msj" => "Contraseña actualizada!" ));
+					
+			}else{
+				echo json_encode(array("estatus" => false, "msj" => "Error en actualizar contraseña"));
+			}	
+	}
 }

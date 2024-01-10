@@ -120,7 +120,7 @@ class dashModel extends CI_Model {
 
 	public function getPregunta($dt){
 
-		$query = $this->db-> query("SELECT DISTINCT pg.pregunta, ec.respuestas, pg.idPregunta, ec.idEncuesta, ec.idEncuestaCreada   
+		$query = $this->db-> query("SELECT DISTINCT pg.pregunta, ec.respuestas, pg.idPregunta, ec.idEncuesta, ec.idEncuestaCreada, ec.idArea  
 		FROM encuestasCreadas ec
 		INNER JOIN preguntasGeneradas pg ON pg.pregunta = ec.pregunta
 		WHERE ec.estatus = 1 AND abierta = 1 AND especialidad = $dt");
@@ -139,13 +139,33 @@ class dashModel extends CI_Model {
 	public function getRespuestas($dt){
 
 		if(!empty ($dt)){
-			$respuestas = $dt[1]["respuestas"];
 
-			$query = $this->db-> query("SELECT STRING_AGG(respuesta, ', ') AS respuestas 
-			FROM respuestasGenerales 
-			WHERE grupo = $respuestas
-			GROUP BY grupo;");
+			$idPregunta = $dt[0]["idPregunta"];
+			$idEncuesta = $dt[1]["idEncuesta"];
+			$idEspecialidad = $dt[2]["idArea"];
+
+			$query_pregunta = $this->db->query("SELECT DISTINCT pg.pregunta  
+				FROM encuestasCreadas ec
+				INNER JOIN preguntasGeneradas pg ON pg.pregunta = ec.pregunta
+				WHERE ec.estatus = 1 AND abierta = 1 AND especialidad = ? AND idPregunta = ?",
+				array($idEspecialidad, $idPregunta));
+
+			$idPrg = [];
+			foreach ($query_pregunta->result() as $row) {
+				$idPrg[] = "'" . $row->pregunta . "'";
+			}
+
+			$idPreguntasString = implode(",", $idPrg);
+
+			$query = $this->db->query("SELECT STRING_AGG(rg.respuesta, ', ') AS respuestas, rg.grupo  
+				FROM encuestasCreadas ec
+				INNER JOIN respuestasGenerales rg ON rg.grupo = ec.respuestas 
+				WHERE ec.pregunta IN ($idPreguntasString) AND idEncuesta = ?
+				GROUP BY grupo",
+				array($idEncuesta));
+
 			return $query->result();
+
 		}else
 		{
 			return false;
@@ -156,14 +176,15 @@ class dashModel extends CI_Model {
 
 		if(!empty ($dt)){
 
-        $idEncuesta = $dt[2]["idEncuesta"];
-        $idPregunta = $dt[0]["idPregunta"];
+		$idPregunta = $dt[0]["idPregunta"];
+        $idEncuesta = $dt[1]["idEncuesta"];
 		
-		$query = $this->db-> query("SELECT rg.respuesta, COUNT(*) AS cantidad, (COUNT(*) * 100.0 / SUM(COUNT(*)) OVER ()) AS porcentaje
-		FROM encuestasContestadas ec
-		INNER JOIN respuestasGenerales rg ON rg.idRespuestaGeneral = ec.idRespuesta
-		WHERE ec.idEncuesta = $idEncuesta AND ec.idPregunta = $idPregunta
-		GROUP BY rg.respuesta");
+		$query = $this->db-> query("SELECT rg.respuesta, COUNT(*) AS cantidad, (COUNT(*) * 100.0 / SUM(COUNT(*)) OVER ()) AS porcentaje, 
+		ec.idPregunta, ec.idArea, ec.idEncuesta
+			FROM encuestasContestadas ec
+			INNER JOIN respuestasGenerales rg ON rg.idRespuestaGeneral = ec.idRespuesta
+			WHERE ec.idEncuesta = $idEncuesta AND ec.idPregunta = $idPregunta
+			GROUP BY rg.respuesta, ec.idPregunta, ec.idArea, ec.idEncuesta");
 
 		return $query->result();
 		}else

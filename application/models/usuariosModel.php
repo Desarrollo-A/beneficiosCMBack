@@ -5,7 +5,7 @@
 class usuariosModel extends CI_Model {
 	public function __construct()
 	{
-		parent::__construct();
+		
 	}
 
     public function usuarios()
@@ -36,5 +36,28 @@ class usuariosModel extends CI_Model {
 	{
 		$query = $this->db->query("SELECT idUsuario, nombre FROM usuarios");
 		return $query->result();
+	}
+
+	public function decodePass($dt)
+	{
+
+		if(!empty($dt))
+		{
+			$query = $this->db-> query("SELECT *
+			FROM usuarios us
+			WHERE us.idUsuario = $dt");
+
+			$pass = '';
+			foreach ($query->result() as $row) {
+				$pass = $row->password;
+			}
+
+			$res = desencriptar($pass);
+
+			return $res;
+		}else{
+			return false;
+		}
+		
 	}
 }

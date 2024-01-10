@@ -162,23 +162,14 @@ class encuestasModel extends CI_Model {
         $idEncuesta = $dataArray[0];
         $idUsuario = $dataArray[1];
 
-        $query_v1 = $this->db->query("SELECT DISTINCT ct.idEspecialista
-        FROM usuarios us
-        INNER JOIN citas ct ON ct.idPaciente = us.idUsuario
-        WHERE ct.estatusCita = 4 AND us.idUsuario = $idUsuario AND ct.fechaFinal BETWEEN '2023-11-01' AND '2023-12-31'");
+        $query_v2 = $this->db->query("SELECT * FROM encuestasContestadas WHERE idEncuesta = $idEncuesta AND idUsuario = $idUsuario");
 
-        if ($query_v1->num_rows() > 0) {
+        $query_v3 = $this->db->query("SELECT * FROM encuestasCreadas WHERE idEncuesta = $idEncuesta AND estatus = 0");
 
-            $query_v2 = $this->db->query("SELECT * FROM encuestasContestadas WHERE idEncuesta = $idEncuesta AND idUsuario = $idUsuario");
-
-            if ($query_v2->num_rows() > 0) {
-                return false;
-            } else {
-                return true;
-            }
-        } else {
-
+        if ($query_v2->num_rows() > 0 || $query_v3->num_rows() > 0) {
             return false;
+        }else{
+            return true;
         }
 
     }
