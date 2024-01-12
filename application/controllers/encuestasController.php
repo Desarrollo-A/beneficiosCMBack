@@ -98,13 +98,43 @@ class encuestasController extends CI_Controller {
 
 		$idEncuesta= $this->input->post('dataValue[idEncuesta]');
 		$estatus= $this->input->post('dataValue[estatus]');
+		$vigencia= $this->input->post('dataValue[vigencia]');
+		$area= $this->input->post('dataValue[area]');
+
+		$query_idEncuesta = $this->db->query("SELECT * FROM encuestasCreadas WHERE idArea = $area AND estatus = 1");
+
+        $idEnc = 0;
+        foreach ($query_idEncuesta->result() as $row) {
+            $idEnc = $row->idEncuesta;
+        }
+
+		$data_1 = array(
+			"estatus" => 0,
+		);
+
+		$response_1=$this->generalModel->updateRecord('encuestasCreadas', $data_1, 'idEncuesta', $idEnc);
+
+		$data_2 = array(
+			"estatus" => $estatus,
+			"diasVigencia" => $vigencia
+		);
+
+		$response_2=$this->generalModel->updateRecord('encuestasCreadas', $data_2, 'idEncuesta', $idEncuesta);
+		echo json_encode(array("estatus" => true, "msj" => "Estatus Actualizado!" ));
+				
+	}
+
+	public function updateVigencia(){
+
+		$idEncuesta= $this->input->post('dataValue[idEncuesta]');
+		$vigencia= $this->input->post('dataValue[vigencia]');
 
 		$data = array(
-			"estatus" => $estatus
+			"diasVigencia" => $vigencia
 		);
 
 		$response=$this->generalModel->updateRecord('encuestasCreadas', $data, 'idEncuesta', $idEncuesta);
-		echo json_encode(array("estatus" => true, "msj" => "Estatus Actualizado!" ));
+		echo json_encode(array("estatus" => true, "msj" => "Dato Actualizado!" ));
 				
 	}
 

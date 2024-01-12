@@ -89,13 +89,20 @@ class encuestasModel extends CI_Model {
 
     public function getEncNotificacion($dt)
     {
+
+        $idUsuario = $dt["idUsuario"];
+        $vigenciaInicio = $dt["vigenciaInicio"];
+        $vigenciaFin = $dt["vigenciaFin"];
+        $trimestreInicio = $dt["trimDefault"];
+        $fechaActual = $dt["fechActual"];
+
         $query_citas = $this->db->query("SELECT DISTINCT ct.idCita
         FROM usuarios us
         INNER JOIN citas ct ON ct.idPaciente = us.idUsuario
-        WHERE ct.estatusCita = 4 AND us.idUsuario = $dt AND ct.fechaFinal BETWEEN '2023-11-01' AND '2023-12-31'");
+        WHERE ct.estatusCita = 4 AND us.idUsuario = $idUsuario AND ct.fechaFinal BETWEEN '$vigenciaInicio' AND '$vigenciaFin'");
 
         if ($query_citas->num_rows() > 0) {
-
+            
         $idCitas = [];
         foreach ($query_citas->result() as $row) {
             $idCitas[] = $row->idCita;
@@ -127,12 +134,29 @@ class encuestasModel extends CI_Model {
             $idEcuestas[] = $row->idEncuesta;
         }
 
-        $query_encuestasC = $this->db->query("SELECT * FROM encuestasContestadas WHERE idEncuesta IN (" . implode(',', $idEcuestas) . ") AND idUsuario = $dt");
+        $query_encuestasC = $this->db->query("SELECT * FROM encuestasContestadas WHERE idEncuesta IN (" . implode(',', $idEcuestas) . ") AND idUsuario = $idUsuario");
 
         $idEnc = [0];
         foreach ($query_encuestasC->result() as $row) {
             $idEnc[] = $row->idEncuesta;
         }
+
+        $query_enc = $this->db->query("SELECT DISTINCT diasVigencia FROM encuestasCreadas WHERE idEncuesta IN (" . implode(',', $idEnc) . ")");
+
+        $vig = 0;
+        foreach ($query_enc->result() as $row) {
+            $vig = $row->diasVigencia;
+        }
+
+        if($vig == null){
+            $vig = 0;
+        }
+
+        $date = date($trimestreInicio);
+        $mod_date = strtotime($date."+ $vig days");
+        $trimestreFin = date("Y-m-d",$mod_date) . "\n";
+
+        if($fechaActual >= $trimestreInicio && $fechaActual <= $trimestreFin){
 
         $query_enc = $this->db->query("SELECT DISTINCT idEncuesta, ps.puesto
         FROM usuarios us 
@@ -143,6 +167,10 @@ class encuestasModel extends CI_Model {
         $result_encuestas = $query_enc->result_array();
 
         return $result_encuestas;
+
+        } else {
+            return false;
+        }
 
         } else {
             return false;
@@ -253,6 +281,7 @@ class encuestasModel extends CI_Model {
 		$datosValidos = true;
 
 		if (isset($dataArray->area) && isset($dataArray->items)) {
+            $estatus = $dataArray->estatus;
 			$area = $dataArray->area;
 			$items = $dataArray->items;
 
@@ -273,14 +302,31 @@ class encuestasModel extends CI_Model {
 
 			if ($datosValidos) {
 
+                if($estatus == 1){
+
+                    $query_idEncuesta = $this->db->query("SELECT * FROM encuestasCreadas WHERE idArea = $area AND estatus = 1");
+
+                    $idEnc = 0;
+                    foreach ($query_idEncuesta->result() as $row) {
+                        $idEnc = $row->idEncuesta;
+                    }
+
+                    $data_1 = array(
+                        "estatus" => 0,
+                    );
+
+                    $response_1=$this->generalModel->updateRecord('encuestasCreadas', $data_1, 'idEncuesta', $idEnc);
+
+                }
+                
 				foreach ($items as $item) {
 					$pregunta = $item->pregunta;
 					$respuesta = $item->respuesta;
 					$idEncuesta = $item->idEncuesta;
 
 					$query = $this->db->query("INSERT INTO encuestasCreadas (pregunta, respuestas, idArea, estatus, fechaCreacion, idEncuesta) 
-					VALUES (?, ?, ?, 0, GETDATE(), ?)", 
-					array($pregunta, $respuesta, $area, $idEncuesta));
+					VALUES (?, ?, ?, ?, GETDATE(), ?)", 
+					array($pregunta, $respuesta, $area, $estatus, $idEncuesta));
 				}
 
 				$this->db->trans_complete();
@@ -299,10 +345,10 @@ class encuestasModel extends CI_Model {
     public function getEncuestasCreadas($dt){
 
         $query = $this->db->query("WITH cte AS (
-            SELECT idEncuesta, fechaCreacion, estatus, ROW_NUMBER() OVER (PARTITION BY idEncuesta ORDER BY fechaCreacion DESC) AS rn
+            SELECT idEncuesta, fechaCreacion, estatus, ROW_NUMBER() OVER (PARTITION BY idEncuesta ORDER BY fechaCreacion DESC) AS rn, diasVigencia
             FROM encuestasCreadas
             WHERE idArea = $dt)
-            SELECT idEncuesta, fechaCreacion, estatus
+            SELECT idEncuesta, fechaCreacion, estatus, diasVigencia
             FROM cte WHERE rn = 1");
 
         return $query;
