@@ -8,7 +8,6 @@ class Welcome extends CI_Controller {
 		parent::__construct();
 		$this->load->database('default');
 		$this->load->model('usuariosModel');
-		$this->load->model('citasModel');
 		$this->load->model('especialistasModel');
 		$this->load->model('dashModel');
 		
@@ -28,7 +27,7 @@ class Welcome extends CI_Controller {
 
 	public function citas(){
 		$data['data'] = $this->usuariosModel->citas();
-		$data['data'] = $this->citasModel->citas();
+		/* $data['data'] = $this->citasModel->citas(); */
 		echo json_encode($data);
 	}
 
