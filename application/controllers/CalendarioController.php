@@ -309,6 +309,7 @@ class CalendarioController extends CI_Controller{
 
 	public function cancelAppointment(){
 		$dataValue = $this->input->post("dataValue", true);
+		$tipo = intval($dataValue["tipo"]);
 		$current = new DateTime();
 		$startStamp = $dataValue["startStamp"];
 		$endStamp = $current->format('Y/m/d H:i:s');
@@ -317,15 +318,21 @@ class CalendarioController extends CI_Controller{
 		$diferencia = $start->diff(new DateTime($endStamp));
 		$estatus = 2;
 
-		if(intval($dataValue["estatus"]) === 1 && $diferencia->d === 0 && $diferencia->h < 3){ // condición para poder saber si se penaliza la cita
+		if($tipo === 3){
 			$estatus = 3;
 		}
+		else if($tipo === 7){
+			$estatus = 7;
+		}
+		// else if(intval($dataValue["estatus"]) === 1 && $diferencia->d === 0 && $diferencia->h < 3){ // condición para poder saber si se penaliza la cita
+		// 	$estatus = 3;
+		// }
 
 		$values = [
 			"estatusCita" => $estatus,
 		];
 
-		$updateRecord = $this->generalModel->updateRecord("citas", $values, "idCita", $dataValue["id"]);
+		$updateRecord = $this->generalModel->updateRecord("citas", $values, "idCita", $dataValue["idCita"]);
 
 		if ($updateRecord) {
             $response["result"] = true;
@@ -461,18 +468,36 @@ class CalendarioController extends CI_Controller{
 	}
 
 	public function endAppointment(){
-		$dataValue = $this->input->post('dataValue');
+		$dataValue = $this->input->post('dataValue', true);
+		$idCita = $dataValue["idCita"];
+		$idUsuario = $dataValue["idUsuario"];
+		$reasons = $dataValue["reason"];
+		$valuesAdd =[];
 
-		$values = [
-			"estatusCita" => 4
+		foreach($reasons as $reason){
+			array_push($valuesAdd, [
+				"idCita" => $idCita,
+				"idMotivo" => $reason["value"],
+				"creadoPor" => $idUsuario,
+				"fechaCreacion" => $now = date('Y/m/d H:i:s', time()),
+				"modificadoPor" => $idUsuario,
+				"fechaModificacion" => $now = date('Y/m/d H:i:s', time())
+			]);
+		}
+
+		$valuesUpdate = [
+			"estatusCita" => 4,
 		];
 
 		try{
-			$updateRecord = $this->generalModel->updateRecord("citas", $values, "idCita", $dataValue);
-
+			$updateRecord = $this->generalModel->updateRecord("citas", $valuesUpdate, "idCita", $idCita);
 			if($updateRecord){
-				$response["result"] = true;
-				$response["msg"] = "Se ha finalizado la cita";
+				$insertBatch = $this->generalModel->insertBatch("motivosPorCita", $valuesAdd);
+				
+				if($insertBatch){
+					$response["result"] = true;
+					$response["msg"] = "Se ha finalizado la cita";
+				}
 			}
 			else{
 				$response["result"] = false;
