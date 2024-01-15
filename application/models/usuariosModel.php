@@ -20,10 +20,12 @@ class usuariosModel extends CI_Model {
 		return $query->result();
 	}
 
-	public function login($numEmpleado,$password)
+	public function login($numEmpleado, $password)
 	{
-		$query = $this->db->query("SELECT *  FROM usuarios WHERE numEmpleado='$numEmpleado' AND password='$password'");
-		return $query->result();
+		$query = $this->db->query("	SELECT u.*, p.idPuesto, p.puesto, p.idArea FROM USUARIOS as u
+			INNER JOIN puestos AS p ON u.puesto = P.idPuesto
+			WHERE numEmpleado = ? AND password = ?;", array( $numEmpleado, $password ));
+		return $query;
 	}
 
 	public function getAreas()

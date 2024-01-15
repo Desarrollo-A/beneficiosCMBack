@@ -98,7 +98,7 @@ class loginController extends CI_Controller {
 		session_destroy();
 		$datosEmpleado = $array == '' ? json_decode( file_get_contents('php://input')) : json_decode($array);
 		$datosEmpleado->password =  encriptar($datosEmpleado->password);
-		$data = $this->usuariosModel->login($datosEmpleado->numempleado,$datosEmpleado->password);
+		$data = $this->usuariosModel->login($datosEmpleado->numempleado,$datosEmpleado->password)->result();
 		if(empty($data)){
 			echo json_encode(array('response' => [],
 									'message' => 'El número de empleado no se encuentra registrado',
@@ -112,8 +112,9 @@ class loginController extends CI_Controller {
 				'telPersonal' 		    => 		$data[0]->telPersonal,
 				'puesto' 		        => 		$data[0]->puesto,
 				'oficina' 		        => 		$data[0]->oficina,
-				'sede' 		    		=> 		$data[0]->sede,
-				'correo' 		    	=> 		$data[0]->correo,
+				'sede' 		    		=> 		$data[0]->idSede,
+				'correo'		    	=> 		$data[0]->correo,
+				'idArea'				=>		$data[0]->idArea,
 			);
 			session_start();
 			date_default_timezone_set('America/Mexico_City');

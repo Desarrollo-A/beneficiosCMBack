@@ -595,12 +595,13 @@ class CalendarioController extends CI_Controller{
 	}
 
 	public function getEspecialistaPorBeneficioYSede(){
+		$area = $this->input->post('dataValue[area]');
 		$sede = $this->input->post('dataValue[sede]');
 		$beneficio = $this->input->post('dataValue[beneficio]');
 
-		$response['result'] = isset($sede, $beneficio);
+		$response['result'] = isset($area, $sede, $beneficio);
 		if ($response['result']) {
-			$rs = $this->calendarioModel->getEspecialistaPorBeneficioYSede($sede, $beneficio)->result();
+			$rs = $this->calendarioModel->getEspecialistaPorBeneficioYSede($sede, $area, $beneficio)->result();
 			$response['result'] = count($rs) > 0; 
 			if ($response['result']) {
 				$response['msg'] = '¡Listado de especialistas cargado exitosamente!';
@@ -674,6 +675,91 @@ class CalendarioController extends CI_Controller{
 			$response['data'] = $rs;
 		}else {
 			$response['msg'] = '¡No existen registros!';
+		}
+		$this->output->set_content_type("application/json");
+        $this->output->set_output(json_encode($response));
+	}
+
+	public function isPrimeraCita() {
+		$usuario = $this->input->post('dataValue[usuario]');
+		$especialista = $this->input->post('dataValue[especialista]');
+
+		$response['result'] = isset($usuario, $especialista);
+		if ($response['result']) {
+			$rs = $this->calendarioModel->isPrimeraCita($usuario, $especialista)->result();
+			$response['result'] = count($rs) > 0;
+			if ($response['result']) {
+				$response['msg'] = '¡Usuario con registros de citas!';
+				// $response['data'] = $rs;
+			}else {
+				$response['msg'] = '¡No existen registros!';
+			}
+		}else {
+			$response['msg'] = "¡Parametros invalidos!";
+		}
+		$this->output->set_content_type("application/json");
+        $this->output->set_output(json_encode($response));
+	}
+
+	public function getCitasSinFinalizarUsuario() {
+		$usuario = $this->input->post('dataValue[usuario]');
+
+		$response['result'] = isset($usuario);
+		if ($response['result']) {
+			$rs = $this->calendarioModel->getCitasSinFinalizarUsuario($usuario)->result();
+			$response['result'] = count($rs) > 0;
+			if ($response['result']) {
+				$response['msg'] = '¡Usuario con citas sin finalizar!';
+				$response['data'] = $rs;
+			}else {
+				$response['msg'] = '¡No existen registros!';
+			}
+		}else {
+			$response['msg'] = "¡Parametros invalidos!";
+		}
+		$this->output->set_content_type("application/json");
+        $this->output->set_output(json_encode($response));
+	}
+
+	public function getCitasFinalizadasUsuario() {
+		$usuario = $this->input->post('dataValue[usuario]');
+		$mes = $this->input->post('dataValue[mes]');
+		$año = $this->input->post('dataValue[anio]');
+
+		$response['result'] = isset($usuario, $mes, $año);
+		if ($response['result']) {
+			$rs = $this->calendarioModel->getCitasFinalizadasUsuario($usuario, $mes, $año)->result();
+			$response['result'] = count($rs) > 0;
+			if ($response['result']) {
+				$response['msg'] = '¡Usuario con citas finalizadas!';
+				$response['data'] = $rs;
+			}else {
+				$response['msg'] = '¡No existen registros!';
+			}
+		}else {
+			$response['msg'] = "¡Parametros invalidos!";
+		}
+		$this->output->set_content_type("application/json");
+        $this->output->set_output(json_encode($response));
+	}
+
+	public function getAtencionPorSede() {
+		$especialista = $this->input->post('dataValue[especialista]');
+		$sede         = $this->input->post('dataValue[sede]');
+		$modalidad    = $this->input->post('dataValue[modalidad]');
+
+		$response['result'] = isset($especialista, $sede, $modalidad);
+		if ($response['result']) {
+			$rs = $this->calendarioModel->getAtencionPorSede($especialista, $sede, $modalidad)->result();
+			$response['result'] = count($rs) > 0;
+			if ($response['result']) {
+				$response['msg'] = '¡Datos de atencion por sede consultados!';
+				$response['data'] = $rs;
+			}else {
+				$response['msg'] = '¡No existen registros!';
+			}
+		}else {
+			$response['msg'] = "¡Parametros invalidos!";
 		}
 		$this->output->set_content_type("application/json");
         $this->output->set_output(json_encode($response));
