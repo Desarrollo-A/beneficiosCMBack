@@ -197,7 +197,7 @@ class CalendarioModel extends CI_Model
         return $query;
     }
 
-    public function checkAppointmentId($dataValue, $fechaInicioSuma, $fechaFinalResta){
+    public function checkAppointmentId($dataValue, $fecha_inicio_suma, $fecha_final_resta){
         $query = $this->db->query(
             "SELECT *FROM citas WHERE
             ((fechaInicio BETWEEN ? AND ?)
