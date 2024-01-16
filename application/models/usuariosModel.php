@@ -37,12 +37,14 @@ class usuariosModel extends CI_Model {
 	public function getNameUser($idEspecialista)
 	{
 		$query = $this->db->query(
-			"SELECT idUsuario, nombre, idSede FROM usuarios
-			 WHERE idRol = ?
-			 AND estatus = ?
-			 AND idUsuario 
+			"SELECT US.*, PS.puesto as nombrePuesto FROM usuarios US
+			 INNER JOIN puestos PS ON
+			 US.puesto = PS.idPuesto
+			 WHERE US.idRol = ?
+			 AND US.estatus = ?
+			 AND US.idUsuario
 			 NOT IN( SELECT idPaciente FROM citas WHERE estatusCita = ? GROUP BY idPaciente HAVING COUNT(idPaciente) > ?)
-			 AND idSede
+			 AND US.idSede
 			 IN( select distinct idSede from atencionXSede where idEspecialista = ?)",
 			 array( 2, 1, 1, 1, $idEspecialista )
 		);
