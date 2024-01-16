@@ -65,14 +65,15 @@ class CalendarioModel extends CI_Model
 	            WHEN ct.estatusCita = 4 THEN 'green'
                 WHEN ct.estatusCita = 5 THEN 'pink'
                 WHEN ct.estatusCita = 6 THEN 'blue'
+                WHEN ct.estatusCita = 7 THEN 'red'
 	        END
             FROM citas ct
             INNER JOIN usuarios us ON us.idUsuario = ct.idPaciente
             WHERE YEAR(fechaInicio) in (?, ?)
             AND MONTH(fechaInicio) in (?, ?, ?)
             AND idEspecialista = ?
-            AND ct.estatusCita IN(?, ?, ?, ?, ?, ?)",
-            array( $dates["year1"], $dates["year2"], $dates["month1"], $month, $dates["month2"], $idUsuario, 1, 2, 3, 4, 5, 6 )
+            AND ct.estatusCita IN(?, ?, ?, ?, ?, ?, ?)",
+            array( $dates["year1"], $dates["year2"], $dates["month1"], $month, $dates["month2"], $idUsuario, 1, 2, 3, 4, 5, 6, 7 )
         );
 
         return $query;
@@ -80,7 +81,7 @@ class CalendarioModel extends CI_Model
 
     public function getAppointmentRange($fechaInicio, $fechaFin, $idUsuario){
         $query = $this->db->query(
-            "SELECT CAST(ct.idCita AS VARCHAR(36))  AS id,  ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
+            "SELECT CAST(ct.idCita AS VARCHAR(36))  AS id,  ct.titulo AS title, ct.fechaInicio, ct.fechaFinal, 
             ct.fechaInicio AS occupied, 'green' AS 'color', 'date' AS 'type', ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal,
             'color' = CASE
 	            WHEN ct.estatusCita = 0 THEN 'red'
@@ -157,7 +158,7 @@ class CalendarioModel extends CI_Model
             OR (? BETWEEN fechaInicio AND fechaFinal))
             AND ((idPaciente = ?
             AND estatusCita = ?)
-            OR (idEspecialista = ? and estatusCita IN (?)))",
+            OR (idEspecialista = ? and estatusCita IN (?, ?)))",
             array(
                 $fechaInicioSuma, $fechaFinalResta,
                 $fechaInicioSuma, $fechaFinalResta,
@@ -166,7 +167,8 @@ class CalendarioModel extends CI_Model
                 $dataValue["idPaciente"],
                 1,
                 $dataValue["idUsuario"],
-                1
+                1,
+                6
             )
         );
         
@@ -180,15 +182,15 @@ class CalendarioModel extends CI_Model
             OR (fechaFinal BETWEEN ? AND ?)
             OR (? BETWEEN fechaInicio AND fechaFinal)
             OR (? BETWEEN fechaInicio AND fechaFinal))
-            AND idEspecialista = ?
-            AND estatusCita = ?",
+            AND idEspecialista = ? AND estatusCita IN(?, ?)",
             array(
                 $fechaInicioSuma, $fechaFinalResta,
                 $fechaInicioSuma, $fechaFinalResta,
                 $fechaInicioSuma,
                 $fechaFinalResta,
                 $dataValue["idUsuario"],
-                1
+                1,
+                6
             )
         );
         
@@ -205,7 +207,7 @@ class CalendarioModel extends CI_Model
             AND idCita != ?
             AND ((idPaciente = ?
             AND estatusCita = ?)
-            OR (idEspecialista = ? AND estatusCita IN(?)))",
+            OR (idEspecialista = ? AND estatusCita IN(?, ?)))",
         array(
             $fecha_inicio_suma, $fecha_final_resta,
             $fecha_inicio_suma, $fecha_final_resta,
@@ -215,7 +217,8 @@ class CalendarioModel extends CI_Model
             $dataValue["idPaciente"],
             1,
             $dataValue["idUsuario"],
-            1
+            1,
+            6
         )
     );
 
@@ -255,7 +258,7 @@ class CalendarioModel extends CI_Model
             FROM usuarios AS u 
             RIGHT JOIN atencionXSede AS AXS ON AXS.idEspecialista = U.idUsuario
             INNER JOIN opcionesPorCatalogo AS oxc ON oxc.idOpcion= axs.tipoCita
-            INNER JOIN sedes AS S ON S.idSede = U.sede
+            INNER JOIN sedes AS S ON S.idSede = U.idSede
             LEFT JOIN oficinas as o ON o.idoficina = axs.idOficina
             INNER JOIN puestos AS p ON p.idPuesto = u.puesto
             FULL JOIN sedes AS se ON se.idSede = o.idSede
@@ -266,19 +269,19 @@ class CalendarioModel extends CI_Model
         return $query;
 	}
 
-    public function getEspecialistaPorBeneficioYSede($sede, $beneficio)
+    public function getEspecialistaPorBeneficioYSede($sede, $area, $beneficio)
     {
         $query = $this->db->query(
             "SELECT DISTINCT u.idUsuario as id, u.nombre AS especialista
             FROM usuarios AS u 
             RIGHT JOIN atencionXSede AS AXS ON AXS.idEspecialista = U.idUsuario
             INNER JOIN opcionesPorCatalogo AS oxc ON oxc.idOpcion= axs.tipoCita
-            INNER JOIN sedes AS S ON S.idSede = U.sede
+            INNER JOIN sedes AS S ON S.idSede = U.idSede
             LEFT JOIN oficinas as o ON o.idoficina = axs.idOficina
             INNER JOIN puestos AS p ON p.idPuesto = u.puesto
             FULL JOIN sedes AS se ON se.idSede = o.idSede
             WHERE u.estatus = 1 AND s.estatus = 1 AND axs.estatus = 1  AND u.idRol = 3 AND oxc.idCatalogo = 5
-            AND axs.idSede = ? AND u.puesto = ?", array($sede, $beneficio)
+            AND (axs.idSede = ? AND (axs.idArea IS NULL OR axs.idArea = ?)) AND u.puesto = ?;", array($sede, $area, $beneficio)
         );
 
         return $query;
@@ -293,7 +296,7 @@ class CalendarioModel extends CI_Model
             FROM usuarios AS u 
             RIGHT JOIN atencionXSede AS AXS ON AXS.idEspecialista = U.idUsuario
             INNER JOIN opcionesPorCatalogo AS oxc ON oxc.idOpcion= axs.tipoCita
-            INNER JOIN sedes AS S ON S.idSede = U.sede
+            INNER JOIN sedes AS S ON S.idSede = U.idSede
             LEFT JOIN oficinas as o ON o.idoficina = axs.idOficina
             INNER JOIN puestos AS p ON p.idPuesto = u.puesto
             FULL JOIN sedes AS se ON se.idSede = o.idSede
@@ -303,6 +306,11 @@ class CalendarioModel extends CI_Model
         return $query;
     }
 
+    public function getReasons($puesto){
+        $query = $this->db->query("SELECT *from opcionesPorCatalogo where idCatalogo = ?", $puesto);
+
+        return $query->result();
+    }
     public function getOficinaByAtencion($sede, $beneficio, $especialista, $modalidad)
     {
         $query = $this->db->query(
@@ -329,9 +337,52 @@ class CalendarioModel extends CI_Model
         );
 
         return $query;
-    public function getReasons($puesto){
-        $query = $this->db->query("SELECT *from opcionesPorCatalogo where idCatalogo = ?", $puesto);
-
-        return $query->result();
     }
+
+    public function isPrimeraCita($usuario, $especialista)
+    {
+        $query = $this->db->query(
+            "SELECT *FROM CITAS
+            WHERE idPaciente = ? AND idEspecialista = ?;",
+            array($usuario, $especialista)
+        );
+
+        return $query;
+    }
+
+    public function getCitasSinFinalizarUsuario($usuario, $beneficio)
+    {
+        $query = $this->db->query(
+            "SELECT c.*, u.puesto FROM citas AS c
+            INNER JOIN usuarios as u ON c.idEspecialista = u.idUsuario
+            WHERE c.idPaciente = ? AND u.puesto = ? AND c.estatusCita NOT IN (2, 5, 4);",array($usuario, $beneficio)
+        );
+
+        return $query;
+    }
+
+    public function getCitasFinalizadasUsuario($usuario, $mes, $año)
+    {
+        $query = $this->db->query(
+            "SELECT *FROM citas
+            WHERE idPaciente = ? AND MONTH(fechaInicio) = ?
+            AND YEAR(fechaInicio) = ? AND estatusCita IN (4);", array($usuario, $mes, $año)
+        );
+
+        return $query;
+    }
+
+    public function getAtencionPorSede($especialista, $sede, $modalidad)
+    {
+        $query = $this->db->query(
+            "SELECT *FROM atencionXSede 
+            WHERE estatus = 1 AND idEspecialista = ? 
+            AND idSede = ? AND tipoCita = ? ;", array($especialista, $sede, $modalidad)
+        );
+
+        return $query;
+    }
+
+
+
 }
