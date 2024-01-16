@@ -116,6 +116,8 @@ class encuestasModel extends CI_Model {
             SELECT idEspecialista
             FROM cte WHERE rn = 1 ");
 
+        if ($query_especialistas->num_rows() > 0) {
+
         $idEspecialistas = [];
         foreach ($query_especialistas->result() as $row) {
             $idEspecialistas[] = $row->idEspecialista;
@@ -136,12 +138,9 @@ class encuestasModel extends CI_Model {
 
         $query_encuestasC = $this->db->query("SELECT * FROM encuestasContestadas WHERE idEncuesta IN (" . implode(',', $idEcuestas) . ") AND idUsuario = $idUsuario");
 
-        $idEnc = [0];
-        foreach ($query_encuestasC->result() as $row) {
-            $idEnc[] = $row->idEncuesta;
-        }
+        if ($query_encuestasC->num_rows() == 0) {
 
-        $query_enc = $this->db->query("SELECT DISTINCT diasVigencia FROM encuestasCreadas WHERE idEncuesta IN (" . implode(',', $idEnc) . ")");
+        $query_enc = $this->db->query("SELECT DISTINCT diasVigencia FROM encuestasCreadas WHERE idEncuesta IN (" . implode(',', $idEcuestas) . ")");
 
         $vig = 0;
         foreach ($query_enc->result() as $row) {
@@ -162,11 +161,25 @@ class encuestasModel extends CI_Model {
         FROM usuarios us 
         INNER JOIN encuestasCreadas ec ON ec.idArea = us.puesto
         INNER JOIN puestos ps ON ps.idPuesto = ec.idArea
-        WHERE us.idUsuario IN (" . implode(',', $idEspecialistas) . ") AND ec.estatus = 1 AND idEncuesta NOT IN (" . implode(',', $idEnc) . ")");
+        WHERE us.idUsuario IN (" . implode(',', $idEspecialistas) . ") AND ec.estatus = 1");
+
+       /*  $query_enc = $this->db->query("SELECT DISTINCT idEncuesta, ps.puesto
+        FROM usuarios us 
+        INNER JOIN encuestasCreadas ec ON ec.idArea = us.puesto
+        INNER JOIN puestos ps ON ps.idPuesto = ec.idArea
+        WHERE us.idUsuario IN (" . implode(',', $idEspecialistas) . ") AND ec.estatus = 1 AND idEncuesta NOT IN (" . implode(',', $idEnc) . ")"); */
 
         $result_encuestas = $query_enc->result_array();
 
         return $result_encuestas;
+
+        } else {
+            return false;
+        }
+
+        } else {
+            return false;
+        }
 
         } else {
             return false;
@@ -367,5 +380,33 @@ class encuestasModel extends CI_Model {
         rn = 1 AND estatus = 1");
 
         return $query;
+    }
+
+    public function getValidEncContestada($dt){
+    
+        $query1 = $this->db-> query("SELECT DISTINCT ec.idEncuesta
+		FROM encuestasCreadas ec
+		INNER JOIN preguntasGeneradas pg ON pg.pregunta = ec.pregunta
+		WHERE ec.estatus = 1 AND abierta = 1 AND ec.idArea = $dt");
+
+        if ($query1->num_rows() > 0) {
+
+            $idEncuesta = '';
+            foreach ($query1->result() as $row) {
+                $idEncuesta = $row->idEncuesta;;
+            }
+
+            $query2 = $this->db-> query("SELECT * FROM encuestasContestadas WHERE idEncuesta = $idEncuesta");
+
+            if ($query2->num_rows() > 0) {
+                return true;
+            }else{
+                return false;
+            }
+
+        }else{
+            return false;
+        }
+
     }
 }

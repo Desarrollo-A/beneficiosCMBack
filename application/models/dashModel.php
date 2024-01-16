@@ -32,17 +32,14 @@ class dashModel extends CI_Model {
 		$query = $this->db-> query("SELECT
 		DATEPART(MONTH, ct.fechaModificacion) AS mes,
 		COUNT(*) AS cantidad, op.nombre AS nombre
-	FROM
-		catalogos ca
-	INNER JOIN 
-		opcionesPorCatalogo op ON op.idCatalogo = ca.idCatalogo AND ca.idCatalogo = 2
-	INNER JOIN 
-		citas ct ON ct.estatusCita = op.idOpcion 
-	WHERE
+		FROM catalogos ca
+		INNER JOIN opcionesPorCatalogo op ON op.idCatalogo = ca.idCatalogo AND ca.idCatalogo = 2
+		INNER JOIN citas ct ON ct.estatusCita = op.idOpcion 
+		WHERE
 		DATEPART(YEAR, fechaModificacion) = ? AND ct.estatusCita = 1
-	GROUP BY
+		GROUP BY
 		DATEPART(MONTH, fechaModificacion), op.nombre
-	ORDER BY
+		ORDER BY
 		Mes", $year);
 
 		return $query->result();
@@ -53,18 +50,14 @@ class dashModel extends CI_Model {
 		$query = $this->db-> query("SELECT
 		DATEPART(MONTH, ct.fechaModificacion) AS mes,
 		COUNT(*) AS cantidad, op.nombre AS nombre
-	FROM
-		catalogos ca
-	INNER JOIN 
-		opcionesPorCatalogo op ON op.idCatalogo = ca.idCatalogo AND ca.idCatalogo = 2
-	INNER JOIN 
-		citas ct ON ct.estatusCita = op.idOpcion 
-	WHERE
+		FROM catalogos ca
+		INNER JOIN opcionesPorCatalogo op ON op.idCatalogo = ca.idCatalogo AND ca.idCatalogo = 2
+		INNER JOIN citas ct ON ct.estatusCita = op.idOpcion 
+		WHERE
 		DATEPART(YEAR, fechaModificacion) = ? AND ct.estatusCita = 2
-	GROUP BY
+		GROUP BY
 		DATEPART(MONTH, fechaModificacion), op.nombre
-	ORDER BY
-		Mes", $year);
+		ORDER BY Mes", $year);
 
 		return $query->result();
 	}
@@ -74,18 +67,14 @@ class dashModel extends CI_Model {
 		$query = $this->db-> query("SELECT
 		DATEPART(MONTH, ct.fechaModificacion) AS mes,
 		COUNT(*) AS cantidad, op.nombre AS nombre
-	FROM
-		catalogos ca
-	INNER JOIN 
-		opcionesPorCatalogo op ON op.idCatalogo = ca.idCatalogo AND ca.idCatalogo = 2
-	INNER JOIN 
-		citas ct ON ct.estatusCita = op.idOpcion 
-	WHERE
+		FROM catalogos ca
+		INNER JOIN opcionesPorCatalogo op ON op.idCatalogo = ca.idCatalogo AND ca.idCatalogo = 2
+		INNER JOIN citas ct ON ct.estatusCita = op.idOpcion 
+		WHERE
 		DATEPART(YEAR, fechaModificacion) = ? AND ct.estatusCita = 3
-	GROUP BY
+		GROUP BY
 		DATEPART(MONTH, fechaModificacion), op.nombre
-	ORDER BY
-		Mes", $year);
+		ORDER BY Mes", $year);
 
 		return $query->result();
 	}
@@ -102,17 +91,14 @@ class dashModel extends CI_Model {
 		$query =$this->db->query("SELECT
 		DATEPART(MONTH, fechaModificacion) AS mes,
 		COUNT(*) AS cantidad, op.nombre AS nombre
-	FROM
-		catalogos ca
-	INNER JOIN 
-		opcionesPorCatalogo op ON op.idCatalogo = ca.idCatalogo AND ca.idCatalogo = 2
-	INNER JOIN 
-		citas ct ON ct.estatusCita = op.idOpcion
-	WHERE
+		FROM catalogos ca
+		INNER JOIN opcionesPorCatalogo op ON op.idCatalogo = ca.idCatalogo AND ca.idCatalogo = 2
+		INNER JOIN citas ct ON ct.estatusCita = op.idOpcion
+		WHERE
 		DATEPART(YEAR, fechaModificacion) = ?
-	GROUP BY
+		GROUP BY
 		DATEPART(MONTH, fechaModificacion), op.nombre
-	ORDER BY
+		ORDER BY
 		Mes", $year);
 
 		return $query->result();
@@ -123,7 +109,7 @@ class dashModel extends CI_Model {
 		$query = $this->db-> query("SELECT DISTINCT pg.pregunta, ec.respuestas, pg.idPregunta, ec.idEncuesta, ec.idEncuestaCreada, ec.idArea  
 		FROM encuestasCreadas ec
 		INNER JOIN preguntasGeneradas pg ON pg.pregunta = ec.pregunta
-		WHERE ec.estatus = 1 AND abierta = 1 AND especialidad = $dt");
+		WHERE ec.estatus = 1 AND abierta = 1 AND ec.idArea = $dt AND ec.respuestas <= 4");
 		
 		$result = $query->result();
 
@@ -150,6 +136,8 @@ class dashModel extends CI_Model {
 				WHERE ec.estatus = 1 AND abierta = 1 AND especialidad = ? AND idPregunta = ?",
 				array($idEspecialidad, $idPregunta));
 
+			if ($query_pregunta->num_rows() > 0) {
+
 			$idPrg = [];
 			foreach ($query_pregunta->result() as $row) {
 				$idPrg[] = "'" . $row->pregunta . "'";
@@ -165,6 +153,11 @@ class dashModel extends CI_Model {
 				array($idEncuesta));
 
 			return $query->result();
+
+			}else
+			{
+				return false;
+			}
 
 		}else
 		{
@@ -186,10 +179,16 @@ class dashModel extends CI_Model {
 			WHERE ec.idEncuesta = $idEncuesta AND ec.idPregunta = $idPregunta
 			GROUP BY rg.respuesta, ec.idPregunta, ec.idArea, ec.idEncuesta");
 
-		return $query->result();
-		}else
-		{
+		if ($query->num_rows() > 0) {
+
+			return $query->result();
+		}else{
 			return false;
 		}
-	}
+
+		
+			}else{
+				return false;
+			}
+		}
 }
