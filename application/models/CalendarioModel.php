@@ -350,11 +350,12 @@ class CalendarioModel extends CI_Model
         return $query;
     }
 
-    public function getCitasSinFinalizarUsuario($usuario)
+    public function getCitasSinFinalizarUsuario($usuario, $beneficio)
     {
         $query = $this->db->query(
-            "SELECT *FROM citas
-            WHERE idPaciente = ? AND estatusCita NOT IN (2, 5);", array($usuario)
+            "SELECT c.*, u.puesto FROM citas AS c
+            INNER JOIN usuarios as u ON c.idEspecialista = u.idUsuario
+            WHERE c.idPaciente = ? AND u.puesto = ? AND c.estatusCita NOT IN (2, 5, 4);",array($usuario, $beneficio)
         );
 
         return $query;
@@ -382,6 +383,6 @@ class CalendarioModel extends CI_Model
         return $query;
     }
 
-    
+
 
 }
