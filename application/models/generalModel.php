@@ -28,14 +28,14 @@ class generalModel extends CI_Model {
 
     public function especialistas()
 	{
-		$query = $this->db-> query("SELECT * FROM opcionesporcatalogo WHERE idCatalogo = 1");
+		$query = $this->db-> query("SELECT puesto AS nombre FROM puestos WHERE idPuesto = 537 OR idPuesto = 686 OR idPuesto = 158 OR idPuesto = 585");
 		return $query->result();
 	}
 
     // MJ: AGREGA UN REGISTRO A UNA TABLA EN PARTICULAR, RECIBE 2 PARÁMETROS. LA TABLA Y LA DATA A INSERTAR
     public function addRecord($table, $data) { 
         return $this->db->insert($table, $data);
-    } 
+    }
 
     // MJ: ACTUALIZA LA INFORMACIÓN DE UN REGISTRO EN PARTICULAR, RECIBE 4 PARÁMETROS. TABLA, DATA A ACTUALIZAR, LLAVE (WHERE) Y EL VALOR DE LA LLAVE
     public function updateRecord($table, $data, $key, $value) { 
@@ -62,5 +62,24 @@ class generalModel extends CI_Model {
         } else { // Todas las consultas se hicieron correctamente.
             return $this->db->trans_commit();
         }
+    }
+
+    public function getPuesto($dt)
+    {
+        $query = $this->db-> query("SELECT pu.puesto
+        FROM usuarios us
+        INNER JOIN puestos pu ON pu.idPuesto = us.puesto
+        WHERE idUsuario = $dt");
+
+		return $query;
+    }
+
+    public function getSede($dt)
+    {
+        $query = $this->db-> query("SELECT se.sede
+        FROM usuarios us
+        INNER JOIN sedes se ON se.idSede = us.sede
+        WHERE idUsuario = $dt");
+		return $query;
     }
 }

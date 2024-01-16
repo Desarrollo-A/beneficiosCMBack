@@ -25,7 +25,7 @@ class encuestasController extends CI_Controller {
 	}
 
 	public function getRespuestas(){
-		$data['data'] = $this->encuestasModel->getRespuestas();
+		$data['data'] = $this->encuestasModel->getRespuestas()->result();
 		echo json_encode($data);
 	}
 
@@ -35,33 +35,33 @@ class encuestasController extends CI_Controller {
 	}
 
 	public function encuestaMinima(){
-		$data['data'] = $this->encuestasModel->encuestaMinima();
+		$data['data'] = $this->encuestasModel->encuestaMinima()->result();
 		echo json_encode($data);
 	}
 
 	public function getEncuesta(){
 		$dt = $this->input->post('dataValue', true);
-		$data['data'] = $this->encuestasModel->getEncuesta($dt);
+		$data['data'] = $this->encuestasModel->getEncuesta($dt)->result();
 		echo json_encode($data);
 	}
 
 	public function getResp1(){
-		$data['data'] = $this->encuestasModel->getResp1();
+		$data['data'] = $this->encuestasModel->getResp1()->result();
 		echo json_encode($data);
 	}
 
 	public function getResp2(){
-		$data['data'] = $this->encuestasModel->getResp2();
+		$data['data'] = $this->encuestasModel->getResp2()->result();
 		echo json_encode($data);
 	}
 
 	public function getResp3(){
-		$data['data'] = $this->encuestasModel->getResp3();
+		$data['data'] = $this->encuestasModel->getResp3()->result();
 		echo json_encode($data);
 	}
 
 	public function getResp4(){
-		$data['data'] = $this->encuestasModel->getResp4();
+		$data['data'] = $this->encuestasModel->getResp4()->result();
 		echo json_encode($data);
 	}
 
@@ -82,15 +82,67 @@ class encuestasController extends CI_Controller {
 	}
 
 	public function getPuestos(){
-		$data['data'] = $this->encuestasModel->getPuestos();
+		$data['data'] = $this->encuestasModel->getPuestos()->result();
 		echo json_encode($data);
 	}
 
-	public function encuestaConstestada(){
+	public function getEncuestasCreadas(){
+
 		$dt = $this->input->post('dataValue', true);
 
-		$data['data'] = $this->encuestasModel->encuestaConstestada($dt);
+		$data['data'] = $this->encuestasModel->getEncuestasCreadas($dt)->result();
 		echo json_encode($data);
 	}
 
+	public function updateEstatus(){
+
+		$idEncuesta= $this->input->post('dataValue[idEncuesta]');
+		$estatus= $this->input->post('dataValue[estatus]');
+		$vigencia= $this->input->post('dataValue[vigencia]');
+		$area= $this->input->post('dataValue[area]');
+
+		$query_idEncuesta = $this->db->query("SELECT * FROM encuestasCreadas WHERE idArea = $area AND estatus = 1");
+
+        $idEnc = 0;
+        foreach ($query_idEncuesta->result() as $row) {
+            $idEnc = $row->idEncuesta;
+        }
+
+		$data_1 = array(
+			"estatus" => 0,
+		);
+
+		$response_1=$this->generalModel->updateRecord('encuestasCreadas', $data_1, 'idEncuesta', $idEnc);
+
+		$data_2 = array(
+			"estatus" => $estatus,
+			"diasVigencia" => $vigencia
+		);
+
+		$response_2=$this->generalModel->updateRecord('encuestasCreadas', $data_2, 'idEncuesta', $idEncuesta);
+		echo json_encode(array("estatus" => true, "msj" => "Estatus Actualizado!" ));
+				
+	}
+
+	public function updateVigencia(){
+
+		$idEncuesta= $this->input->post('dataValue[idEncuesta]');
+		$vigencia= $this->input->post('dataValue[vigencia]');
+
+		$data = array(
+			"diasVigencia" => $vigencia
+		);
+
+		$response=$this->generalModel->updateRecord('encuestasCreadas', $data, 'idEncuesta', $idEncuesta);
+		echo json_encode(array("estatus" => true, "msj" => "Dato Actualizado!" ));
+				
+	}
+
+	public function getEstatusUno(){
+
+		$dt = $this->input->post('dataValue', true);
+
+		$data['data'] = $this->encuestasModel->getEstatusUno($dt)->result();
+		echo json_encode($data);
+	}
 }

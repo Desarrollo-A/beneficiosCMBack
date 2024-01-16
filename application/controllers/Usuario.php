@@ -156,15 +156,56 @@ class Usuario extends CI_Controller {
 	public function getNameUser(){
 		$idEspecialista = $this->input->post("dataValue", true);
 
-		$rs = $this->usuariosModel->getNameUser($idEspecialista);
-		$data['result'] = count($rs) > 0; 
-		if ($data['result']) {
-			$data['msg'] = '¡Listado de usuarios cargado exitosamente!';
-			$data['data'] = $rs; 
+		$getNameUser = $this->usuariosModel->getNameUser($idEspecialista)->result();
+		$response['result'] = count($getNameUser) > 0;
+		if ($response['result']) {
+			$response['msg'] = '¡Listado de usuarios cargado exitosamente!';
+			$response['data'] = $getNameUser;
 		}else {
-			$data['msg'] = '¡No existen registros!';
+			$response['msg'] = '¡No existen registros!';
 		}
 		$this->output->set_content_type("application/json");
-        $this->output->set_output(json_encode($data));
+        $this->output->set_output(json_encode($response));
+	}
+
+	public function getSpecialistContact() {
+		$especialista = $this->input->post('dataValue[especialista]');
+		$rs = $this->usuariosModel->getSpecialistContact($especialista)->result();
+		$response['result'] = count($rs) > 0;
+		if ($response['result']) {
+			$response['msg'] = '¡Listado de usuarios cargado exitosamente!';
+			$response['data'] = $rs;
+		}else {
+			$response['msg'] = '¡No existen registros!';
+		}
+		$this->output->set_content_type("application/json");
+        $this->output->set_output(json_encode($response));
+	}
+
+	public function decodePass(){
+
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->usuariosModel->decodePass($dt);
+		echo json_encode($data);
+	}
+
+	public function updatePass(){
+
+		$idUsuario = $this->input->post('dataValue[idUsuario]');
+		$password = $this->input->post('dataValue[password]');
+		$newPass= $this->input->post('dataValue[newPassword]');
+
+			if(!empty($newPass))
+			{
+				$data = array(
+					"password" => encriptar($newPass),
+				);
+				
+				$response=$this->generalModel->updateRecord('usuarios', $data, 'idUsuario', $idUsuario);
+				echo json_encode(array("estatus" => true, "msj" => "Contraseña actualizada!" ));
+					
+			}else{
+				echo json_encode(array("estatus" => false, "msj" => "Error en actualizar contraseña"));
+			}	
 	}
 }
