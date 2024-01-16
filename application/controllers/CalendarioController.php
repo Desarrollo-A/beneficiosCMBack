@@ -872,4 +872,13 @@ class CalendarioController extends CI_Controller{
 		$this->output->set_content_type("application/json");
         $this->output->set_output(json_encode($response));
 	}
+
+	public function getPendingEnd(){
+		$idUsuario = $this->input->post('dataValue', true);
+		
+		$get = $this->calendarioModel->getPending($idUsuario);
+
+		$this->output->set_content_type('application/json');
+		$this->output->set_output(json_encode($get));
+	}
 }

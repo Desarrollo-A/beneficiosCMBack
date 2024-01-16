@@ -382,6 +382,12 @@ class CalendarioModel extends CI_Model
         return $query;
     }
 
+    public function getPending($idUsuario){
+        $query = $this->db->query("SELECT *FROM citas WHERE estatusCita = ? AND idEspecialista = ? AND fechaInicio < GETDATE()", array(1, $idUsuario));
+
+        return $query->result();
+    }
+
     
 
 }
