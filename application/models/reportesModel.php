@@ -13,7 +13,7 @@ class reportesModel extends CI_Model {
 		if($dt === 'general'){
 
 			$query = $this->db-> query("SELECT ct.idCita, us.nombre especialista, pa.nombre paciente, pa.oficina, ps.puesto AS area, sd.sede,ct.titulo, op.nombre AS estatus, 
-			CONCAT (CONVERT(DATE,ct.fechaInicio), ' ', FORMAT(ct.fechaInicio, 'HH:mm'), ' - ', FORMAT(ct.fechaFinal, 'HH:mm')) AS horario, observaciones 
+			CONCAT (CONVERT(DATE,ct.fechaInicio), ' ', FORMAT(ct.fechaInicio, 'HH:mm'), ' - ', FORMAT(ct.fechaFinal, 'HH:mm')) AS horario, observaciones, us.sexo, ct.motivoCita 
 			FROM citas ct
 			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
 			INNER JOIN usuarios pa ON pa.idUsuario = ct.idPaciente
@@ -26,7 +26,7 @@ class reportesModel extends CI_Model {
 		}else if($dt === 'faltas'){
 
 			$query = $this->db-> query("SELECT ct.idCita, us.nombre especialista, pa.nombre paciente, pa.oficina, ps.puesto AS area, sd.sede,ct.titulo, op.nombre as estatus, 
-			CONCAT (CONVERT(DATE,ct.fechaInicio), ' ', FORMAT(ct.fechaInicio, 'HH:mm'), ' - ', FORMAT(ct.fechaFinal, 'HH:mm')) AS horario, observaciones 
+			CONCAT (CONVERT(DATE,ct.fechaInicio), ' ', FORMAT(ct.fechaInicio, 'HH:mm'), ' - ', FORMAT(ct.fechaFinal, 'HH:mm')) AS horario, observaciones , us.sexo, ct.motivoCita 
 			FROM citas ct
 			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
 			INNER JOIN usuarios pa ON pa.idUsuario = ct.idPaciente
@@ -39,7 +39,7 @@ class reportesModel extends CI_Model {
 		}else if($dt === 'justificadas'){
 
 			$query = $this->db-> query("SELECT ct.idCita, us.nombre especialista, pa.nombre paciente, pa.oficina, ps.puesto AS area, sd.sede,ct.titulo, op.nombre as estatus, 
-			CONCAT (CONVERT(DATE,ct.fechaInicio), ' ', FORMAT(ct.fechaInicio, 'HH:mm'), ' - ', FORMAT(ct.fechaFinal, 'HH:mm')) AS horario, observaciones 
+			CONCAT (CONVERT(DATE,ct.fechaInicio), ' ', FORMAT(ct.fechaInicio, 'HH:mm'), ' - ', FORMAT(ct.fechaFinal, 'HH:mm')) AS horario, observaciones, us.sexo, ct.motivoCita 
 			FROM citas ct
 			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
 			INNER JOIN usuarios pa ON pa.idUsuario = ct.idPaciente

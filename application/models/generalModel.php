@@ -63,4 +63,23 @@ class generalModel extends CI_Model {
             return $this->db->trans_commit();
         }
     }
+
+    public function getPuesto($dt)
+    {
+        $query = $this->db-> query("SELECT pu.puesto
+        FROM usuarios us
+        INNER JOIN puestos pu ON pu.idPuesto = us.puesto
+        WHERE idUsuario = $dt");
+
+		return $query;
+    }
+
+    public function getSede($dt)
+    {
+        $query = $this->db-> query("SELECT se.sede
+        FROM usuarios us
+        INNER JOIN sedes se ON se.idSede = us.sede
+        WHERE idUsuario = $dt");
+		return $query;
+    }
 }
