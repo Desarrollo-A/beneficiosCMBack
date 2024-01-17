@@ -6,7 +6,7 @@ class CalendarioModel extends CI_Model
 
     public function getAppointmentsByUser($year, $month, $idUsuario){
         $query = $this->db->query(
-            "SELECT CAST(idCita AS VARCHAR(36)) AS id, observaciones AS title, fechaInicio AS 'start', fechaFinal AS 'end', 
+            "SELECT CAST(idCita AS VARCHAR(36)) AS id, titulo AS title, fechaInicio AS 'start', fechaFinal AS 'end', 
             fechaInicio AS occupied, estatusCita
             FROM citas
             WHERE YEAR(fechaInicio) = ?
@@ -386,6 +386,12 @@ class CalendarioModel extends CI_Model
     public function getPending($idUsuario){
         $query = $this->db->query("SELECT * FROM citas WHERE estatusCita = ? AND idEspecialista = ? AND fechaInicio < GETDATE()", array(1, $idUsuario));
 
-        return $query->result();
+        return $query;
+    }
+
+    public function getDetallePago($folio){
+        $query = $this->db->query("SELECT * FROM detallePagos WHERE folio = ?", array($folio));
+
+        return $query;
     }
 }

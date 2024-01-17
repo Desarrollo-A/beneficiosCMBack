@@ -241,40 +241,41 @@ class CalendarioController extends CI_Controller{
 			return $response['msg'] = "¡Parametros invalidos!";
 		}         
 		
-		// // Checa que no se encuentre bloqueado el horario con esos valores.
-		// $dataValue = [ "idPaciente" => $idPaciente, "idUsuario" => $idEspecialista ];
-		// $fechaFinalResta = date('Y/m/d H:i:s', strtotime($fechaInicio . '-1 minute'));
-        // $fechaInicioSuma = date('Y/m/d H:i:s', strtotime($fechaFinal . '+1 minute'));
-		// $checkAppointment = $this->calendarioModel->checkAppointment($dataValue, $fechaInicioSuma, $fechaFinalResta);
-		// $response['result'] = $checkAppointment->num_rows() > 0;
-		// if ($response['result']) {
-		// 	$response['msg'] = "El horario ya ha sido ocupado";
-		// }
-		// // Obtén la fecha actual
-		// $fechaActual = new DateTime();
-		// $fechaActual->modify('+3 hours');
-		// $fechaActual = $fechaActual->format('Y-m-d H:i:s'); // Suma 3 horas a la fecha actual
-		// if ($fechaInicio < $fechaActual) {
-		//     $response['msg'] = "¡Parametros invalidos!";
-		// } else {
-		// 	$values = [
-		// 		"titulo" => $titulo, "idEspecialista" => $idEspecialista,
-		// 		"idPaciente" => $idPaciente, "observaciones" => $observaciones,
-		// 		"fechaInicio" => $fechaInicio, "fechaFinal" => $fechaFinal,
-		// 		"tipoCita" => $tipoCita, "idAtencionXSede" => $idAtencionXSede,
-		// 		"estatusCita" => $estatusCita, "creadoPor" => $idPaciente,
-		// 		"modificadoPor" => $idPaciente
-		// 	];
-		// 	$addRecord = $this->generalModel->addRecord("citas", $values);
-		// 	if ($addRecord) {
-		// 		$response["result"] = true;
-		// 		$response["msg"] = "¡Se ha agendado la cita con exito!";
-		// 	} 
-		// 	else {
-		// 		$response["result"] = false;
-		// 		$response["msg"] = "¡Surgió un error al intentar guardar la cita!";
-		// 	}
-		// }
+		// Checa que no se encuentre bloqueado el horario con esos valores.
+		$dataValue = [ "idPaciente" => $idPaciente, "idUsuario" => $idEspecialista ];
+		$fechaFinalResta = date('Y/m/d H:i:s', strtotime($fechaInicio . '-1 minute'));
+        $fechaInicioSuma = date('Y/m/d H:i:s', strtotime($fechaFinal . '+1 minute'));
+		$checkAppointment = $this->calendarioModel->checkAppointment($dataValue, $fechaInicioSuma, $fechaFinalResta);
+		$response['result'] = $checkAppointment->num_rows() === 0;
+		if (!$response['result']) {
+			return $response['msg'] = "El horario ya ha sido ocupado";
+		}
+
+		// Obtén la fecha actual
+		$fechaActual = new DateTime();
+		$fechaActual->modify('+3 hours');
+		$fechaActual = $fechaActual->format('Y-m-d H:i:s');
+		$response['result'] = $fechaInicio > $fechaActual; //Si la fecha de la cita es despues de la actual
+		if (!$response['result']) {
+		    return $response['msg'] = "¡Horario de cita dentro del limite de horarios no permitidos !";
+		}
+
+		// Hacer el insert 
+		$values = [
+			"titulo" => $titulo, "idEspecialista" => $idEspecialista,
+			"idPaciente" => $idPaciente, "observaciones" => $observaciones,
+			"fechaInicio" => $fechaInicio, "fechaFinal" => $fechaFinal,
+			"tipoCita" => $tipoCita, "idAtencionXSede" => $idAtencionXSede,
+			"estatusCita" => $estatusCita, "creadoPor" => $idPaciente,
+			"fechaModificacion" => date('Y-m-d H:i:s'), "modificadoPor" => $idPaciente
+		];
+		$response["result"] = $this->generalModel->addRecord("citas", $values);
+		if ($response["result"]) {
+			$response["msg"] = "¡Se ha agendado la cita con exito!";
+		} 
+		else {
+			$response["msg"] = "¡Surgió un error al intentar guardar la cita!";
+		}
 		
 		$this->output->set_content_type("application/json");
         $this->output->set_output(json_encode($response));
@@ -829,7 +830,45 @@ class CalendarioController extends CI_Controller{
 	public function getPendingEnd(){
 		$idUsuario = $this->input->post('dataValue', true);
 		
-		$get = $this->calendarioModel->getPending($idUsuario);
+		$get = $this->calendarioModel->getPending($idUsuario)->result();
+
+		$this->output->set_content_type('application/json');
+		$this->output->set_output(json_encode($get));
+	}
+
+	public function registrarTransaccionPago(){
+		$usuario = $this->input->post('dataValue[usuario]');
+		$folio = $this->input->post('dataValue[folio]');
+		$concepto = $this->input->post('dataValue[concepto]');
+		$cantidad = $this->input->post('dataValue[cantidad]');
+		$metodoPago = $this->input->post('dataValue[metodoPago]');
+		$fecha = date('Y-m-d H:i:s');
+		
+		$response['result'] = isset($usuario, $folio, $concepto, $cantidad, $metodoPago, $fecha);
+		if ($response['result']) {
+			$values = [
+				"folio" => $folio,
+				"idConcepto" => $concepto,
+				"cantidad" => $cantidad,
+				"metodoPago" => $observaciones,
+				"estatus" => 1,
+				"creadoPor" => $usuario,
+				"fechaCreacion" => $fecha,
+				"modificadoPor" => $usuario,
+				"fechaModificacion" => $fecha
+			];
+			$response["result"] = $this->generalModel->addRecord("detallePagos", $values);
+			if ($response["result"]) {
+				$response["msg"] = "¡Se ha generado el detalle de pago con exito!";
+				$rs = $this->calendarioModel->getDetallePago($folio);
+				$response["data"] = $rs;
+			} 
+			else {
+				$response["msg"] = "¡Surgió un error al intentar generar el detalle de pago!";
+			}
+		}else {
+			$response['msg'] = "¡Parametros invalidos!";
+		}
 
 		$this->output->set_content_type('application/json');
 		$this->output->set_output(json_encode($get));
