@@ -78,7 +78,7 @@ class generalModel extends CI_Model {
     {
         $query = $this->db-> query("SELECT se.sede
         FROM usuarios us
-        INNER JOIN sedes se ON se.idSede = us.sede
+        INNER JOIN sedes se ON se.idSede = us.idSede
         WHERE idUsuario = $dt");
 		return $query;
     }
