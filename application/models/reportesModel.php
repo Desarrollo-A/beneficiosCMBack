@@ -17,7 +17,7 @@ class reportesModel extends CI_Model {
 			FROM citas ct
 			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
 			INNER JOIN usuarios pa ON pa.idUsuario = ct.idPaciente
-			INNER JOIN sedes sd ON sd.idSede = us.sede
+			INNER JOIN sedes sd ON sd.idSede = us.idSede
 			INNER JOIN puestos ps ON ps.idPuesto = us.puesto
 			INNER JOIN opcionesPorCatalogo op ON op.idOpcion = ct.estatusCita
 			WHERE op.idCatalogo = 2");
@@ -30,7 +30,7 @@ class reportesModel extends CI_Model {
 			FROM citas ct
 			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
 			INNER JOIN usuarios pa ON pa.idUsuario = ct.idPaciente
-			INNER JOIN sedes sd ON sd.idSede = us.sede
+			INNER JOIN sedes sd ON sd.idSede = us.idSede
 			INNER JOIN puestos ps ON ps.idPuesto = us.puesto
 			INNER JOIN opcionesPorCatalogo op ON op.idOpcion = ct.estatusCita
 			WHERE op.idCatalogo = 2 AND ct.estatusCita = 3");
@@ -43,7 +43,7 @@ class reportesModel extends CI_Model {
 			FROM citas ct
 			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
 			INNER JOIN usuarios pa ON pa.idUsuario = ct.idPaciente
-			INNER JOIN sedes sd ON sd.idSede = us.sede
+			INNER JOIN sedes sd ON sd.idSede = us.idSede
 			INNER JOIN puestos ps ON ps.idPuesto = us.puesto
 			INNER JOIN opcionesPorCatalogo op ON op.idOpcion = ct.estatusCita
 			WHERE op.idCatalogo = 2 AND ct.estatusCita = 5");
