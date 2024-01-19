@@ -4,72 +4,120 @@ defined('BASEPATH') or exit('No direct script access allowed');
 class CalendarioModel extends CI_Model
 {
 
-    public function getAppointmentsByUser($year, $month, $id_usuario){
+    public function getAppointmentsByUser($year, $month, $idUsuario){
         $query = $this->db->query(
             "SELECT CAST(idCita AS VARCHAR(36)) AS id, observaciones AS title, fechaInicio AS 'start', fechaFinal AS 'end', 
-            fechaInicio AS occupied, estatus 
+            fechaInicio AS occupied, estatusCita
             FROM citas
             WHERE YEAR(fechaInicio) = ?
             AND MONTH(fechaInicio) = ?
             AND idPaciente = ?
-            AND estatus = ?",
-            array( $year, $month, $id_usuario, 1 )
+            AND estatusCita = ?",
+            array( $year, $month, $idUsuario, 1 )
         );
 
         return $query;
     }
 
-    public function getOccupied($year, $month, $id_usuario, $dates)
-    {
-        $month_1 = ($month - 1) === 0 ? 12 : ($month - 1);
-        $month_2 = ($month + 1) > 12 ? 1 : ($month + 1);
-        
-        $year_1 =  intval($month) === 1 ? $year - 1 : $year;
-        $year_2 =  intval($month) === 12 ? $year + 1 : $year;
-        
+    public function getOccupied($year, $month, $idUsuario, $dates){
         $query = $this->db->query(
-            "SELECT idUnico as id, titulo as title, concat(fechaOcupado, ' ', horaInicio) as 'start', concat(fechaOcupado, ' ', horaFinal) as 'end',
-            fechaOcupado AS occupied, 'red' AS 'color'
+            "SELECT idUnico as id, titulo as title, fechaInicio as 'start', fechaFinal as 'end',
+            'purple' AS 'color', estatus, 'cancel' AS 'type'
             FROM horariosOcupados 
-            WHERE YEAR(fechaOcupado) in (?, ?)
-            AND MONTH(fechaOcupado) in (?, ?, ?)
+            WHERE YEAR(fechaInicio) in (?, ?)
+            AND MONTH(fechaInicio) in (?, ?, ?)
             AND idEspecialista = ?  
             AND estatus = ?",
-            array( $dates["year_1"], $dates["year_2"], $dates["month_1"], $month, $dates["month_2"], $id_usuario, 1 )
+            array( $dates["year1"], $dates["year2"], $dates["month1"], $month, $dates["month2"], $idUsuario, 1 )
         );
         return $query;
     }
 
-    public function getAppointment($year, $month, $id_usuario, $dates){
+    public function getOccupiedRange($fechaInicio, $fechaFin, $idUsuario){
         $query = $this->db->query(
-            "SELECT CAST(idCita AS VARCHAR(36))  AS id,  observaciones AS title, fechaInicio AS 'start', fechaFinal AS 'end', 
-            fechaInicio AS occupied, 'green' AS 'color', 'cita' AS 'type'
-            FROM citas
+            "SELECT * FROM horariosOcupados
+            WHERE idEspecialista = ? AND estatus = ?  AND
+            (fechaInicio BETWEEN ? AND ?
+               OR fechaFinal BETWEEN ? AND ?
+               OR (fechaInicio < ? AND fechaFinal > ?));",
+            array( $idUsuario, 1, $fechaInicio, $fechaFin, $fechaInicio, $fechaFin, $fechaInicio, $fechaFin)
+        );
+        return $query;
+    }
+
+    public function getHorarioBeneficio($beneficio){
+        $query = $this->db->query(
+            "SELECT *FROM horariosPorBeneficio WHERE idBeneficio = ?",
+            array($beneficio)
+        );
+        return $query;
+    }
+
+    public function getAppointment($year, $month, $idUsuario, $dates){
+        $query = $this->db->query(
+            "SELECT CAST(ct.idCita AS VARCHAR(36))  AS id,  ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
+            ct.fechaInicio AS occupied, 'green' AS 'color', 'date' AS 'type', ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal,
+            'color' = CASE
+	            WHEN ct.estatusCita = 0 THEN 'red'
+	            WHEN ct.estatusCita = 1 THEN 'yellow'
+	            WHEN ct.estatusCita = 2 THEN 'red'
+	            WHEN ct.estatusCita = 3 THEN 'grey'
+	            WHEN ct.estatusCita = 4 THEN 'green'
+                WHEN ct.estatusCita = 5 THEN 'pink'
+                WHEN ct.estatusCita = 6 THEN 'blue'
+                WHEN ct.estatusCita = 7 THEN 'red'
+	        END
+            FROM citas ct
+            INNER JOIN usuarios us ON us.idUsuario = ct.idPaciente
             WHERE YEAR(fechaInicio) in (?, ?)
             AND MONTH(fechaInicio) in (?, ?, ?)
             AND idEspecialista = ?
-            AND estatus = ?",
-            array( $dates["year_1"], $dates["year_2"], $dates["month_1"], $month, $dates["month_2"], $id_usuario, 1 )
+            AND ct.estatusCita IN(?, ?, ?, ?, ?, ?, ?)",
+            array( $dates["year1"], $dates["year2"], $dates["month1"], $month, $dates["month2"], $idUsuario, 1, 2, 3, 4, 5, 6, 7 )
         );
 
         return $query;
     }
 
-    public function checkOccupied($dataValue, $hora_inicio_suma, $hora_final_resta){
+    public function getAppointmentRange($fechaInicio, $fechaFin, $idUsuario){
+        $query = $this->db->query(
+            "SELECT CAST(ct.idCita AS VARCHAR(36))  AS id,  ct.titulo AS title, ct.fechaInicio, ct.fechaFinal, 
+            ct.fechaInicio AS occupied, 'green' AS 'color', 'date' AS 'type', ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal,
+            'color' = CASE
+	            WHEN ct.estatusCita = 0 THEN 'red'
+	            WHEN ct.estatusCita = 1 THEN 'green'
+	            WHEN ct.estatusCita = 2 THEN 'red'
+	            WHEN ct.estatusCita = 3 THEN 'grey'
+	            WHEN ct.estatusCita = 4 THEN 'green'
+                WHEN ct.estatusCita > 4 THEN 'pink'
+	        END
+            FROM citas ct
+            INNER JOIN usuarios us ON us.idUsuario = ct.idPaciente
+            WHERE idEspecialista = ? AND ct.estatusCita IN (?) 
+            AND (fechaInicio BETWEEN ? AND ?
+               OR fechaFinal BETWEEN ? AND ?
+               OR (fechaInicio < ? AND fechaFinal > ?))",
+            array( $idUsuario, 1, $fechaInicio, $fechaFin, $fechaInicio, $fechaFin, $fechaInicio, $fechaFin)
+        );
+
+        return $query;
+    }
+
+    public function checkOccupied($dataValue, $fechaInicioSuma, $fechaFinalResta){
         $query = $this->db->query(
             "SELECT *FROM horariosOcupados WHERE 
-            ((fechaOcupado = ? AND horaInicio BETWEEN ? AND ?) 
-            OR (fechaOcupado = ? AND horaFinal BETWEEN ? AND ?)
-            OR (fechaOcupado = ? AND ? BETWEEN horaInicio AND horaFinal) 
-            OR (fechaOcupado = ? AND ? BETWEEN horaInicio AND horaFinal))
+            ((fechaInicio BETWEEN ? AND ?) 
+            OR (fechaFinal BETWEEN ? AND ?)
+            OR (? BETWEEN fechaInicio AND fechaFinal) 
+            OR (? BETWEEN fechaInicio AND fechaFinal))
             AND idEspecialista = ?
             AND estatus = ?",
             array(
-                $dataValue["fecha"], $hora_inicio_suma, $hora_final_resta,
-                $dataValue["fecha"], $hora_inicio_suma, $hora_final_resta,
-                $dataValue["fecha"], $hora_inicio_suma,
-                $dataValue["fecha"], $hora_final_resta,
-                $dataValue["id_usuario"],
+                $fechaInicioSuma, $fechaFinalResta,
+                $fechaInicioSuma, $fechaFinalResta,
+                $fechaInicioSuma,
+                $fechaFinalResta,
+                $dataValue["idUsuario"],
                 1
             )
         );
@@ -77,23 +125,23 @@ class CalendarioModel extends CI_Model
         return $query;
     }
 
-    public function checkOccupiedId($dataValue, $hora_inicio_suma ,$hora_final_resta){
+    public function checkOccupiedId($dataValue, $fechaInicioSuma ,$fechaFinalResta){
         $query = $this->db->query(
             "SELECT *FROM horariosOcupados WHERE 
-                            ((fechaOcupado = ? AND horaInicio BETWEEN ? AND ?) 
-                            OR (fechaOcupado = ? AND horaFinal BETWEEN ? AND ?)
-                            OR (fechaOcupado = ? AND ? BETWEEN horaInicio AND horaFinal) 
-                            OR (fechaOcupado = ? AND ? BETWEEN horaInicio AND horaFinal))
-                            AND idUnico != ?
-                            AND idEspecialista = ?
-                            AND estatus = ?",
+            ((fechaInicio BETWEEN ? AND ?) 
+            OR (fechaFinal BETWEEN ? AND ?)
+            OR (? BETWEEN fechaInicio AND fechaFinal) 
+            OR (? BETWEEN fechaInicio AND fechaFinal))
+            AND idUnico != ?
+            AND idEspecialista = ?
+            AND estatus = ?",
             array(
-                $dataValue["fecha_ocupado"], $hora_inicio_suma, $hora_final_resta,
-                $dataValue["fecha_ocupado"], $hora_inicio_suma, $hora_final_resta,
-                $dataValue["fecha_ocupado"], $hora_inicio_suma,
-                $dataValue["fecha_ocupado"], $hora_final_resta,
+                $fechaInicioSuma, $fechaFinalResta,
+                $fechaInicioSuma, $fechaFinalResta,
+                $fechaInicioSuma,
+                $fechaFinalResta,
                 $dataValue["id"],
-                $dataValue["id_usuario"],
+                $dataValue["idUsuario"],
                 1
             )
         );
@@ -101,22 +149,48 @@ class CalendarioModel extends CI_Model
         return $query;
     }
 
-    public function checkAppointment($dataValue, $fecha_inicio_suma, $fecha_final_resta){
+    public function checkAppointment($dataValue, $fechaInicioSuma, $fechaFinalResta){
         $query = $this->db->query(
             "SELECT *FROM citas WHERE
             ((fechaInicio BETWEEN ? AND ?)
             OR (fechaFinal BETWEEN ? AND ?)
             OR (? BETWEEN fechaInicio AND fechaFinal)
             OR (? BETWEEN fechaInicio AND fechaFinal))
-            AND idEspecialista = ?
-            AND estatus = ?",
+            AND ((idPaciente = ?
+            AND estatusCita = ?)
+            OR (idEspecialista = ? and estatusCita IN (?, ?)))",
             array(
-                $fecha_inicio_suma, $fecha_final_resta,
-                $fecha_inicio_suma, $fecha_final_resta,
-                $fecha_inicio_suma,
-                $fecha_final_resta,
-                $dataValue["id_usuario"],
-                1
+                $fechaInicioSuma, $fechaFinalResta,
+                $fechaInicioSuma, $fechaFinalResta,
+                $fechaInicioSuma,
+                $fechaFinalResta,
+                $dataValue["idPaciente"],
+                1,
+                $dataValue["idUsuario"],
+                1,
+                6
+            )
+        );
+        
+        return $query;
+    }
+
+    public function checkAppointmentNormal($dataValue, $fechaInicioSuma, $fechaFinalResta){
+        $query = $this->db->query(
+            "SELECT *FROM citas WHERE
+            ((fechaInicio BETWEEN ? AND ?)
+            OR (fechaFinal BETWEEN ? AND ?)
+            OR (? BETWEEN fechaInicio AND fechaFinal)
+            OR (? BETWEEN fechaInicio AND fechaFinal))
+            AND idEspecialista = ? AND estatusCita IN(?, ?)",
+            array(
+                $fechaInicioSuma, $fechaFinalResta,
+                $fechaInicioSuma, $fechaFinalResta,
+                $fechaInicioSuma,
+                $fechaFinalResta,
+                $dataValue["idUsuario"],
+                1,
+                6
             )
         );
         
@@ -125,25 +199,40 @@ class CalendarioModel extends CI_Model
 
     public function checkAppointmentId($dataValue, $fecha_inicio_suma, $fecha_final_resta){
         $query = $this->db->query(
-                "SELECT *FROM citas WHERE
-                ((fechaInicio BETWEEN ? AND ?)
-                OR (fechaFinal BETWEEN ? AND ?)
-                OR (? BETWEEN fechaInicio AND fechaFinal)
-                OR (? BETWEEN fechaInicio AND fechaFinal))
-                AND idEspecialista = ?
-                AND idPaciente = ?
-                AND estatus = ?",
-            array(
-                $fecha_inicio_suma, $fecha_final_resta,
-                $fecha_inicio_suma, $fecha_final_resta,
-                $fecha_inicio_suma,
-                $fecha_final_resta,
-                $dataValue["id_usuario"],
-                $dataValue["id_paciente"],
-                1
-            )
-        );
+            "SELECT *FROM citas WHERE
+            ((fechaInicio BETWEEN ? AND ?)
+            OR (fechaFinal BETWEEN ? AND ?)
+            OR (? BETWEEN fechaInicio AND fechaFinal)
+            OR (? BETWEEN fechaInicio AND fechaFinal))
+            AND idCita != ?
+            AND ((idPaciente = ?
+            AND estatusCita = ?)
+            OR (idEspecialista = ? AND estatusCita IN(?, ?)))",
+        array(
+            $fecha_inicio_suma, $fecha_final_resta,
+            $fecha_inicio_suma, $fecha_final_resta,
+            $fecha_inicio_suma,
+            $fecha_final_resta,
+            $dataValue["id"],
+            $dataValue["idPaciente"],
+            1,
+            $dataValue["idUsuario"],
+            1,
+            6
+        )
+    );
 
+    return $query;
+    }
+
+    public function getIdAtencion($dataValue){
+        $query = $this->db->query(
+            "SELECT idAtencionXSede FROM atencionXSede 
+            WHERE idEspecialista = ?
+            AND idSede = ( SELECT idSede FROM usuarios WHERE idUsuario = ? ) AND estatus = ?", 
+            array($dataValue["idUsuario"], $dataValue["idUsuario"], 1)
+        );
+        
         return $query;
     }
 
@@ -159,12 +248,6 @@ class CalendarioModel extends CI_Model
         return $query->result_array();
     }
 
-    function revisaCitas()
-    {
-        print_r($this->session->userdata('id_usuario'));
-        exit;
-    } 
-
     // **********************************************************
 
     
@@ -175,7 +258,7 @@ class CalendarioModel extends CI_Model
             FROM usuarios AS u 
             RIGHT JOIN atencionXSede AS AXS ON AXS.idEspecialista = U.idUsuario
             INNER JOIN opcionesPorCatalogo AS oxc ON oxc.idOpcion= axs.tipoCita
-            INNER JOIN sedes AS S ON S.idSede = U.sede
+            INNER JOIN sedes AS S ON S.idSede = U.idSede
             LEFT JOIN oficinas as o ON o.idoficina = axs.idOficina
             INNER JOIN puestos AS p ON p.idPuesto = u.puesto
             FULL JOIN sedes AS se ON se.idSede = o.idSede
@@ -186,19 +269,19 @@ class CalendarioModel extends CI_Model
         return $query;
 	}
 
-    public function getEspecialistaPorBeneficioYSede($sede, $beneficio)
+    public function getEspecialistaPorBeneficioYSede($sede, $area, $beneficio)
     {
         $query = $this->db->query(
             "SELECT DISTINCT u.idUsuario as id, u.nombre AS especialista
             FROM usuarios AS u 
             RIGHT JOIN atencionXSede AS AXS ON AXS.idEspecialista = U.idUsuario
             INNER JOIN opcionesPorCatalogo AS oxc ON oxc.idOpcion= axs.tipoCita
-            INNER JOIN sedes AS S ON S.idSede = U.sede
+            INNER JOIN sedes AS S ON S.idSede = U.idSede
             LEFT JOIN oficinas as o ON o.idoficina = axs.idOficina
             INNER JOIN puestos AS p ON p.idPuesto = u.puesto
             FULL JOIN sedes AS se ON se.idSede = o.idSede
             WHERE u.estatus = 1 AND s.estatus = 1 AND axs.estatus = 1  AND u.idRol = 3 AND oxc.idCatalogo = 5
-            AND axs.idSede = ? AND u.puesto = ?", array($sede, $beneficio)
+            AND (axs.idSede = ? AND (axs.idArea IS NULL OR axs.idArea = ?)) AND u.puesto = ?;", array($sede, $area, $beneficio)
         );
 
         return $query;
@@ -213,7 +296,7 @@ class CalendarioModel extends CI_Model
             FROM usuarios AS u 
             RIGHT JOIN atencionXSede AS AXS ON AXS.idEspecialista = U.idUsuario
             INNER JOIN opcionesPorCatalogo AS oxc ON oxc.idOpcion= axs.tipoCita
-            INNER JOIN sedes AS S ON S.idSede = U.sede
+            INNER JOIN sedes AS S ON S.idSede = U.idSede
             LEFT JOIN oficinas as o ON o.idoficina = axs.idOficina
             INNER JOIN puestos AS p ON p.idPuesto = u.puesto
             FULL JOIN sedes AS se ON se.idSede = o.idSede
@@ -223,85 +306,86 @@ class CalendarioModel extends CI_Model
         return $query;
     }
 
-    public function createAppointment($data)
+    public function getReasons($puesto){
+        $query = $this->db->query("SELECT *from opcionesPorCatalogo where idCatalogo = ?", $puesto);
+
+        return $query->result();
+    }
+    public function getOficinaByAtencion($sede, $beneficio, $especialista, $modalidad)
     {
-        $hora_final_resta = date('H:i:s', strtotime($data["fechaFinal"] . '-1 minute'));
-        $hora_inicio_suma = date('H:i:s', strtotime($data["fechaInicio"] . '+1 minute'));
+        $query = $this->db->query(
+            "SELECT axs.idAtencionXSede, axs.idEspecialista, axs.idSede, axs.tipoCita,  axs.estatus,
+            ofi.idOficina, ofi.oficina, ofi.ubicación
+            from atencionXSede AS axs
+            INNER JOIN oficinas AS ofi ON axs.idOficina = ofi.idOficina
+            WHERE axs.estatus = 1 AND
+            axs.idSede = ? AND axs.idEspecialista = ? AND axs.tipoCita = ?", array($sede, $especialista, $modalidad)
+        );
 
-        $fecha_final_resta = date('Y/m/d H:i:s', strtotime($data["fechaFinal"] . '-1 minute'));
-        $fecha_inicio_suma = date('Y/m/d H:i:s', strtotime($data["fechaInicio"] . '+1 minute'));
+        return $query;
+    }
 
-        try {
-            $check_occupied = $this->db->query(
-                "SELECT *FROM horariosOcupados WHERE 
-                                ((fechaOcupado = ? AND horaInicio BETWEEN ? AND ?) 
-                                OR (fechaOcupado = ? AND horaFinal BETWEEN ? AND ?)
-                                OR (fechaOcupado = ? AND ? BETWEEN horaInicio AND horaFinal) 
-                                OR (fechaOcupado = ? AND ? BETWEEN horaInicio AND horaFinal))
-                        AND idEspecialista = ?
-                        AND estatus = ?",
-                array(
-                    $data["fechaOcupado"], $hora_inicio_suma, $hora_final_resta,
-                    $data["fechaOcupado"], $hora_inicio_suma, $hora_final_resta,
-                    $data["fechaOcupado"], $hora_inicio_suma,
-                    $data["fechaOcupado"], $hora_final_resta,
-                    $data["idEspecialista"],
-                    1
-                )
-            );
+    public function getHorariosDisponibles($sede, $beneficio, $especialista, $modalidad)
+    {
+        $query = $this->db->query(
+            "SELECT axs.idAtencionXSede, axs.idEspecialista, axs.idSede, axs.tipoCita,  axs.estatus,
+            ofi.idOficina, ofi.oficina, ofi.ubicación
+            from atencionXSede AS axs
+            INNER JOIN oficinas AS ofi ON axs.idOficina = ofi.idOficina
+            WHERE axs.estatus = 1 AND
+            axs.idSede = ? AND axs.idEspecialista = ? AND axs.tipoCita = ?", array($sede, $especialista, $modalidad)
+        );
 
-            $check_appointment = $this->db->query(
-                "SELECT *FROM citas WHERE
-                                ((fechaInicio BETWEEN ? AND ?)
-                                OR (fechaFinal BETWEEN ? AND ?)
-                                OR (? BETWEEN fechaInicio AND fechaFinal)
-                                OR (? BETWEEN fechaInicio AND fechaFinal))
-                        AND idEspecialista = ?
-                        AND idPaciente = ?
-                        AND estatus = ?",
-                array(
-                    $fecha_inicio_suma, $fecha_final_resta,
-                    $fecha_inicio_suma, $fecha_final_resta,
-                    $fecha_inicio_suma,
-                    $fecha_final_resta,
-                    $data["idEspecialista"],
-                    $data["idPaciente"],
-                    1
-                )
-            );
+        return $query;
+    }
 
-            if ($check_appointment->num_rows() > 0 || $check_occupied->num_rows() > 0) {
-                $data["status"] = false;
-                $data["message"] = "El horario ya ha sido ocupado";
-            } else {
-                $this->db->query(
-                    "INSERT INTO citas VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                    array(
-                        $data["idEspecialista"],
-                        $data["idPaciente"],
-                        1,
-                        $data["fechaInicio"],
-                        $data["fechaFinal"],
-                        $data["creadoPor"],
-                        date("Y-m-d H:i:s"),
-                        $data["observaciones"],
-                        $data["modificadoPor"]
-                    )
-                );
+    public function isPrimeraCita($usuario, $especialista)
+    {
+        $query = $this->db->query(
+            "SELECT *FROM CITAS
+            WHERE idPaciente = ? AND idEspecialista = ?;",
+            array($usuario, $especialista)
+        );
 
-                if ($this->db->affected_rows() > 0) {
-                    $data["status"] = true;
-                    $data["message"] = "Se ha agendado a cita";
-                } else {
-                    $data["status"] = false;
-                    $data["message"] = "No se ha guardado la cita";
-                }
-            }
-        } catch (Exception $e) {
-            $data["status"] = false;
-            $data["message"] = "Error al guardar la cita";
-        }
+        return $query;
+    }
 
-        return $data;
+    public function getCitasSinFinalizarUsuario($usuario, $beneficio)
+    {
+        $query = $this->db->query(
+            "SELECT c.*, u.puesto FROM citas AS c
+            INNER JOIN usuarios as u ON c.idEspecialista = u.idUsuario
+            WHERE c.idPaciente = ? AND u.puesto = ? AND c.estatusCita NOT IN (2, 5, 4);",array($usuario, $beneficio)
+        );
+
+        return $query;
+    }
+
+    public function getCitasFinalizadasUsuario($usuario, $mes, $año)
+    {
+        $query = $this->db->query(
+            "SELECT *FROM citas
+            WHERE idPaciente = ? AND MONTH(fechaInicio) = ?
+            AND YEAR(fechaInicio) = ? AND estatusCita IN (4);", array($usuario, $mes, $año)
+        );
+
+        return $query;
+    }
+
+    public function getAtencionPorSede($especialista, $sede, $modalidad)
+    {
+        $query = $this->db->query(
+            "SELECT *FROM atencionXSede 
+            WHERE estatus = 1 AND idEspecialista = ? 
+            AND idSede = ? AND tipoCita = ? ;", array($especialista, $sede, $modalidad)
+        );
+
+        return $query;
+    }
+
+    public function getPending($idUsuario){
+        $query = $this->db->query("SELECT * FROM citas WHERE estatusCita = ? AND idEspecialista = ? AND fechaInicio < GETDATE()", array(1, $idUsuario));
+
+        return $query->result();
     }
 }

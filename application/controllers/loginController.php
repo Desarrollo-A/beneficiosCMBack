@@ -48,27 +48,25 @@ class loginController extends CI_Controller {
 	}
 	public function addRegistroEmpleado(){
 		$this->db->trans_begin();
-		$datosEmpleado = json_decode(file_get_contents('php://input'));
-		$datosEmpleado = $datosEmpleado->params;
+		$datosEmpleado = $this->input->post('params');
 		$insertData = array(
-			"numContrato" => $datosEmpleado->idcontrato,
-			"numEmpleado" => $datosEmpleado->num_empleado,
-			"nombre" => $datosEmpleado->nombre_completo,
-			"telPersonal" => $datosEmpleado->tel_personal,
-			"telOficina" => $datosEmpleado->nom_oficina,
-			"area" => $datosEmpleado->area,
-			"puesto" => $datosEmpleado->puesto,
-			"oficina" => $datosEmpleado->nom_oficina,
-			"sede" => $datosEmpleado->sede,
-			"correo" => $datosEmpleado->email_empresarial,
-			"password" => encriptar($datosEmpleado->password),
+			"numContrato" => $datosEmpleado['idcontrato'],
+			"numEmpleado" => $datosEmpleado['num_empleado'],
+			"nombre" => $datosEmpleado['nombre_completo'],
+			"telPersonal" => $datosEmpleado['tel_personal'],
+			"telOficina" => $datosEmpleado['nom_oficina'],
+			"puesto" => $datosEmpleado['puesto'],
+			"oficina" => $datosEmpleado['nom_oficina'],
+			"sede" => $datosEmpleado['sede'],
+			"correo" => $datosEmpleado['email_empresarial'],
+			"password" => encriptar($datosEmpleado['password'] ),
 			"estatus" => 1,
 			"creadoPor" => 0,
 			"fechaCreacion" => date('Y-m-d H:i:s'),
 			"modificadoPor" => 0,
 			"fechaModificacion" => date('Y-m-d H:i:s')
 		);
-		$resultado = $this->generalModel->agregarRegistro('usuarios',$insertData);
+		$resultado = $this->generalModel->addRecord('usuarios',$insertData);
 		if ($this->db->trans_status() === FALSE){
             $this->db->trans_rollback();
 			if(strpos($resultado['message'], "UNIQUE")){
@@ -98,7 +96,7 @@ class loginController extends CI_Controller {
 		session_destroy();
 		$datosEmpleado = $array == '' ? json_decode( file_get_contents('php://input')) : json_decode($array);
 		$datosEmpleado->password =  encriptar($datosEmpleado->password);
-		$data = $this->usuariosModel->login($datosEmpleado->numempleado,$datosEmpleado->password);
+		$data = $this->usuariosModel->login($datosEmpleado->numempleado,$datosEmpleado->password)->result();
 		if(empty($data)){
 			echo json_encode(array('response' => [],
 									'message' => 'El número de empleado no se encuentra registrado',
@@ -112,8 +110,9 @@ class loginController extends CI_Controller {
 				'telPersonal' 		    => 		$data[0]->telPersonal,
 				'puesto' 		        => 		$data[0]->puesto,
 				'oficina' 		        => 		$data[0]->oficina,
-				'sede' 		    		=> 		$data[0]->sede,
-				'correo' 		    	=> 		$data[0]->correo,
+				'sede' 		    		=> 		$data[0]->idSede,
+				'correo'		    	=> 		$data[0]->correo,
+				'idArea'				=>		$data[0]->idArea,
 			);
 			session_start();
 			date_default_timezone_set('America/Mexico_City');

@@ -154,16 +154,32 @@ class Usuario extends CI_Controller {
 	}
 
 	public function getNameUser(){
-		$rs = $this->usuariosModel->getNameUser();
-		$data['result'] = count($rs) > 0; 
-		if ($data['result']) {
-			$data['msg'] = '¡Listado de usuarios cargado exitosamente!';
-			$data['data'] = $rs; 
+		$idEspecialista = $this->input->post("dataValue", true);
+
+		$getNameUser = $this->usuariosModel->getNameUser($idEspecialista)->result();
+		$response['result'] = count($getNameUser) > 0;
+		if ($response['result']) {
+			$response['msg'] = '¡Listado de usuarios cargado exitosamente!';
+			$response['data'] = $getNameUser;
 		}else {
-			$data['msg'] = '¡No existen registros!';
+			$response['msg'] = '¡No existen registros!';
 		}
 		$this->output->set_content_type("application/json");
-        $this->output->set_output(json_encode($data));
+        $this->output->set_output(json_encode($response));
+	}
+
+	public function getSpecialistContact() {
+		$especialista = $this->input->post('dataValue[especialista]');
+		$rs = $this->usuariosModel->getSpecialistContact($especialista)->result();
+		$response['result'] = count($rs) > 0;
+		if ($response['result']) {
+			$response['msg'] = '¡Listado de usuarios cargado exitosamente!';
+			$response['data'] = $rs;
+		}else {
+			$response['msg'] = '¡No existen registros!';
+		}
+		$this->output->set_content_type("application/json");
+        $this->output->set_output(json_encode($response));
 	}
 
 	public function decodePass(){

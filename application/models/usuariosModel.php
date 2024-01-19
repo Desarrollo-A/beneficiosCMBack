@@ -20,10 +20,12 @@ class usuariosModel extends CI_Model {
 		return $query->result();
 	}
 
-	public function login($numEmpleado,$password)
+	public function login($numEmpleado, $password)
 	{
-		$query = $this->db->query("SELECT *  FROM usuarios WHERE numEmpleado='$numEmpleado' AND password='$password'");
-		return $query->result();
+		$query = $this->db->query("	SELECT u.*, p.idPuesto, p.puesto, p.idArea FROM USUARIOS as u
+			INNER JOIN puestos AS p ON u.puesto = P.idPuesto
+			WHERE numEmpleado = ? AND password = ?;", array( $numEmpleado, $password ));
+		return $query;
 	}
 
 	public function getAreas()
@@ -32,10 +34,37 @@ class usuariosModel extends CI_Model {
         return $query->result();
 	}
 
-	public function getNameUser()
+	public function getNameUser($idEspecialista)
 	{
-		$query = $this->db->query("SELECT idUsuario, nombre FROM usuarios");
-		return $query->result();
+		$query = $this->db->query(
+			"SELECT US.*, PS.puesto as nombrePuesto FROM usuarios US
+			 INNER JOIN puestos PS ON
+			 US.puesto = PS.idPuesto
+			 WHERE US.idRol = ?
+			 AND US.estatus = ?
+			 AND US.idUsuario
+			 NOT IN( SELECT idPaciente FROM citas WHERE estatusCita = ? GROUP BY idPaciente HAVING COUNT(idPaciente) > ?)
+			 AND US.idSede
+			 IN( select distinct idSede from atencionXSede where idEspecialista = ?)",
+			 array( 2, 1, 1, 1, $idEspecialista )
+		);
+		return $query;
+	}
+
+	public function checkUser($idPaciente){
+		$query = $this->db->query(
+			"SELECT idPaciente FROM citas 
+			WHERE estatusCita = 1 AND idPaciente = ? 
+			GROUP BY idPaciente HAVING COUNT(idPaciente) = ?", 
+			array( $idPaciente, 2 ));
+		
+		return $query;
+	}
+
+	public function getSpecialistContact($id)
+	{
+		$query = $this->db->query("SELECT nombre, telPersonal, correo FROM usuarios WHERE idUsuario = ?", $id);
+		return $query;
 	}
 
 	public function decodePass($dt)

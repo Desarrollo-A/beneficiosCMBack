@@ -32,13 +32,13 @@ class generalModel extends CI_Model {
 		return $query->result();
 	}
 
-    public function addRecord($table, $data) 
-    { // MJ: AGREGA UN REGISTRO A UNA TABLA EN PARTICULAR, RECIBE 2 PARÁMETROS. LA TABLA Y LA DATA A INSERTAR
+    // MJ: AGREGA UN REGISTRO A UNA TABLA EN PARTICULAR, RECIBE 2 PARÁMETROS. LA TABLA Y LA DATA A INSERTAR
+    public function addRecord($table, $data) { 
         return $this->db->insert($table, $data);
-    } 
+    }
 
-    public function updateRecord($table, $data, $key, $value) 
-    { // MJ: ACTUALIZA LA INFORMACIÓN DE UN REGISTRO EN PARTICULAR, RECIBE 4 PARÁMETROS. TABLA, DATA A ACTUALIZAR, LLAVE (WHERE) Y EL VALOR DE LA LLAVE
+    // MJ: ACTUALIZA LA INFORMACIÓN DE UN REGISTRO EN PARTICULAR, RECIBE 4 PARÁMETROS. TABLA, DATA A ACTUALIZAR, LLAVE (WHERE) Y EL VALOR DE LA LLAVE
+    public function updateRecord($table, $data, $key, $value) { 
         return $this->db->update($table, $data, "$key = '$value'");
     }
 
