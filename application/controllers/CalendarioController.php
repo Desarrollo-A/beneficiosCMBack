@@ -282,61 +282,75 @@ class CalendarioController extends CI_Controller{
 
 	public function createAppointment(){
 		$dataValue = $this->input->post("dataValue", true);
+		$fundacion = $dataValue["fundacion"];
 		$now = date('Y/m/d H:i:s', time());
 
         $fechaFinalResta = date('Y/m/d H:i:s', strtotime($dataValue["fechaFinal"] . '-1 minute'));
         $fechaInicioSuma = date('Y/m/d H:i:s', strtotime($dataValue["fechaInicio"] . '+1 minute'));
+		$year = date('Y', strtotime($dataValue["fechaInicio"]));
+		$month = date('m', strtotime($dataValue["fechaInicio"]));
 
-		$idAtencion = $this->calendarioModel->getIdAtencion($dataValue)->row()->idAtencionXSede;
+		// Obtén la fecha actual
+        $fechaActual = new DateTime();
+        $fechaActual->modify('+3 hours');
+        $fechaActual = $fechaActual->format('Y/m/d H:i:s');
+        $valid = $dataValue["fechaInicio"] > $fechaActual; //Si la fecha de la cita es despues de la actual
 
-		if($dataValue["fechaInicio"] > $now)
-			$pass = true;
+		if (!$valid) {
+			$response["result"] = false;
+            $response["msg"] = "¡Horario de cita dentro del limite de horarios no permitidos!";
+        }
+		else{
 
-		try{
+			if($dataValue["fechaInicio"] > $now)
+				$pass = true;
+
 			$values = [
 				"idEspecialista" => $dataValue["idUsuario"],
-            	"idPaciente" => $dataValue["idPaciente"],
-            	"estatusCita" => 6,
-            	"fechaInicio" => $dataValue["fechaInicio"],
-            	"fechaFinal" => $dataValue["fechaFinal"],
-            	"creadoPor" => $dataValue["creadoPor"],
-            	"fechaModificacion" => date("Y-m-d H:i:s"),
-            	"titulo" => $dataValue["titulo"],
-            	"modificadoPor" => $dataValue["modificadoPor"],
-				"idAtencionXSede" => $idAtencion
+        		"idPaciente" => $dataValue["idPaciente"],
+        		"estatusCita" => $fundacion == 1 ? 1 : 6,
+        		"fechaInicio" => $dataValue["fechaInicio"],
+        		"fechaFinal" => $dataValue["fechaFinal"],
+        		"creadoPor" => $dataValue["creadoPor"],
+        		"fechaModificacion" => date("Y-m-d H:i:s"),
+        		"titulo" => $dataValue["titulo"],
+        		"modificadoPor" => $dataValue["modificadoPor"],
+				"idAtencionXSede" => intval($dataValue["idCatalogo"]),
+				"tipoCita" => 1
 			];
-			
-			
-			$checkUser = $this->usuariosModel->checkUser($dataValue["idPaciente"]);
+
+
+			$checkUser = $this->usuariosModel->checkUser($dataValue["idPaciente"], $year, $month);
 			$checkAppointment = $this->calendarioModel->checkAppointment($dataValue, $fechaInicioSuma, $fechaFinalResta);
 			$checkOccupied = $this->calendarioModel->checkOccupied($dataValue, $fechaInicioSuma, $fechaFinalResta);
 
-			if ($checkAppointment->num_rows() > 0 || $checkOccupied->num_rows() > 0 || !isset($pass) || $checkUser->num_rows() > 0) {
+			if($checkAppointment->num_rows() > 0){
 				$response["result"] = false;
-
-				if($checkAppointment->num_rows() > 0){
-					$response["msg"] = "El paciente ocupo el horario";
-				}
-				else{
-					$response["msg"] = "Horario no disponible";
-				}
-            } 
+				$response["msg"] = "El paciente ocupo el horario";
+			}
+			else if($checkOccupied->num_rows() > 0){
+				$response["result"] = false;
+				$response["msg"] = "Horario no disponible";
+			}
+			else if($checkUser->num_rows() === 0){
+				$response["result"] = false;
+				$response["msg"] = "El paciente no ha ocupado sus beneficios disponibles";
+			}
+			else if(!isset($pass)){ 
+				$response["result"] = false;
+				$response["msg"] = "Error en las fechas seleccionadas";
+			}
 			else {
 				$addRecord = $this->generalModel->addRecord("citas", $values);
-
-                if ($addRecord) {
-                    $response["result"] = true;
-                    $response["msg"] = "Se ha agendado a cita";
-                } 
+        	    if ($addRecord) {
+        	        $response["result"] = true;
+        	        $response["msg"] = "Se ha agendado a cita";
+        	    } 
 				else {
-                    $response["result"] = false;
-                    $response["msg"] = "No se ha guardado la cita";
-                }
-            }
-		}
-		catch(EXCEPTION $e){
-			$response["result"] = false;
-            $response["msg"] = "Error";
+        	        $response["result"] = false;
+        	        $response["msg"] = "No se ha guardado la cita";
+        	    }
+        	}
 		}
 
 		$this->output->set_content_type("application/json");
@@ -833,5 +847,14 @@ class CalendarioController extends CI_Controller{
 
 		$this->output->set_content_type('application/json');
 		$this->output->set_output(json_encode($get));
+	}
+
+	public function getEventReasons(){
+		$idCita = $this->input->post('dataValue', true);
+
+		$response = $this->calendarioModel->getEventReasons($idCita)->result();
+
+		$this->output->set_content_type('application/json');
+		$this->output->set_output(json_encode($response));
 	}
 }

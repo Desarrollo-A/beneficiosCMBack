@@ -56,10 +56,11 @@ class CalendarioModel extends CI_Model
     public function getAppointment($year, $month, $idUsuario, $dates){
         $query = $this->db->query(
             "SELECT CAST(ct.idCita AS VARCHAR(36))  AS id,  ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
-            ct.fechaInicio AS occupied, 'green' AS 'color', 'date' AS 'type', ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal,
+            ct.fechaInicio AS occupied, 'date' AS 'type', ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal, us.correo,
+            se.sede, ofi.oficina,
             'color' = CASE
 	            WHEN ct.estatusCita = 0 THEN 'red'
-	            WHEN ct.estatusCita = 1 THEN 'yellow'
+	            WHEN ct.estatusCita = 1 THEN 'orange'
 	            WHEN ct.estatusCita = 2 THEN 'red'
 	            WHEN ct.estatusCita = 3 THEN 'grey'
 	            WHEN ct.estatusCita = 4 THEN 'green'
@@ -69,9 +70,12 @@ class CalendarioModel extends CI_Model
 	        END
             FROM citas ct
             INNER JOIN usuarios us ON us.idUsuario = ct.idPaciente
+            INNER JOIN atencionXSede aps ON ct.idAtencionXSede = aps.idAtencionXSede
+            INNER JOIN sedes se ON se.idSede = aps.idSede
+            INNER JOIN oficinas ofi ON ofi.idOficina = aps.idOficina
             WHERE YEAR(fechaInicio) in (?, ?)
             AND MONTH(fechaInicio) in (?, ?, ?)
-            AND idEspecialista = ?
+            AND ct.idEspecialista = ?
             AND ct.estatusCita IN(?, ?, ?, ?, ?, ?, ?)",
             array( $dates["year1"], $dates["year2"], $dates["month1"], $month, $dates["month2"], $idUsuario, 1, 2, 3, 4, 5, 6, 7 )
         );
@@ -384,8 +388,30 @@ class CalendarioModel extends CI_Model
     }
 
     public function getPending($idUsuario){
-        $query = $this->db->query("SELECT * FROM citas WHERE estatusCita = ? AND idEspecialista = ? AND fechaInicio < GETDATE()", array(1, $idUsuario));
+        $query = $this->db->query("SELECT *FROM citas WHERE estatusCita IN(?, ?) AND idEspecialista = ? AND fechaInicio < GETDATE()", array(1, 6, $idUsuario));
 
         return $query->result();
     }
+
+    public function getEventReasons($idCita){
+        $query = $this->db->query("SELECT oxc.idOpcion, oxc.nombre FROM motivosPorCita AS mpc
+        INNER JOIN opcionesPorCatalogo AS oxc ON oxc.idOpcion = mpc.idMotivo
+        INNER JOIN citas AS c ON c.idCita = mpc.idCita
+        INNER JOIN usuarios AS u ON u.idUsuario = c.idEspecialista
+        INNER JOIN puestos AS p ON p.idPuesto = u.puesto WHERE c.idCita = ?
+        AND idCatalogo = 
+            CASE P.idPuesto
+                WHEN 537 THEN 8
+                WHEN 585 THEN 7
+                WHEN 802 THEN 7
+                WHEN 859 THEN 7
+                WHEN 686 THEN 9
+                WHEN 158 THEN 6
+            END",
+            $idCita
+        );
+
+        return $query;
+    }
+
 }
