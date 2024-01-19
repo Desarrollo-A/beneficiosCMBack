@@ -3,17 +3,37 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class CalendarioModel extends CI_Model
 {
-
+    // Mostrarlos en calendario
     public function getAppointmentsByUser($year, $month, $idUsuario){
         $query = $this->db->query(
-            "SELECT CAST(idCita AS VARCHAR(36)) AS id, titulo AS title, fechaInicio AS 'start', fechaFinal AS 'end', 
-            fechaInicio AS occupied, estatusCita
-            FROM citas
-            WHERE YEAR(fechaInicio) = ?
-            AND MONTH(fechaInicio) = ?
-            AND idPaciente = ?
-            AND estatusCita = ?",
-            array( $year, $month, $idUsuario, 1 )
+            "SELECT CAST(idCita AS VARCHAR(36)) AS id, ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
+            ct.fechaInicio AS occupied, ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal, ofi.oficina, ofi.ubicación,
+            sed.sede , atc.idOficina, us.correo, usEspe.nombre as especialista,
+            'color' = CASE WHEN ct.estatusCita = 0 
+            THEN 'red' WHEN ct.estatusCita = 1 
+            THEN 'yellow' WHEN ct.estatusCita = 2 
+            THEN 'red' WHEN ct.estatusCita = 3 
+            THEN 'grey' WHEN ct.estatusCita = 4 
+            THEN 'green' WHEN ct.estatusCita = 5 
+            THEN 'pink' WHEN ct.estatusCita = 6 
+            THEN 'blue' WHEN ct.estatusCita = 7 
+            THEN 'red' END,
+            beneficio = CASE 
+            WHEN pue.idPuesto = 537 THEN 'nutrición'
+            WHEN pue.idPuesto = 585 THEN 'psicología'
+            WHEN pue.idPuesto = 686 THEN 'guía espiritual'
+            WHEN pue.idPuesto = 158 THEN 'quantum balance'
+            END
+            FROM citas ct
+            INNER JOIN usuarios us ON us.idUsuario = ct.idPaciente
+            INNER JOIN usuarios usEspe ON usEspe.idUsuario = ct.idEspecialista
+            inner join atencionXSede atc  ON atc.idAtencionXSede = ct.idAtencionXSede  
+            left join oficinas ofi ON ofi.idOficina = atc.idOficina
+            inner join sedes sed ON sed.idSede = atc.idSede
+            INNER JOIN puestos pue ON pue.idPuesto = usEspe.puesto
+            WHERE YEAR(fechaInicio) = ? AND MONTH(fechaInicio) = ? AND ct.idPaciente = ?
+            AND ct.estatusCita IN(?, ?, ?, ?, ?, ?, ?)",
+            array( $year, $month, $idUsuario, 1, 2, 3, 4, 5, 6, 7 )
         );
 
         return $query;
@@ -79,25 +99,18 @@ class CalendarioModel extends CI_Model
         return $query;
     }
 
-    public function getAppointmentRange($fechaInicio, $fechaFin, $idUsuario){
+    // Función para checar las citas de ambos (Beneficiario y especialista)
+    public function getAppointmentRange($fechaInicio, $fechaFin, $especialista, $usuario){
         $query = $this->db->query(
             "SELECT CAST(ct.idCita AS VARCHAR(36))  AS id,  ct.titulo AS title, ct.fechaInicio, ct.fechaFinal, 
-            ct.fechaInicio AS occupied, 'green' AS 'color', 'date' AS 'type', ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal,
-            'color' = CASE
-	            WHEN ct.estatusCita = 0 THEN 'red'
-	            WHEN ct.estatusCita = 1 THEN 'green'
-	            WHEN ct.estatusCita = 2 THEN 'red'
-	            WHEN ct.estatusCita = 3 THEN 'grey'
-	            WHEN ct.estatusCita = 4 THEN 'green'
-                WHEN ct.estatusCita > 4 THEN 'pink'
-	        END
+            ct.fechaInicio AS occupied, ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal
             FROM citas ct
             INNER JOIN usuarios us ON us.idUsuario = ct.idPaciente
-            WHERE idEspecialista = ? AND ct.estatusCita IN (?) 
+            WHERE (ct.idEspecialista = ? OR ct.idPaciente = ?) AND ct.estatusCita IN (?, ?)
             AND (fechaInicio BETWEEN ? AND ?
                OR fechaFinal BETWEEN ? AND ?
                OR (fechaInicio < ? AND fechaFinal > ?))",
-            array( $idUsuario, 1, $fechaInicio, $fechaFin, $fechaInicio, $fechaFin, $fechaInicio, $fechaFin)
+            array( $especialista, $usuario, 1, 6, $fechaInicio, $fechaFin, $fechaInicio, $fechaFin, $fechaInicio, $fechaFin)
         );
 
         return $query;
@@ -157,18 +170,16 @@ class CalendarioModel extends CI_Model
             OR (? BETWEEN fechaInicio AND fechaFinal)
             OR (? BETWEEN fechaInicio AND fechaFinal))
             AND ((idPaciente = ?
-            AND estatusCita = ?)
+            AND estatusCita IN (?, ?))
             OR (idEspecialista = ? and estatusCita IN (?, ?)))",
             array(
                 $fechaInicioSuma, $fechaFinalResta,
                 $fechaInicioSuma, $fechaFinalResta,
-                $fechaInicioSuma,
-                $fechaFinalResta,
+                $fechaInicioSuma, $fechaFinalResta,
                 $dataValue["idPaciente"],
-                1,
+                1, 6,
                 $dataValue["idUsuario"],
-                1,
-                6
+                1, 6
             )
         );
         
@@ -366,7 +377,7 @@ class CalendarioModel extends CI_Model
         $query = $this->db->query(
             "SELECT *FROM citas
             WHERE idPaciente = ? AND MONTH(fechaInicio) = ?
-            AND YEAR(fechaInicio) = ? AND estatusCita IN (4);", array($usuario, $mes, $año)
+            AND YEAR(fechaInicio) = ? AND estatusCita IN (1, 4, 6);", array($usuario, $mes, $año)
         );
 
         return $query;
