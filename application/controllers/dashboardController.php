@@ -92,4 +92,12 @@ class dashboardController extends CI_Controller {
 		$data['data'] = $this->dashModel->getCountRespuestas($dt);
 		echo json_encode($data);
 	}
+
+	public function getMetas()
+    {
+        $dt = $this->input->post('dataValue', true);
+
+		$data['data'] = $this->dashModel->getMetas($dt)->result();
+		echo json_encode($data);
+    }
 }

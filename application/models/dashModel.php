@@ -190,5 +190,25 @@ class dashModel extends CI_Model {
 			}else{
 				return false;
 			}
-		}
+	}
+
+	public function getMetas($dt)
+    {
+        $idData = $dt["idData"];
+        $idRol = $dt["idRol"];
+        $inicio = $dt["inicio"];
+        $fin = $dt["fin"];
+
+        if($idRol == 1){
+            $query = $this->db-> query("SELECT COUNT(*) AS [citas] FROM usuarios us
+            INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
+            WHERE us.puesto = $idData AND ct.estatusCita = 4 AND fechaFinal BETWEEN '$inicio' AND '$fin'");
+        }else{
+            $query = $this->db-> query("SELECT COUNT(*) AS [citas] FROM usuarios us
+            INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
+            WHERE us.idUsuario = $idData AND ct.estatusCita = 4 AND fechaFinal BETWEEN '$inicio' AND '$fin'");
+        }
+
+        return $query;
+    }
 }
