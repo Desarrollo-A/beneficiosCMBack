@@ -862,41 +862,46 @@ class CalendarioController extends CI_Controller{
 	}
 
 	public function registrarTransaccionPago(){
-		$usuario = $this->input->post('dataValue[usuario]');
-		$folio = $this->input->post('dataValue[folio]');
-		$concepto = $this->input->post('dataValue[concepto]');
-		$cantidad = $this->input->post('dataValue[cantidad]');
-		$metodoPago = $this->input->post('dataValue[metodoPago]');
-		$fecha = date('Y-m-d H:i:s');
-		
-		$response['result'] = isset($usuario, $folio, $concepto, $cantidad, $metodoPago, $fecha);
-		if ($response['result']) {
-			$values = [
-				"folio" => $folio,
-				"idConcepto" => $concepto,
-				"cantidad" => $cantidad,
-				"metodoPago" => $metodoPago,
-				"estatus" => 1,
-				"creadoPor" => $usuario,
-				"fechaCreacion" => $fecha,
-				"modificadoPor" => $usuario,
-				"fechaModificacion" => $fecha
-			];
-			$response["result"] = $this->generalModel->addRecord("detallePagos", $values);
-			if ($response["result"]) {
-				$response["msg"] = "¡Se ha generado el detalle de pago con exito!";
-				$rs = $this->calendarioModel->getDetallePago($folio)->result();
-				if (!empty($rs) && isset($rs[0]->idDetalle)) {
-					$response["data"] = $rs[0]->idDetalle;
-				} else {
-					$response["data"] = null; // o asigna el valor que desees en caso de que no exista 'idDetalle'
-				}
-			} 
-			else {
-				$response["msg"] = "¡Surgió un error al intentar generar el detalle de pago!";
-				echo('fue fal');
-			}
-		}else {
-			$response['msg'] = "¡Parametros invalidos!";
-		}
+        $usuario = $this->input->post('dataValue[usuario]');
+        $folio = $this->input->post('dataValue[folio]');
+        $concepto = $this->input->post('dataValue[concepto]');
+        $cantidad = $this->input->post('dataValue[cantidad]');
+        $metodoPago = $this->input->post('dataValue[metodoPago]');
+        $fecha = date('Y-m-d H:i:s');
+        
+        $response['result'] = isset($usuario, $folio, $concepto, $cantidad, $metodoPago, $fecha);
+        if ($response['result']) {
+            $values = [
+                "folio" => $folio,
+                "idConcepto" => $concepto,
+                "cantidad" => $cantidad,
+                "metodoPago" => $metodoPago,
+                "estatus" => 1,
+                "creadoPor" => $usuario,
+                "fechaCreacion" => $fecha,
+                "modificadoPor" => $usuario,
+                "fechaModificacion" => $fecha
+            ];
+            $response["result"] = $this->generalModel->addRecord("detallePagos", $values);
+            if ($response["result"]) {
+                $response["msg"] = "¡Se ha generado el detalle de pago con exito!";
+                $rs = $this->calendarioModel->getDetallePago($folio)->result();
+                if (!empty($rs) && isset($rs[0]->idDetalle)) {
+                    $response["data"] = $rs[0]->idDetalle;
+                } else {
+                    $response["data"] = null; // o asigna el valor que desees en caso de que no exista 'idDetalle'
+                }
+            } 
+            else {
+                $response["msg"] = "¡Surgió un error al intentar generar el detalle de pago!";
+                echo('fue fal');
+            }
+        }else {
+            $response['msg'] = "¡Parametros invalidos!";
+        }
+
+        $this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($response));
+    }
 }
+
