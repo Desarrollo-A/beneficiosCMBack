@@ -46,12 +46,12 @@ class Usuario extends CI_Controller {
 
 	public function menu()
 	{
-		//print_r($this->session->userdata());
-		//exit();
-		//header('content-type: application/json; charset=utf-8');
+		$headers = (object) $this->input->request_headers();
+		$data = explode('.', $headers->token);
+		$user = json_decode(base64_decode($data[2]));
 
-		$id_user = 41;
-		$id_rol = 2;
+		$id_user = $user->idUsuario;
+		$id_rol = $user->idRol;
 
 		echo json_encode($this->MenuModel->getMenu($id_user, $id_rol));
 	}
