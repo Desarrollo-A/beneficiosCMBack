@@ -48,27 +48,25 @@ class loginController extends CI_Controller {
 	}
 	public function addRegistroEmpleado(){
 		$this->db->trans_begin();
-		$datosEmpleado = json_decode(file_get_contents('php://input'));
-		$datosEmpleado = $datosEmpleado->params;
+		$datosEmpleado = $this->input->post('params');
 		$insertData = array(
-			"numContrato" => $datosEmpleado->idcontrato,
-			"numEmpleado" => $datosEmpleado->num_empleado,
-			"nombre" => $datosEmpleado->nombre_completo,
-			"telPersonal" => $datosEmpleado->tel_personal,
-			"telOficina" => $datosEmpleado->nom_oficina,
-			"area" => $datosEmpleado->area,
-			"puesto" => $datosEmpleado->puesto,
-			"oficina" => $datosEmpleado->nom_oficina,
-			"sede" => $datosEmpleado->sede,
-			"correo" => $datosEmpleado->email_empresarial,
-			"password" => encriptar($datosEmpleado->password),
+			"numContrato" => $datosEmpleado['idcontrato'],
+			"numEmpleado" => $datosEmpleado['num_empleado'],
+			"nombre" => $datosEmpleado['nombre_completo'],
+			"telPersonal" => $datosEmpleado['tel_personal'],
+			"telOficina" => $datosEmpleado['nom_oficina'],
+			"puesto" => $datosEmpleado['puesto'],
+			"oficina" => $datosEmpleado['nom_oficina'],
+			"sede" => $datosEmpleado['sede'],
+			"correo" => $datosEmpleado['email_empresarial'],
+			"password" => encriptar($datosEmpleado['password'] ),
 			"estatus" => 1,
 			"creadoPor" => 0,
 			"fechaCreacion" => date('Y-m-d H:i:s'),
 			"modificadoPor" => 0,
 			"fechaModificacion" => date('Y-m-d H:i:s')
 		);
-		$resultado = $this->generalModel->agregarRegistro('usuarios',$insertData);
+		$resultado = $this->generalModel->addRecord('usuarios',$insertData);
 		if ($this->db->trans_status() === FALSE){
             $this->db->trans_rollback();
 			if(strpos($resultado['message'], "UNIQUE")){
@@ -86,8 +84,15 @@ class loginController extends CI_Controller {
 		$datosSession = json_decode( file_get_contents('php://input'));
 		$arraySession = explode('.',$datosSession->token);
 		$datosUser = json_decode(base64_decode($arraySession[2]));
-		echo json_encode(array('user' => $datosUser,
-									'result' => 1));
+		echo json_encode(array('user' => $datosUser, 'result' => 1));
+	}
+
+	public function check(){
+		$headers = (object) $this->input->request_headers();
+		$data = explode('.', $headers->token);
+		$user = json_decode(base64_decode($data[2]));
+
+		echo json_encode(array('user' => $user, 'result' => 1));
 	}
 
 	public function logout()
@@ -129,6 +134,7 @@ class loginController extends CI_Controller {
 			$tokenPart3 = base64_encode(json_encode($data[0]));
 			$datosSesion['token'] = $tokenPart1.'.'.$tokenPart2;
 			$this->session->set_userdata($datosSesion);
+
 			if($array == ''){
 				echo json_encode(array('user' => $data[0],
 									'accessToken' => $tokenPart1.'.'.$tokenPart2.'.'.$tokenPart3,

@@ -89,13 +89,36 @@ class encuestasModel extends CI_Model {
 
     public function getEncNotificacion($dt)
     {
-        $query_especialistas = $this->db->query("SELECT DISTINCT ct.idEspecialista
+
+        $idUsuario = $dt["idUsuario"];
+        $vigenciaInicio = $dt["vigenciaInicio"];
+        $vigenciaFin = $dt["vigenciaFin"];
+        $trimestreInicio = $dt["trimDefault"];
+        $fechaActual = $dt["fechActual"];
+
+        $query_citas = $this->db->query("SELECT DISTINCT ct.idCita
         FROM usuarios us
         INNER JOIN citas ct ON ct.idPaciente = us.idUsuario
-        WHERE ct.estatusCita = 4 AND us.idUsuario = $dt AND ct.fechaFinal BETWEEN '2023-11-01' AND '2023-12-20'");
+        WHERE ct.estatusCita = 4 AND us.idUsuario = $idUsuario AND ct.fechaFinal BETWEEN '$vigenciaInicio' AND '$vigenciaFin'");
+
+        if ($query_citas->num_rows() > 0) {
+            
+        $idCitas = [];
+        foreach ($query_citas->result() as $row) {
+            $idCitas[] = $row->idCita;
+        }
+
+        $query_especialistas = $this->db->query("WITH cte AS (
+            SELECT us.puesto, ct.idEspecialista,fechaFinal, ROW_NUMBER() OVER (PARTITION BY us.puesto ORDER BY fechaFinal DESC) AS rn
+            FROM citas ct
+            INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
+            WHERE idCita IN (" . implode(',', $idCitas) . "))
+            SELECT idEspecialista
+            FROM cte WHERE rn = 1 ");
 
         if ($query_especialistas->num_rows() > 0) {
-        
+
+        $idEspecialistas = [];
         foreach ($query_especialistas->result() as $row) {
             $idEspecialistas[] = $row->idEspecialista;
         }
@@ -106,27 +129,65 @@ class encuestasModel extends CI_Model {
             INNER JOIN puestos ps ON ps.idPuesto = ec.idArea
             WHERE us.idUsuario IN (" . implode(',', $idEspecialistas) . ") AND ec.estatus = 1");
 
+        if ($query_encuestas->num_rows() > 0) {
+
         $idEcuestas = [];
         foreach ($query_encuestas->result() as $row) {
             $idEcuestas[] = $row->idEncuesta;
         }
 
-        $query_encuestasC = $this->db->query("SELECT * FROM encuestasContestadas WHERE idEncuesta IN (" . implode(',', $idEcuestas) . ") AND idUsuario = $dt");
+        $query_encuestasC = $this->db->query("SELECT * FROM encuestasContestadas WHERE idEncuesta IN (" . implode(',', $idEcuestas) . ") AND idUsuario = $idUsuario");
 
-        $idEnc = [0];
-        foreach ($query_encuestasC->result() as $row) {
-            $idEnc[] = $row->idEncuesta;
+        if ($query_encuestasC->num_rows() == 0) {
+
+        $query_enc = $this->db->query("SELECT DISTINCT diasVigencia FROM encuestasCreadas WHERE idEncuesta IN (" . implode(',', $idEcuestas) . ")");
+
+        $vig = 0;
+        foreach ($query_enc->result() as $row) {
+            $vig = $row->diasVigencia;
         }
+
+        if($vig == null){
+            $vig = 0;
+        }
+
+        $date = date($trimestreInicio);
+        $mod_date = strtotime($date."+ $vig days");
+        $trimestreFin = date("Y-m-d",$mod_date) . "\n";
+
+        if($fechaActual >= $trimestreInicio && $fechaActual <= $trimestreFin){
 
         $query_enc = $this->db->query("SELECT DISTINCT idEncuesta, ps.puesto
         FROM usuarios us 
         INNER JOIN encuestasCreadas ec ON ec.idArea = us.puesto
         INNER JOIN puestos ps ON ps.idPuesto = ec.idArea
-        WHERE us.idUsuario IN (" . implode(',', $idEspecialistas) . ") AND ec.estatus = 1 AND idEncuesta NOT IN (" . implode(',', $idEnc) . ")");
+        WHERE us.idUsuario IN (" . implode(',', $idEspecialistas) . ") AND ec.estatus = 1");
+
+       /*  $query_enc = $this->db->query("SELECT DISTINCT idEncuesta, ps.puesto
+        FROM usuarios us 
+        INNER JOIN encuestasCreadas ec ON ec.idArea = us.puesto
+        INNER JOIN puestos ps ON ps.idPuesto = ec.idArea
+        WHERE us.idUsuario IN (" . implode(',', $idEspecialistas) . ") AND ec.estatus = 1 AND idEncuesta NOT IN (" . implode(',', $idEnc) . ")"); */
 
         $result_encuestas = $query_enc->result_array();
 
         return $result_encuestas;
+
+        } else {
+            return false;
+        }
+
+        } else {
+            return false;
+        }
+
+        } else {
+            return false;
+        }
+
+        } else {
+            return false;
+        }
 
         } else {
             return false;
@@ -142,23 +203,14 @@ class encuestasModel extends CI_Model {
         $idEncuesta = $dataArray[0];
         $idUsuario = $dataArray[1];
 
-        $query_v1 = $this->db->query("SELECT DISTINCT ct.idEspecialista
-        FROM usuarios us
-        INNER JOIN citas ct ON ct.idPaciente = us.idUsuario
-        WHERE ct.estatus = 4 AND us.idUsuario = $idUsuario AND ct.fechaFinal BETWEEN '2023-11-01' AND '2023-12-05'");
+        $query_v2 = $this->db->query("SELECT * FROM encuestasContestadas WHERE idEncuesta = $idEncuesta AND idUsuario = $idUsuario");
 
-        if ($query_v1->num_rows() > 0) {
+        $query_v3 = $this->db->query("SELECT * FROM encuestasCreadas WHERE idEncuesta = $idEncuesta AND estatus = 0");
 
-            $query_v2 = $this->db->query("SELECT * FROM encuestasContestadas WHERE idEncuesta = $idEncuesta AND idUsuario = $idUsuario");
-
-            if ($query_v2->num_rows() > 0) {
-                return false;
-            } else {
-                return true;
-            }
-        } else {
-
+        if ($query_v2->num_rows() > 0 || $query_v3->num_rows() > 0) {
             return false;
+        }else{
+            return true;
         }
 
     }
@@ -184,7 +236,7 @@ class encuestasModel extends CI_Model {
 					break; 
 				}
 			}
-			$idPregunta = 0; 
+			$idPregunta = 1; 
 
 			if ($datosValidos) {
 
@@ -200,9 +252,22 @@ class encuestasModel extends CI_Model {
 
 					$abierta = is_numeric($resp) ? 1 : 0;
 
+                    $query_idEspecialista = $this->db->query("SELECT TOP 1 ct.idEspecialista, MAX(ct.fechaFinal) AS fechaMasReciente
+                    FROM puestos ps
+                    INNER JOIN usuarios us ON us.puesto = ps.idPuesto
+                    INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
+                    WHERE ps.idPuesto = $idArea AND ct.idPaciente = $idUsuario
+                    GROUP BY ct.idEspecialista
+                    ORDER BY fechaMasReciente DESC");
+
+                    $idEspecialista = [];
+                    foreach ($query_idEspecialista->result() as $row) {
+                        $idEspecialista[] = $row->idEspecialista;
+                    }
+
 					$query = $this->db->query("INSERT INTO encuestasContestadas (idPregunta, idRespuesta, idEspecialista, idArea, idEncuesta, fechaCreacion, idUsuario ) 
-					VALUES (?, ?, 1, ?, ?, GETDATE(), ?)", 
-					array($idPregunta, $resp, $idArea, $idEncuesta, $idUsuario ));
+					VALUES (?, ?, ?, ?, ?, GETDATE(), ?)", 
+					array($idPregunta, $resp, $idEspecialista, $idArea, $idEncuesta, $idUsuario ));
 					
 					$queryPreguntasGeneradas = $this->db->query("INSERT INTO preguntasGeneradas (idPregunta, pregunta, estatus, abierta, especialidad, idEncuesta) 
 					VALUES (?, ?, 1, ?, ?, ?)", 
@@ -229,6 +294,7 @@ class encuestasModel extends CI_Model {
 		$datosValidos = true;
 
 		if (isset($dataArray->area) && isset($dataArray->items)) {
+            $estatus = $dataArray->estatus;
 			$area = $dataArray->area;
 			$items = $dataArray->items;
 
@@ -249,14 +315,31 @@ class encuestasModel extends CI_Model {
 
 			if ($datosValidos) {
 
+                if($estatus == 1){
+
+                    $query_idEncuesta = $this->db->query("SELECT * FROM encuestasCreadas WHERE idArea = $area AND estatus = 1");
+
+                    $idEnc = 0;
+                    foreach ($query_idEncuesta->result() as $row) {
+                        $idEnc = $row->idEncuesta;
+                    }
+
+                    $data_1 = array(
+                        "estatus" => 0,
+                    );
+
+                    $response_1=$this->generalModel->updateRecord('encuestasCreadas', $data_1, 'idEncuesta', $idEnc);
+
+                }
+                
 				foreach ($items as $item) {
 					$pregunta = $item->pregunta;
 					$respuesta = $item->respuesta;
 					$idEncuesta = $item->idEncuesta;
 
 					$query = $this->db->query("INSERT INTO encuestasCreadas (pregunta, respuestas, idArea, estatus, fechaCreacion, idEncuesta) 
-					VALUES (?, ?, ?, 1, GETDATE(), ?)", 
-					array($pregunta, $respuesta, $area, $idEncuesta));
+					VALUES (?, ?, ?, ?, GETDATE(), ?)", 
+					array($pregunta, $respuesta, $area, $estatus, $idEncuesta));
 				}
 
 				$this->db->trans_complete();
@@ -270,5 +353,60 @@ class encuestasModel extends CI_Model {
 		} else {
 			echo json_encode(array("estatus" => false, "msj" => "Error Faltan Datos" ));
 		}
+    }
+
+    public function getEncuestasCreadas($dt){
+
+        $query = $this->db->query("WITH cte AS (
+            SELECT idEncuesta, fechaCreacion, estatus, ROW_NUMBER() OVER (PARTITION BY idEncuesta ORDER BY fechaCreacion DESC) AS rn, diasVigencia
+            FROM encuestasCreadas
+            WHERE idArea = $dt)
+            SELECT idEncuesta, fechaCreacion, estatus, diasVigencia
+            FROM cte WHERE rn = 1");
+
+        return $query;
+    }
+
+    public function getEstatusUno($dt){
+
+        $query = $this->db->query("WITH cte AS (SELECT estatus, ROW_NUMBER() OVER (PARTITION BY idEncuesta ORDER BY fechaCreacion DESC) AS rn
+        FROM encuestasCreadas
+        WHERE idArea = $dt)
+        SELECT
+        COUNT(estatus) AS cantidadEstatus
+        FROM
+        cte
+        WHERE
+        rn = 1 AND estatus = 1");
+
+        return $query;
+    }
+
+    public function getValidEncContestada($dt){
+    
+        $query1 = $this->db-> query("SELECT DISTINCT ec.idEncuesta
+		FROM encuestasCreadas ec
+		INNER JOIN preguntasGeneradas pg ON pg.pregunta = ec.pregunta
+		WHERE ec.estatus = 1 AND abierta = 1 AND ec.idArea = $dt");
+
+        if ($query1->num_rows() > 0) {
+
+            $idEncuesta = '';
+            foreach ($query1->result() as $row) {
+                $idEncuesta = $row->idEncuesta;;
+            }
+
+            $query2 = $this->db-> query("SELECT * FROM encuestasContestadas WHERE idEncuesta = $idEncuesta");
+
+            if ($query2->num_rows() > 0) {
+                return true;
+            }else{
+                return false;
+            }
+
+        }else{
+            return false;
+        }
+
     }
 }

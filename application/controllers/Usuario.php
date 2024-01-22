@@ -8,7 +8,8 @@ class Usuario extends CI_Controller {
 		parent::__construct();
 		header('Access-Control-Allow-Origin: *');
 		header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
-		header('Access-Control-Allow-Headers: Content-Type');
+		//header('Access-Control-Allow-Headers: Content-Type');
+		header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
 
 		date_default_timezone_set('America/Mexico_City');
 
@@ -24,13 +25,15 @@ class Usuario extends CI_Controller {
         else
             $origin = $_SERVER['HTTP_HOST'];
 
+        $this->load->library('session');
+
         if(in_array($origin,$urls) || strpos($origin,"192.168")) {
 			$this->load->database('default');
 			$this->load->model('usuariosModel');
 			$this->load->model('generalModel');
+			$this->load->model('MenuModel');
 
             $this->load->helper(array('form','funciones'));
-			$this->load->library(array('session'));
         } else {
             die ("Access Denied");     
             exit;  
@@ -39,6 +42,18 @@ class Usuario extends CI_Controller {
 	public function index()
 	{
 		$this->load->view('welcome_message');
+	}
+
+	public function menu()
+	{
+		$headers = (object) $this->input->request_headers();
+		$data = explode('.', $headers->token);
+		$user = json_decode(base64_decode($data[2]));
+
+		$id_user = $user->idUsuario;
+		$id_rol = $user->idRol;
+
+		echo json_encode($this->MenuModel->getMenu($id_user, $id_rol));
 	}
 
 	public function usuarios(){
@@ -180,5 +195,32 @@ class Usuario extends CI_Controller {
 		}
 		$this->output->set_content_type("application/json");
         $this->output->set_output(json_encode($response));
+	}
+
+	public function decodePass(){
+
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->usuariosModel->decodePass($dt);
+		echo json_encode($data);
+	}
+
+	public function updatePass(){
+
+		$idUsuario = $this->input->post('dataValue[idUsuario]');
+		$password = $this->input->post('dataValue[password]');
+		$newPass= $this->input->post('dataValue[newPassword]');
+
+			if(!empty($newPass))
+			{
+				$data = array(
+					"password" => encriptar($newPass),
+				);
+				
+				$response=$this->generalModel->updateRecord('usuarios', $data, 'idUsuario', $idUsuario);
+				echo json_encode(array("estatus" => true, "msj" => "Contraseña actualizada!" ));
+					
+			}else{
+				echo json_encode(array("estatus" => false, "msj" => "Error en actualizar contraseña"));
+			}	
 	}
 }

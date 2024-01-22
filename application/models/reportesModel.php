@@ -10,21 +10,43 @@ class reportesModel extends CI_Model {
 
     public function citas($dt)
 	{
-		if($dt === 'Reporte General'){
+		if($dt === 'general'){
 
-			$query = $this->db-> query("SELECT  ct.idCita, ct.idEspecialista , ct.idPaciente, ct.idPaciente, ct.estatus as area, ct.fechaInicio as fechaInicio, ct.fechaFinal as fechaFinal,
-			op.nombre as estatus, observaciones FROM catalogos ca 
-			INNER JOIN opcionesPorCatalogo op ON op.idCatalogo = ca.idCatalogo AND ca.idCatalogo = 2
-			INNER JOIN citas ct ON ct.estatus = op.idOpcion ");
+			$query = $this->db-> query("SELECT ct.idCita, us.nombre especialista, pa.nombre paciente, pa.oficina, ps.puesto AS area, sd.sede,ct.titulo, op.nombre AS estatus, 
+			CONCAT (CONVERT(DATE,ct.fechaInicio), ' ', FORMAT(ct.fechaInicio, 'HH:mm'), ' - ', FORMAT(ct.fechaFinal, 'HH:mm')) AS horario, observaciones, us.sexo, ct.motivoCita 
+			FROM citas ct
+			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
+			INNER JOIN usuarios pa ON pa.idUsuario = ct.idPaciente
+			INNER JOIN sedes sd ON sd.idSede = us.idSede
+			INNER JOIN puestos ps ON ps.idPuesto = us.puesto
+			INNER JOIN opcionesPorCatalogo op ON op.idOpcion = ct.estatusCita
+			WHERE op.idCatalogo = 2");
 			return $query;
 
-		}else{
+		}else if($dt === 'faltas'){
 
-			$query = $this->db-> query("SELECT  ct.idCita, ct.idEspecialista , ct.idPaciente, ct.idPaciente, ct.estatus as area, ct.fechaInicio as fechaInicio, ct.fechaFinal as fechaFinal,
-			op.nombre as estatus, observaciones FROM catalogos ca 
-				INNER JOIN opcionesPorCatalogo op ON op.idCatalogo = ca.idCatalogo AND ca.idCatalogo = 2
-				INNER JOIN citas ct ON ct.estatus = op.idOpcion 
-				WHERE op.idOpcion = 3");
+			$query = $this->db-> query("SELECT ct.idCita, us.nombre especialista, pa.nombre paciente, pa.oficina, ps.puesto AS area, sd.sede,ct.titulo, op.nombre as estatus, 
+			CONCAT (CONVERT(DATE,ct.fechaInicio), ' ', FORMAT(ct.fechaInicio, 'HH:mm'), ' - ', FORMAT(ct.fechaFinal, 'HH:mm')) AS horario, observaciones , us.sexo, ct.motivoCita 
+			FROM citas ct
+			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
+			INNER JOIN usuarios pa ON pa.idUsuario = ct.idPaciente
+			INNER JOIN sedes sd ON sd.idSede = us.idSede
+			INNER JOIN puestos ps ON ps.idPuesto = us.puesto
+			INNER JOIN opcionesPorCatalogo op ON op.idOpcion = ct.estatusCita
+			WHERE op.idCatalogo = 2 AND ct.estatusCita = 3");
+			return $query;
+
+		}else if($dt === 'justificadas'){
+
+			$query = $this->db-> query("SELECT ct.idCita, us.nombre especialista, pa.nombre paciente, pa.oficina, ps.puesto AS area, sd.sede,ct.titulo, op.nombre as estatus, 
+			CONCAT (CONVERT(DATE,ct.fechaInicio), ' ', FORMAT(ct.fechaInicio, 'HH:mm'), ' - ', FORMAT(ct.fechaFinal, 'HH:mm')) AS horario, observaciones, us.sexo, ct.motivoCita 
+			FROM citas ct
+			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
+			INNER JOIN usuarios pa ON pa.idUsuario = ct.idPaciente
+			INNER JOIN sedes sd ON sd.idSede = us.idSede
+			INNER JOIN puestos ps ON ps.idPuesto = us.puesto
+			INNER JOIN opcionesPorCatalogo op ON op.idOpcion = ct.estatusCita
+			WHERE op.idCatalogo = 2 AND ct.estatusCita = 5");
 			return $query;
 
 		}

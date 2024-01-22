@@ -30,4 +30,40 @@ class generalController extends CI_Controller {
 		$data['data'] = $this->generalModel->citasCount();
 		echo json_encode($data);
 	}
+
+	public function getPuesto(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->generalModel->getPuesto($dt)->result();
+		echo json_encode($data);
+	}
+
+	public function getSede(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->generalModel->getSede($dt)->result();
+		echo json_encode($data);
+	}
+
+	public function getPacientes(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->generalModel->getPacientes($dt)->result();
+		echo json_encode($data);
+	}
+
+	public function getCtAsistidas(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->generalModel->getCtAsistidas($dt)->result();
+		echo json_encode($data);
+	}
+
+	public function getCtCanceladas(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->generalModel->getCtCanceladas($dt)->result();
+		echo json_encode($data);
+	}
+
+	public function getCtPenalizadas(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->generalModel->getCtPenalizadas($dt)->result();
+		echo json_encode($data);
+	}
 }
