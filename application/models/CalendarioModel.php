@@ -57,7 +57,7 @@ class CalendarioModel extends CI_Model
         $query = $this->db->query(
             "SELECT CAST(ct.idCita AS VARCHAR(36))  AS id,  ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
             ct.fechaInicio AS occupied, 'date' AS 'type', ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal, us.correo,
-            se.sede, ofi.oficina,
+            se.sede, ofi.oficina, idDetalle,
             'color' = CASE
 	            WHEN ct.estatusCita = 0 THEN 'red'
 	            WHEN ct.estatusCita = 1 THEN 'orange'
@@ -67,17 +67,18 @@ class CalendarioModel extends CI_Model
                 WHEN ct.estatusCita = 5 THEN 'pink'
                 WHEN ct.estatusCita = 6 THEN 'blue'
                 WHEN ct.estatusCita = 7 THEN 'red'
+                WHEN ct.estatusCita = 8 THEN 'red'
 	        END
             FROM citas ct
             INNER JOIN usuarios us ON us.idUsuario = ct.idPaciente
             INNER JOIN atencionXSede aps ON ct.idAtencionXSede = aps.idAtencionXSede
             INNER JOIN sedes se ON se.idSede = aps.idSede
-            INNER JOIN oficinas ofi ON ofi.idOficina = aps.idOficina
+            LEFT JOIN oficinas ofi ON ofi.idOficina = aps.idOficina
             WHERE YEAR(fechaInicio) in (?, ?)
             AND MONTH(fechaInicio) in (?, ?, ?)
             AND ct.idEspecialista = ?
-            AND ct.estatusCita IN(?, ?, ?, ?, ?, ?, ?)",
-            array( $dates["year1"], $dates["year2"], $dates["month1"], $month, $dates["month2"], $idUsuario, 1, 2, 3, 4, 5, 6, 7 )
+            AND ct.estatusCita IN(?, ?, ?, ?, ?, ?, ?, ?)",
+            array( $dates["year1"], $dates["year2"], $dates["month1"], $month, $dates["month2"], $idUsuario, 1, 2, 3, 4, 5, 6, 7, 8 )
         );
 
         return $query;

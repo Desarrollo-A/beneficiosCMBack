@@ -364,8 +364,11 @@ class CalendarioController extends CI_Controller{
         		"titulo" => $dataValue["titulo"],
         		"modificadoPor" => $dataValue["modificadoPor"],
 				"idAtencionXSede" => intval($dataValue["idCatalogo"]),
-				"tipoCita" => 1
+				"tipoCita" => 1,
+				"idDetalle" => $dataValue["idDetalle"]
 			];
+
+			$valuesPago = []
 
 
 			$checkUser = $this->usuariosModel->checkUser($dataValue["idPaciente"], $year, $month);
@@ -380,7 +383,7 @@ class CalendarioController extends CI_Controller{
 				$response["result"] = false;
 				$response["msg"] = "Horario no disponible";
 			}
-			else if($checkUser->num_rows() === 0){
+			else if($checkUser->num_rows() > 0){
 				$response["result"] = false;
 				$response["msg"] = "El paciente no ha ocupado sus beneficios disponibles";
 			}
@@ -390,7 +393,8 @@ class CalendarioController extends CI_Controller{
 			}
 			else {
 				$addRecord = $this->generalModel->addRecord("citas", $values);
-        	    if ($addRecord) {
+
+        	    if ($addRecord && ) {
         	        $response["result"] = true;
         	        $response["msg"] = "Se ha agendado a cita";
         	    } 
@@ -476,11 +480,8 @@ class CalendarioController extends CI_Controller{
 		$diferencia = $start->diff(new DateTime($endStamp));
 		$estatus = 2;
 
-		if($tipo === 3){
-			$estatus = 3;
-		}
-		else if($tipo === 7){
-			$estatus = 7;
+		if(in_array($tipo, array(3, 7, 8))){
+			$estatus = $tipo;
 		}
 		// else if(intval($dataValue["estatus"]) === 1 && $diferencia->d === 0 && $diferencia->h < 3){ // condición para poder saber si se penaliza la cita
 		// 	$estatus = 3;
