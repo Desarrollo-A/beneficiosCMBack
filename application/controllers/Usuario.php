@@ -8,7 +8,8 @@ class Usuario extends CI_Controller {
 		parent::__construct();
 		header('Access-Control-Allow-Origin: *');
 		header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
-		header('Access-Control-Allow-Headers: Content-Type');
+		//header('Access-Control-Allow-Headers: Content-Type');
+		header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
 
 		date_default_timezone_set('America/Mexico_City');
 
@@ -24,13 +25,15 @@ class Usuario extends CI_Controller {
         else
             $origin = $_SERVER['HTTP_HOST'];
 
+        $this->load->library('session');
+
         if(in_array($origin,$urls) || strpos($origin,"192.168")) {
 			$this->load->database('default');
 			$this->load->model('usuariosModel');
 			$this->load->model('generalModel');
+			$this->load->model('MenuModel');
 
             $this->load->helper(array('form','funciones'));
-			$this->load->library(array('session'));
         } else {
             die ("Access Denied");     
             exit;  
@@ -39,6 +42,18 @@ class Usuario extends CI_Controller {
 	public function index()
 	{
 		$this->load->view('welcome_message');
+	}
+
+	public function menu()
+	{
+		//print_r($this->session->userdata());
+		//exit();
+		//header('content-type: application/json; charset=utf-8');
+
+		$id_user = 41;
+		$id_rol = 2;
+
+		echo json_encode($this->MenuModel->getMenu($id_user, $id_rol));
 	}
 
 	public function usuarios(){
