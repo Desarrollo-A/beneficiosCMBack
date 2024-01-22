@@ -9,7 +9,7 @@ class Usuario extends CI_Controller {
 		header('Access-Control-Allow-Origin: *');
 		header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
 		//header('Access-Control-Allow-Headers: Content-Type');
-		header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
+		header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Token");
 
 		date_default_timezone_set('America/Mexico_City');
 
@@ -50,8 +50,8 @@ class Usuario extends CI_Controller {
 		$data = explode('.', $headers->token);
 		$user = json_decode(base64_decode($data[2]));
 
-		$id_user = $user->idUsuario;
-		$id_rol = $user->idRol;
+		$id_user = 43;//$user->idUsuario;
+		$id_rol = 3;//$user->idRol;
 
 		echo json_encode($this->MenuModel->getMenu($id_user, $id_rol));
 	}
