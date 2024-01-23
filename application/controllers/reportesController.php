@@ -58,4 +58,10 @@ class reportesController extends CI_Controller {
 
 		}			
 	}
+
+	public function getPacientes(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->reportesModel->getPacientes($dt)->result();
+		echo json_encode($data);
+	}
 }

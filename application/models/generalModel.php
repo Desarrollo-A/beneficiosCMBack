@@ -167,4 +167,28 @@ class generalModel extends CI_Model {
         return $query;
     }
 
+    public function getAppointmentHistory($dt){
+
+        $query = $this->db->query("SELECT us.nombre, ct.idPaciente, ct.titulo, oc.nombre AS estatus, ct.estatusCita, ct.idDetalle AS pago, ct.tipoCita,
+		CONCAT (CONVERT(DATE,ct.fechaInicio), ' ', FORMAT(ct.fechaInicio, 'HH:mm'), ' - ', FORMAT(ct.fechaFinal, 'HH:mm')) AS horario
+		FROM citas ct 
+		INNER JOIN catalogos ca ON ca.idCatalogo = 2
+		INNER JOIN opcionesPorCatalogo oc ON oc.idCatalogo = ca.idCatalogo AND oc.idOpcion = ct.estatusCita
+		INNER JOIN usuarios us ON us.idUsuario = ct.idPaciente
+		WHERE ct.idPaciente = $dt AND oc.idCatalogo = 2
+		GROUP BY us.nombre, ct.idPaciente, ct.titulo, oc.nombre, ct.estatusCita, ct.idDetalle, ct.tipoCita,
+		ct.fechaInicio, ct.fechaFinal
+		ORDER BY ct.fechaInicio, ct.fechaFinal DESC ");
+
+        return $query;
+
+    }
+
+    public function getEstatusPaciente(){
+        
+        $query = $this->db->query("SELECT idOpcion, nombre FROM opcionesPorCatalogo WHERE idCatalogo = 13");
+        return $query;
+
+    }
+
 }

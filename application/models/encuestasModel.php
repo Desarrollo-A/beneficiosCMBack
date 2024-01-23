@@ -89,7 +89,6 @@ class encuestasModel extends CI_Model {
 
     public function getEncNotificacion($dt)
     {
-
         $idUsuario = $dt["idUsuario"];
         $vigenciaInicio = $dt["vigenciaInicio"];
         $vigenciaFin = $dt["vigenciaFin"];
@@ -131,16 +130,24 @@ class encuestasModel extends CI_Model {
 
         if ($query_encuestas->num_rows() > 0) {
 
-        $idEcuestas = [];
+        $idEncuestas = [];
         foreach ($query_encuestas->result() as $row) {
-            $idEcuestas[] = $row->idEncuesta;
+            $idEncuestas[] = $row->idEncuesta;
         }
 
-        $query_encuestasC = $this->db->query("SELECT * FROM encuestasContestadas WHERE idEncuesta IN (" . implode(',', $idEcuestas) . ") AND idUsuario = $idUsuario");
+        $query_encuestasC = $this->db->query("SELECT DISTINCT idEncuesta FROM encuestasContestadas WHERE idEncuesta IN (" . implode(',', $idEncuestas) . ") AND idUsuario = $idUsuario");
 
-        if ($query_encuestasC->num_rows() == 0) {
+        $idEncuesta = [];
+        foreach ($query_encuestasC->result() as $row) {
+            $idEncuesta[] = $row->idEncuesta;
+        }
 
-        $query_enc = $this->db->query("SELECT DISTINCT diasVigencia FROM encuestasCreadas WHERE idEncuesta IN (" . implode(',', $idEcuestas) . ")");
+        $idEncResult = array_values(array_diff(array_merge($idEncuesta, $idEncuestas), array_intersect($idEncuesta, $idEncuestas)));
+
+        if(!empty($idEncResult))
+        {
+
+        $query_enc = $this->db->query("SELECT DISTINCT diasVigencia FROM encuestasCreadas WHERE idEncuesta IN (" . implode(',', $idEncResult) . ")");
 
         $vig = 0;
         foreach ($query_enc->result() as $row) {
@@ -161,7 +168,7 @@ class encuestasModel extends CI_Model {
         FROM usuarios us 
         INNER JOIN encuestasCreadas ec ON ec.idArea = us.puesto
         INNER JOIN puestos ps ON ps.idPuesto = ec.idArea
-        WHERE us.idUsuario IN (" . implode(',', $idEspecialistas) . ") AND ec.estatus = 1");
+        WHERE us.idUsuario IN (" . implode(',', $idEspecialistas) . ") AND ec.estatus = 1 AND ec.idEncuesta IN (" . implode(',', $idEncResult) . ")");
 
        /*  $query_enc = $this->db->query("SELECT DISTINCT idEncuesta, ps.puesto
         FROM usuarios us 
