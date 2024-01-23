@@ -84,8 +84,15 @@ class loginController extends CI_Controller {
 		$datosSession = json_decode( file_get_contents('php://input'));
 		$arraySession = explode('.',$datosSession->token);
 		$datosUser = json_decode(base64_decode($arraySession[2]));
-		echo json_encode(array('user' => $datosUser,
-									'result' => 1));
+		echo json_encode(array('user' => $datosUser, 'result' => 1));
+	}
+
+	public function check(){
+		$headers = (object) $this->input->request_headers();
+		$data = explode('.', $headers->token);
+		$user = json_decode(base64_decode($data[2]));
+
+		echo json_encode(array('user' => $user, 'result' => 1));
 	}
 
 	public function logout()
@@ -127,6 +134,7 @@ class loginController extends CI_Controller {
 			$tokenPart3 = base64_encode(json_encode($data[0]));
 			$datosSesion['token'] = $tokenPart1.'.'.$tokenPart2;
 			$this->session->set_userdata($datosSesion);
+
 			if($array == ''){
 				echo json_encode(array('user' => $data[0],
 									'accessToken' => $tokenPart1.'.'.$tokenPart2.'.'.$tokenPart3,

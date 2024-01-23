@@ -954,3 +954,4 @@ class CalendarioController extends CI_Controller{
 		$this->output->set_output(json_encode($response));
 	}
 }
+
