@@ -77,7 +77,7 @@ class CalendarioModel extends CI_Model
         $query = $this->db->query(
             "SELECT CAST(ct.idCita AS VARCHAR(36))  AS id,  ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
             ct.fechaInicio AS occupied, 'date' AS 'type', ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal, us.correo,
-            se.sede, ofi.oficina, idDetalle,
+            se.sede, ofi.oficina, idDetalle, ct.idAtencionXSede, us.externo, 
             'color' = CASE
 	            WHEN ct.estatusCita = 0 THEN 'red'
 	            WHEN ct.estatusCita = 1 THEN 'orange'
@@ -428,6 +428,12 @@ class CalendarioModel extends CI_Model
             END",
             $idCita
         );
+
+        return $query;
+    }
+
+    public function checkInvoice($idDetalle){
+        $query = $this->db->query("SELECT idDetalle FROM citas WHERE idDetalle = ? GROUP BY idDetalle HAVING COUNT(idDetalle) > ?", array($idDetalle, 2));
 
         return $query;
     }

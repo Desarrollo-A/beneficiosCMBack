@@ -324,9 +324,6 @@ class CalendarioController extends CI_Controller{
 				"idDetalle" => $dataValue["idDetalle"]
 			];
 
-			$valuesPago = []
-
-
 			$checkUser = $this->usuariosModel->checkUser($dataValue["idPaciente"], $year, $month);
 			$checkAppointment = $this->calendarioModel->checkAppointment($dataValue, $fechaInicioSuma, $fechaFinalResta);
 			$checkOccupied = $this->calendarioModel->checkOccupied($dataValue, $fechaInicioSuma, $fechaFinalResta);
@@ -350,7 +347,7 @@ class CalendarioController extends CI_Controller{
 			else {
 				$addRecord = $this->generalModel->addRecord("citas", $values);
 
-        	    if ($addRecord && ) {
+        	    if ($addRecord ) {
         	        $response["result"] = true;
         	        $response["msg"] = "Se ha agendado a cita";
         	    } 
@@ -904,5 +901,22 @@ class CalendarioController extends CI_Controller{
         $this->output->set_content_type('application/json');
         $this->output->set_output(json_encode($response));
     }
+
+	public function checkInvoice(){
+		$id = $this->input->post('dataValue');
+		$checkInvoice = $this->calendarioModel->checkInvoice($id);
+
+		if($checkInvoice->num_rows() > 0){
+			$response['result'] = false;
+			$response['msg'] = 'Ya se ha cancelado y reagendado 2 veces';
+		}
+		else{
+			$response['result'] = true;
+			$response['msg'] = 'Se puede utilizar el folio';
+		}
+
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($response));
+	}
 }
 
