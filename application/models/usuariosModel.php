@@ -50,11 +50,17 @@ class usuariosModel extends CI_Model {
 	}
 
 	public function checkUser($idPaciente, $year, $month){ // función para checar si el beneficiario lleva 2 beneficios usados, sin importar mes
-		$query = $this->db->query(
-			"SELECT idPaciente from (select *from citas ct where YEAR(fechaInicio) = ? AND MONTH(fechaInicio) = ?) as citas 
-			WHERE estatusCita IN(?, ?, ?) AND idPaciente = ? 
-			GROUP BY idPaciente HAVING COUNT(idPaciente) > ?",
-			array( $year, $month, 1, 4, 6, $idPaciente, 1 ));
+		// $query = $this->db->query(
+		// 	"SELECT idPaciente from (select *from citas ct where YEAR(fechaInicio) = ? AND MONTH(fechaInicio) = ?) as citas 
+		// 	WHERE estatusCita IN(?, ?, ?) AND idPaciente = ? 
+		// 	GROUP BY idPaciente HAVING COUNT(idPaciente) > ?",
+		// 	array( $year, $month, 1, 4, 6, $idPaciente, 1 )); // version de query por mes
+
+			$query = $this->db->query(
+				"SELECT idPaciente from citas
+				WHERE estatusCita IN(?, ?, ?) AND idPaciente = ? 
+				GROUP BY idPaciente HAVING COUNT(idPaciente) > ?",
+				array(1, 4, 6, $idPaciente, 1 )); // version de queryu por todos los tiempos
 		
 		return $query;
 	}
