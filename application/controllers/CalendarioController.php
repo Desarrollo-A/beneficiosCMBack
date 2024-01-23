@@ -57,7 +57,7 @@ class CalendarioController extends CI_Controller{
 				$response['msg'] = '¡No existen eventos!';
 			}
 		}else {
-			$response['msg'] = "¡Parametros invalidos!";
+			$response['msg'] = "¡Parámetros inválidos!";
 		}
 
 		$this->output->set_content_type('application/json');
@@ -277,7 +277,7 @@ class CalendarioController extends CI_Controller{
 				$response['msg'] = '¡El horario ya ha sido ocupado!'; 
 			}
 		}else {
-			$response['msg'] = "¡Parametros invalidos!";
+			$response['msg'] = "¡Parámetros inválidos!";
 		}       
 
 		$this->output->set_content_type("application/json");
@@ -361,6 +361,29 @@ class CalendarioController extends CI_Controller{
 		$this->output->set_output(json_encode($response));
 	}
 
+	public function updateAppointmentData() {
+		$idCita      = $this->input->post('dataValue[idCita]');
+		$estatus = $this->input->post('dataValue[estatus]');
+
+		$response['result'] = isset($idCita, $estatus);
+		if ($response['result']) {
+			$values = [
+				"estatusCita" => $estatus,
+			];
+			$response["result"] = $this->generalModel->updateRecord("citas", $values, 'idCita', $idCita);
+			if ($response["result"]) {
+				$response["msg"] = "¡Se ha generado el detalle de pago con exito!";
+			}else {
+				$response["msg"] = "¡Surgió un error al intentar actualizar los datos de cita!";
+			}
+		}else {
+			$response['msg'] = "¡Parámetros inválidos!";
+		}
+
+		$this->output->set_content_type("application/json");
+		$this->output->set_output(json_encode($response));
+	}
+
 	public function updateAppointment(){
 		$dataValue = $this->input->post("dataValue", true);
 		$start = $dataValue["fechaInicio"]; // datos para la validación de no mover una eveneto pasado de su dia
@@ -432,11 +455,8 @@ class CalendarioController extends CI_Controller{
 		$diferencia = $start->diff(new DateTime($endStamp));
 		$estatus = 2;
 
-		if($tipo === 3){
-			$estatus = 3;
-		}
-		else if($tipo === 7){
-			$estatus = 7;
+		if(in_array($tipo, [1, 3, 7, 8])){
+			$estatus = $tipo;
 		}
 		// else if(intval($dataValue["estatus"]) === 1 && $diferencia->d === 0 && $diferencia->h < 3){ // condición para poder saber si se penaliza la cita
 		// 	$estatus = 3;
@@ -641,7 +661,7 @@ class CalendarioController extends CI_Controller{
 				$response['msg'] = '¡No existen registros!';
 			}
 		}else {
-			$response['msg'] = "¡Parametros invalidos!";
+			$response['msg'] = "¡Parámetros inválidos!";
 		}
 		
 		$this->output->set_content_type("application/json");
@@ -664,7 +684,7 @@ class CalendarioController extends CI_Controller{
 				$response['msg'] = '¡No existen registros!';
 			}
 		}else {
-            $response['msg'] = "¡Parametros invalidos!";
+            $response['msg'] = "¡Parámetros inválidos!";
         }
 
 		$this->output->set_content_type("application/json");
@@ -686,7 +706,7 @@ class CalendarioController extends CI_Controller{
 				$response['msg'] = '¡No existen registros!';
 			}
 		}else {
-            $response['msg'] = "¡Parametros invalidos!";
+            $response['msg'] = "¡Parámetros inválidos!";
         }
 
 		$this->output->set_content_type("application/json");
@@ -709,7 +729,7 @@ class CalendarioController extends CI_Controller{
 				$response['msg'] = '¡No existen registros!';
 			}
 		}else {
-			$response['msg'] = "¡Parametros invalidos!";
+			$response['msg'] = "¡Parámetros inválidos!";
 		}
 		
 		$this->output->set_content_type("application/json");
@@ -773,7 +793,7 @@ class CalendarioController extends CI_Controller{
 				$response['msg'] = '¡No existen registros!';
 			}
 		}else {
-			$response['msg'] = "¡Parametros invalidos!";
+			$response['msg'] = "¡Parámetros inválidos!";
 		}
 		$this->output->set_content_type("application/json");
         $this->output->set_output(json_encode($response));
@@ -794,7 +814,7 @@ class CalendarioController extends CI_Controller{
 				$response['msg'] = '¡No existen registros!';
 			}
 		}else {
-			$response['msg'] = "¡Parametros invalidos!";
+			$response['msg'] = "¡Parámetros inválidos!";
 		}
 		$this->output->set_content_type("application/json");
         $this->output->set_output(json_encode($response));
@@ -816,7 +836,7 @@ class CalendarioController extends CI_Controller{
 				$response['msg'] = '¡No existen registros!';
 			}
 		}else {
-			$response['msg'] = "¡Parametros invalidos!";
+			$response['msg'] = "¡Parámetros inválidos!";
 		}
 		$this->output->set_content_type("application/json");
         $this->output->set_output(json_encode($response));
@@ -838,7 +858,7 @@ class CalendarioController extends CI_Controller{
 				$response['msg'] = '¡No existen registros!';
 			}
 		}else {
-			$response['msg'] = "¡Parametros invalidos!";
+			$response['msg'] = "¡Parámetros inválidos!";
 		}
 		$this->output->set_content_type("application/json");
         $this->output->set_output(json_encode($response));
@@ -848,6 +868,15 @@ class CalendarioController extends CI_Controller{
 		$idUsuario = $this->input->post('dataValue', true);
 		
 		$get = $this->calendarioModel->getPending($idUsuario)->result();
+
+		$this->output->set_content_type('application/json');
+		$this->output->set_output(json_encode($get));
+	}
+
+	public function getPendientes(){
+		$modalidad = $this->input->post('dataValue[modalidad]');
+		
+		$get = $this->calendarioModel->getPendientes($idUsuario)->result();
 
 		$this->output->set_content_type('application/json');
 		$this->output->set_output(json_encode($get));
@@ -889,14 +918,39 @@ class CalendarioController extends CI_Controller{
 				if (!empty($rs) && isset($rs[0]->idDetalle)) {
 					$response["data"] = $rs[0]->idDetalle;
 				} else {
-					$response["data"] = null; // o asigna el valor que desees en caso de que no exista 'idDetalle'
+					$response["data"] = null;
 				}
 			} 
 			else {
 				$response["msg"] = "¡Surgió un error al intentar generar el detalle de pago!";
-				echo('fue fal');
 			}
 		}else {
-			$response['msg'] = "¡Parametros invalidos!";
+			$response['msg'] = "¡Parámetros inválidos!";
 		}
+
+		$this->output->set_content_type('application/json');
+		$this->output->set_output(json_encode($response));
+	}
+
+	public function getLastAppointment() {
+		$usuario  = $this->input->post('dataValue[usuario]');
+		$beneficio  = $this->input->post('dataValue[beneficio]');
+
+		$response['result'] = isset($usuario, $beneficio);
+		if ($response['result']) {
+			$rs = $this->calendarioModel->getLastAppointment($usuario, $beneficio)->result();
+			$response['result'] = count($rs) > 0;
+			if ($response['result']) {
+				$response['data'] = $rs;
+				$response['msg'] = '¡Última cita consultada exitosamente!';
+			}else {
+				$response['msg'] = '¡No existen registros!';
+			}
+		}else {
+			$response['msg'] = "¡Parámetros inválidos!";
+		}
+
+		$this->output->set_content_type('application/json');
+		$this->output->set_output(json_encode($response));
+	}
 }

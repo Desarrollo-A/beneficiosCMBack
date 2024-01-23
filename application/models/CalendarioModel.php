@@ -17,6 +17,7 @@ class CalendarioModel extends CI_Model
             THEN 'green' WHEN ct.estatusCita = 5 
             THEN 'pink' WHEN ct.estatusCita = 6 
             THEN 'blue' WHEN ct.estatusCita = 7 
+            THEN 'red' WHEN ct.estatusCita = 8 
             THEN 'red' END,
             beneficio = CASE 
             WHEN pue.idPuesto = 537 THEN 'nutrición'
@@ -27,9 +28,9 @@ class CalendarioModel extends CI_Model
             FROM citas ct
             INNER JOIN usuarios us ON us.idUsuario = ct.idPaciente
             INNER JOIN usuarios usEspe ON usEspe.idUsuario = ct.idEspecialista
-            inner join atencionXSede atc  ON atc.idAtencionXSede = ct.idAtencionXSede  
-            left join oficinas ofi ON ofi.idOficina = atc.idOficina
-            inner join sedes sed ON sed.idSede = atc.idSede
+            INNER join atencionXSede atc  ON atc.idAtencionXSede = ct.idAtencionXSede  
+            LEFT join oficinas ofi ON ofi.idOficina = atc.idOficina
+            INNER join sedes sed ON sed.idSede = atc.idSede
             INNER JOIN puestos pue ON pue.idPuesto = usEspe.puesto
             WHERE YEAR(fechaInicio) = ? AND MONTH(fechaInicio) = ? AND ct.idPaciente = ?
             AND ct.estatusCita IN(?, ?, ?, ?, ?, ?, ?)",
@@ -78,16 +79,16 @@ class CalendarioModel extends CI_Model
             "SELECT CAST(ct.idCita AS VARCHAR(36))  AS id,  ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
             ct.fechaInicio AS occupied, 'date' AS 'type', ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal, us.correo,
             se.sede, ofi.oficina,
-            'color' = CASE
-	            WHEN ct.estatusCita = 0 THEN 'red'
-	            WHEN ct.estatusCita = 1 THEN 'orange'
-	            WHEN ct.estatusCita = 2 THEN 'red'
-	            WHEN ct.estatusCita = 3 THEN 'grey'
-	            WHEN ct.estatusCita = 4 THEN 'green'
-                WHEN ct.estatusCita = 5 THEN 'pink'
-                WHEN ct.estatusCita = 6 THEN 'blue'
-                WHEN ct.estatusCita = 7 THEN 'red'
-	        END
+            'color' = CASE WHEN ct.estatusCita = 0 
+            THEN 'red' WHEN ct.estatusCita = 1 
+            THEN 'yellow' WHEN ct.estatusCita = 2 
+            THEN 'red' WHEN ct.estatusCita = 3 
+            THEN 'grey' WHEN ct.estatusCita = 4 
+            THEN 'green' WHEN ct.estatusCita = 5 
+            THEN 'pink' WHEN ct.estatusCita = 6 
+            THEN 'blue' WHEN ct.estatusCita = 7 
+            THEN 'red' WHEN ct.estatusCita = 8 
+            THEN 'red' END,
             FROM citas ct
             INNER JOIN usuarios us ON us.idUsuario = ct.idPaciente
             INNER JOIN atencionXSede aps ON ct.idAtencionXSede = aps.idAtencionXSede
@@ -404,6 +405,12 @@ class CalendarioModel extends CI_Model
         return $query;
     }
 
+    public function getPendientes($idUsusuario){
+        $query = $this->db->query("SELECT *FROM citas WHERE estatusCita IN(?, ?) AND idEspecialista = ? AND fechaInicio < GETDATE()", array(1, 6, $idUsuario));
+
+        return $query;
+    }
+
     public function getDetallePago($folio){
         $query = $this->db->query("SELECT * FROM detallePagos WHERE folio = ?", array($folio));
 
@@ -431,4 +438,14 @@ class CalendarioModel extends CI_Model
         return $query;
     }
 
+    public function getLastAppointment($usuario, $beneficio) {
+        $query = $this->db->query("SELECT TOP (1) ct.*, usu.puesto, axs.tipoCita FROM citas AS ct
+        INNER JOIN usuarios AS usu ON usu.idUsuario = ct.idEspecialista
+        INNER JOIN atencionXSede AS axs ON axs.idAtencionXSede = ct.idAtencionXSede
+        WHERE ct.idPaciente = ? AND usu.puesto = ?
+        ORDER BY idCita DESC", array($usuario, $beneficio));
+    
+        return $query;
+    }
+    
 }
