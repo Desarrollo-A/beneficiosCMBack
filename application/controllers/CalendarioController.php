@@ -1,7 +1,9 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class CalendarioController extends CI_Controller{
+require_once(APPPATH . "/controllers/BaseController.php");
+
+class CalendarioController extends BaseController{
     public function __construct(){
 		parent::__construct();
 
@@ -9,7 +11,6 @@ class CalendarioController extends CI_Controller{
 		$this->load->model('generalModel');
 		$this->load->model('usuariosModel');
 		$this->load->library('session');
-		date_default_timezone_set('America/Mexico_City');
 	}
 	
 	public function getAllEvents(){
@@ -668,7 +669,7 @@ class CalendarioController extends CI_Controller{
         }
 
 		$this->output->set_content_type("application/json");
-        $this->output->set_output(json_encode($response));
+        echo json_encode(json_encode($response));
 	}
 
 	public function getModalidadesEspecialista(){
