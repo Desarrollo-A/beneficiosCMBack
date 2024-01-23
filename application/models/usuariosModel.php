@@ -22,7 +22,7 @@ class usuariosModel extends CI_Model {
 
 	public function login($numEmpleado, $password)
 	{
-		$query = $this->db->query("	SELECT u.*, p.idPuesto, p.puesto, p.idArea FROM USUARIOS as u
+		$query = $this->db->query("	SELECT u.*, p.idPuesto, p.puesto, p.idArea, p.tipoPuesto FROM USUARIOS as u
 			INNER JOIN puestos AS p ON u.puesto = P.idPuesto
 			WHERE numEmpleado = ? AND password = ?;", array( $numEmpleado, $password ));
 		return $query;
@@ -42,21 +42,19 @@ class usuariosModel extends CI_Model {
 			 US.puesto = PS.idPuesto
 			 WHERE US.idRol = ?
 			 AND US.estatus = ?
-			 AND US.idUsuario
-			 NOT IN( SELECT idPaciente FROM citas WHERE estatusCita = ? GROUP BY idPaciente HAVING COUNT(idPaciente) > ?)
 			 AND US.idSede
 			 IN( select distinct idSede from atencionXSede where idEspecialista = ?)",
-			 array( 2, 1, 1, 1, $idEspecialista )
+			 array( 2, 1, $idEspecialista )
 		);
 		return $query;
 	}
 
-	public function checkUser($idPaciente){
+	public function checkUser($idPaciente, $year, $month){ // función para checar si el beneficiario lleva 2 beneficios usados, sin importar mes
 		$query = $this->db->query(
-			"SELECT idPaciente FROM citas 
-			WHERE estatusCita = 1 AND idPaciente = ? 
-			GROUP BY idPaciente HAVING COUNT(idPaciente) = ?", 
-			array( $idPaciente, 2 ));
+			"SELECT idPaciente from (select *from citas ct where YEAR(fechaInicio) = ? AND MONTH(fechaInicio) = ?) as citas 
+			WHERE estatusCita IN(?, ?, ?) AND idPaciente = ? 
+			GROUP BY idPaciente HAVING COUNT(idPaciente) > ?",
+			array( $year, $month, 1, 4, 6, $idPaciente, 1 ));
 		
 		return $query;
 	}
