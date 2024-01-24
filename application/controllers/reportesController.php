@@ -1,8 +1,9 @@
 <?php
 
 defined('BASEPATH') OR exit('No direct script access allowed');
+require_once(APPPATH . "/controllers/BaseController.php");
 
-class reportesController extends CI_Controller {
+class reportesController extends BaseController {
 
 	public function __construct()
 	{
