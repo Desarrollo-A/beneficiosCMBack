@@ -96,6 +96,7 @@ class CalendarioController extends BaseController{
 			"fechaInicio" => $dataValue["fechaInicio"],
 			"fechaFinal" => $dataValue["fechaFinal"],
 			"creadoPor" => $dataValue["idUsuario"],
+			"modificadoPor" => $dataValue["modificadoPor"],
 			"fechaModificacion" => date("Y-m-d H:i:s"),
 			"fechaCreacion" => date("Y-m-d H:i:s"),
 			"titulo" => $dataValue["titulo"],
@@ -167,6 +168,7 @@ class CalendarioController extends BaseController{
 				"fechaFinal" => $dataValue["fechaFinal"],
 				"fechaModificacion" => date("Y-m-d H:i:s"),
 				"titulo" => $dataValue["titulo"],
+				"modificadoPor" => $dataValue["modificadoPor"]
 			];
 
 			$checkOccupiedId = $this->calendarioModel->checkOccupiedId($dataValue, $fechaInicioSuma, $fechaFinalResta);
@@ -202,13 +204,15 @@ class CalendarioController extends BaseController{
 
 	public function deleteOccupied()
 	{
-		$idUnico = $this->input->post("dataValue", true);
+		$dataValue = $this->input->post("dataValue", true);
 
 		$values = [
-			"estatus" => 0
+			"estatus" => 0,
+			"modificadoPor" => $dataValue["modificadoPor"],
+			"fechaModificacion" => date('Y/m/d H:i:s')
 		];
 
-		$updateRecord = $this->generalModel->updateRecord("horariosOcupados", $values, "idUnico", $idUnico);
+		$updateRecord = $this->generalModel->updateRecord("horariosOcupados", $values, "idUnico", $dataValue["eventId"]);
 
 		if ($updateRecord) {
 			$response["result"] = true;
