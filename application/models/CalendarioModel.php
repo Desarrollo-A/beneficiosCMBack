@@ -481,4 +481,11 @@ class CalendarioModel extends CI_Model
         return $query;
     }
 
+    public function checkDetailPacient($user, $column){
+        $query = $this->db->query("SELECT $column FROM detallePaciente 
+            WHERE idUsuario = ?;", array($user));
+   
+        return $query;
+    }
+
 }
