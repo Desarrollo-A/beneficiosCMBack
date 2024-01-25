@@ -89,7 +89,6 @@ class encuestasModel extends CI_Model {
 
     public function getEncNotificacion($dt)
     {
-
         $idUsuario = $dt["idUsuario"];
         $vigenciaInicio = $dt["vigenciaInicio"];
         $vigenciaFin = $dt["vigenciaFin"];
@@ -109,7 +108,7 @@ class encuestasModel extends CI_Model {
         }
 
         $query_especialistas = $this->db->query("WITH cte AS (
-            SELECT us.puesto, ct.idEspecialista,fechaFinal, ROW_NUMBER() OVER (PARTITION BY us.puesto ORDER BY fechaFinal DESC) AS rn
+            SELECT us.idPuesto, ct.idEspecialista,fechaFinal, ROW_NUMBER() OVER (PARTITION BY us.idPuesto ORDER BY fechaFinal DESC) AS rn
             FROM citas ct
             INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
             WHERE idCita IN (" . implode(',', $idCitas) . "))
@@ -125,22 +124,30 @@ class encuestasModel extends CI_Model {
 
         $query_encuestas = $this->db->query("SELECT DISTINCT idEncuesta, ps.puesto
             FROM usuarios us 
-            INNER JOIN encuestasCreadas ec ON ec.idArea = us.puesto
+            INNER JOIN encuestasCreadas ec ON ec.idArea = us.idPuesto
             INNER JOIN puestos ps ON ps.idPuesto = ec.idArea
             WHERE us.idUsuario IN (" . implode(',', $idEspecialistas) . ") AND ec.estatus = 1");
 
         if ($query_encuestas->num_rows() > 0) {
 
-        $idEcuestas = [];
+        $idEncuestas = [];
         foreach ($query_encuestas->result() as $row) {
-            $idEcuestas[] = $row->idEncuesta;
+            $idEncuestas[] = $row->idEncuesta;
         }
 
-        $query_encuestasC = $this->db->query("SELECT * FROM encuestasContestadas WHERE idEncuesta IN (" . implode(',', $idEcuestas) . ") AND idUsuario = $idUsuario");
+        $query_encuestasC = $this->db->query("SELECT DISTINCT idEncuesta FROM encuestasContestadas WHERE idEncuesta IN (" . implode(',', $idEncuestas) . ") AND idUsuario = $idUsuario");
 
-        if ($query_encuestasC->num_rows() == 0) {
+        $idEncuesta = [];
+        foreach ($query_encuestasC->result() as $row) {
+            $idEncuesta[] = $row->idEncuesta;
+        }
 
-        $query_enc = $this->db->query("SELECT DISTINCT diasVigencia FROM encuestasCreadas WHERE idEncuesta IN (" . implode(',', $idEcuestas) . ")");
+        $idEncResult = array_values(array_diff(array_merge($idEncuesta, $idEncuestas), array_intersect($idEncuesta, $idEncuestas)));
+
+        if(!empty($idEncResult))
+        {
+
+        $query_enc = $this->db->query("SELECT DISTINCT diasVigencia FROM encuestasCreadas WHERE idEncuesta IN (" . implode(',', $idEncResult) . ")");
 
         $vig = 0;
         foreach ($query_enc->result() as $row) {
@@ -159,9 +166,9 @@ class encuestasModel extends CI_Model {
 
         $query_enc = $this->db->query("SELECT DISTINCT idEncuesta, ps.puesto
         FROM usuarios us 
-        INNER JOIN encuestasCreadas ec ON ec.idArea = us.puesto
+        INNER JOIN encuestasCreadas ec ON ec.idArea = us.idPuesto
         INNER JOIN puestos ps ON ps.idPuesto = ec.idArea
-        WHERE us.idUsuario IN (" . implode(',', $idEspecialistas) . ") AND ec.estatus = 1");
+        WHERE us.idUsuario IN (" . implode(',', $idEspecialistas) . ") AND ec.estatus = 1 AND ec.idEncuesta IN (" . implode(',', $idEncResult) . ")");
 
        /*  $query_enc = $this->db->query("SELECT DISTINCT idEncuesta, ps.puesto
         FROM usuarios us 
@@ -254,7 +261,7 @@ class encuestasModel extends CI_Model {
 
                     $query_idEspecialista = $this->db->query("SELECT TOP 1 ct.idEspecialista, MAX(ct.fechaFinal) AS fechaMasReciente
                     FROM puestos ps
-                    INNER JOIN usuarios us ON us.puesto = ps.idPuesto
+                    INNER JOIN usuarios us ON us.idPuesto = ps.idPuesto
                     INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
                     WHERE ps.idPuesto = $idArea AND ct.idPaciente = $idUsuario
                     GROUP BY ct.idEspecialista

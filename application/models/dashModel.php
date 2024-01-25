@@ -202,7 +202,7 @@ class dashModel extends CI_Model {
         if($idRol == 1){
             $query = $this->db-> query("SELECT COUNT(*) AS [citas] FROM usuarios us
             INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
-            WHERE us.puesto = $idData AND ct.estatusCita = 4 AND fechaFinal BETWEEN '$inicio' AND '$fin'");
+            WHERE us.idPuesto = $idData AND ct.estatusCita = 4 AND fechaFinal BETWEEN '$inicio' AND '$fin'");
         }else{
             $query = $this->db-> query("SELECT COUNT(*) AS [citas] FROM usuarios us
             INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario

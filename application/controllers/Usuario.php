@@ -50,8 +50,8 @@ class Usuario extends CI_Controller {
 		$data = explode('.', $headers->token);
 		$user = json_decode(base64_decode($data[2]));
 
-		$id_user = 43;//$user->idUsuario;
-		$id_rol = 3;//$user->idRol;
+		$id_user = intval($user->idUsuario);
+		$id_rol = intval($user->idRol);
 
 		echo json_encode($this->MenuModel->getMenu($id_user, $id_rol));
 	}

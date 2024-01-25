@@ -1,8 +1,9 @@
 <?php
 
 defined('BASEPATH') OR exit('No direct script access allowed');
+require_once(APPPATH . "/controllers/BaseController.php");
 
-class encuestasController extends CI_Controller {
+class encuestasController extends BaseController {
 
 	public function __construct()
 	{
@@ -14,11 +15,6 @@ class encuestasController extends CI_Controller {
 		$this->load->library('email');
 
 		parent::__construct();
-		header('Access-Control-Allow-Origin: *');
-		header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
-		header('Access-Control-Allow-Headers: Content-Type');
-
-		date_default_timezone_set('America/Mexico_City');;
 	}
 
 	public function encuestaInsert(){
@@ -196,7 +192,7 @@ class encuestasController extends CI_Controller {
 			$query = $this->db->query("SELECT DISTINCT ct.idPaciente, co.correo, ec.idEncuesta FROM citas ct
 			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
 			INNER JOIN usuarios co ON co.idUsuario = ct.idPaciente
-			INNER JOIN encuestasCreadas ec ON ec.idArea = us.puesto
+			INNER JOIN encuestasCreadas ec ON ec.idArea = us.idPuesto
 			WHERE estatusCita = 4 AND fechaFinal BETWEEN '$lunesPasado' AND '$lunesActual' AND ec.estatus = 1");
 
 			$correo = '';

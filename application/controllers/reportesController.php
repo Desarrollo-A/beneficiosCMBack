@@ -1,8 +1,9 @@
 <?php
 
 defined('BASEPATH') OR exit('No direct script access allowed');
+require_once(APPPATH . "/controllers/BaseController.php");
 
-class reportesController extends CI_Controller {
+class reportesController extends BaseController {
 
 	public function __construct()
 	{
@@ -57,5 +58,11 @@ class reportesController extends CI_Controller {
 			echo json_encode(array("estatus" => false));
 
 		}			
+	}
+
+	public function getPacientes(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->reportesModel->getPacientes($dt)->result();
+		echo json_encode($data);
 	}
 }

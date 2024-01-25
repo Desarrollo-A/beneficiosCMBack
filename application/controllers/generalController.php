@@ -1,8 +1,9 @@
 <?php
 
 defined('BASEPATH') OR exit('No direct script access allowed');
+require_once(APPPATH . "/controllers/BaseController.php");
 
-class generalController extends CI_Controller {
+class generalController extends BaseController {
 
 	public function __construct()
 	{
@@ -65,5 +66,92 @@ class generalController extends CI_Controller {
 		$dt = $this->input->post('dataValue', true);
 		$data['data'] = $this->generalModel->getCtPenalizadas($dt)->result();
 		echo json_encode($data);
+	}
+
+	public function getAppointmentHistory(){
+
+        $dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->generalModel->getAppointmentHistory($dt)->result();
+		echo json_encode($data);
+
+    }
+
+	public function getEstatusPaciente(){
+        $data['data'] = $this->generalModel->getEstatusPaciente()->result();
+		echo json_encode($data);
+    }
+
+	public function updateEstatusPaciente(){
+
+		$id= $this->input->post('dataValue[idDetallePnt]');
+		$estatus= $this->input->post('dataValue[estatus]');
+		$area= $this->input->post('dataValue[area]');
+
+		switch($area){
+			case 537:
+				if( !empty($id) && !empty($estatus) )
+				{
+					$data = array(
+						"estatusNut" => $estatus,
+					);
+							
+					$response=$this->generalModel->updateRecord('detallePaciente', $data, 'idDetallePaciente', $id);
+					echo json_encode(array("estatus" => true, "msj" => "Estatus actualizado!" ));
+								
+				}else{
+
+				echo json_encode(array("estatus" => false));
+
+				}
+				break;
+			case 585:
+				if( !empty($id) && !empty($estatus) )
+				{
+					$data = array(
+						"estatusPsi" => $estatus,
+					);
+							
+					$response=$this->generalModel->updateRecord('detallePaciente', $data, 'idDetallePaciente', $id);
+					echo json_encode(array("estatus" => true, "msj" => "Estatus actualizado!" ));
+								
+				}else{
+
+				echo json_encode(array("estatus" => false));
+
+				}
+				break;
+			case 158:
+				if( !empty($id) && !empty($estatus) )
+				{
+					$data = array(
+						"estatusQB" => $estatus,
+					);
+							
+					$response=$this->generalModel->updateRecord('detallePaciente', $data, 'idDetallePaciente', $id);
+					echo json_encode(array("estatus" => true, "msj" => "Estatus actualizado!" ));
+								
+				}else{
+
+				echo json_encode(array("estatus" => false));
+
+				}
+				break;
+			case 686:
+				if( !empty($id) && !empty($estatus) )
+				{
+					$data = array(
+						"estatusGE" => $estatus,
+					);
+							
+					$response=$this->generalModel->updateRecord('detallePaciente', $data, 'idDetallePaciente', $id);
+					echo json_encode(array("estatus" => true, "msj" => "Estatus actualizado!" ));
+								
+				}else{
+
+				echo json_encode(array("estatus" => false));
+
+				}
+				break;
+		}			
 	}
 }
