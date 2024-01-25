@@ -23,7 +23,7 @@ class usuariosModel extends CI_Model {
 	public function login($numEmpleado, $password)
 	{
 		$query = $this->db->query("	SELECT u.*, p.idPuesto, p.puesto, p.idArea, p.tipoPuesto, a.idDepto FROM USUARIOS as u
-		INNER JOIN puestos AS p ON u.puesto = P.idPuesto
+		INNER JOIN puestos AS p ON u.idPuesto = P.idPuesto
 		INNER JOIN areas AS a ON a.idArea = p.idArea
 		WHERE numEmpleado = ? AND password = ?;", array( $numEmpleado, $password ));
 		return $query;
@@ -40,7 +40,7 @@ class usuariosModel extends CI_Model {
 		$query = $this->db->query(
 			"SELECT US.*, PS.puesto as nombrePuesto FROM usuarios US
 			 INNER JOIN puestos PS ON
-			 US.puesto = PS.idPuesto
+			 US.idPuesto = PS.idPuesto
 			 WHERE US.idRol = ?
 			 AND US.estatus = ?
 			 AND US.idSede
