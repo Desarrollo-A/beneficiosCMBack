@@ -50,15 +50,14 @@ class loginController extends CI_Controller {
 		$this->db->trans_begin();
 		$datosEmpleado = $this->input->post('params');
 		$insertData = array(
-			"numContrato" => $datosEmpleado['idcontrato'],
+			"numContrato" => '1111',
 			"numEmpleado" => $datosEmpleado['num_empleado'],
-			"nombre" => $datosEmpleado['nombre_completo'],
-			"telPersonal" => $datosEmpleado['tel_personal'],
-			"telOficina" => $datosEmpleado['nom_oficina'],
-			"puesto" => $datosEmpleado['puesto'],
-			"oficina" => $datosEmpleado['nom_oficina'],
-			"sede" => $datosEmpleado['sede'],
-			"correo" => $datosEmpleado['email_empresarial'],
+			"nombre" => $datosEmpleado['nombre_persona'] . $datosEmpleado['pri_apellido'] .  $datosEmpleado['sec_apellido'],
+			"telPersonal" => $datosEmpleado['telefono_personal'],
+			"telOficina" => NULL,
+			"idPuesto" => $datosEmpleado['idpuesto'],
+			"sede" => $datosEmpleado['nsede'],
+			"correo" => $datosEmpleado['mail_emp'],
 			"password" => encriptar($datosEmpleado['password'] ),
 			"estatus" => 1,
 			"creadoPor" => 0,
