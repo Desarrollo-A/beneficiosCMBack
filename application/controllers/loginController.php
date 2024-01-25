@@ -49,6 +49,64 @@ class loginController extends CI_Controller {
 	public function addRegistroEmpleado(){
 		$this->db->trans_begin();
 		$datosEmpleado = $this->input->post('params');
+
+		switch ($datosEmpleado['nsede']){
+			case 'QRO':
+				$sede = 1;
+			break;
+			case 'LEON':
+				$sede = 2;
+			break;
+			case 'SLP':
+				$sede = 3;
+			break;
+			case 'CDMX':
+				$sede = 4;
+			break;
+			case 'MERIDA':
+				$sede = 5;
+			break;
+			case 'CANCUN':
+				$sede = 9;
+			break;
+			case 'TIJUANA':
+				$sede = 11;
+			break;
+			case 'SAN MIGUEL DE ALLENDE':
+				$sede = 12;
+			break;
+			case 'TEXAS':
+				$sede = 13;
+			break;
+			case 'MONTERREY':
+				$sede = 14;
+			break;
+			case 'REGION BAJIO':
+				$sede = 15;
+			break;
+			case 'REGION SUR':
+				$sede = 16;
+			break;
+			case 'GUADALAJARA':
+				$sede = 17;
+			break;
+			case 'AGUASCALIENTES':
+				$sede = 18;
+			break;
+			case 'PUEBLA':
+				$sede = 19;
+			break;
+		}
+
+		switch ($datosEmpleado['idpuesto']){
+			case (158 || 585 || 686 || 537):
+				$idRol = 3;
+			break;
+			default:
+				$idRol = 2;
+			break;
+		}
+
 		$insertData = array(
 			"numContrato" => '1111',
 			"numEmpleado" => $datosEmpleado['num_empleado'],
@@ -56,16 +114,34 @@ class loginController extends CI_Controller {
 			"telPersonal" => $datosEmpleado['telefono_personal'],
 			"telOficina" => NULL,
 			"idPuesto" => $datosEmpleado['idpuesto'],
-			"sede" => $datosEmpleado['nsede'],
+			"idSede" => $sede,
 			"correo" => $datosEmpleado['mail_emp'],
 			"password" => encriptar($datosEmpleado['password'] ),
 			"estatus" => 1,
+			"idRol" => $idRol,
+			"sexo" => $datosEmpleado['sexo'],
+			"idArea" => $datosEmpleado['idarea'],
+			"fechaIngreso" => $datosEmpleado['fingreso'],
+			"externo" => 0,
 			"creadoPor" => 0,
 			"fechaCreacion" => date('Y-m-d H:i:s'),
 			"modificadoPor" => 0,
 			"fechaModificacion" => date('Y-m-d H:i:s')
 		);
+
 		$resultado = $this->generalModel->addRecord('usuarios',$insertData);
+		$last_id = $this->db->insert_id();
+
+		$insertData = array(
+			"idUsuario" => $last_id,
+			"estatus" => 1,
+			"creadoPor" => 1,
+			"fechaCreacion" => date('Y-m-d H:i:s'),
+			"modificadoPor" => 1,
+			"fechaModificacion" => date('Y-m-d H:i:s')
+		);
+		$resultado = $this->generalModel->addRecord('detallePaciente',$insertData);
+
 		if ($this->db->trans_status() === FALSE){
             $this->db->trans_rollback();
 			if(strpos($resultado['message'], "UNIQUE")){
