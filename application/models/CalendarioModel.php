@@ -7,18 +7,20 @@ class CalendarioModel extends CI_Model
     public function getAppointmentsByUser($year, $month, $idUsuario){
         $query = $this->db->query(
             "SELECT CAST(idCita AS VARCHAR(36)) AS id, ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
-            ct.fechaInicio AS occupied, ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal, ofi.oficina, ofi.ubicación,
-            sed.sede , atc.idOficina, us.correo, usEspe.nombre as especialista,
-            'color' = CASE WHEN ct.estatusCita = 0 
-            THEN 'red' WHEN ct.estatusCita = 1 
-            THEN 'yellow' WHEN ct.estatusCita = 2 
-            THEN 'red' WHEN ct.estatusCita = 3 
-            THEN 'grey' WHEN ct.estatusCita = 4 
-            THEN 'green' WHEN ct.estatusCita = 5 
-            THEN 'pink' WHEN ct.estatusCita = 6 
-            THEN 'blue' WHEN ct.estatusCita = 7 
-            THEN 'red' WHEN ct.estatusCita = 8 
-            THEN 'red' END,
+            ct.fechaInicio AS occupied, ct.estatusCita AS estatus, ct.idDetalle, us.nombre, ct.idPaciente, ct.idEspecialista, ct.idAtencionXSede, 
+            ct.tipoCita, atc.tipoCita as modalidad, atc.idSede ,usEspe.puesto, us.telPersonal, ofi.oficina, ofi.ubicación, pue.idArea,
+            sed.sede, atc.idOficina, us.correo, usEspe.correo as correoEspecialista, usEspe.nombre as especialista, usEspe.sexo as sexoEspecialista,
+            'color' = CASE
+	            WHEN ct.estatusCita = 0 THEN 'red'
+	            WHEN ct.estatusCita = 1 THEN 'orange'
+	            WHEN ct.estatusCita = 2 THEN 'red'
+	            WHEN ct.estatusCita = 3 THEN 'grey'
+	            WHEN ct.estatusCita = 4 THEN 'green'
+                WHEN ct.estatusCita = 5 THEN 'pink'
+                WHEN ct.estatusCita = 6 THEN 'blue'
+                WHEN ct.estatusCita = 7 THEN 'red'
+                WHEN ct.estatusCita = 8 THEN 'red'
+	        END,
             beneficio = CASE 
             WHEN pue.idPuesto = 537 THEN 'nutrición'
             WHEN pue.idPuesto = 585 THEN 'psicología'
@@ -33,8 +35,8 @@ class CalendarioModel extends CI_Model
             INNER join sedes sed ON sed.idSede = atc.idSede
             INNER JOIN puestos pue ON pue.idPuesto = usEspe.puesto
             WHERE YEAR(fechaInicio) = ? AND MONTH(fechaInicio) = ? AND ct.idPaciente = ?
-            AND ct.estatusCita IN(?, ?, ?, ?, ?, ?, ?)",
-            array( $year, $month, $idUsuario, 1, 2, 3, 4, 5, 6, 7 )
+            AND ct.estatusCita IN(?, ?, ?, ?, ?, ?, ?, ?)",
+            array( $year, $month, $idUsuario, 1, 2, 3, 4, 5, 6, 7, 8 )
         );
 
         return $query;
@@ -79,16 +81,17 @@ class CalendarioModel extends CI_Model
             "SELECT CAST(ct.idCita AS VARCHAR(36))  AS id,  ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
             ct.fechaInicio AS occupied, 'date' AS 'type', ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal, us.correo,
             se.sede, ofi.oficina,
-            'color' = CASE WHEN ct.estatusCita = 0 
-            THEN 'red' WHEN ct.estatusCita = 1 
-            THEN 'yellow' WHEN ct.estatusCita = 2 
-            THEN 'red' WHEN ct.estatusCita = 3 
-            THEN 'grey' WHEN ct.estatusCita = 4 
-            THEN 'green' WHEN ct.estatusCita = 5 
-            THEN 'pink' WHEN ct.estatusCita = 6 
-            THEN 'blue' WHEN ct.estatusCita = 7 
-            THEN 'red' WHEN ct.estatusCita = 8 
-            THEN 'red' END,
+            'color' = CASE
+	            WHEN ct.estatusCita = 0 THEN 'red'
+	            WHEN ct.estatusCita = 1 THEN 'orange'
+	            WHEN ct.estatusCita = 2 THEN 'red'
+	            WHEN ct.estatusCita = 3 THEN 'grey'
+	            WHEN ct.estatusCita = 4 THEN 'green'
+                WHEN ct.estatusCita = 5 THEN 'pink'
+                WHEN ct.estatusCita = 6 THEN 'blue'
+                WHEN ct.estatusCita = 7 THEN 'red'
+                WHEN ct.estatusCita = 8 THEN 'red'
+	        END
             FROM citas ct
             INNER JOIN usuarios us ON us.idUsuario = ct.idPaciente
             INNER JOIN atencionXSede aps ON ct.idAtencionXSede = aps.idAtencionXSede
@@ -97,8 +100,8 @@ class CalendarioModel extends CI_Model
             WHERE YEAR(fechaInicio) in (?, ?)
             AND MONTH(fechaInicio) in (?, ?, ?)
             AND ct.idEspecialista = ?
-            AND ct.estatusCita IN(?, ?, ?, ?, ?, ?, ?)",
-            array( $dates["year1"], $dates["year2"], $dates["month1"], $month, $dates["month2"], $idUsuario, 1, 2, 3, 4, 5, 6, 7 )
+            AND ct.estatusCita IN(?, ?, ?, ?, ?, ?, ?, ?)",
+            array( $dates["year1"], $dates["year2"], $dates["month1"], $month, $dates["month2"], $idUsuario, 1, 2, 3, 4, 5, 6, 7, 8 )
         );
 
         return $query;
@@ -371,7 +374,7 @@ class CalendarioModel extends CI_Model
         $query = $this->db->query(
             "SELECT c.*, u.puesto FROM citas AS c
             INNER JOIN usuarios as u ON c.idEspecialista = u.idUsuario
-            WHERE c.idPaciente = ? AND u.puesto = ? AND c.estatusCita NOT IN (2, 5, 4);",array($usuario, $beneficio)
+            WHERE c.idPaciente = ? AND u.puesto = ? AND c.estatusCita IN (1, 6);",array($usuario, $beneficio)
         );
 
         return $query;
@@ -382,7 +385,7 @@ class CalendarioModel extends CI_Model
         $query = $this->db->query(
             "SELECT *FROM citas
             WHERE idPaciente = ? AND MONTH(fechaInicio) = ?
-            AND YEAR(fechaInicio) = ? AND estatusCita IN (1, 4, 6);", array($usuario, $mes, $año)
+            AND YEAR(fechaInicio) = ? AND estatusCita IN (4) AND tipoCita IN (1, 2);", array($usuario, $mes, $año)
         );
 
         return $query;
@@ -405,8 +408,24 @@ class CalendarioModel extends CI_Model
         return $query;
     }
 
-    public function getPendientes($idUsusuario){
-        $query = $this->db->query("SELECT *FROM citas WHERE estatusCita IN(?, ?) AND idEspecialista = ? AND fechaInicio < GETDATE()", array(1, 6, $idUsuario));
+    public function getPendientes($idUsuario){
+        $query = $this->db->query("SELECT CAST(idCita AS VARCHAR(36)) AS id, ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
+        ct.fechaInicio AS occupied, ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal, ofi.oficina, ofi.ubicación,
+        sed.sede , atc.idOficina, us.correo, usEspe.correo as correoEspecialista, usEspe.nombre as especialista,
+        beneficio = CASE 
+        WHEN pue.idPuesto = 537 THEN 'Nutrición'
+        WHEN pue.idPuesto = 585 THEN 'Psicología'
+        WHEN pue.idPuesto = 686 THEN 'Guía espiritual'
+        WHEN pue.idPuesto = 158 THEN 'Quantum balance'
+        END
+        FROM citas ct
+        INNER JOIN usuarios us ON us.idUsuario = ct.idPaciente
+        INNER JOIN usuarios usEspe ON usEspe.idUsuario = ct.idEspecialista
+        INNER join atencionXSede atc  ON atc.idAtencionXSede = ct.idAtencionXSede  
+        LEFT join oficinas ofi ON ofi.idOficina = atc.idOficina
+        INNER join sedes sed ON sed.idSede = atc.idSede
+        INNER JOIN puestos pue ON pue.idPuesto = usEspe.puesto
+        WHERE estatusCita IN(?) AND idPaciente = ?", array(6, $idUsuario));
 
         return $query;
     }

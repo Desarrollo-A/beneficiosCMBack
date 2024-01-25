@@ -22,9 +22,10 @@ class usuariosModel extends CI_Model {
 
 	public function login($numEmpleado, $password)
 	{
-		$query = $this->db->query("	SELECT u.*, p.idPuesto, p.puesto, p.idArea, p.tipoPuesto FROM USUARIOS as u
-			INNER JOIN puestos AS p ON u.puesto = P.idPuesto
-			WHERE numEmpleado = ? AND password = ?;", array( $numEmpleado, $password ));
+		$query = $this->db->query("	SELECT u.*, p.idPuesto, p.puesto, p.idArea, p.tipoPuesto, a.idDepto FROM USUARIOS as u
+		INNER JOIN puestos AS p ON u.puesto = P.idPuesto
+		INNER JOIN areas AS a ON a.idArea = p.idArea
+		WHERE numEmpleado = ? AND password = ?;", array( $numEmpleado, $password ));
 		return $query;
 	}
 

@@ -362,13 +362,15 @@ class CalendarioController extends CI_Controller{
 	}
 
 	public function updateAppointmentData() {
-		$idCita      = $this->input->post('dataValue[idCita]');
+		$idCita  = $this->input->post('dataValue[idCita]');
 		$estatus = $this->input->post('dataValue[estatus]');
+		$detalle = $this->input->post('dataValue[detalle]');
 
 		$response['result'] = isset($idCita, $estatus);
 		if ($response['result']) {
 			$values = [
 				"estatusCita" => $estatus,
+				"idDetalle" => $detalle
 			];
 			$response["result"] = $this->generalModel->updateRecord("citas", $values, 'idCita', $idCita);
 			if ($response["result"]) {
@@ -458,9 +460,9 @@ class CalendarioController extends CI_Controller{
 		if(in_array($tipo, [1, 3, 7, 8])){
 			$estatus = $tipo;
 		}
-		// else if(intval($dataValue["estatus"]) === 1 && $diferencia->d === 0 && $diferencia->h < 3){ // condición para poder saber si se penaliza la cita
-		// 	$estatus = 3;
-		// }
+		else if(intval($dataValue["estatus"]) === 0 && $diferencia->d === 0 && $diferencia->h < 3){ // condición para poder saber si se penaliza la cita
+			$estatus = 3;
+		}
 
 		$values = [
 			"estatusCita" => $estatus,
@@ -874,12 +876,24 @@ class CalendarioController extends CI_Controller{
 	}
 
 	public function getPendientes(){
-		$modalidad = $this->input->post('dataValue[modalidad]');
+		$usuario = $this->input->post('dataValue[idUsuario]');
 		
-		$get = $this->calendarioModel->getPendientes($idUsuario)->result();
+		$response['result'] = isset($usuario);
+		if ($response['result']) {
+			$rs = $this->calendarioModel->getPendientes($usuario)->result();
+			$response['result'] = count($rs) > 0;
+			if ($response['result']) {
+				$response['data'] = $rs;
+				$response['msg'] = '¡Consulta de citas con estatus pendiente!';
+			}else {
+				$response['msg'] = '¡No existen registros!';
+			}
+		}else {
+			$response['msg'] = "¡Parámetros inválidos!";
+		}
 
 		$this->output->set_content_type('application/json');
-		$this->output->set_output(json_encode($get));
+		$this->output->set_output(json_encode($response));
 	}
 
 	public function getEventReasons(){
