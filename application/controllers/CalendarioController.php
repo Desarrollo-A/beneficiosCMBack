@@ -309,6 +309,8 @@ class CalendarioController extends CI_Controller
 		$fechaActual = $fechaActual->format('Y/m/d H:i:s');
 		$valid = $dataValue["fechaInicio"] > $fechaActual; //Si la fecha de la cita es despues de la actual
 
+		$reagenda = $dataValue["reagenda"]; // valor 1 es cuando se reagenda
+
 		if (!$valid) {
 			$response["result"] = false;
 			$response["msg"] = "¡Horario de cita dentro del limite de horarios no permitidos!";
@@ -320,7 +322,7 @@ class CalendarioController extends CI_Controller
 			$values = [
 				"idEspecialista" => $dataValue["idUsuario"],
 				"idPaciente" => $dataValue["idPaciente"],
-				"estatusCita" => $fundacion == 1 ? 1 : 6,
+				"estatusCita" => ($fundacion == 1 || $reagenda == 1) ? 1 : 6,
 				"fechaInicio" => $dataValue["fechaInicio"],
 				"fechaFinal" => $dataValue["fechaFinal"],
 				"creadoPor" => $dataValue["creadoPor"],
@@ -445,28 +447,15 @@ class CalendarioController extends CI_Controller
 
 		$values = [
 			"estatusCita" => $estatus,
-		];
-
-		$mailMessage = [
-			"fecha" => $start->format('d/m/Y'),
-			"horaInicio" => $start->format('H:i A'),
-			"horaFinal" => $end->format('H:i A')
+			"fechaModificacion" => $todayStamp,
+			"modificadoPor" => $dataValue["modificadoPor"],
 		];
 
 		$updateRecord = $this->generalModel->updateRecord("citas", $values, "idCita", $dataValue["idCita"]);
 
 		if ($updateRecord) {
-			$mail = $this->sendMail($mailMessage);
-			
-			if($mail["result"]){
-				$response["result"] = true;
-				$response["msg"] = "Se ha cancelado la cita";
-			}
-			else{
-				$response["result"] = false;
-				$response["msg"] = "Se cancelo la cita, pero no se pudo enviar el correo";
-			}
-			
+			$response["result"] = true;
+			$response["msg"] = "Se ha cancelado la cita";	
 		} else {
 			$response["result"] = false;
 			$response["msg"] = "No se puede cancelar la cita";
@@ -944,8 +933,10 @@ class CalendarioController extends CI_Controller
 		$this->output->set_output(json_encode($response));
 	}
 
-	public function sendMail($data)
+	public function sendMail()
 	{
+		$data = $this->input->post('dataValue', true);
+
 		$data["data"] = $data;
 		$config['protocol']  = 'smtp';
 		$config['smtp_host'] = 'smtp.gmail.com';
@@ -956,20 +947,20 @@ class CalendarioController extends CI_Controller
 		$config['mailtype']  = 'html';
 		$config['newline']   = "\r\n";
 
-		$html_message = $this->load->view('email-cancelar', $data, true);
+		$html_message = $this->load->view($data["view"], $data, true); // la variable de data["view"] para cargar una vista dinamica
 
 		$this->load->library("email");
 		$this->email->initialize($config);
 		$this->email->from("no-reply@ciudadmaderas.com");
 		$this->email->to("programador.analista34@ciudadmaderas.com");
 		$this->email->message($html_message);
-		$this->email->subject("Encuesta Beneficios CM");
+		$this->email->subject("Citas Beneficios CM - " . date('d/m/Y - H:i:s A '));
 
 		if ($this->email->send()) {
 			$response["result"] = true;
 			$response["msg"] = "Se ha enviado el correo";
 		}
-		else{
+		else {
 			$response["result"] = false;
 			$response["msg"] = "Error al enviar el correo";
 		}

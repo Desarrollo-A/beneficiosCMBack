@@ -39,8 +39,8 @@
 				</tr><!-- end tr -->
 				<tr>
 					<td valign="middle" class="hero bg_white" style="padding: 3em 0 2em 0;">
-						<img src="<?= base_url() ?>/dist/img/<?= $data["imagen"]?>" alt=""
-							style="width: 300px; max-width: 600px; height: auto; margin: auto; display: block;">
+						<img src="<?= base_url() ?>/dist/img/appointment.png" alt=""
+							style="width: 400px; max-width: 600px; height: auto; margin: auto; display: block;">
 					</td>
 				</tr><!-- end tr -->
 				<tr>
@@ -49,11 +49,15 @@
 							<tr>
 								<td>
 									<div class="text" style="padding: 0 3.5em; text-align: center;">
-										<h2 style="color:#003360"><?= $data["titulo"]?></h2>
-										<h4>Tu reservarción de <strong><?= $data["beneficio"]?></strong> ha sido cancelada</h4>
-										<h4>Especialista: <?= $data["especialista"]?></h4>
+										<h2 style="color:#003360"><?= $data["tituloEmail"]?></h2>
+										<h4><?= $data["temaEmail"] ?><strong><?= $data["especialidad"]?></strong></h4>
+										<h4>Especialista que te atiende: <?= $data["especialista"] ?></h4>
+                                        <h4>Lugar </h4>
+                                        <h5>Sede: <?= $data["sede"] ?></h5>
+                                        <h5>Oficina: <?= $data["oficina"] ?></h5>
+                                    </br>
 										<h4>Horario reservado</h4>
-										<h5>Dia: <?= $data["fecha"] ?></h5>
+										<h5>Fecha: <?= $data["fecha"] ?></h5>
 										<h5>Hora: <?= $data["horaInicio"] ?> - <?= $data["horaFinal"] ?></h5>
 									</div>
 								</td>
@@ -72,6 +76,7 @@
 					</td>
 				</tr>
 			</table>
+
 		</div>
 	</center>
 </body>
