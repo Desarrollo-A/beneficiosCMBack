@@ -18,7 +18,7 @@ class reportesModel extends CI_Model {
 			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
 			INNER JOIN usuarios pa ON pa.idUsuario = ct.idPaciente
 			INNER JOIN sedes sd ON sd.idSede = us.idSede
-			INNER JOIN puestos ps ON ps.idPuesto = us.puesto
+			INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
 			INNER JOIN opcionesPorCatalogo op ON op.idOpcion = ct.estatusCita
 			WHERE op.idCatalogo = 2");
 			return $query;
@@ -31,7 +31,7 @@ class reportesModel extends CI_Model {
 			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
 			INNER JOIN usuarios pa ON pa.idUsuario = ct.idPaciente
 			INNER JOIN sedes sd ON sd.idSede = us.idSede
-			INNER JOIN puestos ps ON ps.idPuesto = us.puesto
+			INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
 			INNER JOIN opcionesPorCatalogo op ON op.idOpcion = ct.estatusCita
 			WHERE op.idCatalogo = 2 AND ct.estatusCita = 3");
 			return $query;
@@ -44,7 +44,7 @@ class reportesModel extends CI_Model {
 			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
 			INNER JOIN usuarios pa ON pa.idUsuario = ct.idPaciente
 			INNER JOIN sedes sd ON sd.idSede = us.idSede
-			INNER JOIN puestos ps ON ps.idPuesto = us.puesto
+			INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
 			INNER JOIN opcionesPorCatalogo op ON op.idOpcion = ct.estatusCita
 			WHERE op.idCatalogo = 2 AND ct.estatusCita = 5");
 			return $query;

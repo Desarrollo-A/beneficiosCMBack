@@ -108,7 +108,7 @@ class encuestasModel extends CI_Model {
         }
 
         $query_especialistas = $this->db->query("WITH cte AS (
-            SELECT us.puesto, ct.idEspecialista,fechaFinal, ROW_NUMBER() OVER (PARTITION BY us.puesto ORDER BY fechaFinal DESC) AS rn
+            SELECT us.idPuesto, ct.idEspecialista,fechaFinal, ROW_NUMBER() OVER (PARTITION BY us.idPuesto ORDER BY fechaFinal DESC) AS rn
             FROM citas ct
             INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
             WHERE idCita IN (" . implode(',', $idCitas) . "))
@@ -166,7 +166,7 @@ class encuestasModel extends CI_Model {
 
         $query_enc = $this->db->query("SELECT DISTINCT idEncuesta, ps.puesto
         FROM usuarios us 
-        INNER JOIN encuestasCreadas ec ON ec.idArea = us.puesto
+        INNER JOIN encuestasCreadas ec ON ec.idArea = us.idPuesto
         INNER JOIN puestos ps ON ps.idPuesto = ec.idArea
         WHERE us.idUsuario IN (" . implode(',', $idEspecialistas) . ") AND ec.estatus = 1 AND ec.idEncuesta IN (" . implode(',', $idEncResult) . ")");
 
@@ -261,7 +261,7 @@ class encuestasModel extends CI_Model {
 
                     $query_idEspecialista = $this->db->query("SELECT TOP 1 ct.idEspecialista, MAX(ct.fechaFinal) AS fechaMasReciente
                     FROM puestos ps
-                    INNER JOIN usuarios us ON us.puesto = ps.idPuesto
+                    INNER JOIN usuarios us ON us.idPuesto = ps.idPuesto
                     INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
                     WHERE ps.idPuesto = $idArea AND ct.idPaciente = $idUsuario
                     GROUP BY ct.idEspecialista

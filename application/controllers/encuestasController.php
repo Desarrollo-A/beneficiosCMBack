@@ -192,7 +192,7 @@ class encuestasController extends BaseController {
 			$query = $this->db->query("SELECT DISTINCT ct.idPaciente, co.correo, ec.idEncuesta FROM citas ct
 			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
 			INNER JOIN usuarios co ON co.idUsuario = ct.idPaciente
-			INNER JOIN encuestasCreadas ec ON ec.idArea = us.puesto
+			INNER JOIN encuestasCreadas ec ON ec.idArea = us.idPuesto
 			WHERE estatusCita = 4 AND fechaFinal BETWEEN '$lunesPasado' AND '$lunesActual' AND ec.estatus = 1");
 
 			$correo = '';
