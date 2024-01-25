@@ -344,7 +344,7 @@ class CalendarioController extends CI_Controller
 			} else if ($checkOccupied->num_rows() > 0) {
 				$response["result"] = false;
 				$response["msg"] = "Horario no disponible";
-			} else if ($checkUser->num_rows() > 0) {
+			} else if ($checkUser->num_rows() === 0) {
 				$response["result"] = false;
 				$response["msg"] = "El paciente no ha ocupado sus beneficios disponibles";
 			} else if (!isset($pass)) {
@@ -431,11 +431,9 @@ class CalendarioController extends CI_Controller
 		$tipo = intval($dataValue["tipo"]);
 		$current = new DateTime();
 		$startStamp = $dataValue["startStamp"];
-		$endStamp = $dataValue["fechaFinal"];
 		$todayStamp = $current->format('Y/m/d H:i:s');
 
 		$start = new DateTime($startStamp);
-		$end = new DateTime($endStamp);
 		$diferencia = $start->diff(new DateTime($todayStamp));
 		$estatus = 2;
 
@@ -952,7 +950,7 @@ class CalendarioController extends CI_Controller
 		$this->load->library("email");
 		$this->email->initialize($config);
 		$this->email->from("no-reply@ciudadmaderas.com");
-		$this->email->to("programador.analista34@ciudadmaderas.com");
+		$this->email->to($data["correo"]);
 		$this->email->message($html_message);
 		$this->email->subject("Citas Beneficios CM - " . date('d/m/Y - H:i:s A '));
 
