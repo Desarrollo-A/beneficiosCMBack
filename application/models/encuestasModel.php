@@ -124,7 +124,7 @@ class encuestasModel extends CI_Model {
 
         $query_encuestas = $this->db->query("SELECT DISTINCT idEncuesta, ps.puesto
             FROM usuarios us 
-            INNER JOIN encuestasCreadas ec ON ec.idArea = us.puesto
+            INNER JOIN encuestasCreadas ec ON ec.idArea = us.idPuesto
             INNER JOIN puestos ps ON ps.idPuesto = ec.idArea
             WHERE us.idUsuario IN (" . implode(',', $idEspecialistas) . ") AND ec.estatus = 1");
 
