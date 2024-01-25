@@ -108,7 +108,7 @@ class Usuario extends CI_Controller {
                     'nombre' => isset($col['nombre']) ? $col['nombre'] : null,
                     'telPersonal' => isset($col['telPersonal']) ? $col['telPersonal'] : null,
                     'area' => isset($col['area']) ? $col['area'] : null,
-					'puesto' => isset($col['puesto']) ? $col['puesto'] : null,
+					'idPuesto' => isset($col['idPuesto']) ? $col['idPuesto'] : null,
                     'oficina' => isset($col['oficina']) ? $col['oficina'] : null,
                     'sede' => isset($col['sede']) ? $col['sede'] : null,
                     'correo' => isset($col['correo']) ? $col['correo'] : null,

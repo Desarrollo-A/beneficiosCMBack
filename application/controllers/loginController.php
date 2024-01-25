@@ -11,7 +11,7 @@ class loginController extends CI_Controller {
 
 		parent::__construct();
 		header('Access-Control-Allow-Origin: *');
-        header('Access-Control-Allow-Headers: Content-Type,Origin, authorization, X-API-KEY,X-Requested-With,Accept,Access-Control-Request-Method');
+        header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Token");
         header('Access-Control-Allow-Method: GET, POST, PUT, DELETE,OPTION');
 
         $urls = array('192.168.30.128/auth/jwt/login','localhost','http://localhost','http://localhost:3030','http://192.168.30.128/auth/jwt/login','192.168.30.128','http://192.168.30.128:3030','127.0.0.1','https://rh.gphsis.com','rh.gphsis.com','https://maderascrm.gphsis.com','maderascrm.gphsis.com');
@@ -114,7 +114,7 @@ class loginController extends CI_Controller {
 				'numContrato'           =>      $data[0]->numContrato,
 				'nombre' 		        => 		$data[0]->nombre,
 				'telPersonal' 		    => 		$data[0]->telPersonal,
-				'puesto' 		        => 		$data[0]->puesto,
+				'idPuesto' 		        => 		$data[0]->idPuesto,
 				'oficina' 		        => 		$data[0]->oficina,
 				'sede' 		    		=> 		$data[0]->idSede,
 				'correo'		    	=> 		$data[0]->correo,
