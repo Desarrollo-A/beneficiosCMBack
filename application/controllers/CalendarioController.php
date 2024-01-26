@@ -330,6 +330,7 @@ class CalendarioController extends BaseController{
 				"fechaFinal" => $dataValue["fechaFinal"],
 				"creadoPor" => $dataValue["creadoPor"],
 				"fechaModificacion" => date("Y-m-d H:i:s"),
+				"fechaCreacion" => date("Y-m-d H:i:s"),
 				"titulo" => $dataValue["titulo"],
 				"modificadoPor" => $dataValue["modificadoPor"],
 				"idAtencionXSede" => intval($dataValue["idCatalogo"]),
@@ -959,21 +960,24 @@ class CalendarioController extends BaseController{
 	}
 
 	public function checkInvoice()
-	{
-		$id = $this->input->post('dataValue');
-		$checkInvoice = $this->calendarioModel->checkInvoice($id);
-
-		if ($checkInvoice->num_rows() > 0) {
-			$response['result'] = false;
-			$response['msg'] = 'Ya se ha cancelado y reagendado 2 veces';
-		} else {
-			$response['result'] = true;
-			$response['msg'] = 'Se puede utilizar el folio';
-		}
-
-		$this->output->set_content_type('application/json');
-		$this->output->set_output(json_encode($response));
-	}
+    {
+        $id = $this->input->post('dataValue');
+    
+        $response['result'] = isset($id);
+        
+        if ($response['result']) {
+            $response['result'] = $this->calendarioModel->checkInvoice($id)->num_rows() === 0;
+            if ($response['result']) {
+                $response['msg'] = 'Se puede utilizar el folio';
+            } else {
+                $response['msg'] = 'Ya se ha cancelado y reagendado 2 veces';
+            }
+        }else{
+            $response['msg'] = "¡Parámetros inválidos!";
+        }
+        $this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($response));
+    }
 
 	public function sendMail()
 	{
