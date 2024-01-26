@@ -99,7 +99,10 @@ class loginController extends CI_Controller {
 		}
 
 		switch ($datosEmpleado['idpuesto']){
-			case (158 || 585 || 686 || 537):
+			case "158":
+			case "585":
+			case "686": 
+			case "537":
 				$idRol = 3;
 			break;
 			default:
@@ -108,7 +111,7 @@ class loginController extends CI_Controller {
 		}
 
 		$insertData = array(
-			"numContrato" => '1111',
+			"numContrato" =>  $datosEmpleado['num_empleado'],
 			"numEmpleado" => $datosEmpleado['num_empleado'],
 			"nombre" => $datosEmpleado['nombre_persona'] . $datosEmpleado['pri_apellido'] .  $datosEmpleado['sec_apellido'],
 			"telPersonal" => $datosEmpleado['telefono_personal'],
