@@ -58,11 +58,11 @@ class CalendarioModel extends CI_Model
 
     public function getOccupiedRange($fechaInicio, $fechaFin, $idUsuario){
         $query = $this->db->query(
-            "SELECT * FROM horariosOcupados
+            "SELECT idOcupado as id, titulo as title, fechaInicio as occupied, fechaInicio, fechaFinal FROM horariosOcupados
             WHERE idEspecialista = ? AND estatus = ?  AND
-            (fechaInicio BETWEEN ? AND ?
-               OR fechaFinal BETWEEN ? AND ?
-               OR (fechaInicio < ? AND fechaFinal > ?));",
+            ((fechaInicio BETWEEN ? AND ?) OR 
+            (fechaFinal BETWEEN ? AND ?) OR 
+            (fechaInicio >= ? AND fechaFinal <= ?));",
             array( $idUsuario, 1, $fechaInicio, $fechaFin, $fechaInicio, $fechaFin, $fechaInicio, $fechaFin)
         );
         return $query;
@@ -119,13 +119,13 @@ class CalendarioModel extends CI_Model
     public function getAppointmentRange($fechaInicio, $fechaFin, $especialista, $usuario){
         $query = $this->db->query(
             "SELECT CAST(ct.idCita AS VARCHAR(36))  AS id,  ct.titulo AS title, ct.fechaInicio, ct.fechaFinal, 
-            ct.fechaInicio AS occupied, ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal
+            ct.estatusCita, ct.idPaciente, ct.idEspecialista d
             FROM citas ct
-            INNER JOIN usuarios us ON us.idUsuario = ct.idPaciente
+            LEFT JOIN usuarios us ON us.idUsuario = ct.idPaciente
             WHERE (ct.idEspecialista = ? OR ct.idPaciente = ?) AND ct.estatusCita IN (?, ?)
-            AND (fechaInicio BETWEEN ? AND ?
-               OR fechaFinal BETWEEN ? AND ?
-               OR (fechaInicio < ? AND fechaFinal > ?))",
+            AND ((fechaInicio BETWEEN ? AND ? ) OR 
+            (fechaFinal BETWEEN ? AND ?) OR 
+            (fechaInicio >= ? AND fechaFinal <= ?))",
             array( $especialista, $usuario, 1, 6, $fechaInicio, $fechaFin, $fechaInicio, $fechaFin, $fechaInicio, $fechaFin)
         );
 
@@ -478,6 +478,13 @@ class CalendarioModel extends CI_Model
     public function checkInvoice($idDetalle){
         $query = $this->db->query("SELECT idDetalle FROM citas WHERE idDetalle = ? GROUP BY idDetalle HAVING COUNT(idDetalle) > ?", array($idDetalle, 2));
 
+        return $query;
+    }
+
+    public function checkDetailPacient($user, $column){
+        $query = $this->db->query("SELECT $column FROM detallePaciente 
+            WHERE idUsuario = ?;", array($user));
+   
         return $query;
     }
 
