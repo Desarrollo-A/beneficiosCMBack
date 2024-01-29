@@ -106,10 +106,10 @@ class dashModel extends CI_Model {
 
 	public function getPregunta($dt){
 
-		$query = $this->db-> query("SELECT DISTINCT pg.pregunta, ec.respuestas, pg.idPregunta, ec.idEncuesta, ec.idEncuestaCreada, ec.idArea  
+		$query = $this->db-> query("SELECT DISTINCT ec.idPregunta, pg.pregunta, ec.respuestas, pg.idPregunta, ec.idEncuesta, ec.idEncuestaCreada, ec.idArea  
 		FROM encuestasCreadas ec
-		INNER JOIN preguntasGeneradas pg ON pg.pregunta = ec.pregunta
-		WHERE ec.estatus = 1 AND abierta = 1 AND ec.idArea = $dt AND ec.respuestas <= 4");
+		INNER JOIN preguntasGeneradas pg ON pg.idPregunta = ec.idPregunta
+		WHERE ec.estatus = 1 AND abierta = 1 AND ec.idArea = $dt AND pg.idArea = $dt AND ec.respuestas <= 4");
 		
 		$result = $query->result();
 
@@ -131,10 +131,10 @@ class dashModel extends CI_Model {
 			$idEspecialidad = $dt[2]["idArea"];
 
 			$query_pregunta = $this->db->query("SELECT DISTINCT pg.pregunta  
-				FROM encuestasCreadas ec
-				INNER JOIN preguntasGeneradas pg ON pg.pregunta = ec.pregunta
-				WHERE ec.estatus = 1 AND abierta = 1 AND especialidad = ? AND idPregunta = ?",
-				array($idEspecialidad, $idPregunta));
+			FROM encuestasCreadas ec
+			INNER JOIN preguntasGeneradas pg ON pg.idPregunta = ec.idPregunta
+			WHERE ec.estatus = 1 AND abierta = 1 AND pg.idArea = ? AND pg.idPregunta = ? AND ec.idPregunta = ?",
+				array($idEspecialidad, $idPregunta, $idPregunta));
 
 			if ($query_pregunta->num_rows() > 0) {
 
@@ -146,10 +146,11 @@ class dashModel extends CI_Model {
 			$idPreguntasString = implode(",", $idPrg);
 
 			$query = $this->db->query("SELECT STRING_AGG(rg.respuesta, ', ') AS respuestas, rg.grupo  
-				FROM encuestasCreadas ec
-				INNER JOIN respuestasGenerales rg ON rg.grupo = ec.respuestas 
-				WHERE ec.pregunta IN ($idPreguntasString) AND idEncuesta = ?
-				GROUP BY grupo",
+			FROM encuestasCreadas ec
+			INNER JOIN respuestasGenerales rg ON rg.grupo = ec.respuestas 
+			INNER JOIN preguntasGeneradas pg ON pg.idPregunta = ec.idPregunta
+			WHERE pg.pregunta IN ($idPreguntasString) AND ec.idEncuesta = 1 AND pg.idEncuesta = 1
+			GROUP BY grupo",
 				array($idEncuesta));
 
 			return $query->result();
@@ -173,7 +174,7 @@ class dashModel extends CI_Model {
         $idEncuesta = $dt[1]["idEncuesta"];
 		
 		$query = $this->db-> query("SELECT rg.respuesta, COUNT(*) AS cantidad, (COUNT(*) * 100.0 / SUM(COUNT(*)) OVER ()) AS porcentaje, 
-		ec.idPregunta, ec.idArea, ec.idEncuesta
+			ec.idPregunta, ec.idArea, ec.idEncuesta
 			FROM encuestasContestadas ec
 			INNER JOIN respuestasGenerales rg ON rg.idRespuestaGeneral = ec.idRespuesta
 			WHERE ec.idEncuesta = $idEncuesta AND ec.idPregunta = $idPregunta

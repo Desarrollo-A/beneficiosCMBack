@@ -47,7 +47,9 @@ class encuestasModel extends CI_Model {
 
     public function getEncuesta($dt)
     {
-        $query = $this->db-> query("SELECT * FROM encuestasCreadas WHERE idEncuesta =$dt");
+        $query = $this->db-> query("SELECT DISTINCT ec.idPregunta, pg.pregunta, ec.respuestas, ec.idArea FROM encuestasCreadas ec
+		INNER JOIN preguntasGeneradas pg ON pg.idPregunta = ec.idPregunta
+		WHERE ec.idEncuesta = $dt AND pg.idEncuesta = $dt");
 		return $query;
     }
 
@@ -243,7 +245,7 @@ class encuestasModel extends CI_Model {
 					break; 
 				}
 			}
-			$idPregunta = 1; 
+			$idPregunta = 0; 
 
 			if ($datosValidos) {
 
@@ -254,7 +256,7 @@ class encuestasModel extends CI_Model {
 					$pregunta = $item->pregunta;
 					$resp = $item->resp;
 					$idUsuario = $item->idUsuario;
-					$idEncuesta = $item->idEncuesta;
+					$idEncuesta = $item->idEnc;
 					$idArea = $item->idArea;
 
 					$abierta = is_numeric($resp) ? 1 : 0;
@@ -276,9 +278,9 @@ class encuestasModel extends CI_Model {
 					VALUES (?, ?, ?, ?, ?, GETDATE(), ?)", 
 					array($idPregunta, $resp, $idEspecialista, $idArea, $idEncuesta, $idUsuario ));
 					
-					$queryPreguntasGeneradas = $this->db->query("INSERT INTO preguntasGeneradas (idPregunta, pregunta, estatus, abierta, especialidad, idEncuesta) 
+					/* $queryPreguntasGeneradas = $this->db->query("INSERT INTO preguntasGeneradas (idPregunta, pregunta, estatus, abierta, especialidad, idEncuesta) 
 					VALUES (?, ?, 1, ?, ?, ?)", 
-					array($idPregunta, $pregunta, $abierta, $idArea, $idEncuesta ));
+					array($idPregunta, $pregunta, $abierta, $idArea, $idEncuesta )); */
 				
 				}
 				
@@ -338,15 +340,29 @@ class encuestasModel extends CI_Model {
                     $response_1=$this->generalModel->updateRecord('encuestasCreadas', $data_1, 'idEncuesta', $idEnc);
 
                 }
+
+                $idPregunta = 0; 
                 
 				foreach ($items as $item) {
+
+                    $idPregunta++;
+
 					$pregunta = $item->pregunta;
 					$respuesta = $item->respuesta;
 					$idEncuesta = $item->idEncuesta;
 
-					$query = $this->db->query("INSERT INTO encuestasCreadas (pregunta, respuestas, idArea, estatus, fechaCreacion, idEncuesta) 
-					VALUES (?, ?, ?, ?, GETDATE(), ?)", 
-					array($pregunta, $respuesta, $area, $estatus, $idEncuesta));
+                    $abierta = 0;
+
+                    if($respuesta < 5){$abierta = 1;}
+
+                    $queryPreguntasGeneradas = $this->db->query("INSERT INTO preguntasGeneradas (idPregunta, pregunta, estatus, abierta, idArea, idEncuesta) 
+					VALUES (?, ?, 1, ?, ?, ?)", 
+					array($idPregunta, $pregunta, $abierta, $area, $idEncuesta ));
+
+                    $query = $this->db->query("INSERT INTO encuestasCreadas (idPregunta, respuestas, idArea, estatus, fechaCreacion, idEncuesta) 
+                    VALUES (?, ?, ?, ?, GETDATE(), ?)", 
+                    array($idPregunta, $respuesta, $area, $estatus, $idEncuesta));
+
 				}
 
 				$this->db->trans_complete();
@@ -393,7 +409,7 @@ class encuestasModel extends CI_Model {
     
         $query1 = $this->db-> query("SELECT DISTINCT ec.idEncuesta
 		FROM encuestasCreadas ec
-		INNER JOIN preguntasGeneradas pg ON pg.pregunta = ec.pregunta
+		INNER JOIN preguntasGeneradas pg ON pg.idPregunta = ec.idPregunta
 		WHERE ec.estatus = 1 AND abierta = 1 AND ec.idArea = $dt");
 
         if ($query1->num_rows() > 0) {
