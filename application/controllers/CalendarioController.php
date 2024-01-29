@@ -343,7 +343,7 @@ class CalendarioController extends BaseController{
 			} else if ($checkOccupied->num_rows() > 0) {
 				$response["result"] = false;
 				$response["msg"] = "Horario no disponible";
-			} else if ($checkUser->num_rows() === 0) {
+			} else if ($checkUser->num_rows() > 0) {
 				$response["result"] = false;
 				$response["msg"] = "El paciente no ha ocupado sus beneficios disponibles";
 			} else if (!isset($pass)) {
@@ -1004,5 +1004,46 @@ class CalendarioController extends BaseController{
 		}
 		
 		return $response;
+	}
+
+	public function updateDetallePaciente() {
+		$user  = $this->input->post('dataValue[usuario]');
+		$benefit  = $this->input->post('dataValue[beneficio]');
+
+		$response['result'] = isset($user, $benefit);
+		if ($response['result']) {
+			switch ($benefit) {
+				case 158: $column = 'estatusQB' ; break;
+				case 585: $column = 'estatusPsi'; break;
+				case 537: $column = 'estatusNut'; break;
+				case 68:  $column = 'estatusGE' ; break;
+			}
+			$rs = $this->calendarioModel->checkDetailPacient($user, $column)->result();
+			$response['result'] = count($rs) > 0;
+			if ($response['result']) {
+				if ($rs !== 1) {
+					$values = [
+						$column => 1,
+						"modificadoPor" => $user,
+						"fechaModificacion" => date("Y-m-d H:i:s"),
+					];
+					$updateRecord = $this->generalModel->updateRecord("detallePaciente", $values, "idUsuario", $user);
+					if ($updateRecord) {
+						$response['msg'] = '¡Registro de estatus actualizado!';
+					}else {
+						$response['msg'] = '¡Registro ya activo!';
+					}
+				}else {
+
+				}
+			}else {
+				$response['msg'] = '¡No existen registros!';
+			}
+		}else {
+			$response['msg'] = "¡Parámetros inválidos!";
+		}
+	
+		$this->output->set_content_type('application/json');
+		$this->output->set_output(json_encode($response));
 	}
 }
