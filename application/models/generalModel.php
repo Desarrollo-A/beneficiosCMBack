@@ -169,14 +169,18 @@ class generalModel extends CI_Model {
 
     public function getAppointmentHistory($dt){
 
-        $query = $this->db->query("SELECT us.nombre, ct.idPaciente, ct.titulo, oc.nombre AS estatus, ct.estatusCita, ct.idDetalle AS pago, ct.tipoCita,
+        $idUsuario = $dt["idUser"];
+        $espe = $dt["espe"];
+
+        $query = $this->db->query("SELECT us.nombre, es.nombre AS especialista, ct.idPaciente, ct.titulo, oc.nombre AS estatus, ct.estatusCita, ct.idDetalle AS pago, ct.tipoCita,
 		CONCAT (CONVERT(DATE,ct.fechaInicio), ' ', FORMAT(ct.fechaInicio, 'HH:mm'), ' - ', FORMAT(ct.fechaFinal, 'HH:mm')) AS horario
 		FROM citas ct 
 		INNER JOIN catalogos ca ON ca.idCatalogo = 2
 		INNER JOIN opcionesPorCatalogo oc ON oc.idCatalogo = ca.idCatalogo AND oc.idOpcion = ct.estatusCita
 		INNER JOIN usuarios us ON us.idUsuario = ct.idPaciente
-		WHERE ct.idPaciente = $dt AND oc.idCatalogo = 2
-		GROUP BY us.nombre, ct.idPaciente, ct.titulo, oc.nombre, ct.estatusCita, ct.idDetalle, ct.tipoCita,
+		INNER JOIN usuarios es ON es.idUsuario = ct.idEspecialista
+		WHERE ct.idPaciente = $idUsuario AND oc.idCatalogo = 2 AND es.idPuesto = $espe
+		GROUP BY us.nombre, es.nombre, ct.idPaciente, ct.titulo, oc.nombre, ct.estatusCita, ct.idDetalle, ct.tipoCita,
 		ct.fechaInicio, ct.fechaFinal
 		ORDER BY ct.fechaInicio, ct.fechaFinal DESC ");
 
