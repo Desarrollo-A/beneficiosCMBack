@@ -80,7 +80,8 @@ class CalendarioModel extends CI_Model
         $query = $this->db->query(
             "SELECT CAST(ct.idCita AS VARCHAR(36))  AS id,  ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
             ct.fechaInicio AS occupied, 'date' AS 'type', ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal, us.correo,
-            se.sede, ofi.oficina, idDetalle, ct.idAtencionXSede, us.externo, usEspe.nombre as especialista,
+            se.sede, ofi.oficina, ct.idDetalle, ct.idAtencionXSede, us.externo, usEspe.nombre as especialista, 
+            tf.fechasFolio,
             'color' = CASE
 	            WHEN ct.estatusCita = 0 THEN 'red'
 	            WHEN ct.estatusCita = 1 THEN 'orange'
@@ -90,7 +91,6 @@ class CalendarioModel extends CI_Model
                 WHEN ct.estatusCita = 5 THEN 'pink'
                 WHEN ct.estatusCita = 6 THEN 'blue'
                 WHEN ct.estatusCita = 7 THEN 'red'
-                WHEN ct.estatusCita = 8 THEN 'red'
 	        END,
             beneficio = CASE 
             WHEN pue.idPuesto = 537 THEN 'nutrición'
@@ -105,11 +105,13 @@ class CalendarioModel extends CI_Model
             INNER JOIN sedes se ON se.idSede = aps.idSede
             LEFT JOIN oficinas ofi ON ofi.idOficina = aps.idOficina
             INNER JOIN puestos pue ON pue.idPuesto = usEspe.idPuesto
+            LEFT JOIN (SELECT idDetalle, string_agg(FORMAT(fechaInicio, 'HH:mm MMMM d yyyy','es-US'), ' ,') as fechasFolio FROM citas WHERE estatusCita IN(?) AND citas.idCita = idCita GROUP BY citas.idDetalle) tf
+            ON tf.idDetalle = ct.idDetalle
             WHERE YEAR(fechaInicio) in (?, ?)
             AND MONTH(fechaInicio) in (?, ?, ?)
             AND ct.idEspecialista = ?
-            AND ct.estatusCita IN(?, ?, ?, ?, ?, ?, ?, ?)",
-            array( $dates["year1"], $dates["year2"], $dates["month1"], $month, $dates["month2"], $idUsuario, 1, 2, 3, 4, 5, 6, 7, 8 )
+            AND ct.estatusCita IN(?, ?, ?, ?, ?, ?, ?)",
+            array( 8, $dates["year1"], $dates["year2"], $dates["month1"], $month, $dates["month2"], $idUsuario, 1, 2, 3, 4, 5, 6, 7 )
         );
 
         return $query;
@@ -411,7 +413,21 @@ class CalendarioModel extends CI_Model
     }
 
     public function getPending($idUsuario){
-        $query = $this->db->query("SELECT *FROM citas WHERE estatusCita IN(?, ?) AND idEspecialista = ? AND fechaInicio < GETDATE()", array(1, 6, $idUsuario));
+        $query = $this->db->query("SELECT ct.idCita as id, ct.titulo, ct.fechaInicio as 'start', ct.fechaFinal as 'end', usEsp.nombre as especialista, usBen.correo, sed.sede, ofi.oficina,
+        beneficio = CASE 
+        WHEN pue.idPuesto = 537 THEN 'nutrición'
+        WHEN pue.idPuesto = 585 THEN 'psicología'
+        WHEN pue.idPuesto = 686 THEN 'guía espiritual'
+        WHEN pue.idPuesto = 158 THEN 'quantum balance'
+        END
+        FROM citas ct
+        INNER JOIN usuarios usBen ON usBen.idUsuario = ct.idPaciente
+        INNER JOIN usuarios usEsp ON usEsp.idUsuario = ct.idEspecialista
+        INNER JOIN puestos pue ON usEsp.idPuesto = pue.idPuesto
+        INNER JOIN atencionXSede ats ON ats.idAtencionXSede = ct.idAtencionXSede
+        INNER JOIN sedes sed ON sed.idSede = ats.idSede
+        LEFT JOIN oficinas ofi ON ofi.idOficina = ats.idOficina
+        WHERE estatusCita IN(?) AND ct.idEspecialista = ? AND fechaInicio < GETDATE()", array(1, $idUsuario));
 
         return $query;
     }
