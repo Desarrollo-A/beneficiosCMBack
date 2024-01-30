@@ -59,9 +59,9 @@ class usuariosModel extends CI_Model {
 
 			$query = $this->db->query(
 				"SELECT idPaciente from citas
-				WHERE estatusCita IN(?, ?, ?) AND idPaciente = ? 
+				WHERE estatusCita IN(?, ?, ?) AND idPaciente = ? AND evaluacion != null
 				GROUP BY idPaciente HAVING COUNT(idPaciente) > ?",
-				array(1, 4, 6, $idPaciente, 1 )); // version de queryu por todos los tiempos
+				array(1, 4, 6, $idPaciente, 1 )); // version de query por todos los tiempos
 		
 		return $query;
 	}

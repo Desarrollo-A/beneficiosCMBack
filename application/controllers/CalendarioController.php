@@ -96,6 +96,7 @@ class CalendarioController extends BaseController{
 			"fechaInicio" => $dataValue["fechaInicio"],
 			"fechaFinal" => $dataValue["fechaFinal"],
 			"creadoPor" => $dataValue["idUsuario"],
+			"modificadoPor" => $dataValue["modificadoPor"],
 			"fechaModificacion" => date("Y-m-d H:i:s"),
 			"fechaCreacion" => date("Y-m-d H:i:s"),
 			"titulo" => $dataValue["titulo"],
@@ -167,6 +168,7 @@ class CalendarioController extends BaseController{
 				"fechaFinal" => $dataValue["fechaFinal"],
 				"fechaModificacion" => date("Y-m-d H:i:s"),
 				"titulo" => $dataValue["titulo"],
+				"modificadoPor" => $dataValue["modificadoPor"]
 			];
 
 			$checkOccupiedId = $this->calendarioModel->checkOccupiedId($dataValue, $fechaInicioSuma, $fechaFinalResta);
@@ -202,13 +204,15 @@ class CalendarioController extends BaseController{
 
 	public function deleteOccupied()
 	{
-		$idUnico = $this->input->post("dataValue", true);
+		$dataValue = $this->input->post("dataValue", true);
 
 		$values = [
-			"estatus" => 0
+			"estatus" => 0,
+			"modificadoPor" => $dataValue["modificadoPor"],
+			"fechaModificacion" => date('Y/m/d H:i:s')
 		];
 
-		$updateRecord = $this->generalModel->updateRecord("horariosOcupados", $values, "idUnico", $idUnico);
+		$updateRecord = $this->generalModel->updateRecord("horariosOcupados", $values, "idUnico", $dataValue["eventId"]);
 
 		if ($updateRecord) {
 			$response["result"] = true;
@@ -329,10 +333,11 @@ class CalendarioController extends BaseController{
 				"fechaFinal" => $dataValue["fechaFinal"],
 				"creadoPor" => $dataValue["creadoPor"],
 				"fechaModificacion" => date("Y-m-d H:i:s"),
+				"fechaCreacion" => date("Y-m-d H:i:s"),
 				"titulo" => $dataValue["titulo"],
 				"modificadoPor" => $dataValue["modificadoPor"],
 				"idAtencionXSede" => intval($dataValue["idCatalogo"]),
-				"tipoCita" => 1,
+				"tipoCita" => 3,
 				"idDetalle" => $dataValue["idDetalle"]
 			];
 
@@ -1003,24 +1008,24 @@ class CalendarioController extends BaseController{
 	}
 
 	public function checkInvoice()
-	{
-		$id = $this->input->post('dataValue');
-	
-		$response['result'] = isset($id);
-		
-		if ($response['result']) {
-			$response['result'] = $this->calendarioModel->checkInvoice($id)->num_rows() === 0;
-			if ($response['result']) {
-				$response['msg'] = 'Se puede utilizar el folio';
-			} else {
-				$response['msg'] = 'Ya se ha cancelado y reagendado 2 veces';
-			}
-		}else{
-			$response['msg'] = "¡Parámetros inválidos!";
-		}
-		$this->output->set_content_type('application/json');
-		$this->output->set_output(json_encode($response));
-	}
+    {
+        $id = $this->input->post('dataValue');
+    
+        $response['result'] = isset($id);
+        
+        if ($response['result']) {
+            $response['result'] = $this->calendarioModel->checkInvoice($id)->num_rows() === 0;
+            if ($response['result']) {
+                $response['msg'] = 'Se puede utilizar el folio';
+            } else {
+                $response['msg'] = 'Ya se ha cancelado y reagendado 2 veces';
+            }
+        }else{
+            $response['msg'] = "¡Parámetros inválidos!";
+        }
+        $this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($response));
+    }
 
 	public function sendMail()
 	{
