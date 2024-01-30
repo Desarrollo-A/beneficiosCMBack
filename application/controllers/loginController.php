@@ -1,71 +1,128 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', '1');
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class loginController extends CI_Controller {
+require_once(APPPATH . "/controllers/BaseController.php");
 
+class LoginController extends BaseController {
 
 	public function __construct()
 	{
-
 		parent::__construct();
-		header('Access-Control-Allow-Origin: *');
-        header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Token");
-        header('Access-Control-Allow-Method: GET, POST, PUT, DELETE,OPTION');
+		$this->load->model('UsuariosModel');
+		$this->load->model('GeneralModel');
+		$this->load->model('MenuModel');
 
-        $urls = array('192.168.30.128/auth/jwt/login','localhost','http://localhost','http://localhost:3030','http://192.168.30.128/auth/jwt/login','192.168.30.128','http://192.168.30.128:3030','127.0.0.1','https://rh.gphsis.com','rh.gphsis.com','https://maderascrm.gphsis.com','maderascrm.gphsis.com');
-        date_default_timezone_set('America/Mexico_City');
-
-        if(isset($this->input->request_headers()['origin']))
-            $origin = $this->input->request_headers()['origin'];
-        else if(array_key_exists('HTTP_ORIGIN',$_SERVER))
-            $origin = $_SERVER['HTTP_ORIGIN'];
-        else if(array_key_exists('HTTP_PREFERER',$_SERVER))
-            $origin = $_SERVER['HTTP_PREFERER'];
-        else
-            $origin = $_SERVER['HTTP_HOST'];
-
-        if(in_array($origin,$urls) || strpos($origin,"192.168")) {
-			$this->load->database('default');
-            $this->load->helper(array('form','funciones'));
-            $this->load->model(array('usuariosModel','generalModel'));
-			$this->load->library(array('session'));
-        } else {
-            die ("Access Denied");     
-            exit;  
-        }
+		$this->load->helper(array('form','funciones'));
 	}
 
 	public function index()
 	{
-		
+		$this->load->view('welcome_message');
 	}
 
 	public function usuarios(){
-		$data['data'] = $this->usuariosModel->usuarios();
+		$data['data'] = $this->UsuariosModel->usuarios();
 		echo json_encode($data);
 	}
 	public function addRegistroEmpleado(){
 		$this->db->trans_begin();
 		$datosEmpleado = $this->input->post('params');
+
+		switch ($datosEmpleado['nsede']){
+			case 'QRO':
+				$sede = 1;
+			break;
+			case 'LEON':
+				$sede = 2;
+			break;
+			case 'SLP':
+				$sede = 3;
+			break;
+			case 'CDMX':
+				$sede = 4;
+			break;
+			case 'MERIDA':
+				$sede = 5;
+			break;
+			case 'CANCUN':
+				$sede = 9;
+			break;
+			case 'TIJUANA':
+				$sede = 11;
+			break;
+			case 'SAN MIGUEL DE ALLENDE':
+				$sede = 12;
+			break;
+			case 'TEXAS':
+				$sede = 13;
+			break;
+			case 'MONTERREY':
+				$sede = 14;
+			break;
+			case 'REGION BAJIO':
+				$sede = 15;
+			break;
+			case 'REGION SUR':
+				$sede = 16;
+			break;
+			case 'GUADALAJARA':
+				$sede = 17;
+			break;
+			case 'AGUASCALIENTES':
+				$sede = 18;
+			break;
+			case 'PUEBLA':
+				$sede = 19;
+			break;
+		}
+
+		switch ($datosEmpleado['idpuesto']){
+			case "158":
+			case "585":
+			case "686": 
+			case "537":
+				$idRol = 3;
+			break;
+			default:
+				$idRol = 2;
+			break;
+		}
+
 		$insertData = array(
-			"numContrato" => '1111',
+			"numContrato" =>  $datosEmpleado['num_empleado'],
 			"numEmpleado" => $datosEmpleado['num_empleado'],
 			"nombre" => $datosEmpleado['nombre_persona'] . $datosEmpleado['pri_apellido'] .  $datosEmpleado['sec_apellido'],
 			"telPersonal" => $datosEmpleado['telefono_personal'],
 			"telOficina" => NULL,
 			"idPuesto" => $datosEmpleado['idpuesto'],
-			"sede" => $datosEmpleado['nsede'],
+			"idSede" => $sede,
 			"correo" => $datosEmpleado['mail_emp'],
 			"password" => encriptar($datosEmpleado['password'] ),
 			"estatus" => 1,
+			"idRol" => $idRol,
+			"sexo" => $datosEmpleado['sexo'],
+			"idArea" => $datosEmpleado['idarea'],
+			"fechaIngreso" => $datosEmpleado['fingreso'],
+			"externo" => 0,
 			"creadoPor" => 0,
 			"fechaCreacion" => date('Y-m-d H:i:s'),
 			"modificadoPor" => 0,
 			"fechaModificacion" => date('Y-m-d H:i:s')
 		);
-		$resultado = $this->generalModel->addRecord('usuarios',$insertData);
+
+		$resultado = $this->GeneralModel->addRecord('usuarios',$insertData);
+		$last_id = $this->db->insert_id();
+
+		$insertData = array(
+			"idUsuario" => $last_id,
+			"estatus" => 1,
+			"creadoPor" => 1,
+			"fechaCreacion" => date('Y-m-d H:i:s'),
+			"modificadoPor" => 1,
+			"fechaModificacion" => date('Y-m-d H:i:s')
+		);
+		$resultado = $this->GeneralModel->addRecord('detallePaciente',$insertData);
+
 		if ($this->db->trans_status() === FALSE){
             $this->db->trans_rollback();
 			if(strpos($resultado['message'], "UNIQUE")){
@@ -98,11 +155,12 @@ class loginController extends CI_Controller {
 	{
 		$this->session->sess_destroy();
 	}
+	
 	public function login($array = ''){
-		session_destroy();
+		//session_destroy();
 		$datosEmpleado = $array == '' ? json_decode( file_get_contents('php://input')) : json_decode($array);
 		$datosEmpleado->password =  encriptar($datosEmpleado->password);
-		$data = $this->usuariosModel->login($datosEmpleado->numempleado,$datosEmpleado->password)->result();
+		$data = $this->UsuariosModel->login($datosEmpleado->numempleado,$datosEmpleado->password)->result();
 		if(empty($data)){
 			echo json_encode(array('response' => [],
 									'message' => 'El número de empleado no se encuentra registrado',
@@ -119,7 +177,10 @@ class loginController extends CI_Controller {
 				'correo'		    	=> 		$data[0]->correo,
 				'idArea'				=>		$data[0]->idArea,
 			);
-			session_start();
+			if(!isset($_SESSION)) 
+			{ 
+				session_start(); 
+			} 
 			date_default_timezone_set('America/Mexico_City');
 			$time = time();
                     $dataTimeToken = array(
@@ -146,3 +207,5 @@ class loginController extends CI_Controller {
 		}
 	}
 }
+
+?>

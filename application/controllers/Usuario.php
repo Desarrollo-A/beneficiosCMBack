@@ -1,47 +1,36 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Usuario extends CI_Controller {
+require_once(APPPATH . "/controllers/BaseController.php");
+
+class Usuario extends BaseController {
 
 	public function __construct()
 	{
 		parent::__construct();
-		header('Access-Control-Allow-Origin: *');
-		header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
-		//header('Access-Control-Allow-Headers: Content-Type');
-		header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Token");
+		$this->load->database('default');
+		$this->load->model('UsuariosModel');
+		$this->load->model('GeneralModel');
+		$this->load->model('MenuModel');
 
-		date_default_timezone_set('America/Mexico_City');
-
-		$urls = array('192.168.30.128/auth/jwt/login','localhost','http://localhost','http://localhost:3030','http://192.168.30.128/auth/jwt/login','192.168.30.128','http://192.168.30.128:3030','127.0.0.1','https://rh.gphsis.com','rh.gphsis.com','https://maderascrm.gphsis.com','maderascrm.gphsis.com');
-        date_default_timezone_set('America/Mexico_City');
-
-        if(isset($this->input->request_headers()['origin']))
-            $origin = $this->input->request_headers()['origin'];
-        else if(array_key_exists('HTTP_ORIGIN',$_SERVER))
-            $origin = $_SERVER['HTTP_ORIGIN'];
-        else if(array_key_exists('HTTP_PREFERER',$_SERVER))
-            $origin = $_SERVER['HTTP_PREFERER'];
-        else
-            $origin = $_SERVER['HTTP_HOST'];
-
-        $this->load->library('session');
-
-        if(in_array($origin,$urls) || strpos($origin,"192.168")) {
-			$this->load->database('default');
-			$this->load->model('usuariosModel');
-			$this->load->model('generalModel');
-			$this->load->model('MenuModel');
-
-            $this->load->helper(array('form','funciones'));
-        } else {
-            die ("Access Denied");     
-            exit;  
-        }
+		$this->load->helper(array('form','funciones'));
 	}
+	
 	public function index()
 	{
 		$this->load->view('welcome_message');
+	}
+
+	public function get_token(){
+		$headers = (object) $this->input->request_headers();
+		$data = explode('.', $headers->token);
+		$user = json_decode(base64_decode($data[2]));
+
+		$code = $this->post('code');
+
+		$access_token = $this->googleapi->getAccessToken($code);
+
+		$this->UsuariosModel->updateRefreshToken($user->idUsuario, $access_token->refresh_token);
 	}
 
 	public function menu()
@@ -57,12 +46,12 @@ class Usuario extends CI_Controller {
 	}
 
 	public function usuarios(){
-		$data['data'] = $this->usuariosModel->usuarios();
+		$data['data'] = $this->UsuariosModel->usuarios();
 		echo json_encode($data);
 	}
 
 	public function getUsers(){
-		$rs = $this->usuariosModel->getUsers();
+		$rs = $this->UsuariosModel->getUsers();
 		$data['result'] = count($rs) > 0; 
 		if ($data['result']) {
 			$data['msg'] = '¡Listado de usuarios cargado exitosamente!';
@@ -75,7 +64,7 @@ class Usuario extends CI_Controller {
 	}
 
 	public function getAreas(){
-		$rs = $this->usuariosModel->getAreas();
+		$rs = $this->UsuariosModel->getAreas();
 		$data['result'] = count($rs) > 0; 
 		if ($data['result']) {
 			$data['msg'] = '¡Listado de areas cargado exitosamente!';
@@ -122,7 +111,7 @@ class Usuario extends CI_Controller {
                 $rows[] = $row;
             }
         
-            $response['result'] = $this->generalModel->insertBatch($table, $rows);
+            $response['result'] = $this->GeneralModel->insertBatch($table, $rows);
             
             if ($response['result']) {
                 $response['msg'] = "¡Listado insertado exitosamente!";
@@ -153,7 +142,7 @@ class Usuario extends CI_Controller {
 		
 		if ($response['result']) {  
 			$data['fechaModificacion'] = $fecha;
-			$response['result'] = $this->generalModel->updateRecord('usuarios', $data, 'idUsuario', $user);
+			$response['result'] = $this->GeneralModel->updateRecord('usuarios', $data, 'idUsuario', $user);
 	
 			if ($response['result']) {
 				$response['msg'] = "¡Usuario actualizado exitosamente!";
@@ -171,7 +160,7 @@ class Usuario extends CI_Controller {
 	public function getNameUser(){
 		$idEspecialista = $this->input->post("dataValue", true);
 
-		$getNameUser = $this->usuariosModel->getNameUser($idEspecialista)->result();
+		$getNameUser = $this->UsuariosModel->getNameUser($idEspecialista)->result();
 		$response['result'] = count($getNameUser) > 0;
 		if ($response['result']) {
 			$response['msg'] = '¡Listado de usuarios cargado exitosamente!';
@@ -185,7 +174,7 @@ class Usuario extends CI_Controller {
 
 	public function getSpecialistContact() {
 		$especialista = $this->input->post('dataValue[especialista]');
-		$rs = $this->usuariosModel->getSpecialistContact($especialista)->result();
+		$rs = $this->UsuariosModel->getSpecialistContact($especialista)->result();
 		$response['result'] = count($rs) > 0;
 		if ($response['result']) {
 			$response['msg'] = '¡Listado de usuarios cargado exitosamente!';
@@ -200,7 +189,7 @@ class Usuario extends CI_Controller {
 	public function decodePass(){
 
 		$dt = $this->input->post('dataValue', true);
-		$data['data'] = $this->usuariosModel->decodePass($dt);
+		$data['data'] = $this->UsuariosModel->decodePass($dt);
 		echo json_encode($data);
 	}
 
@@ -216,7 +205,7 @@ class Usuario extends CI_Controller {
 					"password" => encriptar($newPass),
 				);
 				
-				$response=$this->generalModel->updateRecord('usuarios', $data, 'idUsuario', $idUsuario);
+				$response=$this->GeneralModel->updateRecord('usuarios', $data, 'idUsuario', $idUsuario);
 				echo json_encode(array("estatus" => true, "msj" => "Contraseña actualizada!" ));
 					
 			}else{

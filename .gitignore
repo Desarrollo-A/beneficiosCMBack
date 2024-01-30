@@ -65,7 +65,7 @@ application/config/*
 application/core/*
 application/helpers/*
 application/hooks/*
-application/libraries/*
+application/libraries/google-api/*
 application/migrations/*
 application/third_party/*
 

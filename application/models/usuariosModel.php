@@ -2,7 +2,7 @@
 /**
  * 
  */
-class usuariosModel extends CI_Model {
+class UsuariosModel extends CI_Model {
 	public function __construct()
 	{
 		
@@ -93,5 +93,11 @@ class usuariosModel extends CI_Model {
 			return false;
 		}
 		
+	}
+
+	public function updateRefreshToken($idUsuario, $refresh_token){
+		$query = "UPDATE usuarios SET refreshToken=$refresh_token WHERE idUsuario=$idUsuario";
+
+		return $this->db->query($query);
 	}
 }
