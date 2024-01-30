@@ -8,10 +8,9 @@ class CalendarioModel extends CI_Model
         $query = $this->db->query(
             "SELECT CAST(idCita AS VARCHAR(36)) AS id, ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
             ct.fechaInicio AS occupied, ct.estatusCita AS estatus, ct.idDetalle, us.nombre, ct.idPaciente, ct.idEspecialista, ct.idAtencionXSede, 
-            ct.tipoCita, atc.tipoCita as modalidad, atc.idSede ,usEspe.idPuesto, us.telPersonal, ofi.oficina, ofi.ubicación, pue.idArea,
+            ct.tipoCita, atc.tipoCita as modalidad, atc.idSede ,usEspe.idPuesto, us.telPersonal, usEspe.telPersonal as telefonoEspecialista, ofi.oficina, ofi.ubicación, pue.idArea,
             sed.sede, atc.idOficina, us.correo, usEspe.correo as correoEspecialista, usEspe.nombre as especialista, usEspe.sexo as sexoEspecialista,
             'color' = CASE
-	            WHEN ct.estatusCita = 0 THEN 'red'
 	            WHEN ct.estatusCita = 1 THEN 'orange'
 	            WHEN ct.estatusCita = 2 THEN 'red'
 	            WHEN ct.estatusCita = 3 THEN 'grey'
@@ -19,7 +18,6 @@ class CalendarioModel extends CI_Model
                 WHEN ct.estatusCita = 5 THEN 'pink'
                 WHEN ct.estatusCita = 6 THEN 'blue'
                 WHEN ct.estatusCita = 7 THEN 'red'
-                WHEN ct.estatusCita = 8 THEN 'red'
 	        END,
             beneficio = CASE 
             WHEN pue.idPuesto = 537 THEN 'nutrición'
@@ -35,8 +33,8 @@ class CalendarioModel extends CI_Model
             INNER join sedes sed ON sed.idSede = atc.idSede
             INNER JOIN puestos pue ON pue.idPuesto = usEspe.idPuesto
             WHERE YEAR(fechaInicio) = ? AND MONTH(fechaInicio) = ? AND ct.idPaciente = ?
-            AND ct.estatusCita IN(?, ?, ?, ?, ?, ?, ?, ?)",
-            array( $year, $month, $idUsuario, 1, 2, 3, 4, 5, 6, 7, 8 )
+            AND ct.estatusCita IN(?, ?, ?, ?, ?, ?, ?)",
+            array( $year, $month, $idUsuario, 1, 2, 3, 4, 5, 6, 7)
         );
 
         return $query;
@@ -90,7 +88,6 @@ class CalendarioModel extends CI_Model
                 WHEN ct.estatusCita = 5 THEN 'pink'
                 WHEN ct.estatusCita = 6 THEN 'blue'
                 WHEN ct.estatusCita = 7 THEN 'red'
-                WHEN ct.estatusCita = 8 THEN 'red'
 	        END,
             beneficio = CASE 
             WHEN pue.idPuesto = 537 THEN 'nutrición'
@@ -108,8 +105,8 @@ class CalendarioModel extends CI_Model
             WHERE YEAR(fechaInicio) in (?, ?)
             AND MONTH(fechaInicio) in (?, ?, ?)
             AND ct.idEspecialista = ?
-            AND ct.estatusCita IN(?, ?, ?, ?, ?, ?, ?, ?)",
-            array( $dates["year1"], $dates["year2"], $dates["month1"], $month, $dates["month2"], $idUsuario, 1, 2, 3, 4, 5, 6, 7, 8 )
+            AND ct.estatusCita IN(?, ?, ?, ?, ?, ?, ?)",
+            array( $dates["year1"], $dates["year2"], $dates["month1"], $month, $dates["month2"], $idUsuario, 1, 2, 3, 4, 5, 6, 7 )
         );
 
         return $query;
@@ -388,6 +385,17 @@ class CalendarioModel extends CI_Model
         return $query;
     }
 
+    public function getCitasSinEvaluar($usuario, $beneficio)
+    {
+        $query = $this->db->query(
+            "SELECT c.*, u.idPuesto FROM citas AS c
+            INNER JOIN usuarios as u ON c.idEspecialista = u.idUsuario
+            WHERE c.idPaciente = ? AND u.idPuesto = ? AND evaluacion is NULL AND c.estatusCita IN (?)",array($usuario, $beneficio, 4)
+        );
+
+        return $query;
+    }
+
     public function getCitasFinalizadasUsuario($usuario, $mes, $año)
     {
         $query = $this->db->query(
@@ -416,10 +424,11 @@ class CalendarioModel extends CI_Model
         return $query;
     }
 
-    public function getPendientes($idUsuario){
+    public function getPendientesPago($idUsuario){
         $query = $this->db->query("SELECT CAST(idCita AS VARCHAR(36)) AS id, ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
         ct.fechaInicio AS occupied, ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal, ofi.oficina, ofi.ubicación,
-        sed.sede , atc.idOficina, us.correo, usEspe.correo as correoEspecialista, usEspe.nombre as especialista,
+        sed.sede , atc.idOficina, us.correo, usEspe.correo as correoEspecialista, usEspe.nombre as especialista, ct.idDetalle, usEspe.telPersonal as telefonoEspecialista,
+        usEspe.sexo as sexoEspecialista,
         beneficio = CASE 
         WHEN pue.idPuesto = 537 THEN 'Nutrición'
         WHEN pue.idPuesto = 585 THEN 'Psicología'
@@ -433,7 +442,30 @@ class CalendarioModel extends CI_Model
         LEFT join oficinas ofi ON ofi.idOficina = atc.idOficina
         INNER join sedes sed ON sed.idSede = atc.idSede
         INNER JOIN puestos pue ON pue.idPuesto = usEspe.idPuesto
-        WHERE estatusCita IN(?) AND idPaciente = ?", array(6, $idUsuario));
+        WHERE ct.estatusCita IN(?) AND ct.idPaciente = ?", array(6, $idUsuario));
+
+        return $query;
+    }
+
+    public function getPendientesEvaluacion($idUsuario){
+        $query = $this->db->query("SELECT CAST(idCita AS VARCHAR(36)) AS id, ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
+        ct.fechaInicio AS occupied, ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal, ofi.oficina, ofi.ubicación,
+        sed.sede , atc.idOficina, us.correo, usEspe.correo as correoEspecialista, usEspe.nombre as especialista, ct.idDetalle, usEspe.telPersonal as telefonoEspecialista,
+        usEspe.sexo as sexoEspecialista,
+        beneficio = CASE 
+        WHEN pue.idPuesto = 537 THEN 'Nutrición'
+        WHEN pue.idPuesto = 585 THEN 'Psicología'
+        WHEN pue.idPuesto = 686 THEN 'Guía espiritual'
+        WHEN pue.idPuesto = 158 THEN 'Quantum balance'
+        END
+        FROM citas ct
+        INNER JOIN usuarios us ON us.idUsuario = ct.idPaciente
+        INNER JOIN usuarios usEspe ON usEspe.idUsuario = ct.idEspecialista
+        INNER join atencionXSede atc  ON atc.idAtencionXSede = ct.idAtencionXSede  
+        LEFT join oficinas ofi ON ofi.idOficina = atc.idOficina
+        INNER join sedes sed ON sed.idSede = atc.idSede
+        INNER JOIN puestos pue ON pue.idPuesto = usEspe.idPuesto
+        WHERE ct.estatusCita IN(?) AND ct.evaluacion is NULL AND ct.idPaciente = ?", array(4, $idUsuario));
 
         return $query;
     }
@@ -485,6 +517,39 @@ class CalendarioModel extends CI_Model
         $query = $this->db->query("SELECT $column FROM detallePaciente 
             WHERE idUsuario = ?;", array($user));
    
+        return $query;
+    }
+
+    public function getCitaById($idCita){
+        $query = $this->db->query("SELECT CAST(idCita AS VARCHAR(36)) AS id, ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
+        ct.fechaInicio AS occupied, ct.estatusCita AS estatus, ct.idDetalle, us.nombre, ct.idPaciente, ct.idEspecialista, ct.idAtencionXSede, 
+        ct.tipoCita, atc.tipoCita as modalidad, atc.idSede ,usEspe.idPuesto, us.telPersonal, usEspe.telPersonal as telefonoEspecialista, ofi.oficina, ofi.ubicación, pue.idArea,
+        sed.sede, atc.idOficina, us.correo, usEspe.correo as correoEspecialista, usEspe.nombre as especialista, usEspe.sexo as sexoEspecialista,
+        'color' = CASE
+            WHEN ct.estatusCita = 1 THEN 'orange'
+            WHEN ct.estatusCita = 2 THEN 'red'
+            WHEN ct.estatusCita = 3 THEN 'grey'
+            WHEN ct.estatusCita = 4 THEN 'green'
+            WHEN ct.estatusCita = 5 THEN 'pink'
+            WHEN ct.estatusCita = 6 THEN 'blue'
+            WHEN ct.estatusCita = 7 THEN 'red'
+        END,
+        beneficio = CASE 
+            WHEN pue.idPuesto = 537 THEN 'nutrición'
+            WHEN pue.idPuesto = 585 THEN 'psicología'
+            WHEN pue.idPuesto = 686 THEN 'guía espiritual'
+            WHEN pue.idPuesto = 158 THEN 'quantum balance'
+        END
+        FROM citas ct
+        INNER JOIN usuarios us ON us.idUsuario = ct.idPaciente
+        INNER JOIN usuarios usEspe ON usEspe.idUsuario = ct.idEspecialista
+        INNER join atencionXSede atc  ON atc.idAtencionXSede = ct.idAtencionXSede  
+        LEFT join oficinas ofi ON ofi.idOficina = atc.idOficina
+        INNER join sedes sed ON sed.idSede = atc.idSede
+        INNER JOIN puestos pue ON pue.idPuesto = usEspe.idPuesto
+        WHERE idCita = ? ",
+        array( $idCita ));
+
         return $query;
     }
 

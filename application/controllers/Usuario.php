@@ -183,20 +183,6 @@ class Usuario extends CI_Controller {
         $this->output->set_output(json_encode($response));
 	}
 
-	public function getSpecialistContact() {
-		$especialista = $this->input->post('dataValue[especialista]');
-		$rs = $this->usuariosModel->getSpecialistContact($especialista)->result();
-		$response['result'] = count($rs) > 0;
-		if ($response['result']) {
-			$response['msg'] = '¡Listado de usuarios cargado exitosamente!';
-			$response['data'] = $rs;
-		}else {
-			$response['msg'] = '¡No existen registros!';
-		}
-		$this->output->set_content_type("application/json");
-        $this->output->set_output(json_encode($response));
-	}
-
 	public function decodePass(){
 
 		$dt = $this->input->post('dataValue', true);

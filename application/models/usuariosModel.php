@@ -66,12 +66,6 @@ class usuariosModel extends CI_Model {
 		return $query;
 	}
 
-	public function getSpecialistContact($id)
-	{
-		$query = $this->db->query("SELECT nombre, telPersonal, correo FROM usuarios WHERE idUsuario = ?", $id);
-		return $query;
-	}
-
 	public function decodePass($dt)
 	{
 
