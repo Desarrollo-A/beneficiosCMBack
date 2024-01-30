@@ -3,35 +3,31 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 require_once(APPPATH . "/controllers/BaseController.php");
 
-class reportesController extends BaseController {
+class ReportesController extends BaseController {
 
 	public function __construct()
 	{
 		parent::__construct();
 		$this->load->database('default');
-		$this->load->model('usuariosModel');
-		$this->load->model('reportesModel');
-		$this->load->model('especialistasModel');
-		$this->load->model('generalModel');
-
-		header('Access-Control-Allow-Origin: *');
-        header('Access-Control-Allow-Headers: Content-Type,Origin, authorization, X-API-KEY,X-Requested-With,Accept,Access-Control-Request-Method');
-        header('Access-Control-Allow-Method: GET, POST, PUT, DELETE,OPTION');
+		$this->load->model('UsuariosModel');
+		$this->load->model('ReportesModel');
+		$this->load->model('EspecialistasModel');
+		$this->load->model('GeneralModel');
 	}
 
 	public function usuarios(){
-		$data['data'] = $this->usuariosModel->usuarios();
+		$data['data'] = $this->UsuariosModel->usuarios();
 		echo json_encode($data);
 	}
 
 	public function citas(){
 		$dt = $this->input->post('dataValue', true);
-		$data['data'] = $this->reportesModel->citas($dt)->result();
+		$data['data'] = $this->ReportesModel->citas($dt)->result();
 		echo json_encode($data);
 	}
 
 	public function especialistas(){
-		$data['data'] = $this->especialistasModel->especialistas()->result();
+		$data['data'] = $this->EspecialistasModel->especialistas()->result();
 		echo json_encode($data);
 	}
 
@@ -50,7 +46,7 @@ class reportesController extends BaseController {
 				"modificadoPor" => $modificadoPor,
 			);
 			
-			$response=$this->generalModel->updateRecord('citas', $data, 'idCita', $idCita);
+			$response=$this->GeneralModel->updateRecord('citas', $data, 'idCita', $idCita);
 			echo json_encode(array("estatus" => true, "msj" => "Observación Registrada!" ));
 				
 		}else{
@@ -62,7 +58,7 @@ class reportesController extends BaseController {
 
 	public function getPacientes(){
 		$dt = $this->input->post('dataValue', true);
-		$data['data'] = $this->reportesModel->getPacientes($dt)->result();
+		$data['data'] = $this->ReportesModel->getPacientes($dt)->result();
 		echo json_encode($data);
 	}
 }

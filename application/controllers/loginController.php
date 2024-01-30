@@ -1,49 +1,27 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', '1');
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class loginController extends CI_Controller {
+require_once(APPPATH . "/controllers/BaseController.php");
 
+class LoginController extends BaseController {
 
 	public function __construct()
 	{
-
 		parent::__construct();
-		header('Access-Control-Allow-Origin: *');
-        header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Token");
-        header('Access-Control-Allow-Method: GET, POST, PUT, DELETE,OPTION');
+		$this->load->model('UsuariosModel');
+		$this->load->model('GeneralModel');
+		$this->load->model('MenuModel');
 
-        $urls = array('192.168.30.128/auth/jwt/login','localhost','http://localhost','http://localhost:3030','http://192.168.30.128/auth/jwt/login','192.168.30.128','http://192.168.30.128:3030','127.0.0.1','https://rh.gphsis.com','rh.gphsis.com','https://maderascrm.gphsis.com','maderascrm.gphsis.com');
-        date_default_timezone_set('America/Mexico_City');
-
-        if(isset($this->input->request_headers()['origin']))
-            $origin = $this->input->request_headers()['origin'];
-        else if(array_key_exists('HTTP_ORIGIN',$_SERVER))
-            $origin = $_SERVER['HTTP_ORIGIN'];
-        else if(array_key_exists('HTTP_PREFERER',$_SERVER))
-            $origin = $_SERVER['HTTP_PREFERER'];
-        else
-            $origin = $_SERVER['HTTP_HOST'];
-
-        if(in_array($origin,$urls) || strpos($origin,"192.168")) {
-			$this->load->database('default');
-            $this->load->helper(array('form','funciones'));
-            $this->load->model(array('usuariosModel','generalModel'));
-			$this->load->library(array('session'));
-        } else {
-            die ("Access Denied");     
-            exit;  
-        }
+		$this->load->helper(array('form','funciones'));
 	}
 
 	public function index()
 	{
-		
+		$this->load->view('welcome_message');
 	}
 
 	public function usuarios(){
-		$data['data'] = $this->usuariosModel->usuarios();
+		$data['data'] = $this->UsuariosModel->usuarios();
 		echo json_encode($data);
 	}
 	public function addRegistroEmpleado(){
@@ -132,7 +110,7 @@ class loginController extends CI_Controller {
 			"fechaModificacion" => date('Y-m-d H:i:s')
 		);
 
-		$resultado = $this->generalModel->addRecord('usuarios',$insertData);
+		$resultado = $this->GeneralModel->addRecord('usuarios',$insertData);
 		$last_id = $this->db->insert_id();
 
 		$insertData = array(
@@ -143,7 +121,7 @@ class loginController extends CI_Controller {
 			"modificadoPor" => 1,
 			"fechaModificacion" => date('Y-m-d H:i:s')
 		);
-		$resultado = $this->generalModel->addRecord('detallePaciente',$insertData);
+		$resultado = $this->GeneralModel->addRecord('detallePaciente',$insertData);
 
 		if ($this->db->trans_status() === FALSE){
             $this->db->trans_rollback();
@@ -177,11 +155,12 @@ class loginController extends CI_Controller {
 	{
 		$this->session->sess_destroy();
 	}
+	
 	public function login($array = ''){
-		session_destroy();
+		//session_destroy();
 		$datosEmpleado = $array == '' ? json_decode( file_get_contents('php://input')) : json_decode($array);
 		$datosEmpleado->password =  encriptar($datosEmpleado->password);
-		$data = $this->usuariosModel->login($datosEmpleado->numempleado,$datosEmpleado->password)->result();
+		$data = $this->UsuariosModel->login($datosEmpleado->numempleado,$datosEmpleado->password)->result();
 		if(empty($data)){
 			echo json_encode(array('response' => [],
 									'message' => 'El número de empleado no se encuentra registrado',
@@ -198,7 +177,10 @@ class loginController extends CI_Controller {
 				'correo'		    	=> 		$data[0]->correo,
 				'idArea'				=>		$data[0]->idArea,
 			);
-			session_start();
+			if(!isset($_SESSION)) 
+			{ 
+				session_start(); 
+			} 
 			date_default_timezone_set('America/Mexico_City');
 			$time = time();
                     $dataTimeToken = array(
@@ -225,3 +207,5 @@ class loginController extends CI_Controller {
 		}
 	}
 }
+
+?>
