@@ -199,58 +199,15 @@ class EncuestasController extends BaseController {
 			foreach ($query->result() as $row) {
 				$correo = $row->correo;
 				$encuesta = $row->idEncuesta;
+
+				$data["data"] = $encuesta;
 			
-					$html_message = '<html>
-						<head>
-						<link href="'.base_url().'dist/css/email.css" rel="stylesheet" />
-						</head>
-						<body width="100%" style="margin: 0; padding: 0 !important; mso-line-height-rule: exactly; background-color: #f1f1f1;">
-						<center style="width: 100%; background-color: #f1f1f1;">
-						<div style="display: none; font-size: 1px;max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden; mso-hide: all; font-family: sans-serif;">
-						&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;
-						</div>
-						<div style="max-width: 600px; margin: 0 auto;" class="email-container">
-							<!-- BEGIN BODY -->
-						<table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: auto;">
-							<tr>
-							<td valign="top" class="bg_white" style="padding: 1em 2.5em 0 2.5em;">
-								<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
-									<tr>
-										<td class="logo" style="text-align: center;">
-											<h1>Beneficios CM</h1>
-										</td>
-									</tr>
-								</table>
-							</td>
-							</tr><!-- end tr -->
-							<tr>
-							</tr><!-- end tr -->
-									<tr>
-							<td valign="middle" class="hero bg_white" >
-								<table>
-									<tr>
-										<td>
-											<div class="text" style="padding: 1em 2.5em 0 2.5em;">
-												<h2 text-align: center;" style="text-align: center;">Tienes una encuesta disponible</h2>
-												<h3 text-align: center;" style="text-align: center;">Haz click en el boton para contestarla</h3>
-												<p text-align: center;" style="text-align: center;"><a href="#" >Encuesta</a></p>
-											</div>
-										</td>
-									</tr>
-								</table>
-							</td>
-							</tr><!-- end tr -->
-						<!-- 1 Column Text + Button : END -->
-						</table>
-					
-						</div>
-					</center>
-					</body>';
+				$html_message = $this->load->view("email-encuestas", $data, true);
 					
 					$this->load->library("email");
 					$this->email->initialize($config);
 					$this->email->from("no-reply@ciudadmaderas.com");
-					$this->email->to("programador.analista32@ciudadmaderas.com");
+					$this->email->to($correo);
 					$this->email->message($html_message);
 					$this->email->subject("Encuesta Beneficios CM");
 
