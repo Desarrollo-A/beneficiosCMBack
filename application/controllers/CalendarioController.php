@@ -11,6 +11,7 @@ class CalendarioController extends BaseController{
 		$this->load->model('generalModel');
 		$this->load->model('usuariosModel');
 		$this->load->library('session');
+		$this->load->library("email");
 	}
 
 	public function getAllEvents()
@@ -1040,13 +1041,13 @@ class CalendarioController extends BaseController{
 		$config['charset']   = 'utf-8';
 		$config['mailtype']  = 'html';
 		$config['newline']   = "\r\n";
+		$config['smtp_crypto']   = 'ssl';
 
 		$html_message = $this->load->view($data["view"], $data, true); // la variable de data["view"] para cargar una vista dinamica
 
-		$this->load->library("email");
 		$this->email->initialize($config);
 		$this->email->from("no-reply@ciudadmaderas.com");
-		$this->email->to($data["correo"]);
+		$this->email->to($data["correo"]); // 'correo' or 'correo, correo1' or [correo, correo1, correo2].
 		$this->email->message($html_message);
 		$this->email->subject("Citas Beneficios CM - " . date('d/m/Y - H:i:s A '));
 
@@ -1059,7 +1060,8 @@ class CalendarioController extends BaseController{
 			$response["msg"] = "Error al enviar el correo";
 		}
 		
-		return $response;
+		$this->output->set_content_type('application/json');
+		$this->output->set_output(json_encode($response));
 	}
 
 	public function updateDetallePaciente() {

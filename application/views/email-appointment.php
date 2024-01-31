@@ -60,7 +60,6 @@
 										<h5>Fecha: <?= $data["fecha"] ?></h5>
 										<h5>Hora: <?= $data["horaInicio"] ?> - <?= $data["horaFinal"] ?></h5>
 									</br>
-										<a href="<?= $data["link"] ?>"><?= $data["temaExtra"]?></a>
 									</div>
 								</td>
 							</tr>
