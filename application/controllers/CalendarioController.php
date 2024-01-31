@@ -212,7 +212,7 @@ class CalendarioController extends BaseController{
 			"fechaModificacion" => date('Y/m/d H:i:s')
 		];
 
-		$updateRecord = $this->generalModel->updateRecord("horariosOcupados", $values, "idUnico", $dataValue["eventId"]);
+		$updateRecord = $this->GeneralModel->updateRecord("horariosOcupados", $values, "idUnico", $dataValue["eventId"]);
 
 		if ($updateRecord) {
 			$response["result"] = true;
@@ -1014,7 +1014,7 @@ class CalendarioController extends BaseController{
         $response['result'] = isset($id);
         
         if ($response['result']) {
-            $response['result'] = $this->calendarioModel->checkInvoice($id)->num_rows() === 0;
+            $response['result'] = $this->CalendarioModel->checkInvoice($id)->num_rows() === 0;
             if ($response['result']) {
                 $response['msg'] = 'Se puede utilizar el folio';
             } else {
