@@ -50,7 +50,8 @@
 								<td>
 									<div class="text" style="padding: 0 3.5em; text-align: center;">
 										<h2 style="color:#003360"><?= $data["tituloEmail"]?></h2>
-										<h4><?= $data["temaEmail"] ?><strong><?= $data["especialidad"]?></strong></h4>
+										<h4>Tu cita de <strong><?= $data["especialidad"]?></strong> se ha finalizado con exito</h4>
+										<a href="<?= $data['link'] ?>">Califica tu cita</a>
 										<h4>Especialista que te atiende: <?= $data["especialista"] ?></h4>
                                         <h4>Lugar </h4>
                                         <h5>Sede: <?= $data["sede"] ?></h5>
@@ -59,6 +60,7 @@
 										<h4>Horario reservado</h4>
 										<h5>Fecha: <?= $data["fecha"] ?></h5>
 										<h5>Hora: <?= $data["horaInicio"] ?> - <?= $data["horaFinal"] ?></h5>
+									</br>
 									</div>
 								</td>
 							</tr>

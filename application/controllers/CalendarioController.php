@@ -210,7 +210,7 @@ class CalendarioController extends BaseController{
 			"fechaModificacion" => date('Y/m/d H:i:s')
 		];
 
-		$updateRecord = $this->generalModel->updateRecord("horariosOcupados", $values, "idUnico", $dataValue["eventId"]);
+		$updateRecord = $this->GeneralModel->updateRecord("horariosOcupados", $values, "idUnico", $dataValue["eventId"]);
 
 		if ($updateRecord) {
 			$response["result"] = true;
@@ -346,7 +346,7 @@ class CalendarioController extends BaseController{
 			} else if ($checkOccupied->num_rows() > 0) {
 				$response["result"] = false;
 				$response["msg"] = "Horario no disponible";
-			} else if ($checkUser->num_rows() > 0) {
+			} else if ($checkUser->num_rows() === 0) {
 				$response["result"] = false;
 				$response["msg"] = "El paciente no ha ocupado sus beneficios disponibles";
 			} else if (!isset($pass)) {
@@ -964,7 +964,7 @@ class CalendarioController extends BaseController{
         $response['result'] = isset($id);
         
         if ($response['result']) {
-            $response['result'] = $this->calendarioModel->checkInvoice($id)->num_rows() === 0;
+            $response['result'] = $this->CalendarioModel->checkInvoice($id)->num_rows() === 0;
             if ($response['result']) {
                 $response['msg'] = 'Se puede utilizar el folio';
             } else {
@@ -990,6 +990,7 @@ class CalendarioController extends BaseController{
 		$config['charset']   = 'utf-8';
 		$config['mailtype']  = 'html';
 		$config['newline']   = "\r\n";
+		$config['smtp_crypto']   = 'ssl';
 
 		$html_message = $this->load->view($data["view"], $data, true); // la variable de data["view"] para cargar una vista dinamica
 
