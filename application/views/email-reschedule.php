@@ -49,17 +49,21 @@
 							<tr>
 								<td>
 									<div class="text" style="padding: 0 3.5em; text-align: center;">
-										<h2 style="color:#003360"><?= $data["tituloEmail"]?></h2>
-										<h4><?= $data["temaEmail"] ?><strong><?= $data["especialidad"]?></strong></h4>
+										<h2 style="color:#003360"><?= $data["titulo"]?></h2>
+										<h4>Se ha reagendado tu cita de <strong><?= $data["beneficio"]?></strong></h4>
 										<h4>Especialista que te atiende: <?= $data["especialista"] ?></h4>
                                         <h4>Lugar </h4>
                                         <h5>Sede: <?= $data["sede"] ?></h5>
                                         <h5>Oficina: <?= $data["oficina"] ?></h5>
                                     </br>
-										<h4>Horario reservado</h4>
+										<h4>Horario reagendado</h4>
 										<h5>Fecha: <?= $data["fecha"] ?></h5>
 										<h5>Hora: <?= $data["horaInicio"] ?> - <?= $data["horaFinal"] ?></h5>
-									</br>
+                                    </br>
+                                    </br>
+                                        <h4 style="color: red"><strong> Horario cancelado</strong> </h4>
+										<h5>Fecha: <?= $data["fechaOld"] ?></h5>
+										<h5>Hora: <?= $data["horaInicioOld"] ?> - <?= $data["horaFinalOld"] ?></h5>
 									</div>
 								</td>
 							</tr>
