@@ -8,9 +8,9 @@ class LoginController extends BaseController {
 	public function __construct()
 	{
 		parent::__construct();
-		$this->load->model('UsuariosModel');
-		$this->load->model('GeneralModel');
-		$this->load->model('MenuModel');
+		$this->load->model('usuariosModel');
+		$this->load->model('generalModel');
+		$this->load->model('menuModel');
 
 		$this->load->helper(array('form','funciones'));
 	}
@@ -21,7 +21,7 @@ class LoginController extends BaseController {
 	}
 
 	public function usuarios(){
-		$data['data'] = $this->UsuariosModel->usuarios();
+		$data['data'] = $this->usuariosModel->usuarios();
 		echo json_encode($data);
 	}
 	public function addRegistroEmpleado(){
@@ -110,7 +110,7 @@ class LoginController extends BaseController {
 			"fechaModificacion" => date('Y-m-d H:i:s')
 		);
 
-		$resultado = $this->GeneralModel->addRecord('usuarios',$insertData);
+		$resultado = $this->generalModel->addRecord('usuarios',$insertData);
 		$last_id = $this->db->insert_id();
 
 		$insertData = array(
@@ -121,7 +121,7 @@ class LoginController extends BaseController {
 			"modificadoPor" => 1,
 			"fechaModificacion" => date('Y-m-d H:i:s')
 		);
-		$resultado = $this->GeneralModel->addRecord('detallePaciente',$insertData);
+		$resultado = $this->generalModel->addRecord('detallePaciente',$insertData);
 
 		if ($this->db->trans_status() === FALSE){
             $this->db->trans_rollback();
@@ -160,7 +160,7 @@ class LoginController extends BaseController {
 		//session_destroy();
 		$datosEmpleado = $array == '' ? json_decode( file_get_contents('php://input')) : json_decode($array);
 		$datosEmpleado->password =  encriptar($datosEmpleado->password);
-		$data = $this->UsuariosModel->login($datosEmpleado->numempleado,$datosEmpleado->password)->result();
+		$data = $this->usuariosModel->login($datosEmpleado->numempleado,$datosEmpleado->password)->result();
 		if(empty($data)){
 			echo json_encode(array('response' => [],
 									'message' => 'El número de empleado no se encuentra registrado',

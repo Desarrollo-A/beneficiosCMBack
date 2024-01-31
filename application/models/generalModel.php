@@ -2,7 +2,7 @@
 /**
  * 
  */
-class GeneralModel extends CI_Model {
+class generalModel extends CI_Model {
 	public function __construct()
 	{
 		parent::__construct();

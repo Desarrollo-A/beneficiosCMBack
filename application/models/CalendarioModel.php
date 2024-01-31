@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
-class CalendarioModel extends CI_Model
+class calendarioModel extends CI_Model
 {
     // Mostrarlos en calendario
     public function getAppointmentsByUser($year, $month, $idUsuario){

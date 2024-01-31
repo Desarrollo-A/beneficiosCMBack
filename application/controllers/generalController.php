@@ -9,75 +9,75 @@ class GeneralController extends BaseController {
 	{
 		parent::__construct();
 		$this->load->database('default');
-		$this->load->model('GeneralModel');
+		$this->load->model('generalModel');
 	}
 
 	public function usuarios(){
-		$data['data'] = $this->GeneralModel->usuarios();
+		$data['data'] = $this->generalModel->usuarios();
 		echo json_encode($data);
 	}
 
 	public function especialistas(){
-		$data['data'] = $this->GeneralModel->especialistas();
+		$data['data'] = $this->generalModel->especialistas();
 		echo json_encode($data);
 	}
 
     public function usrCount(){
-		$data['data'] = $this->GeneralModel->usrCount();
+		$data['data'] = $this->generalModel->usrCount();
 		echo json_encode($data);
 	}
 
     public function citasCount(){
-		$data['data'] = $this->GeneralModel->citasCount();
+		$data['data'] = $this->generalModel->citasCount();
 		echo json_encode($data);
 	}
 
 	public function getPuesto(){
 		$dt = $this->input->post('dataValue', true);
-		$data['data'] = $this->GeneralModel->getPuesto($dt)->result();
+		$data['data'] = $this->generalModel->getPuesto($dt)->result();
 		echo json_encode($data);
 	}
 
 	public function getSede(){
 		$dt = $this->input->post('dataValue', true);
-		$data['data'] = $this->GeneralModel->getSede($dt)->result();
+		$data['data'] = $this->generalModel->getSede($dt)->result();
 		echo json_encode($data);
 	}
 
 	public function getPacientes(){
 		$dt = $this->input->post('dataValue', true);
-		$data['data'] = $this->GeneralModel->getPacientes($dt)->result();
+		$data['data'] = $this->generalModel->getPacientes($dt)->result();
 		echo json_encode($data);
 	}
 
 	public function getCtAsistidas(){
 		$dt = $this->input->post('dataValue', true);
-		$data['data'] = $this->GeneralModel->getCtAsistidas($dt)->result();
+		$data['data'] = $this->generalModel->getCtAsistidas($dt)->result();
 		echo json_encode($data);
 	}
 
 	public function getCtCanceladas(){
 		$dt = $this->input->post('dataValue', true);
-		$data['data'] = $this->GeneralModel->getCtCanceladas($dt)->result();
+		$data['data'] = $this->generalModel->getCtCanceladas($dt)->result();
 		echo json_encode($data);
 	}
 
 	public function getCtPenalizadas(){
 		$dt = $this->input->post('dataValue', true);
-		$data['data'] = $this->GeneralModel->getCtPenalizadas($dt)->result();
+		$data['data'] = $this->generalModel->getCtPenalizadas($dt)->result();
 		echo json_encode($data);
 	}
 
 	public function getAppointmentHistory(){
 
         $dt = $this->input->post('dataValue', true);
-		$data['data'] = $this->GeneralModel->getAppointmentHistory($dt)->result();
+		$data['data'] = $this->generalModel->getAppointmentHistory($dt)->result();
 		echo json_encode($data);
 
     }
 
 	public function getEstatusPaciente(){
-        $data['data'] = $this->GeneralModel->getEstatusPaciente()->result();
+        $data['data'] = $this->generalModel->getEstatusPaciente()->result();
 		echo json_encode($data);
     }
 
@@ -95,7 +95,7 @@ class GeneralController extends BaseController {
 						"estatusNut" => $estatus,
 					);
 							
-					$response=$this->GeneralModel->updateRecord('detallePaciente', $data, 'idDetallePaciente', $id);
+					$response=$this->generalModel->updateRecord('detallePaciente', $data, 'idDetallePaciente', $id);
 					echo json_encode(array("estatus" => true, "msj" => "Estatus actualizado!" ));
 								
 				}else{
@@ -111,7 +111,7 @@ class GeneralController extends BaseController {
 						"estatusPsi" => $estatus,
 					);
 							
-					$response=$this->GeneralModel->updateRecord('detallePaciente', $data, 'idDetallePaciente', $id);
+					$response=$this->generalModel->updateRecord('detallePaciente', $data, 'idDetallePaciente', $id);
 					echo json_encode(array("estatus" => true, "msj" => "Estatus actualizado!" ));
 								
 				}else{
@@ -127,7 +127,7 @@ class GeneralController extends BaseController {
 						"estatusQB" => $estatus,
 					);
 							
-					$response=$this->GeneralModel->updateRecord('detallePaciente', $data, 'idDetallePaciente', $id);
+					$response=$this->generalModel->updateRecord('detallePaciente', $data, 'idDetallePaciente', $id);
 					echo json_encode(array("estatus" => true, "msj" => "Estatus actualizado!" ));
 								
 				}else{
@@ -143,7 +143,7 @@ class GeneralController extends BaseController {
 						"estatusGE" => $estatus,
 					);
 							
-					$response=$this->GeneralModel->updateRecord('detallePaciente', $data, 'idDetallePaciente', $id);
+					$response=$this->generalModel->updateRecord('detallePaciente', $data, 'idDetallePaciente', $id);
 					echo json_encode(array("estatus" => true, "msj" => "Estatus actualizado!" ));
 								
 				}else{
