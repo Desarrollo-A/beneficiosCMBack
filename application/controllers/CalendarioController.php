@@ -1124,7 +1124,7 @@ class CalendarioController extends BaseController{
 			];
 			$response["result"] = $this->generalModel->updateRecord("citas", $values, 'idCita', $idCita);
 			if ($response["result"]) {
-				$response["msg"] = "¡Se ha generado el detalle de pago con éxito!";
+				$response["msg"] = "¡Se ha actualizado la información de la cita!";
 			}else {
 				$response["msg"] = "¡Surgió un error al intentar actualizar los datos de cita!";
 			}

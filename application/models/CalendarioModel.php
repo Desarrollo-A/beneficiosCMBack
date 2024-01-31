@@ -8,8 +8,9 @@ class CalendarioModel extends CI_Model
         $query = $this->db->query(
             "SELECT CAST(idCita AS VARCHAR(36)) AS id, ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
             ct.fechaInicio AS occupied, ct.estatusCita AS estatus, ct.idDetalle, us.nombre, ct.idPaciente, ct.idEspecialista, ct.idAtencionXSede, 
-            ct.tipoCita, atc.tipoCita as modalidad, atc.idSede ,usEspe.idPuesto, us.telPersonal, usEspe.telPersonal as telefonoEspecialista, ofi.oficina, ofi.ubicación, pue.idArea,
-            sed.sede, atc.idOficina, us.correo, usEspe.correo as correoEspecialista, usEspe.nombre as especialista, usEspe.sexo as sexoEspecialista,
+            ct.tipoCita, atc.tipoCita as modalidad, atc.idSede ,usEspe.idPuesto, us.telPersonal, usEspe.telPersonal as telefonoEspecialista, ofi.oficina, 
+            ofi.ubicación, pue.idArea, sed.sede, atc.idOficina, us.correo, usEspe.correo as correoEspecialista, usEspe.nombre as especialista, 
+            usEspe.sexo as sexoEspecialista, tf.fechasFolio,
             'color' = CASE
 	            WHEN ct.estatusCita = 1 THEN 'orange'
 	            WHEN ct.estatusCita = 2 THEN 'red'
@@ -32,6 +33,8 @@ class CalendarioModel extends CI_Model
             LEFT join oficinas ofi ON ofi.idOficina = atc.idOficina
             INNER join sedes sed ON sed.idSede = atc.idSede
             INNER JOIN puestos pue ON pue.idPuesto = usEspe.idPuesto
+            LEFT JOIN (SELECT idDetalle, string_agg(FORMAT(fechaInicio, 'HH:mm MMMM d yyyy','es-US'), ' ,') as fechasFolio 
+                        FROM citas WHERE estatusCita IN(8) GROUP BY citas.idDetalle) tf ON tf.idDetalle = ct.idDetalle
             WHERE YEAR(fechaInicio) = ? AND MONTH(fechaInicio) = ? AND ct.idPaciente = ?
             AND ct.estatusCita IN(?, ?, ?, ?, ?, ?, ?)",
             array( $year, $month, $idUsuario, 1, 2, 3, 4, 5, 6, 7)
@@ -388,7 +391,7 @@ class CalendarioModel extends CI_Model
         return $query;
     }
 
-    public function getCitasSinEvaluar($usuario, $beneficio)
+    public function getCitasSinEvaluarUsuario($usuario, $beneficio)
     {
         $query = $this->db->query(
             "SELECT c.*, u.idPuesto FROM citas AS c
@@ -445,7 +448,7 @@ class CalendarioModel extends CI_Model
         $query = $this->db->query("SELECT CAST(idCita AS VARCHAR(36)) AS id, ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
         ct.fechaInicio AS occupied, ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal, ofi.oficina, ofi.ubicación,
         sed.sede , atc.idOficina, us.correo, usEspe.correo as correoEspecialista, usEspe.nombre as especialista, ct.idDetalle, usEspe.telPersonal as telefonoEspecialista,
-        usEspe.sexo as sexoEspecialista,
+        usEspe.sexo as sexoEspecialista, tf.fechasFolio,
         beneficio = CASE 
         WHEN pue.idPuesto = 537 THEN 'Nutrición'
         WHEN pue.idPuesto = 585 THEN 'Psicología'
@@ -459,6 +462,8 @@ class CalendarioModel extends CI_Model
         LEFT join oficinas ofi ON ofi.idOficina = atc.idOficina
         INNER join sedes sed ON sed.idSede = atc.idSede
         INNER JOIN puestos pue ON pue.idPuesto = usEspe.idPuesto
+        LEFT JOIN (SELECT idDetalle, string_agg(FORMAT(fechaInicio, 'HH:mm MMMM d yyyy','es-US'), ' ,') as fechasFolio 
+                        FROM citas WHERE estatusCita IN(8) GROUP BY citas.idDetalle) tf ON tf.idDetalle = ct.idDetalle
         WHERE ct.estatusCita IN(?) AND ct.idPaciente = ?", array(6, $idUsuario));
 
         return $query;
@@ -468,7 +473,7 @@ class CalendarioModel extends CI_Model
         $query = $this->db->query("SELECT CAST(idCita AS VARCHAR(36)) AS id, ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
         ct.fechaInicio AS occupied, ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal, ofi.oficina, ofi.ubicación,
         sed.sede , atc.idOficina, us.correo, usEspe.correo as correoEspecialista, usEspe.nombre as especialista, ct.idDetalle, usEspe.telPersonal as telefonoEspecialista,
-        usEspe.sexo as sexoEspecialista,
+        usEspe.sexo as sexoEspecialista, tf.fechasFolio,
         beneficio = CASE 
         WHEN pue.idPuesto = 537 THEN 'Nutrición'
         WHEN pue.idPuesto = 585 THEN 'Psicología'
@@ -482,6 +487,8 @@ class CalendarioModel extends CI_Model
         LEFT join oficinas ofi ON ofi.idOficina = atc.idOficina
         INNER join sedes sed ON sed.idSede = atc.idSede
         INNER JOIN puestos pue ON pue.idPuesto = usEspe.idPuesto
+        LEFT JOIN (SELECT idDetalle, string_agg(FORMAT(fechaInicio, 'HH:mm MMMM d yyyy','es-US'), ' ,') as fechasFolio 
+                        FROM citas WHERE estatusCita IN(8) GROUP BY citas.idDetalle) tf ON tf.idDetalle = ct.idDetalle
         WHERE ct.estatusCita IN(?) AND ct.evaluacion is NULL AND ct.idPaciente = ?", array(4, $idUsuario));
 
         return $query;
@@ -542,6 +549,7 @@ class CalendarioModel extends CI_Model
         ct.fechaInicio AS occupied, ct.estatusCita AS estatus, ct.idDetalle, us.nombre, ct.idPaciente, ct.idEspecialista, ct.idAtencionXSede, 
         ct.tipoCita, atc.tipoCita as modalidad, atc.idSede ,usEspe.idPuesto, us.telPersonal, usEspe.telPersonal as telefonoEspecialista, ofi.oficina, ofi.ubicación, pue.idArea,
         sed.sede, atc.idOficina, us.correo, usEspe.correo as correoEspecialista, usEspe.nombre as especialista, usEspe.sexo as sexoEspecialista,
+        tf.fechasFolio,
         'color' = CASE
             WHEN ct.estatusCita = 1 THEN 'orange'
             WHEN ct.estatusCita = 2 THEN 'red'
@@ -564,6 +572,8 @@ class CalendarioModel extends CI_Model
         LEFT join oficinas ofi ON ofi.idOficina = atc.idOficina
         INNER join sedes sed ON sed.idSede = atc.idSede
         INNER JOIN puestos pue ON pue.idPuesto = usEspe.idPuesto
+        LEFT JOIN (SELECT idDetalle, string_agg(FORMAT(fechaInicio, 'HH:mm MMMM d yyyy','es-US'), ' ,') as fechasFolio 
+                        FROM citas WHERE estatusCita IN(8) GROUP BY citas.idDetalle) tf ON tf.idDetalle = ct.idDetalle
         WHERE idCita = ? ",
         array( $idCita ));
 
