@@ -98,7 +98,49 @@ class GoogleApi {
 
         $response = $request->getResponse();
 
-        return $response->getParsedResponse();
+        return json_decode($response->getParsedResponse());
+    }
+
+    public function updateCalendarEvent($calendar_name = 'primary', $id, $data){
+
+        //INSERT ITEM IN CALENDAR
+        $calendar_url = "https://www.googleapis.com/calendar/v3/calendars/$calendar_name/events/$id?sendUpdates=all";
+
+        $headers = [
+            "Authorization" => "Bearer $this->token",
+            "Accept" => "application/json",
+            "Content-Type" => "application/json",
+            "Referer" => "https://prueba.gphsis.com/",
+        ];
+
+        $client = new Client();
+
+        $request = $client->newRequest($calendar_url, 'PUT', $data, $headers);
+
+        $response = $request->getResponse();
+
+        return json_decode($response->getParsedResponse());
+    }
+
+    public function deleteCalendarEvent($calendar_name = 'primary', $id){
+
+        //INSERT ITEM IN CALENDAR
+        $calendar_url = "https://www.googleapis.com/calendar/v3/calendars/$calendar_name/events/$id?sendUpdates=all";
+
+        $headers = [
+            "Authorization" => "Bearer $this->token",
+            "Accept" => "application/json",
+            "Content-Type" => "application/json",
+            "Referer" => "https://prueba.gphsis.com/",
+        ];
+
+        $client = new Client();
+
+        $request = $client->newRequest($calendar_url, 'DELETE', null, $headers);
+
+        $response = $request->getResponse();
+
+        $response->getParsedResponse();
     }
 }
 
