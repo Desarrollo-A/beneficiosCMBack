@@ -1,140 +1,146 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 
-/**
- * Authorization_Token
- * ----------------------------------------------------------
- * API Token Generate/Validation
- * 
- * @author: Jeevan Lal
- * @version: 0.0.1
- */
+require_once(APPPATH . "libraries/http/IClient.php");
+require_once(APPPATH . "libraries/http/IRequest.php");
+require_once(APPPATH . "libraries/http/Request.php");
+require_once(APPPATH . "libraries/http/IResponse.php");
+require_once(APPPATH . "libraries/http/Response.php");
+require_once(APPPATH . "libraries/http/Client.php");
 
-require_once(APPPATH . "libraries/google-api/vendor/autoload.php");
+use RestClient\Client;
 
 class GoogleApi {
-    protected $client;
-
-    protected $calendar;
-
-    protected $service;
-
-    protected $application_name;
-
-    protected $scopes;
+    protected $token;
 
     public function __construct(){
         $this->CI =& get_instance();
         $this->CI->load->config('google_api');
-
-        $this->application_name = $this->CI->config->item('application_name');
-        $this->scopes = $this->CI->config->item('scopes');
-
-        $this->client = new Google_Client();
-        $this->client->setApplicationName($this->application_name);
-        $this->client->setScopes($this->scopes);
-        $this->client->setAuthConfig(APPPATH . 'config/google_api_credentials.json');
-        $this->client->setAccessType('offline');
-        $this->client->setPrompt('select_account consent');
-
-        //$this->client->addScope(Google_Service_Calendar::CALENDAR);
-
-        //$this->calendar = new Google\Service\Calendar($this->client);
-        $this->calendar = new Google_Service_Calendar($this->client);
     }
 
-    public function getAccessToken($code){
-        return $access_token = $this->client->fetchAccessTokenWithAuthCode($code);
+    public function getAccessToken($email){
+        // Get config vars
+        $token_url = $this->CI->config->item('token_url');
+        $private_key_id = $this->CI->config->item('private_key_id');
+        $private_key = $this->CI->config->item('private_key');
+        $service_account = $this->CI->config->item('service_account');
+        $scopes = $this->CI->config->item('scopes');
+        $redirect_uri = $this->CI->config->item('redirect_uri');
+        $application_name = $this->CI->config->item('application_name');
+        $client_id = $this->CI->config->item('client_id');
+        $client_secret = $this->CI->config->item('client_secret');
+        $api_key = $this->CI->config->item('api_key');
+
+        $header = [
+            "alg" => "RS256",
+            "typ" => "JWT",
+            "kid" => $private_key_id
+        ];
+
+        $header = base64_encode(json_encode($header));
+
+        $claims = [
+            "iss" => $service_account,
+            "scope" => $scopes,
+            "aud" => $token_url,
+            "exp" => time() + (1 * 60),
+            "iat" => time(),
+            "sub" => $email,
+        ];
+
+        $claims = base64_encode(json_encode($claims));
+
+        $binary_signature = "";
+        $algo = "SHA256";
+        $data = $header.".".$claims;
+        openssl_sign($data, $binary_signature, $private_key, $algo);
+
+        $firm = urlencode(base64_encode($binary_signature));
+
+        //$firm = hash_hmac('sha256', "$header.$claims", $private_key_id);
+
+        //print_r($firm);
+        //exit;
+
+        $jwt = "$header.$claims.$firm";
+
+        //$code = "4/0AfJohXnIdjh2Is1Lt9KzmWWjO9eNd3ullAXvDUHgWz7VGGNpqE1PjqGemu4fihwGZXD25A";
+
+        $data = "grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=$jwt";
+
+        $client = new Client();
+
+        $headers = [
+            "Content-type" => "application/x-www-form-urlencoded",
+        ];
+
+        $request = $client->newRequest($token_url, 'POST', $data, $headers);
+
+        $response = $request->getResponse();
+
+        $this->token = json_decode($response->getParsedResponse())->access_token;
     }
 
-    public function refreshToken($refresh_token){
-        return $access_token = $this->client->fetchAccessTokenWithRefreshToken($refresh_token);
+    public function createCalendarEvent($calendar_name = 'primary', $data){
+
+        //INSERT ITEM IN CALENDAR
+        $calendar_url = "https://www.googleapis.com/calendar/v3/calendars/$calendar_name/events?sendNotifications=true&sendUpdates=all";
+
+        $headers = [
+            "Authorization" => "Bearer $this->token",
+            "Accept" => "application/json",
+            "Content-Type" => "application/json",
+            "Referer" => "https://prueba.gphsis.com/",
+        ];
+
+        $client = new Client();
+
+        $request = $client->newRequest($calendar_url, 'POST', $data, $headers);
+
+        $response = $request->getResponse();
+
+        return json_decode($response->getParsedResponse());
     }
 
-    public function createEvent($token, $data = null){
+    public function updateCalendarEvent($calendar_name = 'primary', $id, $data){
 
-        $this->client->setAccessToken($token);
+        //INSERT ITEM IN CALENDAR
+        $calendar_url = "https://www.googleapis.com/calendar/v3/calendars/$calendar_name/events/$id?sendUpdates=all";
 
-        $event = new Google_Service_Calendar_Event(array(
-            'summary' =>'something',
-            'location' => 'something',
-            'description' => ' test',
-            'start' => array(
-                'dateTime' => '2024-01-25T09:00:00-07:00',
-                // 'dateTime' => $start.':00-04:00',
-                'timeZone' => 'America/Mexico_City',
-            ),
-            'end' => array(
-                'dateTime' => '2024-01-25T10:00:00-07:00',
-                //'dateTime' => $end.':00-04:00',
-                'timeZone' => 'America/Mexico_City',
-            ),
-            'attendees' => array(
-                array('email' => 'programador.analista40@ciudadmaderas.com'),
-                'responseStatus' => 'needsAction',
-            ),
-            'reminders' => array(
-                'useDefault' => FALSE,
-                'overrides' => array(
-                    array('method' => 'email', 'minutes' => 24 * 60),
-                    array('method' => 'popup', 'minutes' => 10),
-                ),
-            ),
-            'visibility' => 'public',
-        ));
+        $headers = [
+            "Authorization" => "Bearer $this->token",
+            "Accept" => "application/json",
+            "Content-Type" => "application/json",
+            "Referer" => "https://prueba.gphsis.com/",
+        ];
 
-        $calendar_id = 'primary';
+        $client = new Client();
 
-        $opts = array('sendNotifications' => true, 'conferenceDataVersion' => true);
+        $request = $client->newRequest($calendar_url, 'PUT', $data, $headers);
 
-        $event = $this->calendar->events->insert($calendar_id, $event, $opts);
+        $response = $request->getResponse();
 
-        print_r($event);
+        return json_decode($response->getParsedResponse());
     }
 
-    public function editEvent($token, $id_event, $data = null){
+    public function deleteCalendarEvent($calendar_name = 'primary', $id){
 
-        $access_token = $this->client->fetchAccessTokenWithAuthCode("4/0AfJohXltjnBeLTo9WVwcBVRiefkJmtXdAbUVBLiLpgEC-KTloTxa-q8TChHcZm9oVNXfoQ");
+        //INSERT ITEM IN CALENDAR
+        $calendar_url = "https://www.googleapis.com/calendar/v3/calendars/$calendar_name/events/$id?sendUpdates=all";
 
-        print_r($access_token);
-        exit();
+        $headers = [
+            "Authorization" => "Bearer $this->token",
+            "Accept" => "application/json",
+            "Content-Type" => "application/json",
+            "Referer" => "https://prueba.gphsis.com/",
+        ];
 
-        $this->client->setAccessToken($token);
+        $client = new Client();
 
-        $event = new Google_Service_Calendar_Event(array(
-            'summary' =>'evento actualizado',
-            'location' => 'something',
-            'description' => ' test',
-            'start' => array(
-                'dateTime' => '2024-01-25T10:00:00-07:00',
-                // 'dateTime' => $start.':00-04:00',
-                'timeZone' => 'America/Mexico_City',
-            ),
-            'end' => array(
-                'dateTime' => '2024-01-25T11:00:00-07:00',
-                //'dateTime' => $end.':00-04:00',
-                'timeZone' => 'America/Mexico_City',
-            ),
-            'attendees' => array(
-                array('email' => 'programador.analista40@ciudadmaderas.com'),
-                'responseStatus' => 'needsAction',
-            ),
-            'reminders' => array(
-                'useDefault' => FALSE,
-                'overrides' => array(
-                    array('method' => 'email', 'minutes' => 24 * 60),
-                    array('method' => 'popup', 'minutes' => 10),
-                ),
-            ),
-            'visibility' => 'public',
-        ));
+        $request = $client->newRequest($calendar_url, 'DELETE', null, $headers);
 
-        $calendar_id = 'primary';
+        $response = $request->getResponse();
 
-        $opts = array('sendNotifications' => true, 'conferenceDataVersion' => true);
-
-        $event = $this->calendar->events->update($calendar_id, $id_event, $event);
-
-        print_r($event);
+        $response->getParsedResponse();
     }
 }
 
