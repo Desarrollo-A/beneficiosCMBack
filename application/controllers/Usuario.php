@@ -60,7 +60,7 @@ class Usuario extends BaseController {
 			$data['msg'] = '¡No existen registros!';
 		}
 		$this->output->set_content_type("application/json");
-        $this->output->set_output(json_encode($data), JSON_NUMERIC_CHECK);
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
 	}
 
 	public function getAreas(){
@@ -73,7 +73,7 @@ class Usuario extends BaseController {
 			$data['msg'] = '¡No existen registros!';
 		}
 		$this->output->set_content_type("application/json");
-        $this->output->set_output(json_encode($data), JSON_NUMERIC_CHECK);
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
 	}
 
 	public function insertBatchUsers()
@@ -122,7 +122,7 @@ class Usuario extends BaseController {
             $response['msg'] = "¡Parametros invalidos!";
         }
         $this->output->set_content_type("application/json");
-        $this->output->set_output(json_encode($response), JSON_NUMERIC_CHECK);
+        $this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
     }
 
 	public function updateUser() {
@@ -154,7 +154,7 @@ class Usuario extends BaseController {
 		}
 	
 		$this->output->set_content_type("application/json");
-		$this->output->set_output(json_encode($response), JSON_NUMERIC_CHECK);
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
 	public function getNameUser(){
@@ -169,7 +169,7 @@ class Usuario extends BaseController {
 			$response['msg'] = '¡No existen registros!';
 		}
 		$this->output->set_content_type("application/json");
-        $this->output->set_output(json_encode($response), JSON_NUMERIC_CHECK);
+        $this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
 	public function decodePass(){

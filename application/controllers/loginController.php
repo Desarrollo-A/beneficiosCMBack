@@ -188,9 +188,9 @@ class LoginController extends BaseController {
                         "iat" => $time, // Tiempo en que inició el token
                         "exp" => $time + (24 * 60 * 60), // Tiempo en el que expirará el token (24 horas)
                     );
-			$tokenPart1 = base64_encode(json_encode(array("alg" => "HS256", "typ"=>"JWT")), JSON_NUMERIC_CHECK);
+			$tokenPart1 = base64_encode(json_encode(array("alg" => "HS256", "typ"=>"JWT"), JSON_NUMERIC_CHECK));
 			$tokenPart2 = base64_encode(json_encode(array("numEmpleado" => $data[0]->numEmpleado, "iat" => $time,"exp" => $time + (24 * 60 * 60)), JSON_NUMERIC_CHECK));
-			$tokenPart3 = base64_encode(json_encode($data[0]), JSON_NUMERIC_CHECK);
+			$tokenPart3 = base64_encode(json_encode($data[0], JSON_NUMERIC_CHECK));
 			$datosSesion['token'] = $tokenPart1.'.'.$tokenPart2;
 			$this->session->set_userdata($datosSesion);
 
