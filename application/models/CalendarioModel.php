@@ -81,7 +81,7 @@ class calendarioModel extends CI_Model
         $query = $this->db->query(
             "SELECT CAST(ct.idCita AS VARCHAR(36))  AS id,  ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
             ct.fechaInicio AS occupied, 'date' AS 'type', ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal, us.correo,
-            se.sede, ofi.oficina, ct.idDetalle, ct.idAtencionXSede, us.externo, usEspe.nombre as especialista, 
+            se.sede, ofi.oficina, ct.idDetalle, ct.idAtencionXSede, us.externo, usEspe.nombre as especialista, ct.fechaCreacion,
             tf.fechasFolio,
             'color' = CASE
 	            WHEN ct.estatusCita = 0 THEN 'red'

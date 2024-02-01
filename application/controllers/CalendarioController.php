@@ -306,6 +306,7 @@ class CalendarioController extends BaseController{
 
 		$fechaFinalResta = date('Y/m/d H:i:s', strtotime($dataValue["fechaFinal"] . '-1 minute'));
 		$fechaInicioSuma = date('Y/m/d H:i:s', strtotime($dataValue["fechaInicio"] . '+1 minute'));
+
 		$year = date('Y', strtotime($dataValue["fechaInicio"]));
 		$month = date('m', strtotime($dataValue["fechaInicio"]));
 
