@@ -407,7 +407,7 @@ class calendarioModel extends CI_Model
         $query = $this->db->query(
             "SELECT *FROM citas
             WHERE idPaciente = ? AND MONTH(fechaInicio) = ?
-            AND YEAR(fechaInicio) = ? AND estatusCita IN (4) AND tipoCita IN (1, 2);", array($usuario, $mes, $año)
+            AND YEAR(fechaInicio) = ? AND estatusCita IN (4, 1) AND tipoCita IN (1, 2);", array($usuario, $mes, $año)
         );
 
         return $query;
