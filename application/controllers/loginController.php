@@ -22,7 +22,7 @@ class LoginController extends BaseController {
 
 	public function usuarios(){
 		$data['data'] = $this->usuariosModel->usuarios();
-		echo json_encode($data);
+		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 	public function addRegistroEmpleado(){
 		$this->db->trans_begin();
@@ -126,13 +126,13 @@ class LoginController extends BaseController {
 		if ($this->db->trans_status() === FALSE){
             $this->db->trans_rollback();
 			if(strpos($resultado['message'], "UNIQUE")){
-				echo json_encode(array("estatus" => 0, "mensaje" => "El número de empleado ingresado ya se encuentra registrado" ));
+				echo json_encode(array("estatus" => 0, "mensaje" => "El número de empleado ingresado ya se encuentra registrado" ), JSON_NUMERIC_CHECK);
 			}else{
-				echo json_encode(array("estatus" => -1, "mensaje" => "Hubo un error al registrase" ));
+				echo json_encode(array("estatus" => -1, "mensaje" => "Hubo un error al registrase" ), JSON_NUMERIC_CHECK);
 			}
         } else {
             $this->db->trans_commit();
-			echo json_encode(array("estatus" => 1, "mensaje" => "Te has registrado con éxito"));
+			echo json_encode(array("estatus" => 1, "mensaje" => "Te has registrado con éxito"), JSON_NUMERIC_CHECK);
         }
 	
 	}
@@ -140,7 +140,7 @@ class LoginController extends BaseController {
 		$datosSession = json_decode( file_get_contents('php://input'));
 		$arraySession = explode('.',$datosSession->token);
 		$datosUser = json_decode(base64_decode($arraySession[2]));
-		echo json_encode(array('user' => $datosUser, 'result' => 1));
+		echo json_encode(array('user' => $datosUser, 'result' => 1), JSON_NUMERIC_CHECK);
 	}
 
 	public function check(){
@@ -148,7 +148,7 @@ class LoginController extends BaseController {
 		$data = explode('.', $headers->token);
 		$user = json_decode(base64_decode($data[2]));
 
-		echo json_encode(array('user' => $user, 'result' => 1));
+		echo json_encode(array('user' => $user, 'result' => 1), JSON_NUMERIC_CHECK);
 	}
 
 	public function logout()
@@ -164,7 +164,7 @@ class LoginController extends BaseController {
 		if(empty($data)){
 			echo json_encode(array('response' => [],
 									'message' => 'El número de empleado no se encuentra registrado',
-									'result' => 0));
+									'result' => 0), JSON_NUMERIC_CHECK);
 		}else{
 			$datosSesion = array(
 				'id_usuario' 	        => 		$data[0]->idUsuario,
@@ -188,20 +188,20 @@ class LoginController extends BaseController {
                         "iat" => $time, // Tiempo en que inició el token
                         "exp" => $time + (24 * 60 * 60), // Tiempo en el que expirará el token (24 horas)
                     );
-			$tokenPart1 = base64_encode(json_encode(array("alg" => "HS256", "typ"=>"JWT")));
-			$tokenPart2 = base64_encode(json_encode(array("numEmpleado" => $data[0]->numEmpleado, "iat" => $time,"exp" => $time + (24 * 60 * 60))));
-			$tokenPart3 = base64_encode(json_encode($data[0]));
+			$tokenPart1 = base64_encode(json_encode(array("alg" => "HS256", "typ"=>"JWT")), JSON_NUMERIC_CHECK);
+			$tokenPart2 = base64_encode(json_encode(array("numEmpleado" => $data[0]->numEmpleado, "iat" => $time,"exp" => $time + (24 * 60 * 60)), JSON_NUMERIC_CHECK));
+			$tokenPart3 = base64_encode(json_encode($data[0]), JSON_NUMERIC_CHECK);
 			$datosSesion['token'] = $tokenPart1.'.'.$tokenPart2;
 			$this->session->set_userdata($datosSesion);
 
 			if($array == ''){
 				echo json_encode(array('user' => $data[0],
 									'accessToken' => $tokenPart1.'.'.$tokenPart2.'.'.$tokenPart3,
-									'result' => 1));
+									'result' => 1), JSON_NUMERIC_CHECK);
 			} else{
 				return json_encode(array('user' => $data[0],
 				'accessToken' => $tokenPart1.'.'.$tokenPart2.'.'.$tokenPart3,
-				'result' => 1));
+				'result' => 1), JSON_NUMERIC_CHECK);
 			}
 							
 		}
