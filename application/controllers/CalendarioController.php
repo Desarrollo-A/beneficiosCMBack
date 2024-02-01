@@ -248,7 +248,7 @@ class CalendarioController extends BaseController{
 			$fechaFinal,
 			$tipoCita,
 			$idAtencionXSede,
-			$estatusCita,
+			$estatusCita
 		);
 		if ($response['result']) { // Validamos que vengan todos los valores de post
 			$dataValue = ["idPaciente" => $idPaciente, "idUsuario" => $idEspecialista];
@@ -721,8 +721,8 @@ class CalendarioController extends BaseController{
 			$response['msg'] = "¡Parámetros inválidos!";
 		}
 
-		$this->output->set_content_type("application/json");
-		$this->output->set_output(json_encode($response));
+		header('Content-Type: application/json');
+		echo json_encode($response, JSON_NUMERIC_CHECK);
 	}
 
 	public function getReasons()
