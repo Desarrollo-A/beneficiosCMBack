@@ -154,4 +154,29 @@ class GeneralController extends BaseController {
 				break;
 		}			
 	}
+
+	public function getAtencionXsede(){
+		$data['data'] = $this->generalModel->getAtencionXsede()->result();
+		echo json_encode($data);
+	}
+
+	public function getSedes(){
+		$data['data'] = $this->generalModel->getSedes()->result();
+		echo json_encode($data);
+	}
+
+	public function getOficinas(){
+		$data['data'] = $this->generalModel->getOficinas()->result();
+		echo json_encode($data);
+	}
+
+	public function getModalidades(){
+		$data['data'] = $this->generalModel->getModalidades()->result();
+		echo json_encode($data);
+	}
+
+	public function getSinAsigSede(){
+		$data['data'] = $this->generalModel->getSinAsigSede();
+		echo json_encode($data);
+	}
 }
