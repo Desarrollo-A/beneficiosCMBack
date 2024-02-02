@@ -1,6 +1,7 @@
 <?php
 
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
+
 require_once(APPPATH . "/controllers/BaseController.php");
 
 class gestorController extends BaseController {
@@ -12,7 +13,6 @@ class gestorController extends BaseController {
 		$this->load->model('gestorModel');
 		$this->load->model('generalModel');
 
-		parent::__construct();
 	}
 
     public function getOficinasVal(){
