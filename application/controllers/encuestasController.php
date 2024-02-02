@@ -13,7 +13,6 @@ class EncuestasController extends BaseController {
 		$this->load->model('generalModel');
 		$this->load->library('email');
 
-		parent::__construct();
 	}
 
 	public function encuestaInsert(){
