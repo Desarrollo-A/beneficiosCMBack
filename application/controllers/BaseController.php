@@ -10,8 +10,8 @@ abstract class BaseController extends CI_Controller{
         header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
         header('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Token');
 
-        /*
-        $urls = array('192.168.30.128/auth/jwt/login','localhost','http://localhost','http://localhost:3030','http://192.168.30.128/auth/jwt/login','192.168.30.128','http://192.168.30.128:3030','127.0.0.1','https://rh.gphsis.com','rh.gphsis.com','https://maderascrm.gphsis.com','maderascrm.gphsis.com');
+    
+        $urls = array('192.168.30.128/auth/jwt/login','localhost','http://localhost','http://localhost:3030','http://192.168.30.128/auth/jwt/login','192.168.30.128','http://192.168.30.128:3030','127.0.0.1','https://rh.gphsis.com','rh.gphsis.com','https://maderascrm.gphsis.com','maderascrm.gphsis.com', 'https://prueba.gphsis.com/beneficiosmaderas', 'prueba.gphsis.com/beneficiosmaderas', 'https://prueba.gphsis.com', 'prueba.gphsis.com');
 
         if(isset($this->input->request_headers()['origin']))
             $origin = $this->input->request_headers()['origin'];
@@ -21,10 +21,10 @@ abstract class BaseController extends CI_Controller{
             $origin = $_SERVER['HTTP_PREFERER'];
         else
             $origin = $_SERVER['HTTP_HOST'];
-        */
+        
 
         $this->load->database('default');
-
+        $this->load->library('session');
         //$this->load->helper(array('form','funciones'));
 
         /* $this->load->library('Token');
@@ -62,7 +62,7 @@ abstract class BaseController extends CI_Controller{
     public function json($object){
         header('Content-Type: application/json');
 
-        echo json_encode($object);
+        echo json_encode($object, JSON_NUMERIC_CHECK);
 
         exit();
     }

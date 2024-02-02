@@ -6,11 +6,11 @@ require_once(APPPATH . "/controllers/BaseController.php");
 class CalendarioController extends BaseController{
     public function __construct(){
 		parent::__construct();
-
 		$this->load->model('calendarioModel');
 		$this->load->model('generalModel');
 		$this->load->model('usuariosModel');
-		$this->load->library('session');
+
+		$this->load->library("email");
 	}
 
 	public function getAllEvents()
@@ -37,7 +37,7 @@ class CalendarioController extends BaseController{
 			$data["events"] = array('');
 
 		$this->output->set_content_type('application/json');
-		$this->output->set_output(json_encode($data));
+		$this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
 	}
 
 	public function getAllEventsWithRange()
@@ -64,7 +64,7 @@ class CalendarioController extends BaseController{
 		}
 
 		$this->output->set_content_type('application/json');
-		$this->output->set_output(json_encode($response));
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
 	public function getHorarioBeneficio()
@@ -80,7 +80,7 @@ class CalendarioController extends BaseController{
 			$response['msg'] = '¡No existen horario!';
 		}
 		$this->output->set_content_type("application/json");
-		$this->output->set_output(json_encode($response));
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
 	public function saveOccupied()
@@ -96,6 +96,7 @@ class CalendarioController extends BaseController{
 			"fechaInicio" => $dataValue["fechaInicio"],
 			"fechaFinal" => $dataValue["fechaFinal"],
 			"creadoPor" => $dataValue["idUsuario"],
+			"modificadoPor" => $dataValue["modificadoPor"],
 			"fechaModificacion" => date("Y-m-d H:i:s"),
 			"fechaCreacion" => date("Y-m-d H:i:s"),
 			"titulo" => $dataValue["titulo"],
@@ -134,7 +135,7 @@ class CalendarioController extends BaseController{
 		}
 
 		$this->output->set_content_type('application/json');
-		$this->output->set_output(json_encode($response));
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
 	public function updateOccupied()
@@ -158,7 +159,7 @@ class CalendarioController extends BaseController{
 			}
 
 			$this->output->set_content_type('application/json');
-			$this->output->set_output(json_encode($response));
+			$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 		}
 
 		try {
@@ -167,6 +168,7 @@ class CalendarioController extends BaseController{
 				"fechaFinal" => $dataValue["fechaFinal"],
 				"fechaModificacion" => date("Y-m-d H:i:s"),
 				"titulo" => $dataValue["titulo"],
+				"modificadoPor" => $dataValue["modificadoPor"]
 			];
 
 			$checkOccupiedId = $this->calendarioModel->checkOccupiedId($dataValue, $fechaInicioSuma, $fechaFinalResta);
@@ -197,18 +199,20 @@ class CalendarioController extends BaseController{
 		}
 
 		$this->output->set_content_type('application/json');
-		$this->output->set_output(json_encode($response));
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
 	public function deleteOccupied()
 	{
-		$idUnico = $this->input->post("dataValue", true);
+		$dataValue = $this->input->post("dataValue", true);
 
 		$values = [
-			"estatus" => 0
+			"estatus" => 0,
+			"modificadoPor" => $dataValue["modificadoPor"],
+			"fechaModificacion" => date('Y/m/d H:i:s')
 		];
 
-		$updateRecord = $this->generalModel->updateRecord("horariosOcupados", $values, "idUnico", $idUnico);
+		$updateRecord = $this->generalModel->updateRecord("horariosOcupados", $values, "idUnico", $dataValue["eventId"]);
 
 		if ($updateRecord) {
 			$response["result"] = true;
@@ -219,7 +223,7 @@ class CalendarioController extends BaseController{
 		}
 
 		$this->output->set_content_type('application/json');
-		$this->output->set_output(json_encode($response));
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
 	public function createAppointmentByColaborator()
@@ -244,15 +248,15 @@ class CalendarioController extends BaseController{
 			$fechaFinal,
 			$tipoCita,
 			$idAtencionXSede,
-			$estatusCita,
-			$detalle
+			$estatusCita
 		);
 		if ($response['result']) { // Validamos que vengan todos los valores de post
 			$dataValue = ["idPaciente" => $idPaciente, "idUsuario" => $idEspecialista];
 			$fechaFinalResta = date('Y/m/d H:i:s', strtotime($fechaFinal . '-1 minute'));
 			$fechaInicioSuma = date('Y/m/d H:i:s', strtotime($fechaInicio . '+1 minute'));
 			$checkAppointment = $this->calendarioModel->checkAppointment($dataValue, $fechaInicioSuma, $fechaFinalResta);
-			$response['result'] = $checkAppointment->num_rows() === 0;
+			$checkOccupied = $this->calendarioModel->checkOccupied($dataValue, $fechaInicioSuma, $fechaFinalResta);
+			$response['result'] = $checkAppointment->num_rows() === 0 && $checkOccupied->num_rows() === 0;
 
 			if ($response['result']) { // Validamos que no tenga registros con horarios repetidos
 				// Obtén la fecha actual
@@ -271,9 +275,12 @@ class CalendarioController extends BaseController{
 						"fechaModificacion" => date('Y-m-d H:i:s'), "modificadoPor" => $idPaciente,
 						"idDetalle" => $detalle
 					];
-					$response["result"] = $this->generalModel->addRecord("citas", $values);
+					$rs = $this->generalModel->addRecord("citas", $values);
+					$last_id = $this->db->insert_id();
+					$response["result"] = $rs;
+					$response["data"] = $last_id;
 					if ($response["result"]) {
-						$response["msg"] = "¡Se ha agendado la cita con exito!";
+						$response["msg"] = "¡Se ha agendado la cita con éxito!";
 					} else {
 						$response["msg"] = "¡Surgió un error al intentar guardar la cita!";
 					}
@@ -288,7 +295,7 @@ class CalendarioController extends BaseController{
 		}       
 
 		$this->output->set_content_type("application/json");
-        $this->output->set_output(json_encode($response));
+        $this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
 	public function createAppointment()
@@ -299,6 +306,7 @@ class CalendarioController extends BaseController{
 
 		$fechaFinalResta = date('Y/m/d H:i:s', strtotime($dataValue["fechaFinal"] . '-1 minute'));
 		$fechaInicioSuma = date('Y/m/d H:i:s', strtotime($dataValue["fechaInicio"] . '+1 minute'));
+
 		$year = date('Y', strtotime($dataValue["fechaInicio"]));
 		$month = date('m', strtotime($dataValue["fechaInicio"]));
 
@@ -326,10 +334,11 @@ class CalendarioController extends BaseController{
 				"fechaFinal" => $dataValue["fechaFinal"],
 				"creadoPor" => $dataValue["creadoPor"],
 				"fechaModificacion" => date("Y-m-d H:i:s"),
+				"fechaCreacion" => date("Y-m-d H:i:s"),
 				"titulo" => $dataValue["titulo"],
 				"modificadoPor" => $dataValue["modificadoPor"],
 				"idAtencionXSede" => intval($dataValue["idCatalogo"]),
-				"tipoCita" => 1,
+				"tipoCita" => 3,
 				"idDetalle" => $dataValue["idDetalle"]
 			];
 
@@ -343,7 +352,7 @@ class CalendarioController extends BaseController{
 			} else if ($checkOccupied->num_rows() > 0) {
 				$response["result"] = false;
 				$response["msg"] = "Horario no disponible";
-			} else if ($checkUser->num_rows() > 0) {
+			} else if ($checkUser->num_rows() === 0) {
 				$response["result"] = false;
 				$response["msg"] = "El paciente no ha ocupado sus beneficios disponibles";
 			} else if (!isset($pass)) {
@@ -363,7 +372,7 @@ class CalendarioController extends BaseController{
 		}
 
 		$this->output->set_content_type("application/json");
-		$this->output->set_output(json_encode($response));
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
 	public function updateAppointment()
@@ -381,7 +390,7 @@ class CalendarioController extends BaseController{
 			$response["msg"] = "No se pueden mover las fechas a un dia anterior o actual";
 
 			$this->output->set_content_type('application/json');
-			$this->output->set_output(json_encode($response));
+			$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 		}
 
 		try {
@@ -421,30 +430,30 @@ class CalendarioController extends BaseController{
 		}
 
 		$this->output->set_content_type('application/json');
-		$this->output->set_output(json_encode($response));
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
 	public function cancelAppointment()
 	{
 		$dataValue = $this->input->post("dataValue", true);
 		$tipo = intval($dataValue["tipo"]);
-		$current = new DateTime();
-		$startStamp = $dataValue["startStamp"];
-		$todayStamp = $current->format('Y/m/d H:i:s');
+		$startDate = $dataValue["start"];
 
-		$start = new DateTime($startStamp);
-		$diferencia = $start->diff(new DateTime($todayStamp));
 		$estatus = 2;
+
+		$fechaActual = new DateTime();
+		$fechaActual->modify('+3 hours');
+		$fechaActual = $fechaActual->format('Y-m-d H:i:s');
 
 		if (in_array($tipo, array(3, 7, 8))) {
 			$estatus = $tipo;
-		} else if ($tipo === 0 && $diferencia->d === 0 && $diferencia->h < 3) { // condición para poder saber si se penaliza la cita
+		} else if ($tipo == 0 && ($fechaActual > $startDate)) { // condición para poder saber si se penaliza la cita
 			$estatus = 3;
 		}
 
 		$values = [
 			"estatusCita" => $estatus,
-			"fechaModificacion" => $todayStamp,
+			"fechaModificacion" => date('Y-m-d H:i:s'),
 			"modificadoPor" => $dataValue["modificadoPor"],
 		];
 
@@ -459,7 +468,7 @@ class CalendarioController extends BaseController{
 		}
 
 		$this->output->set_content_type("application/json");
-		$this->output->set_output(json_encode($response));
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
 	public function appointmentDrop()
@@ -520,7 +529,7 @@ class CalendarioController extends BaseController{
 		}
 
 		$this->output->set_content_type('application/json');
-		$this->output->set_output(json_encode($response));
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
 	public function occupiedDrop()
@@ -576,7 +585,7 @@ class CalendarioController extends BaseController{
 		}
 
 		$this->output->set_content_type('application/json');
-		$this->output->set_output(json_encode($response));
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
 	public function endAppointment()
@@ -621,7 +630,7 @@ class CalendarioController extends BaseController{
 		}
 
 		$this->output->set_content_type('application/json');
-		$this->output->set_output(json_encode($response));
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
 	public function getBeneficiosPorSede()
@@ -643,7 +652,7 @@ class CalendarioController extends BaseController{
 		}
 
 		$this->output->set_content_type("application/json");
-		$this->output->set_output(json_encode($response));
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
 	public function getEspecialistaPorBeneficioYSede()
@@ -667,7 +676,7 @@ class CalendarioController extends BaseController{
         }
 
 		$this->output->set_content_type("application/json");
-		$this->output->set_output(json_encode($response));
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
 	public function getModalidadesEspecialista()
@@ -690,7 +699,7 @@ class CalendarioController extends BaseController{
         }
 
 		$this->output->set_content_type("application/json");
-		$this->output->set_output(json_encode($response));
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
 	public function getAppointmentsByUser()
@@ -714,7 +723,7 @@ class CalendarioController extends BaseController{
 		}
 
 		$this->output->set_content_type("application/json");
-		$this->output->set_output(json_encode($response));
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
 	public function getReasons()
@@ -739,7 +748,7 @@ class CalendarioController extends BaseController{
 		$get = $this->calendarioModel->getReasons($tipo);
 
 		$this->output->set_content_type('application/json');
-		$this->output->set_output(json_encode($get));
+		$this->output->set_output(json_encode($get, JSON_NUMERIC_CHECK));
 	}
 
 	public function getOficinaByAtencion()
@@ -758,7 +767,7 @@ class CalendarioController extends BaseController{
 			$response['msg'] = '¡No existen registros!';
 		}
 		$this->output->set_content_type("application/json");
-		$this->output->set_output(json_encode($response));
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
 	public function isPrimeraCita()
@@ -780,7 +789,7 @@ class CalendarioController extends BaseController{
 			$response['msg'] = "¡Parámetros inválidos!";
 		}
 		$this->output->set_content_type("application/json");
-		$this->output->set_output(json_encode($response));
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
 	public function getCitasSinFinalizarUsuario()
@@ -802,7 +811,29 @@ class CalendarioController extends BaseController{
 			$response['msg'] = "¡Parámetros inválidos!";
 		}
 		$this->output->set_content_type("application/json");
-		$this->output->set_output(json_encode($response));
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
+	}
+
+	public function getCitasSinEvaluarUsuario()
+	{
+		$usuario   = $this->input->post('dataValue[usuario]');
+		$beneficio = $this->input->post('dataValue[beneficio]');
+
+		$response['result'] = isset($usuario, $beneficio);
+		if ($response['result']) {
+			$rs = $this->calendarioModel->getCitasSinEvaluarUsuario($usuario, $beneficio)->result();
+			$response['result'] = count($rs) > 0;
+			if ($response['result']) {
+				$response['msg'] = '¡Usuario con citas sin evaluar!';
+				$response['data'] = $rs;
+			} else {
+				$response['msg'] = '¡No existen registros!';
+			}
+		}else {
+			$response['msg'] = "¡Parámetros inválidos!";
+		}
+		$this->output->set_content_type("application/json");
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
 	public function getCitasFinalizadasUsuario()
@@ -825,7 +856,7 @@ class CalendarioController extends BaseController{
 			$response['msg'] = "¡Parámetros inválidos!";
 		}
 		$this->output->set_content_type("application/json");
-		$this->output->set_output(json_encode($response));
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
 	public function getAtencionPorSede()
@@ -848,7 +879,7 @@ class CalendarioController extends BaseController{
 			$response['msg'] = "¡Parámetros inválidos!";
 		}
 		$this->output->set_content_type("application/json");
-		$this->output->set_output(json_encode($response));
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
 	public function getPendingEnd()
@@ -858,7 +889,7 @@ class CalendarioController extends BaseController{
 		$get = $this->calendarioModel->getPending($idUsuario)->result();
 
 		$this->output->set_content_type('application/json');
-		$this->output->set_output(json_encode($get));
+		$this->output->set_output(json_encode($get, JSON_NUMERIC_CHECK));
 	}
 
 	public function getPendientes(){
@@ -866,7 +897,30 @@ class CalendarioController extends BaseController{
 		
 		$response['result'] = isset($usuario);
 		if ($response['result']) {
-			$rs = $this->calendarioModel->getPendientes($usuario)->result();
+			$rs = $this->calendarioModel->getPendientesPago($usuario)->result();
+			$rs2 = $this->calendarioModel->getPendientesEvaluacion($usuario)->result();
+			$response['result'] = count($rs) > 0 || count($rs2) > 0;
+			if ($response['result']) {
+				$response['data']['pago'] = $rs;
+				$response['data']['evaluacion'] = $rs2;
+				$response['msg'] = '¡Consulta de citas con estatus pendiente!';
+			}else {
+				$response['msg'] = '¡No existen registros!';
+			}
+		}else {
+			$response['msg'] = "¡Parámetros inválidos!";
+		}
+
+		$this->output->set_content_type('application/json');
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
+	}
+
+	public function getUnrated(){
+		$usuario = $this->input->post('dataValue[idUsuario]');
+		
+		$response['result'] = isset($usuario);
+		if ($response['result']) {
+			$rs = $this->calendarioModel->getUnrated($usuario)->result();
 			$response['result'] = count($rs) > 0;
 			if ($response['result']) {
 				$response['data'] = $rs;
@@ -879,7 +933,7 @@ class CalendarioController extends BaseController{
 		}
 
 		$this->output->set_content_type('application/json');
-		$this->output->set_output(json_encode($response));
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
 	public function getEventReasons(){
@@ -887,7 +941,7 @@ class CalendarioController extends BaseController{
 
 		$response = $this->calendarioModel->getEventReasons($idCita)->result();
 		$this->output->set_content_type('application/json');
-		$this->output->set_output(json_encode($response));
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
 	public function registrarTransaccionPago(){
@@ -913,7 +967,7 @@ class CalendarioController extends BaseController{
 			];
 			$response["result"] = $this->generalModel->addRecord("detallePagos", $values);
 			if ($response["result"]) {
-				$response["msg"] = "¡Se ha generado el detalle de pago con exito!";
+				$response["msg"] = "¡Se ha generado el detalle de pago con éxito!";
 				$rs = $this->calendarioModel->getDetallePago($folio)->result();
 				if (!empty($rs) && isset($rs[0]->idDetalle)) {
 					$response["data"] = $rs[0]->idDetalle;
@@ -929,7 +983,7 @@ class CalendarioController extends BaseController{
 		}
 
 		$this->output->set_content_type('application/json');
-		$this->output->set_output(json_encode($response));
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
 	public function getLastAppointment() {
@@ -951,25 +1005,28 @@ class CalendarioController extends BaseController{
 		}
 
 		$this->output->set_content_type('application/json');
-		$this->output->set_output(json_encode($response));
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
 	public function checkInvoice()
-	{
-		$id = $this->input->post('dataValue');
-		$checkInvoice = $this->calendarioModel->checkInvoice($id);
-
-		if ($checkInvoice->num_rows() > 0) {
-			$response['result'] = false;
-			$response['msg'] = 'Ya se ha cancelado y reagendado 2 veces';
-		} else {
-			$response['result'] = true;
-			$response['msg'] = 'Se puede utilizar el folio';
-		}
-
-		$this->output->set_content_type('application/json');
-		$this->output->set_output(json_encode($response));
-	}
+    {
+        $id = $this->input->post('dataValue');
+    
+        $response['result'] = isset($id);
+        
+        if ($response['result']) {
+            $response['result'] = $this->calendarioModel->checkInvoice($id)->num_rows() === 0;
+            if ($response['result']) {
+                $response['msg'] = 'Se puede utilizar el folio';
+            } else {
+                $response['msg'] = 'Ya se ha cancelado y reagendado 2 veces';
+            }
+        }else{
+            $response['msg'] = "¡Parámetros inválidos!";
+        }
+        $this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
+    }
 
 	public function sendMail()
 	{
@@ -984,13 +1041,13 @@ class CalendarioController extends BaseController{
 		$config['charset']   = 'utf-8';
 		$config['mailtype']  = 'html';
 		$config['newline']   = "\r\n";
+		$config['smtp_crypto']   = 'ssl';
 
 		$html_message = $this->load->view($data["view"], $data, true); // la variable de data["view"] para cargar una vista dinamica
 
-		$this->load->library("email");
 		$this->email->initialize($config);
 		$this->email->from("no-reply@ciudadmaderas.com");
-		$this->email->to($data["correo"]);
+		$this->email->to($data["correo"]); // 'correo' or 'correo, correo1' or [correo, correo1, correo2].
 		$this->email->message($html_message);
 		$this->email->subject("Citas Beneficios CM - " . date('d/m/Y - H:i:s A '));
 
@@ -1003,12 +1060,13 @@ class CalendarioController extends BaseController{
 			$response["msg"] = "Error al enviar el correo";
 		}
 		
-		return $response;
+		$this->output->set_content_type('application/json');
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
 	public function updateDetallePaciente() {
-		$user  = $this->input->post('dataValue[usuario]');
-		$benefit  = $this->input->post('dataValue[beneficio]');
+		$user  	 = $this->input->post('dataValue[usuario]');
+		$benefit = $this->input->post('dataValue[beneficio]');
 
 		$response['result'] = isset($user, $benefit);
 		if ($response['result']) {
@@ -1016,7 +1074,8 @@ class CalendarioController extends BaseController{
 				case 158: $column = 'estatusQB' ; break;
 				case 585: $column = 'estatusPsi'; break;
 				case 537: $column = 'estatusNut'; break;
-				case 68:  $column = 'estatusGE' ; break;
+				case 686:  $column = 'estatusGE' ; break;
+				default: $column = 'estatus';
 			}
 			$rs = $this->calendarioModel->checkDetailPacient($user, $column)->result();
 			$response['result'] = count($rs) > 0;
@@ -1044,6 +1103,57 @@ class CalendarioController extends BaseController{
 		}
 	
 		$this->output->set_content_type('application/json');
-		$this->output->set_output(json_encode($response));
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
+	}
+
+	public function updateAppointmentData() {
+		$idUsuario  = $this->input->post('dataValue[idUsuario]');
+		$idCita     = $this->input->post('dataValue[idCita]');
+		$estatus    = $this->input->post('dataValue[estatus]');
+		$detalle    = $this->input->post('dataValue[detalle]');
+		$evaluacion = $this->input->post('dataValue[evaluacion]');
+
+		$response['result'] = isset($idUsuario, $idCita, $estatus, $detalle);
+		if ($response['result']) {
+			$values = [
+				"estatusCita" => $estatus,
+				"idDetalle" => $detalle,
+				"evaluacion" => $evaluacion,
+				"modificadoPor" => $idUsuario,
+				"fechaModificacion" => date("Y-m-d H:i:s"),
+			];
+			$response["result"] = $this->generalModel->updateRecord("citas", $values, 'idCita', $idCita);
+			if ($response["result"]) {
+				$response["msg"] = "¡Se ha actualizado la información de la cita!";
+			}else {
+				$response["msg"] = "¡Surgió un error al intentar actualizar los datos de cita!";
+			}
+		}else {
+			$response['msg'] = "¡Parámetros inválidos!";
+		}
+
+		$this->output->set_content_type("application/json");
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
+	}
+
+	public function getCitaById () {
+		$idCita  = $this->input->post('dataValue[idCita]');
+
+		$response['result'] = isset($idCita);
+		if ($response['result']) {
+			$rs = $this->calendarioModel->getCitaById($idCita)->result();
+			$response['result'] = count($rs) > 0;
+			if ($response["result"]) {
+				$response["data"] = $rs;
+				$response["msg"] = "¡Se ha generado el detalle de pago con éxito!";
+			}else {
+				$response["msg"] = "¡Surgió un error al intentar actualizar los datos de cita!";
+			}
+		}else {
+			$response['msg'] = "¡Parámetros inválidos!";
+		}
+
+		$this->output->set_content_type("application/json");
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 }

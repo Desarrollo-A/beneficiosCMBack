@@ -51,24 +51,11 @@ class usuariosModel extends CI_Model {
 	}
 
 	public function checkUser($idPaciente, $year, $month){ // función para checar si el beneficiario lleva 2 beneficios usados, sin importar mes
-		// $query = $this->db->query(
-		// 	"SELECT idPaciente from (select *from citas ct where YEAR(fechaInicio) = ? AND MONTH(fechaInicio) = ?) as citas 
-		// 	WHERE estatusCita IN(?, ?, ?) AND idPaciente = ? 
-		// 	GROUP BY idPaciente HAVING COUNT(idPaciente) > ?",
-		// 	array( $year, $month, 1, 4, 6, $idPaciente, 1 )); // version de query por mes
-
-			$query = $this->db->query(
-				"SELECT idPaciente from citas
-				WHERE estatusCita IN(?, ?, ?) AND idPaciente = ? 
-				GROUP BY idPaciente HAVING COUNT(idPaciente) > ?",
-				array(1, 4, 6, $idPaciente, 1 )); // version de queryu por todos los tiempos
+		$query = $this->db->query(
+			"SELECT idPaciente from (select *from citas ct where YEAR(fechaInicio) = ? AND MONTH(fechaInicio) = ?) as citas 
+			WHERE estatusCita IN(?) AND idPaciente = ? AND tipoCita != ? GROUP BY idPaciente HAVING COUNT(idPaciente) > ?",
+			array( $year, $month, 4, $idPaciente, 3, 1 )); // version de query por mes
 		
-		return $query;
-	}
-
-	public function getSpecialistContact($id)
-	{
-		$query = $this->db->query("SELECT nombre, telPersonal, correo FROM usuarios WHERE idUsuario = ?", $id);
 		return $query;
 	}
 
@@ -93,5 +80,11 @@ class usuariosModel extends CI_Model {
 			return false;
 		}
 		
+	}
+
+	public function updateRefreshToken($idUsuario, $refresh_token){
+		$query = "UPDATE usuarios SET refreshToken=$refresh_token WHERE idUsuario=$idUsuario";
+
+		return $this->db->query($query);
 	}
 }

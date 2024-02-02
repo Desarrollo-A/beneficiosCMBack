@@ -3,7 +3,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 require_once(APPPATH . "/controllers/BaseController.php");
 
-class reportesController extends BaseController {
+class ReportesController extends BaseController {
 
 	public function __construct()
 	{
@@ -13,26 +13,22 @@ class reportesController extends BaseController {
 		$this->load->model('reportesModel');
 		$this->load->model('especialistasModel');
 		$this->load->model('generalModel');
-
-		header('Access-Control-Allow-Origin: *');
-        header('Access-Control-Allow-Headers: Content-Type,Origin, authorization, X-API-KEY,X-Requested-With,Accept,Access-Control-Request-Method');
-        header('Access-Control-Allow-Method: GET, POST, PUT, DELETE,OPTION');
 	}
 
 	public function usuarios(){
 		$data['data'] = $this->usuariosModel->usuarios();
-		echo json_encode($data);
+		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
 	public function citas(){
 		$dt = $this->input->post('dataValue', true);
 		$data['data'] = $this->reportesModel->citas($dt)->result();
-		echo json_encode($data);
+		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
 	public function especialistas(){
 		$data['data'] = $this->especialistasModel->especialistas()->result();
-		echo json_encode($data);
+		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
 	public function observacion(){
@@ -51,11 +47,11 @@ class reportesController extends BaseController {
 			);
 			
 			$response=$this->generalModel->updateRecord('citas', $data, 'idCita', $idCita);
-			echo json_encode(array("estatus" => true, "msj" => "Observación Registrada!" ));
+			echo json_encode(array("estatus" => true, "msj" => "Observación Registrada!" ), JSON_NUMERIC_CHECK);
 				
 		}else{
 
-			echo json_encode(array("estatus" => false));
+			echo json_encode(array("estatus" => false), JSON_NUMERIC_CHECK);
 
 		}			
 	}
@@ -63,6 +59,6 @@ class reportesController extends BaseController {
 	public function getPacientes(){
 		$dt = $this->input->post('dataValue', true);
 		$data['data'] = $this->reportesModel->getPacientes($dt)->result();
-		echo json_encode($data);
+		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 }
