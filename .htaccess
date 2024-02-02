@@ -1,5 +1,5 @@
 Options -Indexes
 RewriteEngine on
-RewriteCond $1 !^(index\.php|static|images|robots\.txt)
+RewriteCond $1 !^(index\.php|dist|images|robots\.txt)
 RewriteCond $1 !^(index\.php|image|images|robots\.txt)
 RewriteRule ^(.*)$ index.php/$1 [L]
