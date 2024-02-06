@@ -13,13 +13,22 @@ jobs:
       - name: 🚚 Checkout
         uses: actions/checkout@v4
 
-      - name: 📂 Sync files
+      - name: 📂 Upload controllers
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
           server: 104.198.134.0
           port: 22
           username: prohab
           password: ${{ secrets.SFTP_SSH_PRIVATE_KEY }}
-          local-dir: ./dist/
-          server-dir: /mnt/data/aplicaciones/Prueba/git-test/
-          dangerous-clean-slate: true
+          local-dir: ./application/controllers/
+          server-dir: public_html/www/application/controllers/
+
+      - name: 📂 Upload models
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: 104.198.134.0
+          port: 22
+          username: prohab
+          password: ${{ secrets.SFTP_SSH_PRIVATE_KEY }}
+          local-dir: ./application/models/
+          server-dir: public_html/www/application/models/
