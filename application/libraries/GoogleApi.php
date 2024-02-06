@@ -115,7 +115,7 @@ class GoogleApi {
 
         $client = new Client();
 
-        $request = $client->newRequest($calendar_url, 'PUT', $data, $headers);
+        $request = $client->newRequest($calendar_url, 'PATCH', $data, $headers);
 
         $response = $request->getResponse();
 
@@ -140,7 +140,7 @@ class GoogleApi {
 
         $response = $request->getResponse();
 
-        $response->getParsedResponse();
+        return json_decode($response->getParsedResponse());
     }
 }
 
