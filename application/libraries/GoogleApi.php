@@ -104,7 +104,7 @@ class GoogleApi {
     public function updateCalendarEvent($calendar_name = 'primary', $id, $data){
 
         //INSERT ITEM IN CALENDAR
-        $calendar_url = "https://www.googleapis.com/calendar/v3/calendars/$calendar_name/events/$id?sendUpdates=all";
+        $calendar_url = "https://www.googleapis.com/calendar/v3/calendars/$calendar_name/events/$id?sendNotifications=true&sendUpdates=all";
 
         $headers = [
             "Authorization" => "Bearer $this->token",
