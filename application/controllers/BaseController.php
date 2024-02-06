@@ -24,7 +24,7 @@ abstract class BaseController extends CI_Controller{
         
 
         $this->load->database('default');
-        $this->load->library('session');
+        
         //$this->load->helper(array('form','funciones'));
 
         // $this->load->library('Token');

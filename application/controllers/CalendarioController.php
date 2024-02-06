@@ -32,12 +32,12 @@ class CalendarioController extends BaseController{
 		$appointment = $this->calendarioModel->getAppointment($year, $month, $idUsuario, $dates);
 
 		if ($occupied->num_rows() > 0 || $appointment->num_rows() > 0)
-			$data["events"] = array_merge($occupied->result(), $appointment->result());
+			$response["events"] = array_merge($occupied->result(), $appointment->result());
 		else
-			$data["events"] = array('');
+			$response["events"] = array('');
 
 		$this->output->set_content_type('application/json');
-		$this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
 	public function getAllEventsWithRange()
@@ -352,7 +352,7 @@ class CalendarioController extends BaseController{
 			} else if ($checkOccupied->num_rows() > 0) {
 				$response["result"] = false;
 				$response["msg"] = "Horario no disponible";
-			} else if ($checkUser->num_rows() === 0) {
+			} else if ($checkUser->num_rows() > 0) {
 				$response["result"] = false;
 				$response["msg"] = "El paciente no ha ocupado sus beneficios disponibles";
 			} else if (!isset($pass)) {

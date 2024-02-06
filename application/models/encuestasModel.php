@@ -2,7 +2,7 @@
 /**
  * 
  */
-class encuestasModel extends CI_Model {
+class EncuestasModel extends CI_Model {
 	public function __construct()
 	{
 		parent::__construct();
