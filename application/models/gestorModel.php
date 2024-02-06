@@ -11,7 +11,7 @@ class gestorModel extends CI_Model {
 
     public function getOficinasVal($dt)
     {
-        $query = $this->db-> query("SELECT idOficina, oficina FROM oficinas WHERE idSede =  $dt");
+        $query = $this->db-> query("SELECT idOficina, oficina FROM oficinas WHERE idSede =  $dt OR idSede =  0");
         
         if($query->num_rows() > 0){
             return $query->result();
@@ -27,7 +27,7 @@ class gestorModel extends CI_Model {
         $idSede = $dt["idSd"];
         $idPuesto = $dt["idPs"];
 
-        $query = $this->db-> query("SELECT idUsuario, nombre FROM usuarios WHERE idSede = $idSede AND idRol = 3 AND idPuesto = $idPuesto");
+        $query = $this->db-> query("SELECT idUsuario, nombre FROM usuarios WHERE idRol = 3 AND idPuesto = $idPuesto");
         
         if($query->num_rows() > 0){
             return $query->result();
