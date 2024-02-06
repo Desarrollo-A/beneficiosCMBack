@@ -11,6 +11,7 @@ class CalendarioController extends BaseController{
 		$this->load->model('usuariosModel');
 
 		$this->load->library("email");
+		$this->load->library('GoogleApi');
 	}
 
 	public function getAllEvents()
@@ -34,7 +35,7 @@ class CalendarioController extends BaseController{
 		if ($occupied->num_rows() > 0 || $appointment->num_rows() > 0)
 			$response["events"] = array_merge($occupied->result(), $appointment->result());
 		else
-			$response["events"] = array('');
+			$response["events"] = array();
 
 		$this->output->set_content_type('application/json');
 		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
@@ -123,7 +124,7 @@ class CalendarioController extends BaseController{
 			} else {
 				$response["result"] = false;
 
-				if ($check_appointment->num_rows() > 0) {
+				if ($checkAppointment->num_rows() > 0) {
 					$response["msg"] = "El paciente ocupo el horario";
 				} else {
 					$response["msg"] = "Horario no disponible";
@@ -339,7 +340,8 @@ class CalendarioController extends BaseController{
 				"modificadoPor" => $dataValue["modificadoPor"],
 				"idAtencionXSede" => intval($dataValue["idCatalogo"]),
 				"tipoCita" => 3,
-				"idDetalle" => $dataValue["idDetalle"]
+				"idDetalle" => $dataValue["idDetalle"],
+				"idEventoGoogle" => $reagenda == 1 ? $dataValue["idEventoGoogle"] : ''
 			];
 
 			$checkUser = $this->usuariosModel->checkUser($dataValue["idPaciente"], $year, $month);
@@ -361,8 +363,11 @@ class CalendarioController extends BaseController{
 			} else {
 				$addRecord = $this->generalModel->addRecord("citas", $values);
 
+				$last_id = $this->db->insert_id();
+				
 				if ($addRecord) {
 					$response["result"] = true;
+					$response["data"] = $last_id;
 					$response["msg"] = "Se ha agendado a cita";
 				} else {
 					$response["result"] = false;
@@ -1155,5 +1160,150 @@ class CalendarioController extends BaseController{
 
 		$this->output->set_content_type("application/json");
 		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
+	}
+
+	public function insertGoogleEvent () {
+        $dataValue = $this->input->post("dataValue", true);
+
+        $title       = $this->input->post('dataValue[title]'); // Titulo del evento: 'Cualquier titulo'
+        $start       = $this->input->post('dataValue[start]'); // Fecha inicial del evento: '2024-01-31T13:00:00'
+        $end         = $this->input->post('dataValue[end]');   // Fecha final del evento: '2024-01-31T14:00:00'
+        $location    = $this->input->post('dataValue[location]'); // Ubicación del evento: 'Queretaro, querétaro, etc. etc...'
+        $description = $this->input->post('dataValue[description]'); // Descripción del evento: 'Cita para el beneficio de ciudad maderas'
+        $attendees   = $this->input->post('dataValue[attendees]'); // Personas involucradas para asistir al evento
+        $email       = $this->input->post('dataValue[email]'); // Correo del que utilizará el correo para agendarlo.
+
+        $response['result'] = isset($title, $end, $start, $attendees, $email);
+        if ($response['result']) {
+            $this->googleapi->getAccessToken($email);
+
+            $data = json_encode(array(
+                'summary' => $title,
+                'location' => $location,
+                'description' => $description,
+                'start' => array(
+                    'dateTime' => $start,
+                    'timeZone' => 'America/Mexico_City',
+                ),
+                'end' => array(
+                    'dateTime' => $end,
+                    'timeZone' => 'America/Mexico_City',
+                ),
+                'attendees' => $attendees,
+                'source' => [
+                    'title' => 'Beneficios Maderas',
+                    'url' => 'https://prueba.gphsis.com/beneficiosmaderas/'
+                ],
+                'reminders' => array(
+                    'useDefault' => FALSE,
+                    'overrides' => array(
+                        array('method' => 'email', 'minutes' => 24 * 60), // 1 dia antes
+                        array('method' => 'email', 'minutes' => 4 * 60), // 4 horas antes
+                        array('method' => 'popup', 'minutes' => 24* 60), // 1 dia antes
+                        array('method' => 'popup', 'minutes' => 4 * 60), // 4 horas antes
+                    ),
+                ),
+                'visibility' => 'public',
+                'colorId' => '07'
+            ), JSON_NUMERIC_CHECK);
+
+            $event = $this->googleapi->createCalendarEvent('primary', $data);
+            $response['result'] = !isset($event->error); 
+
+            if ($response['result']) {
+                $response['data'] = $event;
+                $response['msg'] = "¡Evento registrado en el calendario de google!"; 
+            }else {
+                $response['msg'] = "¡No se pudó insertar el evento en el calendario de google!"; 
+            }
+        }else {
+            $response['msg'] = "¡Parámetros inválidos!";
+        }
+
+        $this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
+    }
+
+	public function updateGoogleEvent(){
+        $start = $this->input->post("dataValue[start]");
+        $end = $this->input->post("dataValue[end]");
+        $id = $this->input->post("dataValue[id]");
+        $email    = $this->input->post("dataValue[email]");
+		$attendees = $this->input->post("dataValue[attendees]");
+
+        $response["result"] = isset($id, $start, $end, $email, $attendees);
+	
+        if($response["result"]){
+            $this->googleapi->getAccessToken($email);
+
+            $data = json_encode(array(
+                'start' => array(
+                    'dateTime' => $start,
+                    'timeZone' => 'America/Mexico_City',
+                ),
+                'end' => array(
+                    'dateTime' => $end,
+                    'timeZone' => 'America/Mexico_City',
+				),
+				'attendees' => $attendees
+            ), JSON_NUMERIC_CHECK);
+    
+            $updatedEvent = $this->googleapi->updateCalendarEvent('primary', $id, $data);
+            $response["result"] = !isset($updatedEvent->error);
+
+            if($response["result"]){
+                $response["data"] = $updatedEvent;
+                $response["msg"] = "Se ha actualizado los datos del evento en el calendario de google";
+            }
+            else{
+                $response["msg"] = "No se pudo realizar la modificación de datos del evento en el calendario de google";
+            }
+        } 
+        else{
+            $response['msg'] = "¡Parámetros inválidos!";
+        }
+
+        $this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
+    }
+
+	public function deleteGoogleEvent(){
+
+        $id    = $this->input->post('dataValue[id]');
+        $email = $this->input->post('dataValue[email]');
+
+        $response["result"] = isset($id, $email);
+
+        if($response['result']){
+            $this->googleapi->getAccessToken($email);
+
+            $delete = $this->googleapi->deleteCalendarEvent('primary', $id);
+            $response['result'] = !isset($delete->error);
+            if ($response['result']) {
+                $response['msg'] = "¡Evento eliminado en el calendario de google!"; 
+                $response['data'] = $delete;
+            }else {
+                $response['msg'] = "¡No se pudó eliminar el evento en el calendario de google!";
+            }
+        }
+        else{
+            $response['msg'] = "¡Parámetros inválidos!";
+        }
+
+        $this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
+    }
+
+	public function insertGoogleId(){
+		$dataValue = $this->input->post('dataValue', true);
+
+		$data = [
+			'idEventoGoogle' => $dataValue['idEventoGoogle']
+		];
+
+		$update = $this->generalModel->updateRecord("citas", $data, 'idCita', $dataValue["idCita"]);
+
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($update, JSON_NUMERIC_CHECK));
 	}
 }
