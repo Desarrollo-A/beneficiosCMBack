@@ -1283,7 +1283,7 @@ class CalendarioController extends BaseController{
                 $response['msg'] = "¡Evento eliminado en el calendario de google!"; 
                 $response['data'] = $delete;
             }else {
-                $response['msg'] = "¡No se pudó eliminar el evento en el calendario de google!";
+                $response['msg'] = "¡No se pudo eliminar el evento en el calendario de google!";
             }
         }
         else{
