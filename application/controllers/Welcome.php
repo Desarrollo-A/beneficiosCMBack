@@ -7,9 +7,9 @@ class Welcome extends CI_Controller {
 	{
 		parent::__construct();
 		$this->load->database('default');
-		$this->load->model('usuariosModel');
-		$this->load->model('especialistasModel');
-		$this->load->model('dashModel');
+		$this->load->model('UsuariosModel');
+		$this->load->model('EspecialistasModel');
+		$this->load->model('DashModel');
 		
 		header('Access-Control-Allow-Origin: *');
 		header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
@@ -21,7 +21,7 @@ class Welcome extends CI_Controller {
 	}
 
 	public function usuarios(){
-		$data['data'] = $this->usuariosModel->usuarios();
+		$data['data'] = $this->UsuariosModel->usuarios();
 		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 }

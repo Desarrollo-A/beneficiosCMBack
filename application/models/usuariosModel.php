@@ -2,7 +2,7 @@
 /**
  * 
  */
-class usuariosModel extends CI_Model {
+class UsuariosModel extends CI_Model {
 	public function __construct()
 	{
 		

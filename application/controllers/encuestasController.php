@@ -9,55 +9,55 @@ class EncuestasController extends BaseController {
 	{
 		parent::__construct();
 		$this->load->database('default');
-		$this->load->model('encuestasModel');
-		$this->load->model('generalModel');
+		$this->load->model('EncuestasModel');
+		$this->load->model('GeneralModel');
 		$this->load->library('email');
 
 	}
 
 	public function encuestaInsert(){
 		$dt = $this->input->post('dataValue', true);
-		$data['data'] = $this->encuestasModel->encuestaInsert($dt);
+		$data['data'] = $this->EncuestasModel->encuestaInsert($dt);
 	}
 
 	public function getRespuestas(){
-		$data['data'] = $this->encuestasModel->getRespuestas()->result();
+		$data['data'] = $this->EncuestasModel->getRespuestas()->result();
 		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
 	public function encuestaCreate(){
 		$dt = $this->input->post('dataValue', true);
-		$data['data'] = $this->encuestasModel->encuestaCreate($dt);
+		$data['data'] = $this->EncuestasModel->encuestaCreate($dt);
 	}
 
 	public function encuestaMinima(){
-		$data['data'] = $this->encuestasModel->encuestaMinima()->result();
+		$data['data'] = $this->EncuestasModel->encuestaMinima()->result();
 		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
 	public function getEncuesta(){
 		$dt = $this->input->post('dataValue', true);
-		$data['data'] = $this->encuestasModel->getEncuesta($dt)->result();
+		$data['data'] = $this->EncuestasModel->getEncuesta($dt)->result();
 		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
 	public function getResp1(){
-		$data['data'] = $this->encuestasModel->getResp1()->result();
+		$data['data'] = $this->EncuestasModel->getResp1()->result();
 		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
 	public function getResp2(){
-		$data['data'] = $this->encuestasModel->getResp2()->result();
+		$data['data'] = $this->EncuestasModel->getResp2()->result();
 		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
 	public function getResp3(){
-		$data['data'] = $this->encuestasModel->getResp3()->result();
+		$data['data'] = $this->EncuestasModel->getResp3()->result();
 		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
 	public function getResp4(){
-		$data['data'] = $this->encuestasModel->getResp4()->result();
+		$data['data'] = $this->EncuestasModel->getResp4()->result();
 		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
@@ -65,7 +65,7 @@ class EncuestasController extends BaseController {
 
 		$dt = $this->input->post('dataValue', true);
 
-		$data['data'] = $this->encuestasModel->getEncNotificacion($dt);
+		$data['data'] = $this->EncuestasModel->getEncNotificacion($dt);
 		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
@@ -73,12 +73,12 @@ class EncuestasController extends BaseController {
 
 		$dt = $this->input->post('dataValue', true);
 
-		$data['data'] = $this->encuestasModel->getEcuestaValidacion($dt);
+		$data['data'] = $this->EncuestasModel->getEcuestaValidacion($dt);
 		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
 	public function getPuestos(){
-		$data['data'] = $this->encuestasModel->getPuestos()->result();
+		$data['data'] = $this->EncuestasModel->getPuestos()->result();
 		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
@@ -86,7 +86,7 @@ class EncuestasController extends BaseController {
 
 		$dt = $this->input->post('dataValue', true);
 
-		$data['data'] = $this->encuestasModel->getEncuestasCreadas($dt)->result();
+		$data['data'] = $this->EncuestasModel->getEncuestasCreadas($dt)->result();
 		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
@@ -108,14 +108,14 @@ class EncuestasController extends BaseController {
 			"estatus" => 0,
 		);
 
-		$response_1=$this->generalModel->updateRecord('encuestasCreadas', $data_1, 'idEncuesta', $idEnc);
+		$response_1=$this->GeneralModel->updateRecord('encuestasCreadas', $data_1, 'idEncuesta', $idEnc);
 
 		$data_2 = array(
 			"estatus" => $estatus,
 			"diasVigencia" => $vigencia
 		);
 
-		$response_2=$this->generalModel->updateRecord('encuestasCreadas', $data_2, 'idEncuesta', $idEncuesta);
+		$response_2=$this->GeneralModel->updateRecord('encuestasCreadas', $data_2, 'idEncuesta', $idEncuesta);
 		echo json_encode(array("estatus" => true, "msj" => "Estatus Actualizado!" ), JSON_NUMERIC_CHECK);
 				
 	}
@@ -129,7 +129,7 @@ class EncuestasController extends BaseController {
 			"diasVigencia" => $vigencia
 		);
 
-		$response=$this->generalModel->updateRecord('encuestasCreadas', $data, 'idEncuesta', $idEncuesta);
+		$response=$this->GeneralModel->updateRecord('encuestasCreadas', $data, 'idEncuesta', $idEncuesta);
 		echo json_encode(array("estatus" => true, "msj" => "Dato Actualizado!" ), JSON_NUMERIC_CHECK);
 				
 	}
@@ -138,7 +138,7 @@ class EncuestasController extends BaseController {
 
 		$dt = $this->input->post('dataValue', true);
 
-		$data['data'] = $this->encuestasModel->getEstatusUno($dt)->result();
+		$data['data'] = $this->EncuestasModel->getEstatusUno($dt)->result();
 		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
@@ -185,7 +185,7 @@ class EncuestasController extends BaseController {
 				"proximaEjecucion" => $lunesProximo
 			);
 		
-			$response = $this->generalModel->updateRecord('cronConsulta', $data, 'idCronConsulta', 1);
+			$response = $this->GeneralModel->updateRecord('cronConsulta', $data, 'idCronConsulta', 1);
 
 			$query = $this->db->query("SELECT DISTINCT ct.idPaciente, co.correo, ec.idEncuesta FROM citas ct
 			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
@@ -240,7 +240,7 @@ class EncuestasController extends BaseController {
 
 		$dt = $this->input->post('dataValue', true);
 
-		$data['data'] = $this->encuestasModel->getValidEncContestada($dt);
+		$data['data'] = $this->EncuestasModel->getValidEncContestada($dt);
 		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 }

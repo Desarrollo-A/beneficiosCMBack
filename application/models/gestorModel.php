@@ -2,7 +2,7 @@
 /**
  * 
  */
-class gestorModel extends CI_Model {
+class GestorModel extends CI_Model {
 	public function __construct()
 	{
 		parent::__construct();
@@ -88,13 +88,11 @@ class gestorModel extends CI_Model {
 
         if (isset($data)) {
 
-			foreach ($data["items"] as $item) {
-
-                $idEspecialista = $item["especialista"];
-                $idSede = $item["sede"];
-                $idOficina = $item["oficina"];
-                $tipoCita = $item["modalidad"];
-                $idUsuario = $item["usuario"];
+                $idEspecialista = $data["especialista"];
+                $idSede = $data["sede"];
+                $idOficina = $data["oficina"];
+                $tipoCita = $data["modalidad"];
+                $idUsuario = $data["usuario"];
 
 				if (empty($idEspecialista) ||
                     empty($idSede) ||
@@ -105,7 +103,6 @@ class gestorModel extends CI_Model {
 					echo json_encode(array("estatus" => false, "msj" => "Faltan datos!" ));
 					$datosValidos = false;
 
-					break; 
 				}else{
 
                     $query = $this->db->query("INSERT INTO atencionXSede
@@ -122,7 +119,7 @@ class gestorModel extends CI_Model {
                     }
                 
                 }
-			}
+
         } else {
 			echo json_encode(array("estatus" => false, "msj" => "Error Faltan Datos" ));
 		}
