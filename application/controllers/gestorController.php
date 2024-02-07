@@ -72,6 +72,28 @@ class GestorController extends BaseController {
 				
 	}
 
+	public function updateOficina(){
+
+		$idOficina= $this->input->post('dataValue[idOfi]');
+		$oficina= $this->input->post('dataValue[ofi]');
+		$idSede= $this->input->post('dataValue[idSede]');
+		$ubicacion= $this->input->post('dataValue[ubi]');
+		$estatus= $this->input->post('dataValue[estatus]');
+		$modificadoPor= $this->input->post('dataValue[modificadoPor]');
+
+		$data = array(
+			"oficina" => $oficina,
+			"idSede" => $idSede,	
+			"ubicación" => $ubicacion,
+			"estatus" => $estatus,
+			"modificadoPor" => $modificadoPor,
+		);
+
+		$response=$this->GeneralModel->updateRecord('oficinas', $data, 'idOficina', $idOficina);
+		echo json_encode(array("estatus" => true, "msj" => "Estatus Actualizado!" ));
+				
+	}
+
 	public function getEsp(){
 		$dt = $this->input->post('dataValue', true);
 		$data['data'] = $this->GestorModel->getEsp($dt);
@@ -82,6 +104,17 @@ class GestorController extends BaseController {
 		$dt = $this->input->post('dataValue', true);
 		$data['data'] = $this->GestorModel->getAtencionXsedeEsp($dt);
 		echo json_encode($data);
+	}
+
+	public function getOficinas(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->GestorModel->getOficinas($dt)->result();
+		echo json_encode($data);
+	}
+
+	public function insertOficinas(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->GestorModel->insertOficinas($dt);
 	}
 
 }

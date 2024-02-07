@@ -141,4 +141,68 @@ class GestorModel extends CI_Model {
         
     }
 
+    public function getOficinas($dt)
+    {
+        $idRol = $dt["idRol"];
+        $idPuesto = $dt["idPuesto"];
+        
+        if($idRol == 4){
+            $query = $this->db-> query("SELECT ofi.idOficina, ofi.oficina, sd.idSede, sd.sede, ofi.ubicación, ofi.estatus 
+            FROM oficinas ofi
+            INNER JOIN sedes sd ON sd.idSede = ofi.idSede");
+            return $query;
+        }
+        else{
+            $query = $this->db-> query("SELECT DISTINCT ofi.idOficina, ofi.oficina, sd.sede, ofi.ubicación, ofi.estatus 
+            FROM usuarios us
+            INNER JOIN oficinas ofi ON ofi.idSede = us.idSede
+            INNER JOIN sedes sd ON sd.idSede = us.idSede
+            WHERE us.idPuesto = $idPuesto");
+            return $query;
+        }
+    }
+
+    public function insertOficinas($dt)
+    {
+        $data = json_decode($dt, true);
+
+        $datosValidos = true;
+
+        if (isset($data)) {
+
+                $oficina = $data["ofi"];
+                $idSede = $data["idSede"];
+                $ubicacion = $data["ubi"];
+                $estatus = $data["estatus"];
+                $creadoPor = $data["creadoPor"];
+
+				if (empty($oficina) ||
+                    empty($idSede) ||
+                    empty($ubicacion) ||
+                    empty($creadoPor)) {
+
+					echo json_encode(array("estatus" => false, "msj" => "Faltan datos!" ));
+					$datosValidos = false;
+
+				}else{
+
+                    $query = $this->db->query("INSERT INTO oficinas (oficina, idSede, ubicación, estatus, creadoPor, fechaCreacion ) 
+                    VALUES (?, ?, ?, ?, ?, GETDATE())", 
+                    array($oficina, $idSede, $ubicacion, $estatus, $creadoPor));
+                    
+                    $this->db->trans_complete();
+
+                    if ($this->db->trans_status() === FALSE) {
+                        echo "Error al realizar el registro";
+                    } else {
+                        echo json_encode(array("estatus" => true, "msj" => "Registro realizado exitosamente" ));
+                    }
+                
+                }
+
+        } else {
+			echo json_encode(array("estatus" => false, "msj" => "Error Faltan Datos" ));
+		}
+    }
+
 }
