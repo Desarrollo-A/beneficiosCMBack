@@ -1,14 +1,24 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
-class avisosPrivacidadModel extends CI_Model{
+class avisosPrivacidadModel extends CI_Model
+{
 
-	function getEspecialidades(){
-		$query = $this->db->query("SELECT * FROM opcionesPorCatalogo WHERE idCatalogo=1");
+	function getEspecialidades()
+	{
+		$query = $this->db->query("SELECT *, 
+		'idPuesto' =  CASE
+		WHEN idOpcion = 1 THEN 585
+		WHEN idOpcion = 2 THEN 537
+		WHEN idOpcion = 3 THEN 686
+		WHEN idOpcion = 4 THEN 158
+		END
+		from opcionesPorCatalogo where idCatalogo = 1");
 		return $query->result_array();
 	}
 
-	function getAvisoPrivacidadByEsp($idEspecialidad){
+	function getAvisoPrivacidadByEsp($idEspecialidad)
+	{
 		$query = $this->db->query("SELECT hd.*, opc.nombre as nombreDocumento, opc2.nombre as nombreEspecialidad
  		FROM historialDocumento hd
 		LEFT JOIN opcionesPorCatalogo opc ON opc.idOpcion = hd.tipoDocumento AND opc.idCatalogo = 11
@@ -18,7 +28,8 @@ class avisosPrivacidadModel extends CI_Model{
 		return $query->result_array();
 	}
 
-	function revisaRamaActiva($idExpediente){
+	function revisaRamaActiva($idExpediente)
+	{
 		$query = $this->db->query("SELECT * FROM historialDocumento WHERE status=1 AND tipoDocumento = 1 AND idDocumento=$idExpediente;");
 		return $query->result_array();
 	}
