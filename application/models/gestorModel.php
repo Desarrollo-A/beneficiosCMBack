@@ -205,4 +205,45 @@ class GestorModel extends CI_Model {
 		}
     }
 
+    public function insertSedes($dt)
+    {
+        $data = json_decode($dt, true);
+
+        $datosValidos = true;
+
+        if (isset($data)) {
+
+                $sede = $data["sede"];
+                $abreviacion = $data["abreviacion"];
+                $estatus = $data["estatus"];
+                $creadoPor = $data["creadoPor"];
+
+				if (empty($sede) ||
+                    empty($abreviacion) ||
+                    empty($creadoPor)) {
+
+					echo json_encode(array("estatus" => false, "msj" => "Faltan datos!" ));
+					$datosValidos = false;
+
+				}else{
+
+                    $query = $this->db->query("INSERT INTO sedes (sede, abreviacion, estatus, creadoPor, fechaCreacion ) 
+                    VALUES (?, ?, ?, ?, GETDATE())", 
+                    array($sede, $abreviacion, $estatus, $creadoPor));
+                    
+                    $this->db->trans_complete();
+
+                    if ($this->db->trans_status() === FALSE) {
+                        echo "Error al realizar el registro";
+                    } else {
+                        echo json_encode(array("estatus" => true, "msj" => "Registro realizado exitosamente" ));
+                    }
+                
+                }
+
+        } else {
+			echo json_encode(array("estatus" => false, "msj" => "Error Faltan Datos" ));
+		}
+    }
+
 }
