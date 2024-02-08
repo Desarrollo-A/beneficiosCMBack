@@ -9,10 +9,9 @@ class Usuario extends BaseController {
 	{
 		parent::__construct();
 		$this->load->database('default');
-		$this->load->model('UsuariosModel');
-		$this->load->model('GeneralModel');
+		$this->load->model('usuariosModel');
+		$this->load->model('generalModel');
 		$this->load->model('menuModel');
-		$this->load->library('GoogleApi');
 
 		$this->load->helper(array('form','funciones'));
 		$this->load->library('GoogleApi');
@@ -69,7 +68,7 @@ class Usuario extends BaseController {
 
 		$data->password = encriptar($data->password);
 
-		$user = $this->UsuariosModel->login($data->numempleado, $data->password);
+		$user = $this->usuariosModel->login($data->numempleado, $data->password);
 
 		if(!$user){
 			$response['message'] = 'El empleado no se encuentra registrado';
@@ -116,7 +115,7 @@ class Usuario extends BaseController {
 
 		$access_token = $this->googleapi->getAccessToken($code);
 
-		$this->UsuariosModel->updateRefreshToken($user->idUsuario, $access_token->refresh_token);
+		$this->usuariosModel->updateRefreshToken($user->idUsuario, $access_token->refresh_token);
 	}
 
 	public function menu()
@@ -128,16 +127,16 @@ class Usuario extends BaseController {
 		$id_user = intval($user->idUsuario);
 		$id_rol = intval($user->idRol);
 
-		echo json_encode($this->menuModel->getMenu($id_user, $id_rol), JSON_NUMERIC_CHECK);
+		echo json_encode($this->menuModel->getMenu($id_user, $id_rol));
 	}
 
 	public function usuarios(){
-		$data['data'] = $this->UsuariosModel->usuarios();
-		echo json_encode($data, JSON_NUMERIC_CHECK);
+		$data['data'] = $this->usuariosModel->usuarios();
+		echo json_encode($data);
 	}
 
 	public function getUsers(){
-		$rs = $this->UsuariosModel->getUsers();
+		$rs = $this->usuariosModel->getUsers();
 		$data['result'] = count($rs) > 0; 
 		if ($data['result']) {
 			$data['msg'] = '¡Listado de usuarios cargado exitosamente!';
@@ -146,11 +145,11 @@ class Usuario extends BaseController {
 			$data['msg'] = '¡No existen registros!';
 		}
 		$this->output->set_content_type("application/json");
-        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+        $this->output->set_output(json_encode($data));
 	}
 
 	public function getAreas(){
-		$rs = $this->UsuariosModel->getAreas();
+		$rs = $this->usuariosModel->getAreas();
 		$data['result'] = count($rs) > 0; 
 		if ($data['result']) {
 			$data['msg'] = '¡Listado de areas cargado exitosamente!';
@@ -159,7 +158,7 @@ class Usuario extends BaseController {
 			$data['msg'] = '¡No existen registros!';
 		}
 		$this->output->set_content_type("application/json");
-        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+        $this->output->set_output(json_encode($data));
 	}
 
 	public function insertBatchUsers()
@@ -197,7 +196,7 @@ class Usuario extends BaseController {
                 $rows[] = $row;
             }
         
-            $response['result'] = $this->GeneralModel->insertBatch($table, $rows);
+            $response['result'] = $this->generalModel->insertBatch($table, $rows);
             
             if ($response['result']) {
                 $response['msg'] = "¡Listado insertado exitosamente!";
@@ -208,7 +207,7 @@ class Usuario extends BaseController {
             $response['msg'] = "¡Parametros invalidos!";
         }
         $this->output->set_content_type("application/json");
-        $this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
+        $this->output->set_output(json_encode($response));
     }
 
 	public function updateUser() {
@@ -228,7 +227,7 @@ class Usuario extends BaseController {
 		
 		if ($response['result']) {  
 			$data['fechaModificacion'] = $fecha;
-			$response['result'] = $this->GeneralModel->updateRecord('usuarios', $data, 'idUsuario', $user);
+			$response['result'] = $this->generalModel->updateRecord('usuarios', $data, 'idUsuario', $user);
 	
 			if ($response['result']) {
 				$response['msg'] = "¡Usuario actualizado exitosamente!";
@@ -240,13 +239,13 @@ class Usuario extends BaseController {
 		}
 	
 		$this->output->set_content_type("application/json");
-		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
+		$this->output->set_output(json_encode($response));
 	}
 
 	public function getNameUser(){
 		$idEspecialista = $this->input->post("dataValue", true);
 
-		$getNameUser = $this->UsuariosModel->getNameUser($idEspecialista)->result();
+		$getNameUser = $this->usuariosModel->getNameUser($idEspecialista)->result();
 		$response['result'] = count($getNameUser) > 0;
 		if ($response['result']) {
 			$response['msg'] = '¡Listado de usuarios cargado exitosamente!';
@@ -255,14 +254,14 @@ class Usuario extends BaseController {
 			$response['msg'] = '¡No existen registros!';
 		}
 		$this->output->set_content_type("application/json");
-        $this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
+        $this->output->set_output(json_encode($response));
 	}
 
 	public function decodePass(){
 
 		$dt = $this->input->post('dataValue', true);
-		$data['data'] = $this->UsuariosModel->decodePass($dt);
-		echo json_encode($data, JSON_NUMERIC_CHECK);
+		$data['data'] = $this->usuariosModel->decodePass($dt);
+		echo json_encode($data);
 	}
 
 	public function updatePass(){
@@ -277,216 +276,11 @@ class Usuario extends BaseController {
 					"password" => encriptar($newPass),
 				);
 				
-				$response=$this->GeneralModel->updateRecord('usuarios', $data, 'idUsuario', $idUsuario);
-				echo json_encode(array("estatus" => true, "msj" => "Contraseña actualizada!" ), JSON_NUMERIC_CHECK);
+				$response=$this->generalModel->updateRecord('usuarios', $data, 'idUsuario', $idUsuario);
+				echo json_encode(array("estatus" => true, "msj" => "Contraseña actualizada!" ));
 					
 			}else{
-				echo json_encode(array("estatus" => false, "msj" => "Error en actualizar contraseña"), JSON_NUMERIC_CHECK);
+				echo json_encode(array("estatus" => false, "msj" => "Error en actualizar contraseña"));
 			}	
 	}
-
-	//////////////////////
-	// START GOOGLE API//
-	/////////////////////
-
-	public function test(){
-
-        $email = "programador.analista40@ciudadmaderas.com";
-
-        $this->googleapi->getAccessToken($email);
-        
-        $data = json_encode(array(
-            'summary' =>'reunion nutriologo',
-            'location' => 'avenidad el sauz 621 colonia los pinos, celaya guanajuato',
-            'description' => ' cita con el nutriologo perez para bajarte la panza',
-            'start' => array(
-                'dateTime' => '2024-01-31T13:00:00',
-                // 'dateTime' => $start.':00-04:00',
-                'timeZone' => 'America/Mexico_City',
-            ),
-            'end' => array(
-                'dateTime' => '2024-01-31T14:50:00',
-                //'dateTime' => $end.':00-04:00',
-                'timeZone' => 'America/Mexico_City',
-            ),
-            'attendees' => [
-            	0 => [
-            		'email' => $email,
-            		'responseStatus' => 'accepted',
-            	],
-            	1 => [
-            		'email' => "rimtzg@gmail.com",
-            		'responseStatus' => 'needsAction',
-            		'displayName' => 'Yo merengues'
-            	]
-            ],
-            'source' => [
-            	'title' => 'El google',
-            	'url' => 'https://www.google.com'
-            ],
-            'reminders' => array(
-                'useDefault' => FALSE,
-                'overrides' => array(
-                    array('method' => 'email', 'minutes' => 24 * 60),
-                    array('method' => 'popup', 'minutes' => 60),
-                    array('method' => 'popup', 'minutes' => 10),
-                ),
-            ),
-            'visibility' => 'public',
-        ), JSON_NUMERIC_CHECK);
-
-        $event = $this->googleapi->createCalendarEvent('primary', $data);
-
-        //print_r($event);
-
-        $id = $event->id;
-
-        //print_r($id);
-
-        $data = json_encode(array(
-            'summary' =>'reunion nutriologo (actualizado)',
-            'location' => 'avenidad el sauz 621 colonia los pinos, celaya guanajuato',
-            'description' => ' cita con el nutriologo perez para bajarte la panza',
-            'start' => array(
-                'dateTime' => '2024-01-31T13:00:00',
-                // 'dateTime' => $start.':00-04:00',
-                'timeZone' => 'America/Mexico_City',
-            ),
-            'end' => array(
-                'dateTime' => '2024-01-31T14:50:00',
-                //'dateTime' => $end.':00-04:00',
-                'timeZone' => 'America/Mexico_City',
-            ),
-            'attendees' => [
-            	0 => [
-            		'email' => $email,
-            		'responseStatus' => 'accepted',
-            	],
-            	1 => [
-            		'email' => "rimtzg@gmail.com",
-            		'responseStatus' => 'needsAction',
-            		'displayName' => 'Yo merengues'
-            	]
-            ],
-            'source' => [
-            	'title' => 'El google',
-            	'url' => 'https://www.google.com'
-            ],
-            'reminders' => array(
-                'useDefault' => FALSE,
-                'overrides' => array(
-                    array('method' => 'email', 'minutes' => 24 * 60),
-                    array('method' => 'popup', 'minutes' => 60),
-                    array('method' => 'popup', 'minutes' => 10),
-                ),
-            ),
-            'visibility' => 'public',
-        ), JSON_NUMERIC_CHECK);
-
-	    $event = $this->googleapi->updateCalendarEvent('primary', $id, $data);
-
-	    //print_r($event);
-
-	    $this->googleapi->deleteCalendarEvent('primary', $id);
-
-	    print_r($event);
-
-        exit();
-    }
-
-	public function authorized(){
-		/*
-		$token = $this->headers('Token');
-		$session = $this->token->validateToken($token);
-
-		$user = (object) $session['data'];
-		*/
-
-		$headers = (object) $this->input->request_headers();
-
-		//print_r($headers);
-		//exit();
-
-		$data = explode('.', $headers->token);
-		$user = json_decode(base64_decode($data[2]));
-
-		$path = $this->input->get('path');
-
-		//print_r($path);
-		//exit();
-
-		$id_user = intval($user->idUsuario);
-		$id_rol = intval($user->idRol);
-
-		$auth = $this->MenuModel->checkAuth($path, $id_user, $id_rol);
-
-		$result = [
-			"idRol" => $id_rol,
-			"idUsuario" => $id_user,
-			"authorized" => $auth,
-		];
-
-		$this->json($result);
-	}
-
-	public function login(){
-		$response = [
-			'message' => 'Error',
-			'result' => 0
-		];
-
-		$data = $this->post();
-
-		if(!(isset($data->password) || isset($data->numempleado))){
-			$response['message'] = 'Faltan datos';
-
-			$this->json($response);
-		}
-
-		$data->password = encriptar($data->password);
-
-		$user = $this->usuariosModel->login($data->numempleado, $data->password);
-
-		if(!$user){
-			$response['message'] = 'El empleado no se encuentra registrado';
-
-			$this->json($response);
-		}
-
-		$session = array(
-			'idUsuario'		=>	$user->idUsuario,
-			'idRol'			=>	$user->idRol,
-			'numEmpleado'	=>	$user->numEmpleado,
-			'numContrato'	=>	$user->numContrato,
-			'nombre'		=>	$user->nombre,
-			'telPersonal'	=>	$user->telPersonal,
-			'puesto'		=>	$user->puesto,
-			'oficina'		=>	$user->oficina,
-			'sede'			=>	$user->idSede,
-			'correo'		=>	$user->correo,
-			'idArea'		=>	$user->idArea,
-		);
-
-		$token = $this->token->generateToken($session);
-
-		if($token){
-			$response['token'] = $token;
-			$response['message'] = 'ok';
-			$response['result'] = 1;
-		}
-
-		$this->json($response);
-	}
-
-	public function check(){
-		$token = $this->headers('Token');
-
-		$session = $this->token->validateToken($token);
-
-		$this->json($session);
-	}
-
-	////////////////////
-	// END GOOGLE API//
-	///////////////////
 }
