@@ -15,7 +15,7 @@ class Especialistas extends BaseController{
 
         $sedes = $this->SedesModel->getPresencialXEspecialista($idEspecialista);
 
-        echo json_encode($sedes);
+        $this->json($sedes);
     }
 
     public function horario(){
@@ -42,5 +42,13 @@ class Especialistas extends BaseController{
 
             $this->json($response);
         }
+    }
+
+    public function horarios(){
+        $idEspecialista = $this->input->get('idEspecialista');
+
+        $horarios = $this->SedesModel->getHorariosEspecialista($idEspecialista);
+
+        $this->json($horarios);
     }
 }

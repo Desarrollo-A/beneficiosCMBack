@@ -40,4 +40,15 @@ class SedesModel extends CI_Model {
 
         return $this->db->query($query);
     }
+
+    public function getHorariosEspecialista($idEspecialista){
+        $query = "SELECT *
+        FROM presencialXSede
+        WHERE
+            idEspecialista='$idEspecialista'";
+
+        $horaios = $this->db->query($query)->result_array();
+
+        return $horaios;
+    }
 }
