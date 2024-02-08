@@ -27,8 +27,8 @@ abstract class BaseController extends CI_Controller{
         
         //$this->load->helper(array('form','funciones'));
 
-        /* $this->load->library('Token');
-        $this->load->library('GoogleApi'); */
+        // $this->load->library('Token');
+        //$this->load->library('GoogleApi');
     }
 
     public function headers($key = null){

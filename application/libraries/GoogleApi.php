@@ -104,7 +104,7 @@ class GoogleApi {
     public function updateCalendarEvent($calendar_name = 'primary', $id, $data){
 
         //INSERT ITEM IN CALENDAR
-        $calendar_url = "https://www.googleapis.com/calendar/v3/calendars/$calendar_name/events/$id?sendUpdates=all";
+        $calendar_url = "https://www.googleapis.com/calendar/v3/calendars/$calendar_name/events/$id?sendNotifications=true&sendUpdates=all";
 
         $headers = [
             "Authorization" => "Bearer $this->token",
@@ -115,7 +115,7 @@ class GoogleApi {
 
         $client = new Client();
 
-        $request = $client->newRequest($calendar_url, 'PUT', $data, $headers);
+        $request = $client->newRequest($calendar_url, 'PATCH', $data, $headers);
 
         $response = $request->getResponse();
 
@@ -140,7 +140,7 @@ class GoogleApi {
 
         $response = $request->getResponse();
 
-        $response->getParsedResponse();
+        return json_decode($response->getParsedResponse());
     }
 }
 

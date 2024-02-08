@@ -12,233 +12,10 @@ class Usuario extends BaseController {
 		$this->load->model('UsuariosModel');
 		$this->load->model('GeneralModel');
 		$this->load->model('menuModel');
+		$this->load->library('GoogleApi');
 
 		$this->load->helper(array('form','funciones'));
 		$this->load->library('GoogleApi');
-	}
-	
-	public function test(){
-
-        $email = "programador.analista40@ciudadmaderas.com";
-
-        $this->googleapi->getAccessToken($email);
-        
-        $data = json_encode(array(
-            'summary' =>'reunion nutriologo',
-            'location' => 'avenidad el sauz 621 colonia los pinos, celaya guanajuato',
-            'description' => ' cita con el nutriologo perez para bajarte la panza',
-            'start' => array(
-                'dateTime' => '2024-01-31T13:00:00',
-                // 'dateTime' => $start.':00-04:00',
-                'timeZone' => 'America/Mexico_City',
-            ),
-            'end' => array(
-                'dateTime' => '2024-01-31T14:50:00',
-                //'dateTime' => $end.':00-04:00',
-                'timeZone' => 'America/Mexico_City',
-            ),
-            'attendees' => [
-            	0 => [
-            		'email' => $email,
-            		'responseStatus' => 'accepted',
-            	],
-            	1 => [
-            		'email' => "rimtzg@gmail.com",
-            		'responseStatus' => 'needsAction',
-            		'displayName' => 'Yo merengues'
-            	]
-            ],
-            'source' => [
-            	'title' => 'El google',
-            	'url' => 'https://www.google.com'
-            ],
-            'reminders' => array(
-                'useDefault' => FALSE,
-                'overrides' => array(
-                    array('method' => 'email', 'minutes' => 24 * 60),
-                    array('method' => 'popup', 'minutes' => 60),
-                    array('method' => 'popup', 'minutes' => 10),
-                ),
-            ),
-            'visibility' => 'public',
-        ));
-
-        $event = $this->googleapi->createCalendarEvent('primary', $data);
-
-        //print_r($event);
-
-        $id = $event->id;
-
-        //print_r($id);
-
-        $data = json_encode(array(
-            'summary' =>'reunion nutriologo (actualizado)',
-            'location' => 'avenidad el sauz 621 colonia los pinos, celaya guanajuato',
-            'description' => ' cita con el nutriologo perez para bajarte la panza',
-            'start' => array(
-                'dateTime' => '2024-01-31T13:00:00',
-                // 'dateTime' => $start.':00-04:00',
-                'timeZone' => 'America/Mexico_City',
-            ),
-            'end' => array(
-                'dateTime' => '2024-01-31T14:50:00',
-                //'dateTime' => $end.':00-04:00',
-                'timeZone' => 'America/Mexico_City',
-            ),
-            'attendees' => [
-            	0 => [
-            		'email' => $email,
-            		'responseStatus' => 'accepted',
-            	],
-            	1 => [
-            		'email' => "rimtzg@gmail.com",
-            		'responseStatus' => 'needsAction',
-            		'displayName' => 'Yo merengues'
-            	]
-            ],
-            'source' => [
-            	'title' => 'El google',
-            	'url' => 'https://www.google.com'
-            ],
-            'reminders' => array(
-                'useDefault' => FALSE,
-                'overrides' => array(
-                    array('method' => 'email', 'minutes' => 24 * 60),
-                    array('method' => 'popup', 'minutes' => 60),
-                    array('method' => 'popup', 'minutes' => 10),
-                ),
-            ),
-            'visibility' => 'public',
-        ));
-
-	    $event = $this->googleapi->updateCalendarEvent('primary', $id, $data);
-
-	    //print_r($event);
-
-	    $this->googleapi->deleteCalendarEvent('primary', $id);
-
-	    print_r($event);
-
-        exit();
-    }
-
-	public function insertGoogleEvent () {
-		$dataValue = $this->input->post("dataValue", true);
-
-		$eventTittle = $dataValue['title'];
-		
-		$response['result'] = isset($eventTittle, $usuario );
-		if ($response['result']) {
-
-		}else {
-
-		}
-
-		$data = json_encode(array(
-            'summary' =>'reunion nutriologo',
-            'location' => 'avenidad el sauz 621 colonia los pinos, celaya guanajuato',
-            'description' => ' cita con el nutriologo perez para bajarte la panza',
-            'start' => array(
-                'dateTime' => '2024-01-31T13:00:00',
-                // 'dateTime' => $start.':00-04:00',
-                'timeZone' => 'America/Mexico_City',
-            ),
-            'end' => array(
-                'dateTime' => '2024-01-31T14:50:00',
-                //'dateTime' => $end.':00-04:00',
-                'timeZone' => 'America/Mexico_City',
-            ),
-            'attendees' => [
-            	0 => [
-            		'email' => $email,
-            		'responseStatus' => 'accepted',
-            	],
-            	1 => [
-            		'email' => "rimtzg@gmail.com",
-            		'responseStatus' => 'needsAction',
-            		'displayName' => 'Yo merengues'
-            	]
-            ],
-            'source' => [
-            	'title' => 'El google',
-            	'url' => 'https://www.google.com'
-            ],
-            'reminders' => array(
-                'useDefault' => FALSE,
-                'overrides' => array(
-                    array('method' => 'email', 'minutes' => 24 * 60),
-                    array('method' => 'popup', 'minutes' => 60),
-                    array('method' => 'popup', 'minutes' => 10),
-                ),
-            ),
-            'visibility' => 'public',
-        ));
-
-	}
-
-	public function updateGoogleEvent(){
-		$dataValue = $this->input->post("dataValue");
-
-		$id = $data["id"];
-
-		$data = json_encode(array(
-            'summary' =>'reunion nutriologo',
-            'location' => 'avenidad el sauz 621 colonia los pinos, celaya guanajuato',
-            'description' => ' cita con el nutriologo perez para bajarte la panza',
-            'start' => array(
-                'dateTime' => '2024-01-31T13:00:00',
-                // 'dateTime' => $start.':00-04:00',
-                'timeZone' => 'America/Mexico_City',
-            ),
-            'end' => array(
-                'dateTime' => '2024-01-31T14:50:00',
-                //'dateTime' => $end.':00-04:00',
-                'timeZone' => 'America/Mexico_City',
-            ),
-            'attendees' => [
-            	0 => [
-            		'email' => $email,
-            		'responseStatus' => 'accepted',
-            	],
-            	1 => [
-            		'email' => "rimtzg@gmail.com",
-            		'responseStatus' => 'needsAction',
-            		'displayName' => 'Yo merengues'
-            	]
-            ],
-            'source' => [
-            	'title' => 'El google',
-            	'url' => 'https://www.google.com'
-            ],
-            'reminders' => array(
-                'useDefault' => FALSE,
-                'overrides' => array(
-                    array('method' => 'email', 'minutes' => 24 * 60),
-                    array('method' => 'popup', 'minutes' => 60),
-                    array('method' => 'popup', 'minutes' => 10),
-                ),
-            ),
-            'visibility' => 'public',
-        ));
-
-		$update = $this->googleapi->updateCalendarEvent('primary', $id, $data);
-	}
-
-	public function deleteGoogleEvent(){
-		$dataValue = $this->input->post("dataValue");
-
-		$id = $dataValue["id"];
-
-		$response["result"] = isset($id);
-		if(isset($response['result'])){
-			$this->googleapi->deleteCalendarEvent('primary', $id);
-		}
-		else{
-			$response["result"] = false;
-			$response["msg"] = 'Datos invalidos';
-		}
-
-		exit;
 	}
 
 	public function authorized(){
@@ -512,257 +289,202 @@ class Usuario extends BaseController {
 	// START GOOGLE API//
 	/////////////////////
 
-	// public function test(){
+	public function test(){
 
-    //     $email = "programador.analista40@ciudadmaderas.com";
+        $email = "programador.analista40@ciudadmaderas.com";
 
-    //     $this->googleapi->getAccessToken($email);
+        $this->googleapi->getAccessToken($email);
         
-    //     $data = json_encode(array(
-    //         'summary' =>'reunion nutriologo',
-    //         'location' => 'avenidad el sauz 621 colonia los pinos, celaya guanajuato',
-    //         'description' => ' cita con el nutriologo perez para bajarte la panza',
-    //         'start' => array(
-    //             'dateTime' => '2024-01-31T13:00:00',
-    //             // 'dateTime' => $start.':00-04:00',
-    //             'timeZone' => 'America/Mexico_City',
-    //         ),
-    //         'end' => array(
-    //             'dateTime' => '2024-01-31T14:50:00',
-    //             //'dateTime' => $end.':00-04:00',
-    //             'timeZone' => 'America/Mexico_City',
-    //         ),
-    //         'attendees' => [
-    //         	0 => [
-    //         		'email' => $email,
-    //         		'responseStatus' => 'accepted',
-    //         	],
-    //         	1 => [
-    //         		'email' => "rimtzg@gmail.com",
-    //         		'responseStatus' => 'needsAction',
-    //         		'displayName' => 'Yo merengues'
-    //         	]
-    //         ],
-    //         'source' => [
-    //         	'title' => 'El google',
-    //         	'url' => 'https://www.google.com'
-    //         ],
-    //         'reminders' => array(
-    //             'useDefault' => FALSE,
-    //             'overrides' => array(
-    //                 array('method' => 'email', 'minutes' => 24 * 60),
-    //                 array('method' => 'popup', 'minutes' => 60),
-    //                 array('method' => 'popup', 'minutes' => 10),
-    //             ),
-    //         ),
-    //         'visibility' => 'public',
-    //     ), JSON_NUMERIC_CHECK);
+        $data = json_encode(array(
+            'summary' =>'reunion nutriologo',
+            'location' => 'avenidad el sauz 621 colonia los pinos, celaya guanajuato',
+            'description' => ' cita con el nutriologo perez para bajarte la panza',
+            'start' => array(
+                'dateTime' => '2024-01-31T13:00:00',
+                // 'dateTime' => $start.':00-04:00',
+                'timeZone' => 'America/Mexico_City',
+            ),
+            'end' => array(
+                'dateTime' => '2024-01-31T14:50:00',
+                //'dateTime' => $end.':00-04:00',
+                'timeZone' => 'America/Mexico_City',
+            ),
+            'attendees' => [
+            	0 => [
+            		'email' => $email,
+            		'responseStatus' => 'accepted',
+            	],
+            	1 => [
+            		'email' => "rimtzg@gmail.com",
+            		'responseStatus' => 'needsAction',
+            		'displayName' => 'Yo merengues'
+            	]
+            ],
+            'source' => [
+            	'title' => 'El google',
+            	'url' => 'https://www.google.com'
+            ],
+            'reminders' => array(
+                'useDefault' => FALSE,
+                'overrides' => array(
+                    array('method' => 'email', 'minutes' => 24 * 60),
+                    array('method' => 'popup', 'minutes' => 60),
+                    array('method' => 'popup', 'minutes' => 10),
+                ),
+            ),
+            'visibility' => 'public',
+        ), JSON_NUMERIC_CHECK);
 
-    //     $event = $this->googleapi->createCalendarEvent('primary', $data);
+        $event = $this->googleapi->createCalendarEvent('primary', $data);
 
-    //     //print_r($event);
+        //print_r($event);
 
-    //     $id = $event->id;
+        $id = $event->id;
 
-    //     //print_r($id);
+        //print_r($id);
 
-    //     $data = json_encode(array(
-    //         'summary' =>'reunion nutriologo (actualizado)',
-    //         'location' => 'avenidad el sauz 621 colonia los pinos, celaya guanajuato',
-    //         'description' => ' cita con el nutriologo perez para bajarte la panza',
-    //         'start' => array(
-    //             'dateTime' => '2024-01-31T13:00:00',
-    //             // 'dateTime' => $start.':00-04:00',
-    //             'timeZone' => 'America/Mexico_City',
-    //         ),
-    //         'end' => array(
-    //             'dateTime' => '2024-01-31T14:50:00',
-    //             //'dateTime' => $end.':00-04:00',
-    //             'timeZone' => 'America/Mexico_City',
-    //         ),
-    //         'attendees' => [
-    //         	0 => [
-    //         		'email' => $email,
-    //         		'responseStatus' => 'accepted',
-    //         	],
-    //         	1 => [
-    //         		'email' => "rimtzg@gmail.com",
-    //         		'responseStatus' => 'needsAction',
-    //         		'displayName' => 'Yo merengues'
-    //         	]
-    //         ],
-    //         'source' => [
-    //         	'title' => 'El google',
-    //         	'url' => 'https://www.google.com'
-    //         ],
-    //         'reminders' => array(
-    //             'useDefault' => FALSE,
-    //             'overrides' => array(
-    //                 array('method' => 'email', 'minutes' => 24 * 60),
-    //                 array('method' => 'popup', 'minutes' => 60),
-    //                 array('method' => 'popup', 'minutes' => 10),
-    //             ),
-    //         ),
-    //         'visibility' => 'public',
-    //     ), JSON_NUMERIC_CHECK);
+        $data = json_encode(array(
+            'summary' =>'reunion nutriologo (actualizado)',
+            'location' => 'avenidad el sauz 621 colonia los pinos, celaya guanajuato',
+            'description' => ' cita con el nutriologo perez para bajarte la panza',
+            'start' => array(
+                'dateTime' => '2024-01-31T13:00:00',
+                // 'dateTime' => $start.':00-04:00',
+                'timeZone' => 'America/Mexico_City',
+            ),
+            'end' => array(
+                'dateTime' => '2024-01-31T14:50:00',
+                //'dateTime' => $end.':00-04:00',
+                'timeZone' => 'America/Mexico_City',
+            ),
+            'attendees' => [
+            	0 => [
+            		'email' => $email,
+            		'responseStatus' => 'accepted',
+            	],
+            	1 => [
+            		'email' => "rimtzg@gmail.com",
+            		'responseStatus' => 'needsAction',
+            		'displayName' => 'Yo merengues'
+            	]
+            ],
+            'source' => [
+            	'title' => 'El google',
+            	'url' => 'https://www.google.com'
+            ],
+            'reminders' => array(
+                'useDefault' => FALSE,
+                'overrides' => array(
+                    array('method' => 'email', 'minutes' => 24 * 60),
+                    array('method' => 'popup', 'minutes' => 60),
+                    array('method' => 'popup', 'minutes' => 10),
+                ),
+            ),
+            'visibility' => 'public',
+        ), JSON_NUMERIC_CHECK);
 
-	//     $event = $this->googleapi->updateCalendarEvent('primary', $id, $data);
+	    $event = $this->googleapi->updateCalendarEvent('primary', $id, $data);
 
-	//     //print_r($event);
+	    //print_r($event);
 
-	//     $this->googleapi->deleteCalendarEvent('primary', $id);
+	    $this->googleapi->deleteCalendarEvent('primary', $id);
 
-	//     print_r($event);
+	    print_r($event);
 
-    //     exit();
-    // }
+        exit();
+    }
 
-	// public function authorized(){
-	// 	/*
-	// 	$token = $this->headers('Token');
-	// 	$session = $this->token->validateToken($token);
+	public function authorized(){
+		/*
+		$token = $this->headers('Token');
+		$session = $this->token->validateToken($token);
 
-	// 	$user = (object) $session['data'];
-	// 	*/
+		$user = (object) $session['data'];
+		*/
 
-	// 	$headers = (object) $this->input->request_headers();
+		$headers = (object) $this->input->request_headers();
 
-	// 	//print_r($headers);
-	// 	//exit();
+		//print_r($headers);
+		//exit();
 
-	// 	$data = explode('.', $headers->token);
-	// 	$user = json_decode(base64_decode($data[2]));
+		$data = explode('.', $headers->token);
+		$user = json_decode(base64_decode($data[2]));
 
-	// 	$path = $this->input->get('path');
+		$path = $this->input->get('path');
 
-	// 	//print_r($path);
-	// 	//exit();
+		//print_r($path);
+		//exit();
 
-	// 	$id_user = intval($user->idUsuario);
-	// 	$id_rol = intval($user->idRol);
+		$id_user = intval($user->idUsuario);
+		$id_rol = intval($user->idRol);
 
-	// 	$auth = $this->MenuModel->checkAuth($path, $id_user, $id_rol);
+		$auth = $this->MenuModel->checkAuth($path, $id_user, $id_rol);
 
-	// 	$result = [
-	// 		"idRol" => $id_rol,
-	// 		"idUsuario" => $id_user,
-	// 		"authorized" => $auth,
-	// 	];
+		$result = [
+			"idRol" => $id_rol,
+			"idUsuario" => $id_user,
+			"authorized" => $auth,
+		];
 
-	// 	$this->json($result);
-	// }
+		$this->json($result);
+	}
 
-	// public function login(){
-	// 	$response = [
-	// 		'message' => 'Error',
-	// 		'result' => 0
-	// 	];
+	public function login(){
+		$response = [
+			'message' => 'Error',
+			'result' => 0
+		];
 
-	// 	$data = $this->post();
-		
-	// 	if(!(isset($data->password) || isset($data->numempleado))){
-	// 		$response['message'] = 'Faltan datos';
+		$data = $this->post();
 
-	// 		$this->json($response);
-	// 	}
+		if(!(isset($data->password) || isset($data->numempleado))){
+			$response['message'] = 'Faltan datos';
 
-	// 	$data->password = encriptar($data->password);
+			$this->json($response);
+		}
 
-	// 	$user = $this->UsuariosModel->login($data->numempleado, $data->password);
+		$data->password = encriptar($data->password);
 
-	// 	if(!$user){
-	// 		$response['message'] = 'El empleado no se encuentra registrado';
+		$user = $this->usuariosModel->login($data->numempleado, $data->password);
 
-	// 		$this->json($response);
-	// 	}
+		if(!$user){
+			$response['message'] = 'El empleado no se encuentra registrado';
 
-	// 	$session = array(
-	// 		'idUsuario'		=>	$user->idUsuario,
-	// 		'idRol'			=>	$user->idRol,
-	// 		'numEmpleado'	=>	$user->numEmpleado,
-	// 		'numContrato'	=>	$user->numContrato,
-	// 		'nombre'		=>	$user->nombre,
-	// 		'telPersonal'	=>	$user->telPersonal,
-	// 		'puesto'		=>	$user->puesto,
-	// 		'oficina'		=>	$user->oficina,
-	// 		'sede'			=>	$user->idSede,
-	// 		'correo'		=>	$user->correo,
-	// 		'idArea'		=>	$user->idArea,
-	// 	);
+			$this->json($response);
+		}
 
-	// 	$token = $this->token->generateToken($session);
+		$session = array(
+			'idUsuario'		=>	$user->idUsuario,
+			'idRol'			=>	$user->idRol,
+			'numEmpleado'	=>	$user->numEmpleado,
+			'numContrato'	=>	$user->numContrato,
+			'nombre'		=>	$user->nombre,
+			'telPersonal'	=>	$user->telPersonal,
+			'puesto'		=>	$user->puesto,
+			'oficina'		=>	$user->oficina,
+			'sede'			=>	$user->idSede,
+			'correo'		=>	$user->correo,
+			'idArea'		=>	$user->idArea,
+		);
 
-	// 	if($token){
-	// 		$response['token'] = $token;
-	// 		$response['message'] = 'ok';
-	// 		$response['result'] = 1;
-	// 	}
+		$token = $this->token->generateToken($session);
 
-	// 	$this->json($response);
-	// }
+		if($token){
+			$response['token'] = $token;
+			$response['message'] = 'ok';
+			$response['result'] = 1;
+		}
 
-	// public function check(){
-	// 	$token = $this->headers('Token');
+		$this->json($response);
+	}
 
-	// 	$session = $this->token->validateToken($token);
+	public function check(){
+		$token = $this->headers('Token');
 
-	// 	$this->json($session);
-	// }
+		$session = $this->token->validateToken($token);
 
-	// public function insertGoogleEvent () {
-    //     $dataValue = $this->input->post("dataValue", true);
-
-    //     $title  	  = $dataValue['title'];
-	// 	$end    	  = $dataValue['end'];
-	// 	$start  	  = $dataValue['start'];
-	// 	$location  	  = $dataValue['location'];
-	// 	$description  = $dataValue['description'];
-    //     $attendees  = $dataValue['description'];
-
-    //     $response['result'] = isset($title, $end, $start);
-    //     if ($response['result']) {
-
-    //     }else {
-
-    //     }
-
-
-
-    //     $data = json_encode(array(
-    //         'summary' =>'reunion nutriologo',
-    //         'location' => 'avenidad el sauz 621 colonia los pinos, celaya guanajuato',
-    //         'description' => ' cita con el nutriologo perez para bajarte la panza',
-    //         'start' => array(
-    //             'dateTime' => '2024-01-31T13:00:00',
-    //             'timeZone' => 'America/Mexico_City',
-    //         ),
-    //         'end' => array(
-    //             'dateTime' => '2024-01-31T14:50:00',
-    //             'timeZone' => 'America/Mexico_City',
-    //         ),
-    //         'attendees' => [
-    //             0 => [
-    //                 'email' => $email,
-    //                 'responseStatus' => 'accepted',
-    //             ],
-    //             1 => [
-    //                 'email' => "rimtzg@gmail.com",
-	// 				'responseStatus' => 'accepted',
-    //                 'displayName' => 'Yo merengues'
-    //             ]
-    //         ],
-    //         'reminders' => array(
-    //             'useDefault' => FALSE,
-    //             'overrides' => array(
-    //                 array('method' => 'email', 'minutes' => 24 * 60),
-    //                 array('method' => 'popup', 'minutes' => 60),
-    //                 array('method' => 'popup', 'minutes' => 10),
-    //             ),
-    //         ),
-    //         'visibility' => 'public',
-    //     ), JSON_NUMERIC_CHECK);
-
-    // }
+		$this->json($session);
+	}
 
 	////////////////////
 	// END GOOGLE API//

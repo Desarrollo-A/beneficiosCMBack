@@ -91,7 +91,7 @@ class LoginController extends BaseController {
 		$insertData = array(
 			"numContrato" =>  $datosEmpleado['num_empleado'],
 			"numEmpleado" => $datosEmpleado['num_empleado'],
-			"nombre" => $datosEmpleado['nombre_persona'] . $datosEmpleado['pri_apellido'] .  $datosEmpleado['sec_apellido'],
+			"nombre" => $datosEmpleado['nombre_persona'].' '.$datosEmpleado['pri_apellido'].' '.$datosEmpleado['sec_apellido'],
 			"telPersonal" => $datosEmpleado['telefono_personal'],
 			"telOficina" => NULL,
 			"idPuesto" => $datosEmpleado['idpuesto'],

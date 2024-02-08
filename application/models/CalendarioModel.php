@@ -10,7 +10,7 @@ class calendarioModel extends CI_Model
             ct.fechaInicio AS occupied, ct.estatusCita AS estatus, ct.idDetalle, us.nombre, ct.idPaciente, ct.idEspecialista, ct.idAtencionXSede, 
             ct.tipoCita, atc.tipoCita as modalidad, atc.idSede ,usEspe.idPuesto, us.telPersonal, usEspe.telPersonal as telefonoEspecialista, ofi.oficina, 
             ofi.ubicación, pue.idArea, sed.sede, atc.idOficina, us.correo, usEspe.correo as correoEspecialista, usEspe.nombre as especialista, 
-            usEspe.sexo as sexoEspecialista, tf.fechasFolio,
+            usEspe.sexo as sexoEspecialista, tf.fechasFolio, ct.idEventoGoogle,
             'color' = CASE
 	            WHEN ct.estatusCita = 1 THEN 'orange'
 	            WHEN ct.estatusCita = 2 THEN 'red'
@@ -82,7 +82,7 @@ class calendarioModel extends CI_Model
             "SELECT CAST(ct.idCita AS VARCHAR(36))  AS id,  ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
             ct.fechaInicio AS occupied, 'date' AS 'type', ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal, us.correo,
             se.sede, ofi.oficina, ct.idDetalle, ct.idAtencionXSede, us.externo, usEspe.nombre as especialista, ct.fechaCreacion,
-            tf.fechasFolio,
+            tf.fechasFolio, idEventoGoogle,
             'color' = CASE
 	            WHEN ct.estatusCita = 0 THEN 'red'
 	            WHEN ct.estatusCita = 1 THEN 'orange'
@@ -277,9 +277,6 @@ class calendarioModel extends CI_Model
 		AND idCatalogo=1");
         return $query->result_array();
     }
-
-    // **********************************************************
-
     
     public function getBeneficiosPorSede($sede)
 	{
@@ -448,7 +445,7 @@ class calendarioModel extends CI_Model
         $query = $this->db->query("SELECT CAST(idCita AS VARCHAR(36)) AS id, ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
         ct.fechaInicio AS occupied, ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal, ofi.oficina, ofi.ubicación,
         sed.sede , atc.idOficina, us.correo, usEspe.correo as correoEspecialista, usEspe.nombre as especialista, ct.idDetalle, usEspe.telPersonal as telefonoEspecialista,
-        usEspe.sexo as sexoEspecialista, tf.fechasFolio,
+        usEspe.sexo as sexoEspecialista, tf.fechasFolio, ct.idEventoGoogle,
         beneficio = CASE 
         WHEN pue.idPuesto = 537 THEN 'Nutrición'
         WHEN pue.idPuesto = 585 THEN 'Psicología'
@@ -473,7 +470,7 @@ class calendarioModel extends CI_Model
         $query = $this->db->query("SELECT CAST(idCita AS VARCHAR(36)) AS id, ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
         ct.fechaInicio AS occupied, ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal, ofi.oficina, ofi.ubicación,
         sed.sede , atc.idOficina, us.correo, usEspe.correo as correoEspecialista, usEspe.nombre as especialista, ct.idDetalle, usEspe.telPersonal as telefonoEspecialista,
-        usEspe.sexo as sexoEspecialista, tf.fechasFolio,
+        usEspe.sexo as sexoEspecialista, tf.fechasFolio, ct.idEventoGoogle,
         beneficio = CASE 
         WHEN pue.idPuesto = 537 THEN 'Nutrición'
         WHEN pue.idPuesto = 585 THEN 'Psicología'
@@ -549,7 +546,7 @@ class calendarioModel extends CI_Model
         ct.fechaInicio AS occupied, ct.estatusCita AS estatus, ct.idDetalle, us.nombre, ct.idPaciente, ct.idEspecialista, ct.idAtencionXSede, 
         ct.tipoCita, atc.tipoCita as modalidad, atc.idSede ,usEspe.idPuesto, us.telPersonal, usEspe.telPersonal as telefonoEspecialista, ofi.oficina, ofi.ubicación, pue.idArea,
         sed.sede, atc.idOficina, us.correo, usEspe.correo as correoEspecialista, usEspe.nombre as especialista, usEspe.sexo as sexoEspecialista,
-        tf.fechasFolio,
+        tf.fechasFolio, ct.idEventoGoogle,
         'color' = CASE
             WHEN ct.estatusCita = 1 THEN 'orange'
             WHEN ct.estatusCita = 2 THEN 'red'
