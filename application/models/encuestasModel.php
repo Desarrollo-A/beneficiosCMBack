@@ -337,7 +337,7 @@ class EncuestasModel extends CI_Model {
                         "estatus" => 0,
                     );
 
-                    $response_1=$this->generalModel->updateRecord('encuestasCreadas', $data_1, 'idEncuesta', $idEnc);
+                    $response_1=$this->GeneralModel->updateRecord('encuestasCreadas', $data_1, 'idEncuesta', $idEnc);
 
                 }
 

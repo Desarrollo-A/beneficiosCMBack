@@ -9,8 +9,8 @@ class Usuario extends BaseController {
 	{
 		parent::__construct();
 		$this->load->database('default');
-		$this->load->model('usuariosModel');
-		$this->load->model('generalModel');
+		$this->load->model('UsuariosModel');
+		$this->load->model('GeneralModel');
 		$this->load->model('menuModel');
 		$this->load->library('GoogleApi');
 
@@ -69,7 +69,7 @@ class Usuario extends BaseController {
 
 		$data->password = encriptar($data->password);
 
-		$user = $this->usuariosModel->login($data->numempleado, $data->password);
+		$user = $this->UsuariosModel->login($data->numempleado, $data->password);
 
 		if(!$user){
 			$response['message'] = 'El empleado no se encuentra registrado';
@@ -116,7 +116,7 @@ class Usuario extends BaseController {
 
 		$access_token = $this->googleapi->getAccessToken($code);
 
-		$this->usuariosModel->updateRefreshToken($user->idUsuario, $access_token->refresh_token);
+		$this->UsuariosModel->updateRefreshToken($user->idUsuario, $access_token->refresh_token);
 	}
 
 	public function menu()
@@ -132,12 +132,12 @@ class Usuario extends BaseController {
 	}
 
 	public function usuarios(){
-		$data['data'] = $this->usuariosModel->usuarios();
+		$data['data'] = $this->UsuariosModel->usuarios();
 		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
 	public function getUsers(){
-		$rs = $this->usuariosModel->getUsers();
+		$rs = $this->UsuariosModel->getUsers();
 		$data['result'] = count($rs) > 0; 
 		if ($data['result']) {
 			$data['msg'] = '¡Listado de usuarios cargado exitosamente!';
@@ -150,7 +150,7 @@ class Usuario extends BaseController {
 	}
 
 	public function getAreas(){
-		$rs = $this->usuariosModel->getAreas();
+		$rs = $this->UsuariosModel->getAreas();
 		$data['result'] = count($rs) > 0; 
 		if ($data['result']) {
 			$data['msg'] = '¡Listado de areas cargado exitosamente!';
@@ -197,7 +197,7 @@ class Usuario extends BaseController {
                 $rows[] = $row;
             }
         
-            $response['result'] = $this->generalModel->insertBatch($table, $rows);
+            $response['result'] = $this->GeneralModel->insertBatch($table, $rows);
             
             if ($response['result']) {
                 $response['msg'] = "¡Listado insertado exitosamente!";
@@ -228,7 +228,7 @@ class Usuario extends BaseController {
 		
 		if ($response['result']) {  
 			$data['fechaModificacion'] = $fecha;
-			$response['result'] = $this->generalModel->updateRecord('usuarios', $data, 'idUsuario', $user);
+			$response['result'] = $this->GeneralModel->updateRecord('usuarios', $data, 'idUsuario', $user);
 	
 			if ($response['result']) {
 				$response['msg'] = "¡Usuario actualizado exitosamente!";
@@ -246,7 +246,7 @@ class Usuario extends BaseController {
 	public function getNameUser(){
 		$idEspecialista = $this->input->post("dataValue", true);
 
-		$getNameUser = $this->usuariosModel->getNameUser($idEspecialista)->result();
+		$getNameUser = $this->UsuariosModel->getNameUser($idEspecialista)->result();
 		$response['result'] = count($getNameUser) > 0;
 		if ($response['result']) {
 			$response['msg'] = '¡Listado de usuarios cargado exitosamente!';
@@ -261,7 +261,7 @@ class Usuario extends BaseController {
 	public function decodePass(){
 
 		$dt = $this->input->post('dataValue', true);
-		$data['data'] = $this->usuariosModel->decodePass($dt);
+		$data['data'] = $this->UsuariosModel->decodePass($dt);
 		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
@@ -277,7 +277,7 @@ class Usuario extends BaseController {
 					"password" => encriptar($newPass),
 				);
 				
-				$response=$this->generalModel->updateRecord('usuarios', $data, 'idUsuario', $idUsuario);
+				$response=$this->GeneralModel->updateRecord('usuarios', $data, 'idUsuario', $idUsuario);
 				echo json_encode(array("estatus" => true, "msj" => "Contraseña actualizada!" ), JSON_NUMERIC_CHECK);
 					
 			}else{
@@ -436,7 +436,7 @@ class Usuario extends BaseController {
 		];
 
 		$data = $this->post();
-		
+
 		if(!(isset($data->password) || isset($data->numempleado))){
 			$response['message'] = 'Faltan datos';
 

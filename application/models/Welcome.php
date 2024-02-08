@@ -7,7 +7,7 @@ class Welcome extends CI_Controller {
 	{
 		parent::__construct();
 		$this->load->database('default');
-		$this->load->model('especialistasModel');
+		$this->load->model('EspecialistasModel');
 	}
 	public function index()
 	{
@@ -20,7 +20,7 @@ class Welcome extends CI_Controller {
 	}
 
 	public function especialistas(){
-		$data['data'] = $this->especialistasModel->especialistas();
+		$data['data'] = $this->EspecialistasModel->especialistas();
 		echo json_encode($data);
 	}
 }

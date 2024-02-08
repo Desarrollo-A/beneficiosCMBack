@@ -7,8 +7,9 @@ class CalendarioController extends BaseController{
     public function __construct(){
 		parent::__construct();
 		$this->load->model('calendarioModel');
-		$this->load->model('generalModel');
-		$this->load->model('usuariosModel');
+
+		$this->load->model('GeneralModel');
+		$this->load->model('UsuariosModel');
 		
 		$this->load->library('GoogleApi');
 
@@ -114,7 +115,7 @@ class CalendarioController extends BaseController{
 			$checkAppointment = $this->calendarioModel->checkAppointmentNormal($dataValue, $fechaInicioSuma, $fechaFinalResta);
 
 			if ($checkOccupied->num_rows() < 1 && $checkAppointment->num_rows() < 1 && isset($pass)) {
-				$addRecord = $this->generalModel->addRecord("horariosOcupados", $values);
+				$addRecord = $this->GeneralModel->addRecord("horariosOcupados", $values);
 
 				if ($addRecord) {
 					$response["result"] = true;
@@ -186,7 +187,7 @@ class CalendarioController extends BaseController{
 					$response["msg"] = "Horario no disponible";
 				}
 			} else {
-				$updateRecord = $this->generalModel->updateRecord("horariosOcupados", $values, "idUnico", $dataValue["id"]);
+				$updateRecord = $this->GeneralModel->updateRecord("horariosOcupados", $values, "idUnico", $dataValue["id"]);
 
 				if ($updateRecord) {
 					$response["result"] = true;
@@ -215,7 +216,7 @@ class CalendarioController extends BaseController{
 			"fechaModificacion" => date('Y/m/d H:i:s')
 		];
 
-		$updateRecord = $this->generalModel->updateRecord("horariosOcupados", $values, "idUnico", $dataValue["eventId"]);
+		$updateRecord = $this->GeneralModel->updateRecord("horariosOcupados", $values, "idUnico", $dataValue["eventId"]);
 
 		if ($updateRecord) {
 			$response["result"] = true;
@@ -280,7 +281,7 @@ class CalendarioController extends BaseController{
 						"idDetalle" => $detalle,
 						"idEventoGoogle" => $idGoogleEvent
 					];
-					$rs = $this->generalModel->addRecord("citas", $values);
+					$rs = $this->GeneralModel->addRecord("citas", $values);
 					$last_id = $this->db->insert_id();
 					$response["result"] = $rs;
 					$response["data"] = $last_id;
@@ -348,7 +349,7 @@ class CalendarioController extends BaseController{
 				"idEventoGoogle" => $reagenda == 1 ? $dataValue["idEventoGoogle"] : ''
 			];
 
-			$checkUser = $this->usuariosModel->checkUser($dataValue["idPaciente"], $year, $month);
+			$checkUser = $this->UsuariosModel->checkUser($dataValue["idPaciente"], $year, $month);
 			$checkAppointment = $this->calendarioModel->checkAppointment($dataValue, $fechaInicioSuma, $fechaFinalResta);
 			$checkOccupied = $this->calendarioModel->checkOccupied($dataValue, $fechaInicioSuma, $fechaFinalResta);
 
@@ -365,7 +366,7 @@ class CalendarioController extends BaseController{
 				$response["result"] = false;
 				$response["msg"] = "Error en las fechas seleccionadas";
 			} else {
-				$addRecord = $this->generalModel->addRecord("citas", $values);
+				$addRecord = $this->GeneralModel->addRecord("citas", $values);
 
 				$last_id = $this->db->insert_id();
 				
@@ -423,7 +424,7 @@ class CalendarioController extends BaseController{
 					$response["msg"] = "Horario no disponible";
 				}
 			} else {
-				$updateRecord = $this->generalModel->updateRecord("citas", $values, "idCita", $dataValue["id"]);
+				$updateRecord = $this->GeneralModel->updateRecord("citas", $values, "idCita", $dataValue["id"]);
 
 				if ($updateRecord) {
 					$response["result"] = true;
@@ -466,7 +467,7 @@ class CalendarioController extends BaseController{
 			"modificadoPor" => $dataValue["modificadoPor"],
 		];
 
-		$updateRecord = $this->generalModel->updateRecord("citas", $values, "idCita", $dataValue["idCita"]);
+		$updateRecord = $this->GeneralModel->updateRecord("citas", $values, "idCita", $dataValue["idCita"]);
 
 		if ($updateRecord) {
 			$response["result"] = true;
@@ -522,7 +523,7 @@ class CalendarioController extends BaseController{
 					$response["msg"] = "Horario no disponible";
 				}
 			} else {
-				$updateRecord = $this->generalModel->updateRecord("citas", $values, "idCita", $dataValue["id"]);
+				$updateRecord = $this->GeneralModel->updateRecord("citas", $values, "idCita", $dataValue["id"]);
 
 				if ($updateRecord) {
 					$response["result"] = true;
@@ -578,7 +579,7 @@ class CalendarioController extends BaseController{
 				$response["result"] = false;
 				$response["msg"] = "El horario ya ha sido ocupado";
 			} else {
-				$updateRecord = $this->generalModel->updateRecord("horariosOcupados", $values, "idUnico", $dataValue["id"]);
+				$updateRecord = $this->GeneralModel->updateRecord("horariosOcupados", $values, "idUnico", $dataValue["id"]);
 
 				if ($updateRecord) {
 					$response["result"] = true;
@@ -621,9 +622,9 @@ class CalendarioController extends BaseController{
 		];
 
 		try {
-			$updateRecord = $this->generalModel->updateRecord("citas", $valuesUpdate, "idCita", $idCita);
+			$updateRecord = $this->GeneralModel->updateRecord("citas", $valuesUpdate, "idCita", $idCita);
 			if ($updateRecord) {
-				$insertBatch = $this->generalModel->insertBatch("motivosPorCita", $valuesAdd);
+				$insertBatch = $this->GeneralModel->insertBatch("motivosPorCita", $valuesAdd);
 
 				if ($insertBatch) {
 					$response["result"] = true;
@@ -974,7 +975,7 @@ class CalendarioController extends BaseController{
 				"modificadoPor" => $usuario,
 				"fechaModificacion" => $fecha
 			];
-			$response["result"] = $this->generalModel->addRecord("detallePagos", $values);
+			$response["result"] = $this->GeneralModel->addRecord("detallePagos", $values);
 			if ($response["result"]) {
 				$response["msg"] = "¡Se ha generado el detalle de pago con éxito!";
 				$rs = $this->calendarioModel->getDetallePago($folio)->result();
@@ -1095,7 +1096,7 @@ class CalendarioController extends BaseController{
 						"modificadoPor" => $user,
 						"fechaModificacion" => date("Y-m-d H:i:s"),
 					];
-					$updateRecord = $this->generalModel->updateRecord("detallePaciente", $values, "idUsuario", $user);
+					$updateRecord = $this->GeneralModel->updateRecord("detallePaciente", $values, "idUsuario", $user);
 					if ($updateRecord) {
 						$response['msg'] = '¡Registro de estatus actualizado!';
 					}else {
@@ -1134,7 +1135,7 @@ class CalendarioController extends BaseController{
 				"modificadoPor" => $idUsuario,
 				"fechaModificacion" => date("Y-m-d H:i:s"),
 			];
-			$response["result"] = $this->generalModel->updateRecord("citas", $values, 'idCita', $idCita);
+			$response["result"] = $this->GeneralModel->updateRecord("citas", $values, 'idCita', $idCita);
 			if ($response["result"]) {
 				$response["msg"] = "¡Se ha actualizado la información de la cita!";
 			}else {
