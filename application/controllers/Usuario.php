@@ -33,18 +33,6 @@ class Usuario extends BaseController {
 		$this->usuariosModel->updateRefreshToken($user->idUsuario, $access_token->refresh_token);
 	}
 
-	public function menu()
-	{
-		$headers = (object) $this->input->request_headers();
-		$data = explode('.', $headers->token);
-		$user = json_decode(base64_decode($data[2]));
-
-		$id_user = intval($user->idUsuario);
-		$id_rol = intval($user->idRol);
-
-		echo json_encode($this->menuModel->getMenu($id_user, $id_rol));
-	}
-
 	public function authorized(){
 		/*
 		$token = $this->headers('Token');
@@ -135,23 +123,6 @@ class Usuario extends BaseController {
 		$this->json($response);
 	}
 
-	public function index()
-	{
-		$this->load->view('welcome_message');
-	}
-
-	public function get_token(){
-		$headers = (object) $this->input->request_headers();
-		$data = explode('.', $headers->token);
-		$user = json_decode(base64_decode($data[2]));
-
-		$code = $this->post('code');
-
-		$access_token = $this->googleapi->getAccessToken($code);
-
-		$this->UsuariosModel->updateRefreshToken($user->idUsuario, $access_token->refresh_token);
-	}
-
 	public function menu()
 	{
 		$headers = (object) $this->input->request_headers();
@@ -183,7 +154,7 @@ class Usuario extends BaseController {
 	}
 	
 	public function getUsersExternos(){
-		$rs = $this->usuariosModel->getUsersExternos()->result();
+		$rs = $this->UsuariosModel->getUsersExternos()->result();
 		$data['result'] = count($rs) > 0; 
 		if ($data['result']) {
 			$data['msg'] = '¡Listado de usuarios cargado exitosamente!';
