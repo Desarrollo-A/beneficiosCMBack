@@ -63,6 +63,19 @@ class Usuario extends BaseController {
 		$this->output->set_content_type("application/json");
         $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
 	}
+	
+	public function getUsersExternos(){
+		$rs = $this->usuariosModel->getUsersExternos()->result();
+		$data['result'] = count($rs) > 0; 
+		if ($data['result']) {
+			$data['msg'] = '¡Listado de usuarios cargado exitosamente!';
+			$data['data'] = $rs; 
+		}else {
+			$data['msg'] = '¡No existen registros!';
+		}
+		$this->output->set_content_type("application/json");
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
 
 	public function getAreas(){
 		$rs = $this->usuariosModel->getAreas();
@@ -79,34 +92,33 @@ class Usuario extends BaseController {
 
 	public function insertBatchUsers()
     {
-        $json = file_get_contents('php://input');
-        $params = json_decode($json, true);
-
-        $table = $params['nombreTabla'];
-        $data = $params['data'];
+        $table = $this->input->post('dataValue[tabla]');
+        $data  = $this->input->post('dataValue[data]');
     
-        $response['result'] = isset($table, $data) && !empty($data);
+        $response['result'] = isset($table, $data); // && !empty($data);
         if ($response['result']) {
             $fecha = date('Y-m-d H:i:s');
             $complemento = date('Ymd');
             $rows = array();
-            foreach ($data as $col) {
-                $iniciales = getIniciales($col['nombre']); // 
+            foreach ($data as $user) {
+                $iniciales = getIniciales($user['nombre']); // 
                 $row = array(
-                    'numContrato' => isset($col['nombre']) ? $iniciales.$complemento : null,
-                    'numEmpleado' => isset($col['nombre']) ? $iniciales.$complemento : null,
-                    'nombre' => isset($col['nombre']) ? $col['nombre'] : null,
-                    'telPersonal' => isset($col['telPersonal']) ? $col['telPersonal'] : null,
-                    'area' => isset($col['area']) ? $col['area'] : null,
-					'idPuesto' => isset($col['idPuesto']) ? $col['idPuesto'] : null,
-                    'oficina' => isset($col['oficina']) ? $col['oficina'] : null,
-                    'sede' => isset($col['sede']) ? $col['sede'] : null,
-                    'correo' => isset($col['correo']) ? $col['correo'] : null,
-                    'password' => isset($col['password']) ? encriptar($col['password']) : encriptar('Tempo01@'),
+                    'numContrato' => $iniciales.$complemento,
+                    'numEmpleado' => $iniciales.$complemento,
+                    'nombre' => $user['nombre'],
+                    'telPersonal' => isset($user['telPersonal']) ? $user['telPersonal'] : null,
+                    'idArea' => null,
+					'idPuesto' => null,
+                    'idSede' => null,
+					'sexo' => $user['sexo'],
+					'externo' => 1,
+					'idRol' => 2,
+                    'correo' => isset($user['correo']) ? $user['correo'] : null,
+                    'password' => encriptar('Tempo01@'),
                     'estatus' => 1,
-					'creadoPor' => 1,
+					'creadoPor' => $user['creadoPor'],
                     'fechaCreacion' => $fecha,
-                    'modificadoPor' => 1,
+                    'modificadoPor' => $user['creadoPor'],
                     'fechaModificacion' => $fecha,
                 );
                 $rows[] = $row;
@@ -128,12 +140,11 @@ class Usuario extends BaseController {
 
 	public function updateUser() {
 		$fecha = date('Y-m-d H:i:s');
-		$user = $this->input->post('idUsuario');
+		$user = $this->input->post('dataValue[idUsuario]');
 		
 		$data = array();
 	
-		// Recorre $_POST y agrega los campos con valores (incluido 0) al array $data
-		foreach ($this->input->post() as $key => $value) {
+		foreach ($this->input->post('dataValue') as $key => $value) {
 			if (($value !== null || $value !== '') && $key != 'idUsuario') {
 				$data[$key] = $value;
 			}
