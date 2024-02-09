@@ -2,7 +2,7 @@
 /**
  * 
  */
-class gestorModel extends CI_Model {
+class GestorModel extends CI_Model {
 	public function __construct()
 	{
 		parent::__construct();
@@ -88,13 +88,11 @@ class gestorModel extends CI_Model {
 
         if (isset($data)) {
 
-			foreach ($data["items"] as $item) {
-
-                $idEspecialista = $item["especialista"];
-                $idSede = $item["sede"];
-                $idOficina = $item["oficina"];
-                $tipoCita = $item["modalidad"];
-                $idUsuario = $item["usuario"];
+                $idEspecialista = $data["especialista"];
+                $idSede = $data["sede"];
+                $idOficina = $data["oficina"];
+                $tipoCita = $data["modalidad"];
+                $idUsuario = $data["usuario"];
 
 				if (empty($idEspecialista) ||
                     empty($idSede) ||
@@ -105,7 +103,6 @@ class gestorModel extends CI_Model {
 					echo json_encode(array("estatus" => false, "msj" => "Faltan datos!" ));
 					$datosValidos = false;
 
-					break; 
 				}else{
 
                     $query = $this->db->query("INSERT INTO atencionXSede
@@ -122,7 +119,7 @@ class gestorModel extends CI_Model {
                     }
                 
                 }
-			}
+
         } else {
 			echo json_encode(array("estatus" => false, "msj" => "Error Faltan Datos" ));
 		}
@@ -142,6 +139,111 @@ class gestorModel extends CI_Model {
         
         return $query->result();
         
+    }
+
+    public function getOficinas($dt)
+    {
+        $idRol = $dt["idRol"];
+        $idPuesto = $dt["idPuesto"];
+        
+        if($idRol == 4){
+            $query = $this->db-> query("SELECT ofi.idOficina, ofi.oficina, sd.idSede, sd.sede, ofi.ubicación, ofi.estatus 
+            FROM oficinas ofi
+            INNER JOIN sedes sd ON sd.idSede = ofi.idSede");
+            return $query;
+        }
+        else{
+            $query = $this->db-> query("SELECT DISTINCT ofi.idOficina, ofi.oficina, sd.sede, ofi.ubicación, ofi.estatus 
+            FROM usuarios us
+            INNER JOIN oficinas ofi ON ofi.idSede = us.idSede
+            INNER JOIN sedes sd ON sd.idSede = us.idSede
+            WHERE us.idPuesto = $idPuesto");
+            return $query;
+        }
+    }
+
+    public function insertOficinas($dt)
+    {
+        $data = json_decode($dt, true);
+
+        $datosValidos = true;
+
+        if (isset($data)) {
+
+                $oficina = $data["ofi"];
+                $idSede = $data["idSede"];
+                $ubicacion = $data["ubi"];
+                $estatus = $data["estatus"];
+                $creadoPor = $data["creadoPor"];
+
+				if (empty($oficina) ||
+                    empty($idSede) ||
+                    empty($ubicacion) ||
+                    empty($creadoPor)) {
+
+					echo json_encode(array("estatus" => false, "msj" => "Faltan datos!" ));
+					$datosValidos = false;
+
+				}else{
+
+                    $query = $this->db->query("INSERT INTO oficinas (oficina, idSede, ubicación, estatus, creadoPor, fechaCreacion ) 
+                    VALUES (?, ?, ?, ?, ?, GETDATE())", 
+                    array($oficina, $idSede, $ubicacion, $estatus, $creadoPor));
+                    
+                    $this->db->trans_complete();
+
+                    if ($this->db->trans_status() === FALSE) {
+                        echo "Error al realizar el registro";
+                    } else {
+                        echo json_encode(array("estatus" => true, "msj" => "Registro realizado exitosamente" ));
+                    }
+                
+                }
+
+        } else {
+			echo json_encode(array("estatus" => false, "msj" => "Error Faltan Datos" ));
+		}
+    }
+
+    public function insertSedes($dt)
+    {
+        $data = json_decode($dt, true);
+
+        $datosValidos = true;
+
+        if (isset($data)) {
+
+                $sede = $data["sede"];
+                $abreviacion = $data["abreviacion"];
+                $estatus = $data["estatus"];
+                $creadoPor = $data["creadoPor"];
+
+				if (empty($sede) ||
+                    empty($abreviacion) ||
+                    empty($creadoPor)) {
+
+					echo json_encode(array("estatus" => false, "msj" => "Faltan datos!" ));
+					$datosValidos = false;
+
+				}else{
+
+                    $query = $this->db->query("INSERT INTO sedes (sede, abreviacion, estatus, creadoPor, fechaCreacion ) 
+                    VALUES (?, ?, ?, ?, GETDATE())", 
+                    array($sede, $abreviacion, $estatus, $creadoPor));
+                    
+                    $this->db->trans_complete();
+
+                    if ($this->db->trans_status() === FALSE) {
+                        echo "Error al realizar el registro";
+                    } else {
+                        echo json_encode(array("estatus" => true, "msj" => "Registro realizado exitosamente" ));
+                    }
+                
+                }
+
+        } else {
+			echo json_encode(array("estatus" => false, "msj" => "Error Faltan Datos" ));
+		}
     }
 
 }
