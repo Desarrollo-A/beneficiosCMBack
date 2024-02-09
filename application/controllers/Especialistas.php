@@ -21,7 +21,11 @@ class Especialistas extends BaseController{
     public function horario(){
         $data = $this->post();
 
-        $occuped = $this->SedesModel->checkIfPresencial($data->start, $data->end, $data->sede, $data->especialista);
+        if(isset($data->id)){
+            $occuped = $this->SedesModel->checkIfPresencialExcept($data->id, $data->start, $data->end, $data->sede, $data->especialista);
+        }else{
+            $occuped = $this->SedesModel->checkIfPresencial($data->start, $data->end, $data->sede, $data->especialista);
+        }
 
         if($occuped){
             $response = [
@@ -32,7 +36,11 @@ class Especialistas extends BaseController{
             $this->json($response);
         }
 
-        $is_ok = $this->SedesModel->addHorarioPresencial($data->start, $data->end, $data->sede, $data->especialista);
+        if(isset($data->id)){
+            $is_ok = $this->SedesModel->updateHorarioPresencial($data->id, $data->start, $data->end, $data->sede, $data->especialista);
+        }else{
+            $is_ok = $this->SedesModel->addHorarioPresencial($data->start, $data->end, $data->sede, $data->especialista);
+        }
 
         if($is_ok){
             $response = [
