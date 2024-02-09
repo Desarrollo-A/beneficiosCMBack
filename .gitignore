@@ -70,3 +70,4 @@ application/migrations/*
 application/third_party/*
 
 
+*.pdf

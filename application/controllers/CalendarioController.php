@@ -308,6 +308,7 @@ class CalendarioController extends BaseController{
 	{
 		$dataValue = $this->input->post("dataValue", true);
 		$fundacion = $dataValue["fundacion"];
+		$tipoPuesto = $dataValue["tipoPuesto"];
 		$now = date('Y/m/d H:i:s', time());
 
 		$fechaFinalResta = date('Y/m/d H:i:s', strtotime($dataValue["fechaFinal"] . '-1 minute'));
@@ -335,7 +336,7 @@ class CalendarioController extends BaseController{
 			$values = [
 				"idEspecialista" => $dataValue["idUsuario"],
 				"idPaciente" => $dataValue["idPaciente"],
-				"estatusCita" => ($fundacion == 1 || $reagenda == 1) ? 1 : 6,
+				"estatusCita" => ($fundacion == 1 || $reagenda == 1 || $tipoPuesto == 'Operativa') ? 1 : 6,
 				"fechaInicio" => $dataValue["fechaInicio"],
 				"fechaFinal" => $dataValue["fechaFinal"],
 				"creadoPor" => $dataValue["creadoPor"],
@@ -1291,7 +1292,7 @@ class CalendarioController extends BaseController{
                 $response['msg'] = "¡Evento eliminado en el calendario de google!"; 
                 $response['data'] = $delete;
             }else {
-                $response['msg'] = "¡No se pudo eliminar el evento del calendario de google!";
+                $response['msg'] = "¡No se pudo eliminar el evento en el calendario de google!";
             }
         }
         else{
