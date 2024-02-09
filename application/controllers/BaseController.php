@@ -62,7 +62,7 @@ abstract class BaseController extends CI_Controller{
     public function json($object){
         header('Content-Type: application/json');
 
-        echo json_encode($object);
+        echo json_encode($object, JSON_NUMERIC_CHECK);
 
         exit();
     }

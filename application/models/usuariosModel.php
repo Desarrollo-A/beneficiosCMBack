@@ -2,7 +2,7 @@
 /**
  * 
  */
-class usuariosModel extends CI_Model {
+class UsuariosModel extends CI_Model {
 	public function __construct()
 	{
 		
@@ -20,6 +20,12 @@ class usuariosModel extends CI_Model {
 		return $query->result();
 	}
 
+	public function getUsersExternos()
+	{
+		$query = $this->db->query("SELECT *FROM usuarios WHERE externo = 1"); 
+		return $query;
+	}
+
 	public function login($numEmpleado, $password)
 	{
 		$query = $this->db->query("	SELECT u.*, p.idPuesto, p.puesto, p.idArea, p.tipoPuesto, a.idDepto FROM USUARIOS as u
@@ -31,8 +37,8 @@ class usuariosModel extends CI_Model {
 
 	public function getAreas()
 	{
-		$query = $this->db->distinct()->select('area')->get('usuarios');
-        return $query->result();
+		$query = $this->db->query("SELECT *from usuarios");
+        return $query;
 	}
 
 	public function getNameUser($idEspecialista)

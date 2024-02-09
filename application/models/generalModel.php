@@ -2,7 +2,7 @@
 /**
  * 
  */
-class generalModel extends CI_Model {
+class GeneralModel extends CI_Model {
 	public function __construct()
 	{
 		parent::__construct();
@@ -192,6 +192,62 @@ class generalModel extends CI_Model {
         
         $query = $this->db->query("SELECT idOpcion, nombre FROM opcionesPorCatalogo WHERE idCatalogo = 13");
         return $query;
+
+    }
+
+    public function getAtencionXsede(){
+        
+        $query = $this->db->query("SELECT axs.idAtencionXSede AS id,axs.idSede, sd.sede, o.oficina, o.ubicación, us.nombre, ps.idPuesto, ps.puesto, op.nombre AS modalidad, axs.estatus
+        FROM atencionXSede axs
+        INNER JOIN sedes sd ON sd.idSede = axs.idSede
+        INNER JOIN oficinas o ON o.idOficina = axs.idOficina
+        INNER JOIN usuarios us ON us.idUsuario = axs.idEspecialista
+        INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
+        INNER JOIN catalogos ct ON ct.idCatalogo = 5
+        INNER JOIN opcionesPorCatalogo op ON op.idCatalogo = ct.idCatalogo AND op.idOpcion = axs.tipoCita");
+        return $query;
+
+    }
+
+    public function getSedes(){
+        
+        $query = $this->db->query("SELECT * FROM sedes");
+        return $query;
+
+    }
+
+    public function getOficinas(){
+        
+        $query = $this->db->query("SELECT * FROM oficinas");
+        return $query;
+
+    }
+
+    public function getModalidades(){
+        
+        $query = $this->db->query("SELECT idOpcion, nombre AS modalidad FROM opcionesPorCatalogo WHERE idCatalogo = 5");
+        return $query;
+
+    }
+
+    public function getSinAsigSede(){
+        
+        $query = $this->db->query("SELECT sd.idSede, sd.sede, sd.fechaCreacion AS fecha
+        FROM sedes sd
+        LEFT JOIN atencionXSede ON sd.idSede = atencionXSede.idSede
+        WHERE atencionXSede.idSede IS NULL;
+        ");
+
+        if ($query->num_rows() > 0) {
+
+            return $query->result();
+
+        }else{
+
+            return false;
+
+        }
+
 
     }
 

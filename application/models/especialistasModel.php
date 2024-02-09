@@ -2,7 +2,7 @@
 /**
  * 
  */
-class especialistasModel extends CI_Model {
+class EspecialistasModel extends CI_Model {
 	public function __construct()
 	{
 		parent::__construct();
