@@ -123,6 +123,14 @@ class Usuario extends BaseController {
 		$this->json($response);
 	}
 
+	public function check(){
+		$token = $this->headers('Token');
+
+		$session = $this->token->validateToken($token);
+
+		$this->json($session);
+	}
+
 	public function menu()
 	{
 		$headers = (object) $this->input->request_headers();
@@ -300,4 +308,5 @@ class Usuario extends BaseController {
 				echo json_encode(array("estatus" => false, "msj" => "Error en actualizar contraseña"));
 			}	
 	}
+	
 }
