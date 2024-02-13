@@ -240,4 +240,39 @@ class Usuario extends BaseController {
 				echo json_encode(array("estatus" => false, "msj" => "Error en actualizar contraseña"));
 			}	
 	}
+
+	public function updateUserByCH() {
+        $encodedUserData = file_get_contents('php://input'); // Obtener el cuerpo de la solicitud en formato base64
+        $decodedUserData = base64_decode($encodedUserData); // Decodificar los datos base64
+        $userData = json_decode($decodedUserData, true);  // Procesar los datos como desees, por ejemplo, decodificar JSON
+
+		$fecha = date('Y-m-d H:i:s');
+		foreach ($userData as $key => $value) {
+			if (($value !== null || $value !== '') && $key != 'idContrato' && $key != 'idUsuario' ) {
+				$data[$key] = $value;
+			}
+		}
+		
+		$response['result'] = isset($userData['idContrato']);
+		if ($response['result']) {
+			$data['fechaModificacion'] = $fecha;
+			$response['result'] = $this->GeneralModel->updateRecord('usuarios', $data, 'idUsuario', $userData['idContrato']);
+			if ($response['result']) {
+				$response['msg'] = "¡Usuario actualizado exitosamente!";
+			} else {
+				$response['msg'] = "¡Error al intentar actualizar los datos de usuario!";
+			}
+		} else {
+			$response['msg'] = "¡Parámetros inválidos!";
+		}
+
+		$this->output->set_content_type("application/json");
+		$this->output->set_output(json_encode($response));
+
+		// $this->output->set_output(base64_decode(json_encode($response), JSON_NUMERIC_CHECK));
+
+		// var_dump($response);
+		// exit;
+		// die;
+	}
 }
