@@ -252,11 +252,27 @@ class Usuario extends BaseController {
 				$data[$key] = $value;
 			}
 		}
+
 		
-		$response['result'] = isset($userData['idContrato']);
+		$userData = array( // Orden del arreglo
+			"nombre" => ($data["nombre_persona"] . ' ' . $data["pri_apellido"] . ' ' . $data["sec_apellido"]),
+			"telPersonal" => $data["telefono_personal"],
+			"idPuesto" => intval($data["idpuesto"]),
+			"idSede" => intval($data["idsede"]),
+			"correo" => $data["mail_emp"],
+			"estatus" => intval($data["activo"]),
+			"fechaModificacion" => date('Y-m-d H:i:s'),
+			"idArea" => $data["idarea"],
+			"sexo" => $data["sexo"],
+			"fechaIngreso" => $data["fingreso"],
+		);
+
+		$idContrato = intval($data["idcontrato"]);
+
+		$response['result'] = isset($idContrato);
 		if ($response['result']) {
 			$data['fechaModificacion'] = $fecha;
-			$response['result'] = $this->GeneralModel->updateRecord('usuarios', $data, 'idUsuario', $userData['idContrato']);
+			$response['result'] = $this->GeneralModel->updateRecord('usuarios', $userData, 'idContrato', $idContrato);
 			if ($response['result']) {
 				$response['msg'] = "¡Usuario actualizado exitosamente!";
 			} else {
@@ -268,11 +284,5 @@ class Usuario extends BaseController {
 
 		$this->output->set_content_type("application/json");
 		$this->output->set_output(json_encode($response));
-
-		// $this->output->set_output(base64_decode(json_encode($response), JSON_NUMERIC_CHECK));
-
-		// var_dump($response);
-		// exit;
-		// die;
 	}
 }
