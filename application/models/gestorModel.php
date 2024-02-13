@@ -146,20 +146,11 @@ class GestorModel extends CI_Model {
         $idRol = $dt["idRol"];
         $idPuesto = $dt["idPuesto"];
         
-        if($idRol == 4){
             $query = $this->db-> query("SELECT ofi.idOficina, ofi.oficina, sd.idSede, sd.sede, ofi.ubicación, ofi.estatus 
             FROM oficinas ofi
-            INNER JOIN sedes sd ON sd.idSede = ofi.idSede");
+            INNER JOIN sedes sd ON sd.idSede = ofi.idSede
+            ORDER BY ofi.idOficina");
             return $query;
-        }
-        else{
-            $query = $this->db-> query("SELECT DISTINCT ofi.idOficina, ofi.oficina, sd.sede, ofi.ubicación, ofi.estatus 
-            FROM usuarios us
-            INNER JOIN oficinas ofi ON ofi.idSede = us.idSede
-            INNER JOIN sedes sd ON sd.idSede = us.idSede
-            WHERE us.idPuesto = $idPuesto");
-            return $query;
-        }
     }
 
     public function insertOficinas($dt)
