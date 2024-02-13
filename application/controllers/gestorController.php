@@ -129,7 +129,7 @@ class GestorController extends BaseController {
 	public function getOficinas(){
 		$dt = $this->input->post('dataValue', true);
 		$data['data'] = $this->GestorModel->getOficinas($dt)->result();
-		echo json_encode($data);
+		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
 	public function insertOficinas(){
