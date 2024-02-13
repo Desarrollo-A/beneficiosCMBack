@@ -1,20 +1,41 @@
 <?php
 
-class menuModel extends CI_Model {
+class MenuModel extends CI_Model {
     public function __construct()
     {
         parent::__construct();
+    }
+
+    public function checkAuth($path, $id_user, $id_rol){
+        $item = $this->db->query("SELECT * FROM menu WHERE path = '$path'")->row();
+
+        $auth = false;
+        if($item){
+            $roles_menu = explode(',', $item->rol);
+            $users_can_menu = explode(',', $item->users_can);
+            $users_not_menu = explode(',', $item->users_not);
+
+            if(in_array($id_rol, $roles_menu)){
+                if(!in_array($id_user, $users_not_menu)){
+                    $auth = true;
+                }
+            }elseif(in_array($id_user, $users_can_menu)){
+                $auth = true;
+            }
+        }
+
+        return $auth;
     }
 
     public function getMenu($id_user, $id_rol)
     {
         $subheader = array();
 
-        $items = $this->db->query("SELECT * FROM menu WHERE father IS NULL")->result_array();
+        $items = $this->db->query("SELECT * FROM menu WHERE father IS NULL ORDER BY posOrder")->result_array();
 
         $menus = array();
         foreach ($items as $key_i => $item) {
-            $children = $this->db->query("SELECT * FROM menu WHERE father=$item[id]")->result_array();
+            $children = $this->db->query("SELECT * FROM menu WHERE father=$item[id] ORDER BY posOrder")->result_array();
 
             $childs = array();
             foreach ($children as $key_c => $child) {

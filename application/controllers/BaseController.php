@@ -8,7 +8,7 @@ abstract class BaseController extends CI_Controller{
 
         header('Access-Control-Allow-Origin: *');
         header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
-        header('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Token');
+        header('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Token, Authorization');
 
     
         $urls = array('192.168.30.128/auth/jwt/login','localhost','http://localhost','http://localhost:3030','http://192.168.30.128/auth/jwt/login','192.168.30.128','http://192.168.30.128:3030','127.0.0.1','https://rh.gphsis.com','rh.gphsis.com','https://maderascrm.gphsis.com','maderascrm.gphsis.com', 'https://prueba.gphsis.com/beneficiosmaderas', 'prueba.gphsis.com/beneficiosmaderas', 'https://prueba.gphsis.com', 'prueba.gphsis.com');
