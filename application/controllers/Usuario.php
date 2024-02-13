@@ -240,4 +240,46 @@ class Usuario extends BaseController {
 				echo json_encode(array("estatus" => false, "msj" => "Error en actualizar contraseña"));
 			}	
 	}
+
+	public function updateUserByCH() {
+        $encodedUserData = file_get_contents('php://input'); // Obtener el cuerpo de la solicitud en formato base64
+        $decodedUserData = base64_decode($encodedUserData); // Decodificar los datos base64
+        $userData = json_decode($decodedUserData, true);  // Procesar los datos como desees, por ejemplo, decodificar JSON
+
+		$fecha = date('Y-m-d H:i:s');
+		foreach ($userData as $key => $value) {
+			if (($value !== null || $value !== '') && $key != 'idContrato' && $key != 'idUsuario' ) {
+				$data[$key] = $value;
+			}
+		}
+
+		isset($data["nombre_persona"]) ? $userD['nombre'] = ($data["nombre_persona"] . ' ' . $data["pri_apellido"] . ' ' . $data["sec_apellido"]) : '';
+		isset($data["telefono_personal"]) ? $userD['telPersonal'] = $data["telefono_personal"] : '';
+		isset($data["idpuesto"]) ? $userD['idPuesto'] = intval($data["idpuesto"]) : '';
+		isset($data["idsede"]) ? $userD['idSede'] = intval($data["idsede"]) : '';
+		isset($data["mail_emp"]) ? $userD['correo'] = $data["mail_emp"] : '';
+		isset($data["activo"]) ? $userD['estatus'] = $data["activo"] : '';
+		$userD["fechaModificacion"] = $fecha;
+		isset($data["idarea"]) ? $userD['idArea'] = $data["idarea"] : '';
+		isset($data["sexo"]) ? $userD['sexo'] = $data["sexo"] : '';
+		isset($data["fingreso"]) ? $userD['fechaIngreso'] = $data["fingreso"] : '';
+
+		$idContrato = intval($data["idcontrato"]);
+
+		$response['result'] = isset($idContrato);
+		if ($response['result']) {
+			$data['fechaModificacion'] = $fecha;
+			$response['result'] = $this->GeneralModel->updateRecord('usuarios', $userD, 'idContrato', $idContrato);
+			if ($response['result']) {
+				$response['msg'] = "¡Usuario actualizado exitosamente!";
+			} else {
+				$response['msg'] = "¡Error al intentar actualizar los datos de usuario!";
+			}
+		} else {
+			$response['msg'] = "¡Parámetros inválidos!";
+		}
+
+		$this->output->set_content_type("application/json");
+		$this->output->set_output(json_encode($response));
+	}
 }
