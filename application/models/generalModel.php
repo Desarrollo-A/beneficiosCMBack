@@ -88,19 +88,19 @@ class GeneralModel extends CI_Model {
         $idData = $dt["idData"];
         $idRol = $dt["idRol"];
 
-        if($idRol == 1){
+        if($idRol == 1 || $idRol == 4){
             $query = $this->db-> query("SELECT COUNT(*) AS [pacientes] FROM usuarios us
             INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
             WHERE us.idPuesto = $idData");
+
         }else if($idRol == 2){
             $query = $this->db-> query("SELECT COUNT(*) AS [pacientes] FROM citas WHERE idPaciente = $idData");
-        }
-        else{
-            $query = $this->db-> query("SELECT COUNT(*) AS [pacientes] FROM usuarios us
-            INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
-            WHERE us.idPuesto = $idData");
-        }
 
+        }else if($idRol == 3){
+            $query = $this->db-> query("SELECT COUNT(*) AS [pacientes] FROM citas WHERE idEspecialista = $idData");
+
+        }
+        
         return $query;
     }
 
@@ -109,17 +109,14 @@ class GeneralModel extends CI_Model {
         $idData = $dt["idData"];
         $idRol = $dt["idRol"];
 
-        if($idRol == 1){
+        if($idRol == 1 || $idRol == 4){
             $query = $this->db-> query("SELECT COUNT(*) AS [asistencia] FROM usuarios us
             INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
             WHERE us.idPuesto = $idData AND ct.estatusCita = 4");
         }else if($idRol == 2){
             $query = $this->db-> query("SELECT COUNT(*) AS [asistencia] FROM citas WHERE idPaciente = $idData AND estatusCita = 4");
-        }
-        else{
-            $query = $this->db-> query("SELECT COUNT(*) AS [asistencia] FROM usuarios us
-            INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
-            WHERE us.idUsuario = $idData AND ct.estatusCita = 4");
+        }else if($idRol == 3){
+            $query = $this->db-> query("SELECT COUNT(*) AS [asistencia] FROM citas WHERE idEspecialista = $idData AND estatusCita = 4");
         }
 
         return $query;
@@ -130,17 +127,14 @@ class GeneralModel extends CI_Model {
         $idData = $dt["idData"];
         $idRol = $dt["idRol"];
 
-        if($idRol == 1){
+        if($idRol == 1 || $idRol == 4){
             $query = $this->db-> query("SELECT COUNT(*) AS [cancelada] FROM usuarios us
             INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
             WHERE us.idPuesto = $idData AND ct.estatusCita = 2");
         }else if($idRol == 2){
             $query = $this->db-> query("SELECT COUNT(*) AS [cancelada] FROM citas WHERE idPaciente = $idData AND estatusCita = 2");
-        }
-        else{
-            $query = $this->db-> query("SELECT COUNT(*) AS [cancelada] FROM usuarios us
-            INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
-            WHERE us.idUsuario = $idData AND ct.estatusCita = 2");
+        }else if($idRol == 3){
+            $query = $this->db-> query("SELECT COUNT(*) AS [cancelada] FROM citas WHERE idEspecialista = $idData AND estatusCita = 4");
         }
 
         return $query;
@@ -151,17 +145,14 @@ class GeneralModel extends CI_Model {
         $idData = $dt["idData"];
         $idRol = $dt["idRol"];
 
-        if($idRol == 1){
+        if($idRol == 1 || $idRol == 4){
             $query = $this->db-> query("SELECT COUNT(*) AS [penalizada] FROM usuarios us
             INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
             WHERE us.idPuesto = $idData AND ct.estatusCita = 3");
         }else if($idRol == 2){
             $query = $this->db-> query("SELECT COUNT(*) AS [penalizada] FROM citas WHERE idPaciente = $idData AND estatusCita = 3");
-        }
-        else{
-            $query = $this->db-> query("SELECT COUNT(*) AS [penalizada] FROM usuarios us
-            INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
-            WHERE us.idUsuario = $idData AND ct.estatusCita = 3");
+        }else if($idRol == 3){
+            $query = $this->db-> query("SELECT COUNT(*) AS [penalizada] FROM citas WHERE idEspecialista = $idData AND estatusCita = 4");
         }
 
         return $query;
