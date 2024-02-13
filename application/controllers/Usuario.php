@@ -253,26 +253,36 @@ class Usuario extends BaseController {
 			}
 		}
 
-		
-		$userData = array( // Orden del arreglo
-			"nombre" => ($data["nombre_persona"] . ' ' . $data["pri_apellido"] . ' ' . $data["sec_apellido"]),
-			"telPersonal" => $data["telefono_personal"],
-			"idPuesto" => intval($data["idpuesto"]),
-			"idSede" => intval($data["idsede"]),
-			"correo" => $data["mail_emp"],
-			"estatus" => intval($data["activo"]),
-			"fechaModificacion" => date('Y-m-d H:i:s'),
-			"idArea" => $data["idarea"],
-			"sexo" => $data["sexo"],
-			"fechaIngreso" => $data["fingreso"],
-		);
+		isset($data["nombre_persona"]) ? $userD['nombre'] = ($data["nombre_persona"] . ' ' . $data["pri_apellido"] . ' ' . $data["sec_apellido"]) : '';
+		isset($data["telefono_personal"]) ? $userD['telPersonal'] = $data["telefono_personal"] : '';
+		isset($data["idpuesto"]) ? $userD['idPuesto'] = intval($data["idpuesto"]) : '';
+		isset($data["idsede"]) ? $userD['idSede'] = intval($data["idsede"]) : '';
+		isset($data["mail_emp"]) ? $userD['correo'] = $data["mail_emp"] : '';
+		isset($data["activo"]) ? $userD['estatus'] = $data["activo"] : '';
+		$userD["fechaModificacion"] = $fecha;
+		isset($data["idarea"]) ? $userD['idArea'] = $data["idarea"] : '';
+		isset($data["sexo"]) ? $userD['sexo'] = $data["sexo"] : '';
+		isset($data["fingreso"]) ? $userD['fechaIngreso'] = $data["fingreso"] : '';
+
+		// $userData = array( // Orden del arreglo
+		// 	"nombre" => ($data["nombre_persona"] . ' ' . $data["pri_apellido"] . ' ' . $data["sec_apellido"]),
+		// 	"telPersonal" => $data["telefono_personal"],
+		// 	"idPuesto" => intval($data["idpuesto"]),
+		// 	"idSede" => intval($data["idsede"]),
+		// 	"correo" => $data["mail_emp"],
+		// 	"estatus" => intval($data["activo"]),
+		// 	"fechaModificacion" => $fecha,
+		// 	"idArea" => $data["idarea"],
+		// 	"sexo" => $data["sexo"],
+		// 	"fechaIngreso" => $data["fingreso"],
+		// );
 
 		$idContrato = intval($data["idcontrato"]);
 
 		$response['result'] = isset($idContrato);
 		if ($response['result']) {
 			$data['fechaModificacion'] = $fecha;
-			$response['result'] = $this->GeneralModel->updateRecord('usuarios', $userData, 'idContrato', $idContrato);
+			$response['result'] = $this->GeneralModel->updateRecord('usuarios', $userD, 'idContrato', $idContrato);
 			if ($response['result']) {
 				$response['msg'] = "¡Usuario actualizado exitosamente!";
 			} else {
