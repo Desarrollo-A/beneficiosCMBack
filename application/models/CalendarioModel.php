@@ -81,7 +81,7 @@ class calendarioModel extends CI_Model
         $query = $this->db->query(
             "SELECT CAST(ct.idCita AS VARCHAR(36))  AS id,  ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
             ct.fechaInicio AS occupied, 'date' AS 'type', ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal, us.correo,
-            se.sede, ofi.oficina, ct.idDetalle, ct.idAtencionXSede, us.externo, usEspe.nombre as especialista, ct.fechaCreacion,
+            se.sede, ofi.oficina, ct.idDetalle, ct.idAtencionXSede, us.externo, usEspe.nombre as especialista, ct.fechaCreacion, pue.tipoPuesto,
             tf.fechasFolio, idEventoGoogle,
             'color' = CASE
 	            WHEN ct.estatusCita = 0 THEN 'red'
@@ -100,13 +100,13 @@ class calendarioModel extends CI_Model
             WHEN pue.idPuesto = 158 THEN 'quantum balance'
             END
             FROM citas ct
-            INNER JOIN usuarios us ON us.idUsuario = ct.idPaciente
-            INNER JOIN usuarios usEspe ON usEspe.idUsuario = ct.idEspecialista
-            INNER JOIN atencionXSede aps ON ct.idAtencionXSede = aps.idAtencionXSede
-            INNER JOIN sedes se ON se.idSede = aps.idSede
-            LEFT JOIN oficinas ofi ON ofi.idOficina = aps.idOficina
-            INNER JOIN puestos pue ON pue.idPuesto = usEspe.idPuesto
-            LEFT JOIN (SELECT idDetalle, string_agg(FORMAT(fechaInicio, 'HH:mm MMMM d yyyy','es-US'), ' ,') as fechasFolio FROM citas WHERE estatusCita IN(?) AND citas.idCita = idCita GROUP BY citas.idDetalle) tf
+            FULL JOIN usuarios us ON us.idUsuario = ct.idPaciente
+            FULL JOIN usuarios usEspe ON usEspe.idUsuario = ct.idEspecialista
+            FULL JOIN atencionXSede aps ON ct.idAtencionXSede = aps.idAtencionXSede
+            FULL JOIN sedes se ON se.idSede = aps.idSede
+            FULL JOIN oficinas ofi ON ofi.idOficina = aps.idOficina
+            FULL JOIN puestos pue ON pue.idPuesto = usEspe.idPuesto
+            FULL JOIN (SELECT idDetalle, string_agg(FORMAT(fechaInicio, 'HH:mm MMMM d yyyy','es-US'), ' ,') as fechasFolio FROM citas WHERE estatusCita IN(?) AND citas.idCita = idCita GROUP BY citas.idDetalle) tf
             ON tf.idDetalle = ct.idDetalle
             WHERE YEAR(fechaInicio) in (?, ?)
             AND MONTH(fechaInicio) in (?, ?, ?)

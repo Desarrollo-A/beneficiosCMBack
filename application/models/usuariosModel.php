@@ -20,6 +20,12 @@ class UsuariosModel extends CI_Model {
 		return $query->result();
 	}
 
+	public function getUsersExternos()
+	{
+		$query = $this->db->query("SELECT *FROM usuarios WHERE externo = 1"); 
+		return $query;
+	}
+
 	public function login($numEmpleado, $password)
 	{
 		$query = $this->db->query("	SELECT u.*, p.idPuesto, p.puesto, p.idArea, p.tipoPuesto, a.idDepto FROM USUARIOS as u
@@ -31,22 +37,25 @@ class UsuariosModel extends CI_Model {
 
 	public function getAreas()
 	{
-		$query = $this->db->distinct()->select('area')->get('usuarios');
-        return $query->result();
+		$query = $this->db->query("SELECT *from usuarios");
+        return $query;
 	}
 
 	public function getNameUser($idEspecialista)
 	{
 		$query = $this->db->query(
-			"SELECT US.*, PS.puesto as nombrePuesto FROM usuarios US
+			"SELECT US.*, US.nombre AS nombreCompleto, PS.puesto as nombrePuesto, PS.tipoPuesto FROM usuarios US
 			 INNER JOIN puestos PS ON
 			 US.idPuesto = PS.idPuesto
 			 WHERE US.idRol = ?
 			 AND US.estatus = ?
 			 AND US.idSede
-			 IN( select distinct idSede from atencionXSede where idEspecialista = ?)",
+			 IN( select distinct idSede from atencionXSede where idEspecialista = ?)
+			 UNION
+			 SELECT US2.*, CONCAT('(Lamat)', ' ', US2.nombre) AS nombreCompleto,'nombrePuesto' = 'na', 'tipoPuesto' = 'na' FROM usuarios US2 where externo = 1",
 			 array( 2, 1, $idEspecialista )
 		);
+		
 		return $query;
 	}
 
