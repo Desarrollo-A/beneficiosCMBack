@@ -101,49 +101,121 @@ class ReportesModel extends CI_Model {
 	}
 
 	public function getPacientes($dt){
+
+	$area = $dt["esp"];
+	$idRol = $dt["idRol"];
+	$idUs = $dt["idUs"];
+
+	if($idRol == 1 || $idRol == 4){
 		
-		switch($dt){
+		switch($area){
 			case 537:
-				$query = $this->db-> query("SELECT dp.idDetallePaciente AS id, us.idUsuario, us.nombre, us.correo, sd.sede,
-				op.nombre AS estNut
+				$query = $this->db-> query("SELECT dp.idDetallePaciente AS id, us.idUsuario, us.nombre, dep.depto, sd.sede, pu.puesto,
+				us.correo, sd.sede, op.nombre AS estNut
 				FROM detallePaciente dp 
 				INNER JOIN usuarios us ON us.idUsuario = dp.idUsuario
+				INNER JOIN areas ar ON ar.idArea = us.idArea
+				INNER JOIN departamentos dep ON dep.idDepto = ar.idDepto
+				INNER JOIN puestos pu ON pu.idPuesto = us.idPuesto
 				INNER JOIN sedes sd ON sd.idSede = us.idSede
 				INNER JOIN catalogos ct ON ct.idCatalogo = 13
 				LEFT JOIN opcionesPorCatalogo op ON op.idCatalogo = ct.idCatalogo AND  op.idOpcion = dp.estatusNut
 				WHERE estatusNut IS NOT null");
 				break;
 			case 585:
-				$query = $this->db-> query("SELECT dp.idDetallePaciente AS id, us.idUsuario, us.nombre, us.correo, sd.sede,
-				op.nombre AS estPsi
+				$query = $this->db-> query("SELECT dp.idDetallePaciente AS id, us.idUsuario, us.nombre, dep.depto, sd.sede, pu.puesto,
+				us.correo, sd.sede, op.nombre AS estPsi
 				FROM detallePaciente dp 
 				INNER JOIN usuarios us ON us.idUsuario = dp.idUsuario
+				INNER JOIN areas ar ON ar.idArea = us.idArea
+				INNER JOIN departamentos dep ON dep.idDepto = ar.idDepto
+				INNER JOIN puestos pu ON pu.idPuesto = us.idPuesto
 				INNER JOIN sedes sd ON sd.idSede = us.idSede
 				INNER JOIN catalogos ct ON ct.idCatalogo = 13
 				LEFT JOIN opcionesPorCatalogo op ON op.idCatalogo = ct.idCatalogo AND  op.idOpcion = dp.estatusPsi
 				WHERE estatusPsi IS NOT null");
 				break;
 			case 158:
-				$query = $this->db-> query("SELECT dp.idDetallePaciente AS id, us.idUsuario, us.nombre, us.correo, sd.sede,
-				op.nombre AS estQB
+				$query = $this->db-> query("SELECT dp.idDetallePaciente AS id, us.idUsuario, us.nombre, dep.depto, sd.sede, pu.puesto,
+				us.correo, sd.sede, op.nombre AS estQB
 				FROM detallePaciente dp 
 				INNER JOIN usuarios us ON us.idUsuario = dp.idUsuario
+				INNER JOIN areas ar ON ar.idArea = us.idArea
+				INNER JOIN departamentos dep ON dep.idDepto = ar.idDepto
+				INNER JOIN puestos pu ON pu.idPuesto = us.idPuesto
 				INNER JOIN sedes sd ON sd.idSede = us.idSede
 				INNER JOIN catalogos ct ON ct.idCatalogo = 13
 				LEFT JOIN opcionesPorCatalogo op ON op.idCatalogo = ct.idCatalogo AND  op.idOpcion = dp.estatusQB
 				WHERE estatusQB IS NOT null");
 				break;
 			case 686:
-				$query = $this->db-> query("SELECT dp.idDetallePaciente AS id, us.idUsuario, us.nombre, us.correo, sd.sede,
-				op.nombre AS estGE
+				$query = $this->db-> query("SELECT dp.idDetallePaciente AS id, us.idUsuario, us.nombre, dep.depto, sd.sede, pu.puesto,
+				us.correo, sd.sede, op.nombre AS estGE
 				FROM detallePaciente dp 
 				INNER JOIN usuarios us ON us.idUsuario = dp.idUsuario
+				INNER JOIN areas ar ON ar.idArea = us.idArea
+				INNER JOIN departamentos dep ON dep.idDepto = ar.idDepto
+				INNER JOIN puestos pu ON pu.idPuesto = us.idPuesto
 				INNER JOIN sedes sd ON sd.idSede = us.idSede
 				INNER JOIN catalogos ct ON ct.idCatalogo = 13
 				LEFT JOIN opcionesPorCatalogo op ON op.idCatalogo = ct.idCatalogo AND  op.idOpcion = dp.estatusGE
 				WHERE estatusGE IS NOT null");
 				break;
 		}
+	}else if($idRol == 3){
+
+		switch($area){
+			case 537:
+				$query = $this->db-> query("SELECT DISTINCT us.idUsuario, us.nombre, dp.depto, sd.sede, ps.puesto, op.nombre AS estNut FROM citas ct 
+				INNER JOIN usuarios us ON us.idUsuario = ct.idPaciente
+				INNER JOIN areas ar ON ar.idArea = us.idArea
+				INNER JOIN departamentos dp ON  dp.idDepto = ar.idDepto
+				INNER JOIN sedes sd ON sd.idSede = us.idSede
+				INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
+				INNER JOIN detallePaciente dtp ON dtp.idUsuario = us.idUsuario
+				INNER JOIN catalogos cat ON cat.idCatalogo = 13
+				LEFT JOIN opcionesPorCatalogo op ON op.idCatalogo = cat.idCatalogo AND  op.idOpcion = dtp.estatusNut
+				WHERE ct.idEspecialista = 65 AND estatusNut IS NOT null");
+				break;
+			case 585:
+				$query = $this->db-> query("SELECT DISTINCT us.idUsuario, us.nombre, dp.depto, sd.sede, ps.puesto, op.nombre AS estPsi FROM citas ct 
+				INNER JOIN usuarios us ON us.idUsuario = ct.idPaciente
+				INNER JOIN areas ar ON ar.idArea = us.idArea
+				INNER JOIN departamentos dp ON  dp.idDepto = ar.idDepto
+				INNER JOIN sedes sd ON sd.idSede = us.idSede
+				INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
+				INNER JOIN detallePaciente dtp ON dtp.idUsuario = us.idUsuario
+				INNER JOIN catalogos cat ON cat.idCatalogo = 13
+				LEFT JOIN opcionesPorCatalogo op ON op.idCatalogo = cat.idCatalogo AND  op.idOpcion = dtp.estatusPsi
+				WHERE ct.idEspecialista = 65 AND estatusPsi IS NOT null");
+				break;
+			case 158:
+				$query = $this->db-> query("SELECT DISTINCT us.idUsuario, us.nombre, dp.depto, sd.sede, ps.puesto, op.nombre AS estQB FROM citas ct 
+				INNER JOIN usuarios us ON us.idUsuario = ct.idPaciente
+				INNER JOIN areas ar ON ar.idArea = us.idArea
+				INNER JOIN departamentos dp ON  dp.idDepto = ar.idDepto
+				INNER JOIN sedes sd ON sd.idSede = us.idSede
+				INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
+				INNER JOIN detallePaciente dtp ON dtp.idUsuario = us.idUsuario
+				INNER JOIN catalogos cat ON cat.idCatalogo = 13
+				LEFT JOIN opcionesPorCatalogo op ON op.idCatalogo = cat.idCatalogo AND  op.idOpcion = dtp.estatusQB
+				WHERE ct.idEspecialista = 65 AND estatusQB IS NOT null");
+				break;
+			case 686:
+				$query = $this->db-> query("SELECT DISTINCT us.idUsuario, us.nombre, dp.depto, sd.sede, ps.puesto, op.nombre AS estGE FROM citas ct 
+				INNER JOIN usuarios us ON us.idUsuario = ct.idPaciente
+				INNER JOIN areas ar ON ar.idArea = us.idArea
+				INNER JOIN departamentos dp ON  dp.idDepto = ar.idDepto
+				INNER JOIN sedes sd ON sd.idSede = us.idSede
+				INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
+				INNER JOIN detallePaciente dtp ON dtp.idUsuario = us.idUsuario
+				INNER JOIN catalogos cat ON cat.idCatalogo = 13
+				LEFT JOIN opcionesPorCatalogo op ON op.idCatalogo = cat.idCatalogo AND  op.idOpcion = dtp.estatusGE
+				WHERE ct.idEspecialista = 65 AND estatusGE IS NOT null");
+				break;
+		}
+
+	}
 		
 		return $query;
 	}
