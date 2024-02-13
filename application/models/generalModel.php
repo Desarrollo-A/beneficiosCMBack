@@ -166,10 +166,14 @@ class GeneralModel extends CI_Model {
     public function getAppointmentHistory($dt){
 
         $idUsuario = $dt["idUser"];
+        $idRol = $dt["idRol"];
+        $idEspe = $dt["idEspe"];
         $espe = $dt["espe"];
 
+        if($idRol == 1  || $idRol == 4){
+
         $query = $this->db->query("SELECT us.nombre, es.nombre AS especialista, ct.idPaciente, ct.titulo, oc.nombre AS estatus, ct.estatusCita, ct.idDetalle AS pago, ct.tipoCita,
-		CONCAT (CONVERT(DATE,ct.fechaInicio), ' ', FORMAT(ct.fechaInicio, 'HH:mm'), ' - ', FORMAT(ct.fechaFinal, 'HH:mm')) AS horario
+		CONCAT (CONVERT(DATE,ct.fechaInicio), ' ', FORMAT(ct.fechaInicio, 'HH:mm'), ' - ', FORMAT(ct.fechaFinal, 'HH:mm')) AS horario, ct.motivoCita
 		FROM citas ct 
 		INNER JOIN catalogos ca ON ca.idCatalogo = 2
 		INNER JOIN opcionesPorCatalogo oc ON oc.idCatalogo = ca.idCatalogo AND oc.idOpcion = ct.estatusCita
@@ -177,10 +181,28 @@ class GeneralModel extends CI_Model {
 		INNER JOIN usuarios es ON es.idUsuario = ct.idEspecialista
 		WHERE ct.idPaciente = $idUsuario AND oc.idCatalogo = 2 AND es.idPuesto = $espe
 		GROUP BY us.nombre, es.nombre, ct.idPaciente, ct.titulo, oc.nombre, ct.estatusCita, ct.idDetalle, ct.tipoCita,
-		ct.fechaInicio, ct.fechaFinal
+		ct.fechaInicio, ct.fechaFinal, ct.motivoCita
 		ORDER BY ct.fechaInicio, ct.fechaFinal DESC ");
 
         return $query;
+
+        }else if($idRol == 3){
+
+            $query = $this->db->query("SELECT us.nombre, es.nombre AS especialista, ct.idPaciente, ct.titulo, oc.nombre AS estatus, ct.estatusCita, ct.idDetalle AS pago, ct.tipoCita,
+            CONCAT (CONVERT(DATE,ct.fechaInicio), ' ', FORMAT(ct.fechaInicio, 'HH:mm'), ' - ', FORMAT(ct.fechaFinal, 'HH:mm')) AS horario, ct.motivoCita
+            FROM citas ct 
+            INNER JOIN catalogos ca ON ca.idCatalogo = 2
+            INNER JOIN opcionesPorCatalogo oc ON oc.idCatalogo = ca.idCatalogo AND oc.idOpcion = ct.estatusCita
+            INNER JOIN usuarios us ON us.idUsuario = ct.idPaciente
+            INNER JOIN usuarios es ON es.idUsuario = ct.idEspecialista
+            WHERE ct.idPaciente = $idUsuario AND oc.idCatalogo = 2 AND es.idPuesto = $espe AND es.idUsuario = $idEspe
+            GROUP BY us.nombre, es.nombre, ct.idPaciente, ct.titulo, oc.nombre, ct.estatusCita, ct.idDetalle, ct.tipoCita,
+            ct.fechaInicio, ct.fechaFinal, ct.motivoCita
+            ORDER BY ct.fechaInicio, ct.fechaFinal DESC ");
+    
+            return $query;
+
+        }
 
     }
 

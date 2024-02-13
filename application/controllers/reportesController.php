@@ -61,4 +61,28 @@ class ReportesController extends BaseController {
 		$data['data'] = $this->ReportesModel->getPacientes($dt)->result();
 		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
+
+	public function getResumenTerapias(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->ReportesModel->getResumenTerapias($dt)->result();
+		echo json_encode($data, JSON_NUMERIC_CHECK);
+	}
+
+	public function getCierrePacientes(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->ReportesModel->getCierrePacientes($dt)->result();
+		echo json_encode($data, JSON_NUMERIC_CHECK);
+	}
+
+	public function getCierreIngresos(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->ReportesModel->getCierreIngresos($dt)->result();
+		echo json_encode($data, JSON_NUMERIC_CHECK);
+	}
+
+	public function getSelectEspe(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->ReportesModel->getSelectEspe($dt)->result();
+		echo json_encode($data, JSON_NUMERIC_CHECK);
+	}
 }

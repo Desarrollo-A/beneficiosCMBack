@@ -47,45 +47,45 @@ class Usuario extends BaseController {
 	}
 
 	public function authorized(){
-		/*
-		$token = $this->headers('Token');
-		$session = $this->token->validateToken($token);
+        /*
+        $token = $this->headers('Token');
+        $session = $this->token->validateToken($token);
 
-		$user = (object) $session['data'];
-		*/
+        $user = (object) $session['data'];
+        */
 
-		$headers = (object) $this->input->request_headers();
+        $headers = (object) $this->input->request_headers();
 
-		//print_r($headers);
-		//exit();
+        //print_r($headers);
+        //exit();
 
-		$data = explode('.', $headers->token);
-		$user = json_decode(base64_decode($data[2]));
+        $data = explode('.', $headers->token);
+        $user = json_decode(base64_decode($data[2]));
 
-		//print_r($user);
-		//exit();
+        //print_r($user);
+        //exit();
 
-		$path = substr($this->input->get('path'), 1);
+        $path = substr($this->input->get('path'), 1);
 
-		//print_r($path);
-		//exit();
+        //print_r($path);
+        //exit();
 
-		$id_user = intval($user->idUsuario);
-		$id_rol = intval($user->idRol);
+        $id_user = intval($user->idUsuario);
+        $id_rol = intval($user->idRol);
 
-		$auth = $this->MenuModel->checkAuth($path, $id_user, $id_rol);
+        $auth = $this->MenuModel->checkAuth($path, $id_user, $id_rol);
 
-		//print_r($auth);
-		//exit();
+        //print_r($auth);
+        //exit();
 
-		$result = [
-			"idRol" => $id_rol,
-			"idUsuario" => $id_user,
-			"authorized" => $auth,
-		];
+        $result = [
+            "idRol" => $id_rol,
+            "idUsuario" => $id_user,
+            "authorized" => $auth,
+        ];
 
-		echo json_encode($result);
-	}
+        echo json_encode($result);
+    }
 
 	public function usuarios(){
 		$data['data'] = $this->UsuariosModel->usuarios();
