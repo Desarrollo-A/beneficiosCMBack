@@ -21,18 +21,27 @@ class Especialistas extends BaseController{
     public function horario(){
         $data = $this->post();
 
-        $occuped = $this->SedesModel->checkIfPresencial($data->start, $data->end, $data->sede, $data->especialista);
+        $sede = $data->sede;
+        $especialista = $data->especialista;
 
-        if($occuped){
-            $response = [
-                'status' => 'error',
-                'message' => 'El horario esta ocupado'
-            ];
+        $start = new DateTime($data->start);
+        $interval = new DateInterval('P1D');
+        $end = new DateTime($data->end);
+        $end->modify('+1 day'); //Esto para incluir el ultimo dia, en PHP 8 se usa DatePeriod::INCLUDE_END_DATE
 
-            $this->json($response);
+        $period = new DatePeriod(
+            $start,
+            $interval,
+            $end,
+        );
+
+        foreach ($period as $date) {
+            if($sede != 0){
+                $is_ok = $this->SedesModel->addHorarioPresencial($date->format("Y-m-d"), $sede, $especialista);
+            }else{
+                $is_ok = $this->SedesModel->deleteHorarioPresencial($date->format("Y-m-d"), $sede, $especialista);
+            }
         }
-
-        $is_ok = $this->SedesModel->addHorarioPresencial($data->start, $data->end, $data->sede, $data->especialista);
 
         if($is_ok){
             $response = [
@@ -50,5 +59,21 @@ class Especialistas extends BaseController{
         $horarios = $this->SedesModel->getHorariosEspecialista($idEspecialista);
 
         $this->json($horarios);
+    }
+
+    public function disponibles(){
+        $especialista = $this->input->get('especialista');
+        $sede = $this->input->get('sede');
+
+        $dias = [];
+        if($especialista != '' && $sede != ''){
+            $result = $this->SedesModel->getDiasPresencialXEspe($sede, $especialista);
+
+            foreach ($result as $dia) {
+                array_push($dias, $dia['presencialDate']);
+            }
+        }
+
+        $this->json($dias);
     }
 }
