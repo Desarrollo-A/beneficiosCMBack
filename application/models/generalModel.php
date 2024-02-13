@@ -14,6 +14,11 @@ class GeneralModel extends CI_Model {
 		return $query->result();
 	}
 
+    public function usuarioExiste($numContrato){
+        $query = $this->db-> query("SELECT *FROM usuarios WHERE numContrato = ?", $numContrato);
+		return $query;
+    }
+
     public function usrCount()
 	{
 		$query = $this->db-> query("SELECT COUNT(*) AS [usuarios] FROM usuarios");
