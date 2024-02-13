@@ -10,7 +10,7 @@ class Migrate extends CI_Controller
         {
             show_error($this->migration->error_string());
         }else {
-            echo "¡Las tablas se han migrado correctamente!"
+            echo "¡Las tablas se han migrado correctamente!";
         }
     }
 }

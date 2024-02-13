@@ -89,53 +89,68 @@ class LoginController extends BaseController {
 		}
 
 		$insertData = array(
-			"numContrato" =>  $datosEmpleado['num_empleado'],
-			"numEmpleado" => $datosEmpleado['num_empleado'],
-			"nombre" => $datosEmpleado['nombre_persona'].' '.$datosEmpleado['pri_apellido'].' '.$datosEmpleado['sec_apellido'],
-			"telPersonal" => $datosEmpleado['telefono_personal'],
-			"telOficina" => NULL,
-			"idPuesto" => $datosEmpleado['idpuesto'],
-			"idSede" => $sede,
-			"correo" => $datosEmpleado['mail_emp'],
-			"password" => encriptar($datosEmpleado['password'] ),
+			"numContrato" =>  isset($datosEmpleado['num_empleado']) ? $datosEmpleado['num_empleado'] : NULL,
+			"numEmpleado" => isset($datosEmpleado['num_empleado']) ? $datosEmpleado['num_empleado'] : NULL,
+			"nombre" => isset($datosEmpleado['nombre_persona']) ? $datosEmpleado['nombre_persona'].' '.$datosEmpleado['pri_apellido'].' '.$datosEmpleado['sec_apellido'] : NULL,
+			"telPersonal" => isset($datosEmpleado['telefono_personal']) ? $datosEmpleado['telefono_personal'] : NULL,
+			"idPuesto" => isset($datosEmpleado['idpuesto']) ? $datosEmpleado['idpuesto'] : NULL,
+			"idSede" => isset($sede) ? $sede : NULL,
+			"correo" => isset($datosEmpleado['mail_emp']) ? $datosEmpleado['mail_emp'] : NULL,
+			"password" => isset($datosEmpleado['password']) ? encriptar($datosEmpleado['password']) : NULL,
 			"estatus" => 1,
-			"idRol" => $idRol,
-			"sexo" => $datosEmpleado['sexo'],
-			"idArea" => $datosEmpleado['idarea'],
-			"fechaIngreso" => $datosEmpleado['fingreso'],
+			"idRol" => isset($idRol) ? $idRol : NULL,
+			"sexo" => isset($datosEmpleado['sexo']) ? $datosEmpleado['sexo'] : NULL,
+			"idArea" => isset($datosEmpleado['idarea']) ? $datosEmpleado['idarea'] : NULL,
+			"fechaIngreso" => isset($datosEmpleado['fingreso']) ? $datosEmpleado['fingreso'] : NULL,
 			"externo" => 0,
 			"creadoPor" => 0,
 			"fechaCreacion" => date('Y-m-d H:i:s'),
 			"modificadoPor" => 0,
-			"fechaModificacion" => date('Y-m-d H:i:s')
+			"fechaModificacion" => date('Y-m-d H:i:s'),
+			"idContrato" => isset($datosEmpleado['idcontrato']) ? $datosEmpleado['idcontrato'] : NULL
 		);
 
-		$resultado = $this->GeneralModel->addRecord('usuarios',$insertData);
-		$last_id = $this->db->insert_id();
+		$filteredArray = array_filter($insertData, 'strlen');
+		
+		if(count($insertData) == count($filteredArray)){
+			$usuarioExiste = $this->GeneralModel->usuarioExiste($insertData["numContrato"]);
+			
+			if($usuarioExiste->num_rows() === 0){
+				$resultado = $this->GeneralModel->addRecord('usuarios',$insertData);
+				$last_id = $this->db->insert_id();
+				
+				$insertData = array(
+					"idUsuario" => $last_id,
+					"estatus" => 1,
+					"creadoPor" => 1,
+					"fechaCreacion" => date('Y-m-d H:i:s'),
+					"modificadoPor" => 1,
+					"fechaModificacion" => date('Y-m-d H:i:s')
+				);
 
-		$insertData = array(
-			"idUsuario" => $last_id,
-			"estatus" => 1,
-			"creadoPor" => 1,
-			"fechaCreacion" => date('Y-m-d H:i:s'),
-			"modificadoPor" => 1,
-			"fechaModificacion" => date('Y-m-d H:i:s')
-		);
-		$resultado = $this->GeneralModel->addRecord('detallePaciente',$insertData);
+				$resultado = $this->GeneralModel->addRecord('detallePaciente', $insertData);
 
-		if ($this->db->trans_status() === FALSE){
-            $this->db->trans_rollback();
-			if(strpos($resultado['message'], "UNIQUE")){
-				echo json_encode(array("estatus" => 0, "mensaje" => "El número de empleado ingresado ya se encuentra registrado" ), JSON_NUMERIC_CHECK);
-			}else{
-				echo json_encode(array("estatus" => -1, "mensaje" => "Hubo un error al registrase" ), JSON_NUMERIC_CHECK);
+				if ($this->db->trans_status() === FALSE){
+					$this->db->trans_rollback();
+					
+					if(strpos($resultado['message'], "UNIQUE")){
+						echo json_encode(array("estatus" => 0, "mensaje" => "El número de empleado ingresado ya se encuentra registrado" ), JSON_NUMERIC_CHECK);
+					}else{
+						echo json_encode(array("estatus" => -1, "mensaje" => "Hubo un error al registrase" ), JSON_NUMERIC_CHECK);
+					}
+				} else {
+					$this->db->trans_commit();
+					echo json_encode(array("estatus" => 1, "mensaje" => "Te has registrado con éxito"), JSON_NUMERIC_CHECK);
+				}
 			}
-        } else {
-            $this->db->trans_commit();
-			echo json_encode(array("estatus" => 1, "mensaje" => "Te has registrado con éxito"), JSON_NUMERIC_CHECK);
-        }
-	
+			else{
+				echo json_encode(array("estatus" => -1, "mensaje" => "El número de empleado ingresado ya se encuentra registrado" ), JSON_NUMERIC_CHECK);
+			}
+		} else {
+			echo json_encode(array("estatus" => -1, "mensaje" => "Faltan valores en tu perfil" ), JSON_NUMERIC_CHECK);
+		}
 	}
+	
 	public function me(){
 		$datosSession = json_decode( file_get_contents('php://input'));
 		$arraySession = explode('.',$datosSession->token);
