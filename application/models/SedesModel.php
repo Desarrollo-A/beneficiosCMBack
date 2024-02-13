@@ -20,53 +20,35 @@ class SedesModel extends CI_Model {
         return $sedes;
     }
 
-    public function checkIfPresencial($startDate, $endDate, $idSede, $idEspecialista){
-        $query = "SELECT *
-        FROM presencialXSede
-        WHERE
-            ((startDate BETWEEN '$startDate' AND '$endDate') 
-            OR (endDate BETWEEN '$startDate' AND '$endDate')
-            OR ('$startDate' BETWEEN startDate AND endDate) 
-            OR ('$endDate' BETWEEN startDate AND endDate)) AND
-            idEspecialista='$idEspecialista'";
-
-        $horaios = $this->db->query($query)->result_array();
-
-        return $horaios;
-    }
-
-    public function checkIfPresencialExcept($idEvento, $startDate, $endDate, $idSede, $idEspecialista){
-        $query = "SELECT *
-        FROM presencialXSede
-        WHERE
-            ((startDate BETWEEN '$startDate' AND '$endDate') 
-            OR (endDate BETWEEN '$startDate' AND '$endDate')
-            OR ('$startDate' BETWEEN startDate AND endDate) 
-            OR ('$endDate' BETWEEN startDate AND endDate)) AND
-            idEspecialista='$idEspecialista' AND
-            idEvento != $idEvento";
-
-        $horaios = $this->db->query($query)->result_array();
-
-        return $horaios;
-    }
-
-    public function addHorarioPresencial($startDate, $endDate, $idSede, $idEspecialista){
-        $query = "INSERT INTO presencialXSede
-            (startDate, endDate, idSede, idEspecialista)
-            VALUES ('$startDate', '$endDate', $idSede, $idEspecialista)";
+    public function addHorarioPresencial($presencialDate, $idSede, $idEspecialista){
+        $query = "BEGIN
+            IF NOT EXISTS (
+                SELECT * FROM presencialXSede 
+                WHERE
+                    presencialDate = '$presencialDate'
+                    AND idEspecialista = '$idEspecialista'
+            )
+                BEGIN
+                    INSERT INTO presencialXSede (presencialDate, idSede, idEspecialista)
+                    VALUES ('$presencialDate', '$idSede', '$idEspecialista')
+                END
+            ELSE
+                BEGIN
+                    UPDATE presencialXSede SET idSede='$idSede'
+                    WHERE
+                        presencialDate = '$presencialDate'
+                    AND idEspecialista = '$idEspecialista'
+                END
+        END";
 
         return $this->db->query($query);
     }
 
-    public function updateHorarioPresencial($idEvento, $startDate, $endDate, $idSede, $idEspecialista){
-        $query = "UPDATE presencialXSede
-            SET
-                startDate = '$startDate',
-                endDate = '$endDate',
-                idSede = $idSede,
-                idEspecialista = $idEspecialista
-            WHERE idEvento = $idEvento";
+    public function deleteHorarioPresencial($presencialDate, $idSede, $idEspecialista){
+        $query = "DELETE FROM presencialXSede
+            WHERE
+                presencialDate = '$presencialDate'
+            AND idEspecialista = '$idEspecialista'";
 
         return $this->db->query($query);
     }
@@ -74,11 +56,13 @@ class SedesModel extends CI_Model {
     public function getHorariosEspecialista($idEspecialista){
         $query = "SELECT
         presencialXSede.idEvento AS id,
-        presencialXSede.startDate AS 'start',
-        presencialXSede.endDate AS 'end',
+        presencialXSede.presencialDate AS 'start',
+        presencialXSede.presencialDate AS 'end',
         presencialXSede.idSede AS sede,
         presencialXSede.idEspecialista AS especialista,
-        sedes.sede AS title
+        sedes.sede AS title,
+        'background' AS display,
+        sedes.colorBack AS backgroundColor
         FROM presencialXSede
         LEFT JOIN sedes ON sedes.idSede=presencialXSede.idSede
         WHERE
@@ -87,5 +71,16 @@ class SedesModel extends CI_Model {
         $horaios = $this->db->query($query)->result_array();
 
         return $horaios;
+    }
+
+    public function getDiasPresencialXEspe($idSede, $idEspecialista){
+        $query = "SELECT * FROM presencialXSede
+            WHERE
+                idEspecialista='$idEspecialista'
+            AND idSede='$idSede'";
+
+        $dias = $this->db->query($query)->result_array();
+
+        return $dias;
     }
 }
