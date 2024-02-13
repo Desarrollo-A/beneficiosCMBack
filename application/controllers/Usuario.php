@@ -264,19 +264,6 @@ class Usuario extends BaseController {
 		isset($data["sexo"]) ? $userD['sexo'] = $data["sexo"] : '';
 		isset($data["fingreso"]) ? $userD['fechaIngreso'] = $data["fingreso"] : '';
 
-		// $userData = array( // Orden del arreglo
-		// 	"nombre" => ($data["nombre_persona"] . ' ' . $data["pri_apellido"] . ' ' . $data["sec_apellido"]),
-		// 	"telPersonal" => $data["telefono_personal"],
-		// 	"idPuesto" => intval($data["idpuesto"]),
-		// 	"idSede" => intval($data["idsede"]),
-		// 	"correo" => $data["mail_emp"],
-		// 	"estatus" => intval($data["activo"]),
-		// 	"fechaModificacion" => $fecha,
-		// 	"idArea" => $data["idarea"],
-		// 	"sexo" => $data["sexo"],
-		// 	"fechaIngreso" => $data["fingreso"],
-		// );
-
 		$idContrato = intval($data["idcontrato"]);
 
 		$response['result'] = isset($idContrato);
