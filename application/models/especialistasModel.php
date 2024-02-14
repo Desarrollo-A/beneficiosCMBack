@@ -8,21 +8,20 @@ class EspecialistasModel extends CI_Model {
 		parent::__construct();
 	}
 
-    public function especialistas()
-	{
+    public function especialistas(){
 		$query = $this->db-> query("SELECT * FROM opcionesporcatalogo WHERE idCatalogo = 1");
 		return $query;
 	}
 
-	public function getMeta($idEspecialista)
-    {
+	public function getMeta($idEspecialista){
     	$query = "SELECT
 			CASE
 				WHEN mpe.metaCitas IS NULL THEN ab.metaCitas ELSE mpe.metaCitas END AS meta
 			FROM usuarios us
 			LEFT JOIN areasBeneficios ab ON ab.idAreaBeneficio = us.idAreaBeneficio
 			LEFT JOIN metasPorEspecialista mpe ON mpe.idEspecialista = us.idUsuario
-			WHERE us.idUsuario = $idEspecialista";
+			WHERE 
+				us.idUsuario = $idEspecialista";
 
         return $this->db->query($query)->row();
 
@@ -30,12 +29,13 @@ class EspecialistasModel extends CI_Model {
         //Get meta from especilista
     }
 
-    public function getTotal($idEspecialista)
+    public function getTotal($idEspecialista, $fechaInicio, $fechaFin)
     {
         $query = "SELECT * FROM citas
         	WHERE
-        		idEspecialista = $idEspecialista";
-		// Poner condicion de tiempo
+        		idEspecialista = $idEspecialista
+        	AND estatusCita = 4
+			AND fechaFinal BETWEEN '$fechaInicio' AND '$fechaFin'";
 
         return $this->db->query($query)->num_rows();
     }
