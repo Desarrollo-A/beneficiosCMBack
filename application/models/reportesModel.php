@@ -14,18 +14,19 @@ class ReportesModel extends CI_Model {
 
 			$query = $this->db-> query("SELECT ct.idCita, pa.idUsuario AS idColab, us.nombre especialista, pa.nombre paciente, ps.puesto AS area, sd.sede,ct.titulo, op.nombre AS estatus, 
 			CONCAT (CONVERT(DATE,ct.fechaInicio), ' ', FORMAT(ct.fechaInicio, 'HH:mm'), ' - ', FORMAT(ct.fechaFinal, 'HH:mm')) AS horario, observaciones, us.sexo, 
-			ct.motivoCita, ofi.oficina, ops.nombre AS motivoCita, oxc.nombre AS metodoPago, ct.estatusCita, ct.fechaModificacion,
+			ofi.oficina, oxc.nombre AS metodoPago, ct.estatusCita, ct.fechaModificacion,
+			string_agg(ops.nombre, ', ') AS motivoCita,
 			CASE 
 			WHEN ct.estatusCita IN (2, 7, 8) THEN 'Cancelado'
 			ELSE 'Exitoso'
 			END AS pagoGenerado
 			FROM citas ct
-			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-			INNER JOIN usuarios pa ON pa.idUsuario = ct.idPaciente
-			INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
-			INNER JOIN opcionesPorCatalogo op ON op.idOpcion = ct.estatusCita
+			LEFT JOIN usuarios us ON us.idUsuario = ct.idEspecialista
+			LEFT JOIN usuarios pa ON pa.idUsuario = ct.idPaciente
+			LEFT JOIN puestos ps ON ps.idPuesto = us.idPuesto
+			LEFT JOIN opcionesPorCatalogo op ON op.idOpcion = ct.estatusCita
 			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
-			INNER JOIN sedes sd ON sd.idSede = axs.idSede
+			LEFT JOIN sedes sd ON sd.idSede = axs.idSede
 			LEFT JOIN oficinas ofi ON ofi.idOficina = axs.idOficina
 			LEFT JOIN catalogos cat ON cat.idCatalogo = CASE 
 			WHEN ps.idPuesto = 537 THEN 8
@@ -33,28 +34,48 @@ class ReportesModel extends CI_Model {
 			WHEN ps.idPuesto = 686 THEN 9
 			WHEN ps.idPuesto = 158 THEN 6
 			ELSE ps.idPuesto END 
-			LEFT JOIN opcionesPorCatalogo ops ON ops.idCatalogo =  cat.idCatalogo AND ops.idOpcion = ct.motivoCita
-			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-			INNER JOIN opcionesPorCatalogo oxc ON oxc.idOpcion = dp.metodoPago AND oxc.idCatalogo = 11
-			WHERE op.idCatalogo = 2");
+			LEFT JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
+			LEFT JOIN opcionesPorCatalogo oxc ON oxc.idOpcion = dp.metodoPago AND oxc.idCatalogo = 11
+			LEFT JOIN motivosPorCita mpc ON mpc.idCita = ct.idCita
+  			LEFT JOIN opcionesPorCatalogo ops ON ops.idCatalogo = cat.idCatalogo AND ops.idOpcion = mpc.idMotivo	
+			WHERE op.idCatalogo = 2
+			GROUP BY 
+  				ct.idCita, 
+  				pa.idUsuario, 
+  				us.nombre, 
+  				pa.nombre, 
+  				ps.puesto, 
+  				sd.sede, 
+  				ct.titulo, 
+  				op.nombre, 
+  				ct.fechaInicio, 
+  				ct.fechaFinal, 
+  				observaciones, 
+  				us.sexo, 
+  				ofi.oficina, 
+  				oxc.nombre, 
+  				ct.estatusCita, 
+  				ct.fechaModificacion
+			");
 			return $query;
 
 		}else if($dt === 'faltas'){
 
 			$query = $this->db-> query("SELECT ct.idCita, pa.idUsuario AS idColab, us.nombre especialista, pa.nombre paciente, ps.puesto AS area, sd.sede,ct.titulo, op.nombre AS estatus, 
 			CONCAT (CONVERT(DATE,ct.fechaInicio), ' ', FORMAT(ct.fechaInicio, 'HH:mm'), ' - ', FORMAT(ct.fechaFinal, 'HH:mm')) AS horario, observaciones, us.sexo, 
-			ct.motivoCita, ofi.oficina, ops.nombre AS motivoCita, oxc.nombre AS metodoPago, ct.estatusCita, ct.fechaModificacion,
+			ofi.oficina, oxc.nombre AS metodoPago, ct.estatusCita, ct.fechaModificacion,
+			string_agg(ops.nombre, ', ') AS motivoCita,
 			CASE 
 			WHEN ct.estatusCita IN (2, 7, 8) THEN 'Cancelado'
 			ELSE 'Exitoso'
 			END AS pagoGenerado
 			FROM citas ct
-			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-			INNER JOIN usuarios pa ON pa.idUsuario = ct.idPaciente
-			INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
-			INNER JOIN opcionesPorCatalogo op ON op.idOpcion = ct.estatusCita
+			LEFT JOIN usuarios us ON us.idUsuario = ct.idEspecialista
+			LEFT JOIN usuarios pa ON pa.idUsuario = ct.idPaciente
+			LEFT JOIN puestos ps ON ps.idPuesto = us.idPuesto
+			LEFT JOIN opcionesPorCatalogo op ON op.idOpcion = ct.estatusCita
 			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
-			INNER JOIN sedes sd ON sd.idSede = axs.idSede
+			LEFT JOIN sedes sd ON sd.idSede = axs.idSede
 			LEFT JOIN oficinas ofi ON ofi.idOficina = axs.idOficina
 			LEFT JOIN catalogos cat ON cat.idCatalogo = CASE 
 			WHEN ps.idPuesto = 537 THEN 8
@@ -62,28 +83,48 @@ class ReportesModel extends CI_Model {
 			WHEN ps.idPuesto = 686 THEN 9
 			WHEN ps.idPuesto = 158 THEN 6
 			ELSE ps.idPuesto END 
-			LEFT JOIN opcionesPorCatalogo ops ON ops.idCatalogo =  cat.idCatalogo AND ops.idOpcion = ct.motivoCita
-			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-			INNER JOIN opcionesPorCatalogo oxc ON oxc.idOpcion = dp.metodoPago AND oxc.idCatalogo = 11
-			WHERE op.idCatalogo = 2 AND ct.estatusCita = 3");
+			LEFT JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
+			LEFT JOIN opcionesPorCatalogo oxc ON oxc.idOpcion = dp.metodoPago AND oxc.idCatalogo = 11
+			LEFT JOIN motivosPorCita mpc ON mpc.idCita = ct.idCita
+  			LEFT JOIN opcionesPorCatalogo ops ON ops.idCatalogo = cat.idCatalogo AND ops.idOpcion = mpc.idMotivo	
+			WHERE op.idCatalogo = 2 AND ct.estatusCita = 3
+			GROUP BY 
+  				ct.idCita, 
+  				pa.idUsuario, 
+  				us.nombre, 
+  				pa.nombre, 
+  				ps.puesto, 
+  				sd.sede, 
+  				ct.titulo, 
+  				op.nombre, 
+  				ct.fechaInicio, 
+  				ct.fechaFinal, 
+  				observaciones, 
+  				us.sexo, 
+  				ofi.oficina, 
+  				oxc.nombre, 
+  				ct.estatusCita, 
+  				ct.fechaModificacion
+			");
 			return $query;
 
 		}else if($dt === 'justificadas'){
 
 			$query = $this->db-> query("SELECT ct.idCita, pa.idUsuario AS idColab, us.nombre especialista, pa.nombre paciente, ps.puesto AS area, sd.sede,ct.titulo, op.nombre AS estatus, 
 			CONCAT (CONVERT(DATE,ct.fechaInicio), ' ', FORMAT(ct.fechaInicio, 'HH:mm'), ' - ', FORMAT(ct.fechaFinal, 'HH:mm')) AS horario, observaciones, us.sexo, 
-			ct.motivoCita, ofi.oficina, ops.nombre AS motivoCita, oxc.nombre AS metodoPago, ct.estatusCita, ct.fechaModificacion,
+			ofi.oficina, oxc.nombre AS metodoPago, ct.estatusCita, ct.fechaModificacion,
+			string_agg(ops.nombre, ', ') AS motivoCita,
 			CASE 
 			WHEN ct.estatusCita IN (2, 7, 8) THEN 'Cancelado'
 			ELSE 'Exitoso'
 			END AS pagoGenerado
 			FROM citas ct
-			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-			INNER JOIN usuarios pa ON pa.idUsuario = ct.idPaciente
-			INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
-			INNER JOIN opcionesPorCatalogo op ON op.idOpcion = ct.estatusCita
+			LEFT JOIN usuarios us ON us.idUsuario = ct.idEspecialista
+			LEFT JOIN usuarios pa ON pa.idUsuario = ct.idPaciente
+			LEFT JOIN puestos ps ON ps.idPuesto = us.idPuesto
+			LEFT JOIN opcionesPorCatalogo op ON op.idOpcion = ct.estatusCita
 			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
-			INNER JOIN sedes sd ON sd.idSede = axs.idSede
+			LEFT JOIN sedes sd ON sd.idSede = axs.idSede
 			LEFT JOIN oficinas ofi ON ofi.idOficina = axs.idOficina
 			LEFT JOIN catalogos cat ON cat.idCatalogo = CASE 
 			WHEN ps.idPuesto = 537 THEN 8
@@ -91,10 +132,29 @@ class ReportesModel extends CI_Model {
 			WHEN ps.idPuesto = 686 THEN 9
 			WHEN ps.idPuesto = 158 THEN 6
 			ELSE ps.idPuesto END 
-			LEFT JOIN opcionesPorCatalogo ops ON ops.idCatalogo =  cat.idCatalogo AND ops.idOpcion = ct.motivoCita
-			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-			INNER JOIN opcionesPorCatalogo oxc ON oxc.idOpcion = dp.metodoPago AND oxc.idCatalogo = 11
-			WHERE op.idCatalogo = 2 AND ct.estatusCita = 5");
+			LEFT JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
+			LEFT JOIN opcionesPorCatalogo oxc ON oxc.idOpcion = dp.metodoPago AND oxc.idCatalogo = 11
+			LEFT JOIN motivosPorCita mpc ON mpc.idCita = ct.idCita
+  			LEFT JOIN opcionesPorCatalogo ops ON ops.idCatalogo = cat.idCatalogo AND ops.idOpcion = mpc.idMotivo	
+			WHERE op.idCatalogo = 2 AND ct.estatusCita = 5
+			GROUP BY 
+  				ct.idCita, 
+  				pa.idUsuario, 
+  				us.nombre, 
+  				pa.nombre, 
+  				ps.puesto, 
+  				sd.sede, 
+  				ct.titulo, 
+  				op.nombre, 
+  				ct.fechaInicio, 
+  				ct.fechaFinal, 
+  				observaciones, 
+  				us.sexo, 
+  				ofi.oficina, 
+  				oxc.nombre, 
+  				ct.estatusCita, 
+  				ct.fechaModificacion
+			");
 			return $query;
 
 		}
