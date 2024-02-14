@@ -1310,7 +1310,7 @@ class CalendarioController extends BaseController{
 			'idEventoGoogle' => $dataValue['idEventoGoogle']
 		];
 
-		$update = $this->generalModel->updateRecord("citas", $data, 'idCita', $dataValue["idCita"]);
+		$update = $this->GeneralModel->updateRecord("citas", $data, 'idCita', $dataValue["idCita"]);
 
 		$this->output->set_content_type('application/json');
         $this->output->set_output(json_encode($update, JSON_NUMERIC_CHECK));
