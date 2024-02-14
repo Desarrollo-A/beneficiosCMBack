@@ -94,7 +94,7 @@ class GeneralModel extends CI_Model {
         $idRol = $dt["idRol"];
 
         if($idRol == 1 || $idRol == 4){
-            $query = $this->db-> query("SELECT COUNT(*) AS [pacientes] FROM usuarios us
+            $query = $this->db-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS [pacientes] FROM usuarios us
             INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
             WHERE us.idPuesto = $idData");
 
@@ -102,7 +102,7 @@ class GeneralModel extends CI_Model {
             $query = $this->db-> query("SELECT COUNT(*) AS [pacientes] FROM citas WHERE idPaciente = $idData");
 
         }else if($idRol == 3){
-            $query = $this->db-> query("SELECT COUNT(*) AS [pacientes] FROM citas WHERE idEspecialista = $idData");
+            $query = $this->db-> query("SELECT COUNT(DISTINCT idPaciente) AS [pacientes] FROM citas WHERE idEspecialista = $idData");
 
         }
         
@@ -115,13 +115,13 @@ class GeneralModel extends CI_Model {
         $idRol = $dt["idRol"];
 
         if($idRol == 1 || $idRol == 4){
-            $query = $this->db-> query("SELECT COUNT(*) AS [asistencia] FROM usuarios us
+            $query = $this->db-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS [asistencia] FROM usuarios us
             INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
             WHERE us.idPuesto = $idData AND ct.estatusCita = 4");
         }else if($idRol == 2){
             $query = $this->db-> query("SELECT COUNT(*) AS [asistencia] FROM citas WHERE idPaciente = $idData AND estatusCita = 4");
         }else if($idRol == 3){
-            $query = $this->db-> query("SELECT COUNT(*) AS [asistencia] FROM citas WHERE idEspecialista = $idData AND estatusCita = 4");
+            $query = $this->db-> query("SELECT COUNT(DISTINCT idPaciente) AS [asistencia] FROM citas WHERE idEspecialista = $idData AND estatusCita = 4");
         }
 
         return $query;
@@ -133,13 +133,13 @@ class GeneralModel extends CI_Model {
         $idRol = $dt["idRol"];
 
         if($idRol == 1 || $idRol == 4){
-            $query = $this->db-> query("SELECT COUNT(*) AS [cancelada] FROM usuarios us
+            $query = $this->db-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS [cancelada] FROM usuarios us
             INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
             WHERE us.idPuesto = $idData AND ct.estatusCita = 2");
         }else if($idRol == 2){
             $query = $this->db-> query("SELECT COUNT(*) AS [cancelada] FROM citas WHERE idPaciente = $idData AND estatusCita = 2");
         }else if($idRol == 3){
-            $query = $this->db-> query("SELECT COUNT(*) AS [cancelada] FROM citas WHERE idEspecialista = $idData AND estatusCita = 4");
+            $query = $this->db-> query("SELECT COUNT(DISTINCT idPaciente) AS [cancelada] FROM citas WHERE idEspecialista = $idData AND estatusCita = 4");
         }
 
         return $query;
@@ -151,13 +151,13 @@ class GeneralModel extends CI_Model {
         $idRol = $dt["idRol"];
 
         if($idRol == 1 || $idRol == 4){
-            $query = $this->db-> query("SELECT COUNT(*) AS [penalizada] FROM usuarios us
+            $query = $this->db-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS [penalizada] FROM usuarios us
             INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
             WHERE us.idPuesto = $idData AND ct.estatusCita = 3");
         }else if($idRol == 2){
             $query = $this->db-> query("SELECT COUNT(*) AS [penalizada] FROM citas WHERE idPaciente = $idData AND estatusCita = 3");
         }else if($idRol == 3){
-            $query = $this->db-> query("SELECT COUNT(*) AS [penalizada] FROM citas WHERE idEspecialista = $idData AND estatusCita = 4");
+            $query = $this->db-> query("SELECT COUNT(DISTINCT idPaciente) AS [penalizada] FROM citas WHERE idEspecialista = $idData AND estatusCita = 4");
         }
 
         return $query;
