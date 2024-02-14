@@ -15,7 +15,7 @@ class ReportesModel extends CI_Model {
 			$query = $this->db-> query("SELECT ct.idCita, pa.idUsuario AS idColab, us.nombre especialista, pa.nombre paciente, ps.puesto AS area, sd.sede,ct.titulo, op.nombre AS estatus, 
 			CONCAT (CONVERT(DATE,ct.fechaInicio), ' ', FORMAT(ct.fechaInicio, 'HH:mm'), ' - ', FORMAT(ct.fechaFinal, 'HH:mm')) AS horario, observaciones, us.sexo, 
 			ofi.oficina, oxc.nombre AS metodoPago, ct.estatusCita, ct.fechaModificacion,
-			string_agg(ops.nombre, ', ') AS motivoCita,
+			ISNULL(string_agg(ops.nombre, ', '), 'Sin motivos de cita') AS motivoCita,
 			CASE 
 			WHEN ct.estatusCita IN (2, 7, 8) THEN 'Cancelado'
 			ELSE 'Exitoso'
@@ -64,7 +64,7 @@ class ReportesModel extends CI_Model {
 			$query = $this->db-> query("SELECT ct.idCita, pa.idUsuario AS idColab, us.nombre especialista, pa.nombre paciente, ps.puesto AS area, sd.sede,ct.titulo, op.nombre AS estatus, 
 			CONCAT (CONVERT(DATE,ct.fechaInicio), ' ', FORMAT(ct.fechaInicio, 'HH:mm'), ' - ', FORMAT(ct.fechaFinal, 'HH:mm')) AS horario, observaciones, us.sexo, 
 			ofi.oficina, oxc.nombre AS metodoPago, ct.estatusCita, ct.fechaModificacion,
-			string_agg(ops.nombre, ', ') AS motivoCita,
+			ISNULL(string_agg(ops.nombre, ', '), 'Sin motivos de cita') AS motivoCita,
 			CASE 
 			WHEN ct.estatusCita IN (2, 7, 8) THEN 'Cancelado'
 			ELSE 'Exitoso'
@@ -113,7 +113,7 @@ class ReportesModel extends CI_Model {
 			$query = $this->db-> query("SELECT ct.idCita, pa.idUsuario AS idColab, us.nombre especialista, pa.nombre paciente, ps.puesto AS area, sd.sede,ct.titulo, op.nombre AS estatus, 
 			CONCAT (CONVERT(DATE,ct.fechaInicio), ' ', FORMAT(ct.fechaInicio, 'HH:mm'), ' - ', FORMAT(ct.fechaFinal, 'HH:mm')) AS horario, observaciones, us.sexo, 
 			ofi.oficina, oxc.nombre AS metodoPago, ct.estatusCita, ct.fechaModificacion,
-			string_agg(ops.nombre, ', ') AS motivoCita,
+			ISNULL(string_agg(ops.nombre, ', '), 'Sin motivos de cita') AS motivoCita,
 			CASE 
 			WHEN ct.estatusCita IN (2, 7, 8) THEN 'Cancelado'
 			ELSE 'Exitoso'
