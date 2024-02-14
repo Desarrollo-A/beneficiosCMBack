@@ -200,6 +200,7 @@ class DashModel extends CI_Model {
         $inicio = $dt["inicio"];
         $fin = $dt["fin"];
 
+        /*
         if($idRol == 1 || $idRol == 4){
             $query = $this->db-> query("SELECT COUNT(*) AS [citas] FROM usuarios us
             INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
@@ -209,7 +210,12 @@ class DashModel extends CI_Model {
             INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
             WHERE us.idUsuario = $idData AND ct.estatusCita = 4 AND fechaFinal BETWEEN '$inicio' AND '$fin'");
         }
+        */
 
-        return $query;
+        $query = "SELECT COUNT(*) AS citas FROM citas
+        	WHERE
+        		idEspecialista = $idData";
+
+        return $this->db->query($query)->result();
     }
 }
