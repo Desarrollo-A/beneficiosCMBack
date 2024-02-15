@@ -33,7 +33,7 @@ class Especialistas extends BaseController{
         $period = new DatePeriod(
             $start,
             $interval,
-            $end,
+            $end
         );
 
         foreach ($period as $date) {
