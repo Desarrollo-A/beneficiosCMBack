@@ -173,15 +173,20 @@ class GeneralModel extends CI_Model {
         if($idRol == 1  || $idRol == 4){
 
         $query = $this->db->query("SELECT us.nombre, es.nombre AS especialista, ct.idPaciente, ct.titulo, oc.nombre AS estatus, ct.estatusCita, ct.idDetalle AS pago, ct.tipoCita,
-		CONCAT (CONVERT(DATE,ct.fechaInicio), ' ', FORMAT(ct.fechaInicio, 'HH:mm'), ' - ', FORMAT(ct.fechaFinal, 'HH:mm')) AS horario, ct.motivoCita
+		CONCAT (CONVERT(DATE,ct.fechaInicio), ' ', FORMAT(ct.fechaInicio, 'HH:mm'), ' - ', FORMAT(ct.fechaFinal, 'HH:mm')) AS horario,
+        ISNULL(string_agg(ops.nombre, ', '), 'Sin motivos de cita') AS motivoCita
 		FROM citas ct 
 		INNER JOIN catalogos ca ON ca.idCatalogo = 2
 		INNER JOIN opcionesPorCatalogo oc ON oc.idCatalogo = ca.idCatalogo AND oc.idOpcion = ct.estatusCita
 		INNER JOIN usuarios us ON us.idUsuario = ct.idPaciente
 		INNER JOIN usuarios es ON es.idUsuario = ct.idEspecialista
+        LEFT JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
+		LEFT JOIN opcionesPorCatalogo oxc ON oxc.idOpcion = dp.metodoPago AND oxc.idCatalogo = 11
+		LEFT JOIN motivosPorCita mpc ON mpc.idCita = ct.idCita
+  		LEFT JOIN opcionesPorCatalogo ops ON ops.idOpcion = mpc.idMotivo	
 		WHERE ct.idPaciente = $idUsuario AND oc.idCatalogo = 2 AND es.idPuesto = $espe
 		GROUP BY us.nombre, es.nombre, ct.idPaciente, ct.titulo, oc.nombre, ct.estatusCita, ct.idDetalle, ct.tipoCita,
-		ct.fechaInicio, ct.fechaFinal, ct.motivoCita
+		ct.fechaInicio, ct.fechaFinal
 		ORDER BY ct.fechaInicio, ct.fechaFinal DESC ");
 
         return $query;
@@ -189,15 +194,20 @@ class GeneralModel extends CI_Model {
         }else if($idRol == 3){
 
             $query = $this->db->query("SELECT us.nombre, es.nombre AS especialista, ct.idPaciente, ct.titulo, oc.nombre AS estatus, ct.estatusCita, ct.idDetalle AS pago, ct.tipoCita,
-            CONCAT (CONVERT(DATE,ct.fechaInicio), ' ', FORMAT(ct.fechaInicio, 'HH:mm'), ' - ', FORMAT(ct.fechaFinal, 'HH:mm')) AS horario, ct.motivoCita
+            CONCAT (CONVERT(DATE,ct.fechaInicio), ' ', FORMAT(ct.fechaInicio, 'HH:mm'), ' - ', FORMAT(ct.fechaFinal, 'HH:mm')) AS horario, 
+            ISNULL(string_agg(ops.nombre, ', '), 'Sin motivos de cita') AS motivoCita
             FROM citas ct 
             INNER JOIN catalogos ca ON ca.idCatalogo = 2
             INNER JOIN opcionesPorCatalogo oc ON oc.idCatalogo = ca.idCatalogo AND oc.idOpcion = ct.estatusCita
             INNER JOIN usuarios us ON us.idUsuario = ct.idPaciente
             INNER JOIN usuarios es ON es.idUsuario = ct.idEspecialista
+            LEFT JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
+            LEFT JOIN opcionesPorCatalogo oxc ON oxc.idOpcion = dp.metodoPago AND oxc.idCatalogo = 11
+            LEFT JOIN motivosPorCita mpc ON mpc.idCita = ct.idCita
+            LEFT JOIN opcionesPorCatalogo ops ON ops.idOpcion = mpc.idMotivo	
             WHERE ct.idPaciente = $idUsuario AND oc.idCatalogo = 2 AND es.idPuesto = $espe AND es.idUsuario = $idEspe
             GROUP BY us.nombre, es.nombre, ct.idPaciente, ct.titulo, oc.nombre, ct.estatusCita, ct.idDetalle, ct.tipoCita,
-            ct.fechaInicio, ct.fechaFinal, ct.motivoCita
+            ct.fechaInicio, ct.fechaFinal
             ORDER BY ct.fechaInicio, ct.fechaFinal DESC ");
     
             return $query;
