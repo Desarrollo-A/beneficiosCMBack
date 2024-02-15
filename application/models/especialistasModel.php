@@ -24,9 +24,6 @@ class EspecialistasModel extends CI_Model {
 				us.idUsuario = $idEspecialista";
 
         return $this->db->query($query)->row();
-
-        //Get meta from especialidad
-        //Get meta from especilista
     }
 
     public function getTotal($idEspecialista, $fechaInicio, $fechaFin)
@@ -38,6 +35,16 @@ class EspecialistasModel extends CI_Model {
 			AND fechaFinal BETWEEN '$fechaInicio' AND '$fechaFin'";
 
         return $this->db->query($query)->num_rows();
+    }
+
+    public function getEspecialistasPorArea($idAreaBeneficio){
+    	$query = "SELECT *
+    		FROM usuarios
+    		WHERE
+    			idAreaBeneficio=$idAreaBeneficio
+    		AND idRol = 3";
+
+    	return $this->db->query($query)->result();
     }
 
 }
