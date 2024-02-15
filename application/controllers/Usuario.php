@@ -105,6 +105,19 @@ class Usuario extends BaseController {
         $this->output->set_output(json_encode($data));
 	}
 
+	public function getUsersExternos(){
+		$rs = $this->UsuariosModel->getUsersExternos()->result();
+		$data['result'] = count($rs) > 0; 
+		if ($data['result']) {
+			$data['msg'] = '¡Listado de usuarios cargado exitosamente!';
+			$data['data'] = $rs; 
+		}else {
+			$data['msg'] = '¡No existen registros!';
+		}
+		$this->output->set_content_type("application/json");
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
+
 	public function getAreas(){
 		$rs = $this->UsuariosModel->getAreas();
 		$data['result'] = count($rs) > 0; 
