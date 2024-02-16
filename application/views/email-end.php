@@ -364,12 +364,12 @@
 										<a href="<?= $data['link'] ?>">Califica tu cita</a>
 										<h4>Especialista que te atiende: <?= $data["especialista"] ?></h4>
                                         <h4>Lugar </h4>
-                                        <h5>Sede: <?= $data["sede"] ?></h5>
-                                        <h5>Oficina: <?= $data["oficina"] ?></h5>
+                                        <h5><img src="<?= base_url() ?>dist/img/building-solid.png"> <?= $data["sede"] ?></h5>
+                                        <h5><img src="<?= base_url() ?>dist/img/map-marked-alt-solid.png"> <?= $data["oficina"] ?></h5>
                                     </br>
 										<h4>Horario reservado</h4>
-										<h5>Fecha: <?= $data["fecha"] ?></h5>
-										<h5>Hora: <?= $data["horaInicio"] ?> - <?= $data["horaFinal"] ?></h5>
+										<h5><img src="<?= base_url() ?>dist/img/calendar-alt-solid.png"> <?= $data["fecha"] ?></h5>
+										<h5><img src="<?= base_url() ?>dist/img/clock-regular.png"> <?= $data["horaInicio"] ?> - <?= $data["horaFinal"] ?></h5>
 									</br>
 									</div>
 								</td>
