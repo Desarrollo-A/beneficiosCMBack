@@ -14,7 +14,7 @@ class ReportesModel extends CI_Model {
 
 			$query = $this->db-> query("SELECT ct.idCita, pa.idUsuario AS idColab, us.nombre especialista, pa.nombre paciente, ps.puesto AS area, sd.sede,ct.titulo, op.nombre AS estatus, 
 			CONCAT (CONVERT(DATE,ct.fechaInicio), ' ', FORMAT(ct.fechaInicio, 'HH:mm'), ' - ', FORMAT(ct.fechaFinal, 'HH:mm')) AS horario, observaciones, us.sexo, 
-			ofi.oficina, oxc.nombre AS metodoPago, ct.estatusCita, ct.fechaModificacion,
+			ofi.oficina, oxc.nombre AS metodoPago, ct.estatusCita, ct.fechaModificacion, dep.depto,
 			ISNULL(string_agg(ops.nombre, ', '), 'Sin motivos de cita') AS motivoCita,
 			CASE 
 			WHEN ct.estatusCita IN (2, 7, 8) THEN 'Cancelado'
@@ -28,6 +28,9 @@ class ReportesModel extends CI_Model {
 			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
 			LEFT JOIN sedes sd ON sd.idSede = axs.idSede
 			LEFT JOIN oficinas ofi ON ofi.idOficina = axs.idOficina
+			LEFT JOIN puestos ps2 ON ps2.idPuesto = pa.idPuesto
+			LEFT JOIN areas ar ON ar.idArea = ps2.idArea
+			LEFT JOIN departamentos dep ON dep.idDepto = ar.idDepto
 			LEFT JOIN catalogos cat ON cat.idCatalogo = CASE 
 			WHEN ps.idPuesto = 537 THEN 8
 			WHEN ps.idPuesto = 585 THEN 7
@@ -55,7 +58,8 @@ class ReportesModel extends CI_Model {
   				ofi.oficina, 
   				oxc.nombre, 
   				ct.estatusCita, 
-  				ct.fechaModificacion
+  				ct.fechaModificacion,
+				dep.depto
 			");
 			return $query;
 
@@ -63,7 +67,7 @@ class ReportesModel extends CI_Model {
 
 			$query = $this->db-> query("SELECT ct.idCita, pa.idUsuario AS idColab, us.nombre especialista, pa.nombre paciente, ps.puesto AS area, sd.sede,ct.titulo, op.nombre AS estatus, 
 			CONCAT (CONVERT(DATE,ct.fechaInicio), ' ', FORMAT(ct.fechaInicio, 'HH:mm'), ' - ', FORMAT(ct.fechaFinal, 'HH:mm')) AS horario, observaciones, us.sexo, 
-			ofi.oficina, oxc.nombre AS metodoPago, ct.estatusCita, ct.fechaModificacion,
+			ofi.oficina, oxc.nombre AS metodoPago, ct.estatusCita, ct.fechaModificacion, dep.depto,
 			ISNULL(string_agg(ops.nombre, ', '), 'Sin motivos de cita') AS motivoCita,
 			CASE 
 			WHEN ct.estatusCita IN (2, 7, 8) THEN 'Cancelado'
@@ -77,6 +81,9 @@ class ReportesModel extends CI_Model {
 			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
 			LEFT JOIN sedes sd ON sd.idSede = axs.idSede
 			LEFT JOIN oficinas ofi ON ofi.idOficina = axs.idOficina
+			LEFT JOIN puestos ps2 ON ps2.idPuesto = pa.idPuesto
+			LEFT JOIN areas ar ON ar.idArea = ps2.idArea
+			LEFT JOIN departamentos dep ON dep.idDepto = ar.idDepto
 			LEFT JOIN catalogos cat ON cat.idCatalogo = CASE 
 			WHEN ps.idPuesto = 537 THEN 8
 			WHEN ps.idPuesto = 585 THEN 7
@@ -104,7 +111,8 @@ class ReportesModel extends CI_Model {
   				ofi.oficina, 
   				oxc.nombre, 
   				ct.estatusCita, 
-  				ct.fechaModificacion
+  				ct.fechaModificacion,
+				dep.depto
 			");
 			return $query;
 
@@ -112,7 +120,7 @@ class ReportesModel extends CI_Model {
 
 			$query = $this->db-> query("SELECT ct.idCita, pa.idUsuario AS idColab, us.nombre especialista, pa.nombre paciente, ps.puesto AS area, sd.sede,ct.titulo, op.nombre AS estatus, 
 			CONCAT (CONVERT(DATE,ct.fechaInicio), ' ', FORMAT(ct.fechaInicio, 'HH:mm'), ' - ', FORMAT(ct.fechaFinal, 'HH:mm')) AS horario, observaciones, us.sexo, 
-			ofi.oficina, oxc.nombre AS metodoPago, ct.estatusCita, ct.fechaModificacion,
+			ofi.oficina, oxc.nombre AS metodoPago, ct.estatusCita, ct.fechaModificacion, dep.depto,
 			ISNULL(string_agg(ops.nombre, ', '), 'Sin motivos de cita') AS motivoCita,
 			CASE 
 			WHEN ct.estatusCita IN (2, 7, 8) THEN 'Cancelado'
@@ -126,6 +134,9 @@ class ReportesModel extends CI_Model {
 			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
 			LEFT JOIN sedes sd ON sd.idSede = axs.idSede
 			LEFT JOIN oficinas ofi ON ofi.idOficina = axs.idOficina
+			LEFT JOIN puestos ps2 ON ps2.idPuesto = pa.idPuesto
+			LEFT JOIN areas ar ON ar.idArea = ps2.idArea
+			LEFT JOIN departamentos dep ON dep.idDepto = ar.idDepto
 			LEFT JOIN catalogos cat ON cat.idCatalogo = CASE 
 			WHEN ps.idPuesto = 537 THEN 8
 			WHEN ps.idPuesto = 585 THEN 7
@@ -153,7 +164,8 @@ class ReportesModel extends CI_Model {
   				ofi.oficina, 
   				oxc.nombre, 
   				ct.estatusCita, 
-  				ct.fechaModificacion
+  				ct.fechaModificacion,
+				dep.depto
 			");
 			return $query;
 
