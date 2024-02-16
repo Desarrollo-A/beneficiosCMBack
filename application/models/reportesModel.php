@@ -440,4 +440,14 @@ class ReportesModel extends CI_Model {
 
 	}
 
+	public function getEspeUser($dt){
+
+		$query = $this->db-> query("SELECT ps.idPuesto, ps.puesto
+		FROM usuarios us
+		INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
+		WHERE us.idUsuario = $dt;");
+		return $query;
+
+	}
+
 }
