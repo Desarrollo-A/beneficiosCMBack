@@ -97,7 +97,7 @@ class UsuariosModel extends CI_Model {
 		return $this->db->query($query);
 	}
 
-	public function getUserByNumEmpleado($numEmpleado){
+	public function getUserByNumEmpleado($numContrato){
 		$query = "SELECT
 				idUsuario,
 				numContrato,
@@ -114,7 +114,7 @@ class UsuariosModel extends CI_Model {
 				idContrato
 			FROM usuarios
 			WHERE
-				numEmpleado='$numEmpleado'";
+				numContrato='$numContrato'";
 
 		return $this->db->query($query)->row();
 	}
