@@ -362,7 +362,7 @@ class CalendarioController extends BaseController{
 				$response["msg"] = "Horario no disponible";
 			} else if ($checkUser->num_rows() === 0) {
 				$response["result"] = false;
-				$response["msg"] = "Los beneficios del paciente no han finalizado";
+				$response["msg"] = " El paciente debe finalizar sus beneficios mensuales";
 			} else if (!isset($pass)) {
 				$response["result"] = false;
 				$response["msg"] = "Error en las fechas seleccionadas";
