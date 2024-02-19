@@ -322,7 +322,7 @@
 		}
 
 		.icon{
-			width: 10%
+			width: 5%
 		}
 
 		@media screen and (max-width: 500px) {}
@@ -342,7 +342,7 @@
 						<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
 							<tr>
 								<td class="logo" style="text-align: center;">
-									<img src="<?= base_url() ?>dist/img/Logo1.svg" alt="" style="width: 250px; max-width: 250px; height: auto; margin: auto; display: block;">
+									<img src="<?= base_url() ?>dist/img/logo1.svg" alt="" style="width: 250px; max-width: 250px; height: auto; margin: auto; display: block;">
 								</td>
 							</tr>
 						</table>
