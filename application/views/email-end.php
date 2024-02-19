@@ -316,6 +316,22 @@
 			color: rgba(0, 0, 0, 1);
 		}
 
+		.icon{
+			width: 10%;
+		}
+		
+		.button {
+			display: block;
+			width: 115px;
+			height: 25px;
+			background: #4E9CAF;
+			padding: 10px;
+			text-align: center;
+			border-radius: 5px;
+			color: white;
+			font-weight: bold;
+			line-height: 25px;
+		}
 
 		@media screen and (max-width: 500px) {}
 	</style>
@@ -340,8 +356,8 @@
 						<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
 							<tr>
 								<td class="logo" style="text-align: center;">
-									<img src="<?= base_url() ?>dist/img/Logo_CM2.png" alt=""
-										style="width: 100px; max-width: 100px; height: auto; margin: auto; display: block;">
+									<img src="<?= base_url() ?>dist/img/logo1.svg" alt=""
+										style="width: 250px; max-width: 250px; height: auto; margin: auto; display: block;">
 								</td>
 							</tr>
 						</table>
@@ -358,20 +374,27 @@
 						<table>
 							<tr>
 								<td>
-									<div class="text" style="padding: 0 3.5em; text-align: center;">
+									<div class="text" style="padding: 0 3.5em; text-align: left;">
 										<h2 style="color:#003360"><?= $data["tituloEmail"]?></h2>
 										<h4>Tu cita de <strong><?= $data["especialidad"]?></strong> se ha finalizado con exito</h4>
-										<a href="<?= $data['link'] ?>">Califica tu cita</a>
 										<h4>Especialista que te atiende: <?= $data["especialista"] ?></h4>
-                                        <h4>Lugar </h4>
-                                        <h5><img src="<?= base_url() ?>dist/img/building-solid.png"> <?= $data["sede"] ?></h5>
-                                        <h5><img src="<?= base_url() ?>dist/img/map-marked-alt-solid.png"> <?= $data["oficina"] ?></h5>
-                                    </br>
-										<h4>Horario reservado</h4>
-										<h5><img src="<?= base_url() ?>dist/img/calendar-alt-solid.png"> <?= $data["fecha"] ?></h5>
-										<h5><img src="<?= base_url() ?>dist/img/clock-regular.png"> <?= $data["horaInicio"] ?> - <?= $data["horaFinal"] ?></h5>
+                                        <h4>Detalles de la cita: </h4>
+                                        <h5><img src="<?= base_url() ?>dist/img/building-solid.png" class='icon'> <?= $data["sede"] ?></h5>
+                                        <h5><img src="<?= base_url() ?>dist/img/map-marked-alt-solid.png" class='icon'> <?= $data["oficina"] ?></h5>
+										<h5><img src="<?= base_url() ?>dist/img/calendar-alt-solid.png" class='icon'> <?= $data["fecha"] ?></h5>
+										<h5><img src="<?= base_url() ?>dist/img/clock-regular.png" class='icon'> <?= $data["horaInicio"] ?> - <?= $data["horaFinal"] ?></h5>
 									</br>
+									<div class="text" style="padding: 0 3.5em; text-align: center; padding-bottom: 20%">
+										<a href="<?= $data['link'] ?>" class="button">Califica tu cita</a>
 									</div>
+										
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td class="logo" style="text-align: center;">
+									<img src="<?= base_url() ?>dist/img/Logo_CM2.png" alt=""
+										style="width: 110px; max-width: 110px; height: auto; margin: auto; display: block;">
 								</td>
 							</tr>
 						</table>
@@ -383,8 +406,7 @@
 				style="margin: auto;">
 				<tr>
 					<td class="bg_light" style="text-align: center;">
-						<p>© Ciudad Maderas 2024<!-- <a href="#"
-								style="color: rgba(0,0,0,.8);">Unsubscribe here</a> --></p>
+						<p>© Departamento <?=  date("Y") ?></p>
 					</td>
 				</tr>
 			</table>
