@@ -2,7 +2,7 @@
 /**
  * 
  */
-class usuariosModel extends CI_Model {
+class UsuariosModel extends CI_Model {
 	public function __construct()
 	{
 		
@@ -20,6 +20,12 @@ class usuariosModel extends CI_Model {
 		return $query->result();
 	}
 
+	public function getUsersExternos()
+	{
+		$query = $this->db->query("SELECT *FROM usuarios WHERE externo = 1"); 
+		return $query;
+	}
+
 	public function login($numEmpleado, $password)
 	{
 		$query = $this->db->query("	SELECT u.*, p.idPuesto, p.puesto, p.idArea, p.tipoPuesto, a.idDepto FROM USUARIOS as u
@@ -31,37 +37,33 @@ class usuariosModel extends CI_Model {
 
 	public function getAreas()
 	{
-		$query = $this->db->distinct()->select('area')->get('usuarios');
-        return $query->result();
+		$query = $this->db->query("SELECT *from usuarios");
+        return $query;
 	}
 
 	public function getNameUser($idEspecialista)
 	{
 		$query = $this->db->query(
-			"SELECT US.*, PS.puesto as nombrePuesto FROM usuarios US
+			"SELECT US.*, US.nombre AS nombreCompleto, PS.puesto as nombrePuesto, PS.tipoPuesto FROM usuarios US
 			 INNER JOIN puestos PS ON
 			 US.idPuesto = PS.idPuesto
 			 WHERE US.idRol = ?
 			 AND US.estatus = ?
 			 AND US.idSede
-			 IN( select distinct idSede from atencionXSede where idEspecialista = ?)",
+			 IN( select distinct idSede from atencionXSede where idEspecialista = ?)
+			 UNION
+			 SELECT US2.*, CONCAT('(Lamat)', ' ', US2.nombre) AS nombreCompleto,'nombrePuesto' = 'na', 'tipoPuesto' = 'na' FROM usuarios US2 where externo = 1",
 			 array( 2, 1, $idEspecialista )
 		);
+		
 		return $query;
 	}
 
 	public function checkUser($idPaciente, $year, $month){ // función para checar si el beneficiario lleva 2 beneficios usados, sin importar mes
-		// $query = $this->db->query(
-		// 	"SELECT idPaciente from (select *from citas ct where YEAR(fechaInicio) = ? AND MONTH(fechaInicio) = ?) as citas 
-		// 	WHERE estatusCita IN(?, ?, ?) AND idPaciente = ? 
-		// 	GROUP BY idPaciente HAVING COUNT(idPaciente) > ?",
-		// 	array( $year, $month, 1, 4, 6, $idPaciente, 1 )); // version de query por mes
-
-			$query = $this->db->query(
-				"SELECT idPaciente from citas
-				WHERE estatusCita IN(?) AND idPaciente = ? AND evaluacion IS NULL AND tipoCita != ?
-				GROUP BY idPaciente HAVING COUNT(idPaciente) > ?",
-				array(4, $idPaciente, 3, 1 )); // version de query por todos los tiempos
+		$query = $this->db->query(
+			"SELECT idPaciente from (select *from citas ct where YEAR(fechaInicio) = ? AND MONTH(fechaInicio) = ?) as citas 
+			WHERE estatusCita IN(?) AND idPaciente = ? AND tipoCita != ? GROUP BY idPaciente HAVING COUNT(idPaciente) > ?",
+			array( $year, $month, 4, $idPaciente, 3, 1 )); // version de query por mes
 		
 		return $query;
 	}
@@ -91,6 +93,59 @@ class usuariosModel extends CI_Model {
 
 	public function updateRefreshToken($idUsuario, $refresh_token){
 		$query = "UPDATE usuarios SET refreshToken=$refresh_token WHERE idUsuario=$idUsuario";
+
+		return $this->db->query($query);
+	}
+
+	public function getUserByNumEmpleado($numContrato){
+		$query = "SELECT
+				idUsuario,
+				numContrato,
+				numEmpleado,
+				nombre,
+				telPersonal,
+				telOficina,
+				idSede,
+				correo,
+				idArea,
+				sexo,
+				fechaIngreso,
+				idPuesto,
+				idContrato
+			FROM usuarios
+			WHERE
+				numContrato='$numContrato'";
+
+		return $this->db->query($query)->row();
+	}
+
+	public function updateUserData($idUsuario, $data){
+		$query = "UPDATE usuarios
+			SET
+				numContrato = '$data->numContrato',
+				numEmpleado = '$data->numEmpleado',
+				nombre = '$data->nombre',
+				telPersonal = '$data->telPersonal',
+				telOficina = '$data->telOficina',
+				idSede = $data->idSede,
+				correo = '$data->correo',
+				idArea = $data->idArea,
+				sexo = '$data->sexo',
+				fechaIngreso = '$data->fechaIngreso',
+				idPuesto = $data->idPuesto,
+				idContrato = '$data->idContrato'
+			WHERE
+				idUsuario=$idUsuario";
+
+		return $this->db->query($query);
+	}
+
+	public function setBajaEmpleado($idUsuario){
+		$query = "UPDATE usuarios
+			SET
+				estatus=0
+			WHERE
+				idUsuario=$idUsuario";
 
 		return $this->db->query($query);
 	}

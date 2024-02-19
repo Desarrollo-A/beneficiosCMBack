@@ -2,7 +2,7 @@
 /**
  * 
  */
-class encuestasModel extends CI_Model {
+class EncuestasModel extends CI_Model {
 	public function __construct()
 	{
 		parent::__construct();
@@ -337,7 +337,7 @@ class encuestasModel extends CI_Model {
                         "estatus" => 0,
                     );
 
-                    $response_1=$this->generalModel->updateRecord('encuestasCreadas', $data_1, 'idEncuesta', $idEnc);
+                    $response_1=$this->GeneralModel->updateRecord('encuestasCreadas', $data_1, 'idEncuesta', $idEnc);
 
                 }
 

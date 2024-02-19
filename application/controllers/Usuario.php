@@ -9,9 +9,9 @@ class Usuario extends BaseController {
 	{
 		parent::__construct();
 		$this->load->database('default');
-		$this->load->model('usuariosModel');
-		$this->load->model('generalModel');
-		$this->load->model('menuModel');
+		$this->load->model('UsuariosModel');
+		$this->load->model('GeneralModel');
+		$this->load->model('MenuModel');
 
 		$this->load->helper(array('form','funciones'));
 	}
@@ -30,28 +30,70 @@ class Usuario extends BaseController {
 
 		$access_token = $this->googleapi->getAccessToken($code);
 
-		$this->usuariosModel->updateRefreshToken($user->idUsuario, $access_token->refresh_token);
+		$this->UsuariosModel->updateRefreshToken($user->idUsuario, $access_token->refresh_token);
 	}
 
 	public function menu()
 	{
 		$headers = (object) $this->input->request_headers();
+
 		$data = explode('.', $headers->token);
 		$user = json_decode(base64_decode($data[2]));
 
 		$id_user = intval($user->idUsuario);
 		$id_rol = intval($user->idRol);
 
-		echo json_encode($this->menuModel->getMenu($id_user, $id_rol));
+		echo json_encode($this->MenuModel->getMenu($id_user, $id_rol));
 	}
 
+	public function authorized(){
+        /*
+        $token = $this->headers('Token');
+        $session = $this->token->validateToken($token);
+
+        $user = (object) $session['data'];
+        */
+
+        $headers = (object) $this->input->request_headers();
+
+        //print_r($headers);
+        //exit();
+
+        $data = explode('.', $headers->token);
+        $user = json_decode(base64_decode($data[2]));
+
+        //print_r($user);
+        //exit();
+
+        $path = substr($this->input->get('path'), 1);
+
+        //print_r($path);
+        //exit();
+
+        $id_user = intval($user->idUsuario);
+        $id_rol = intval($user->idRol);
+
+        $auth = $this->MenuModel->checkAuth($path, $id_user, $id_rol);
+
+        //print_r($auth);
+        //exit();
+
+        $result = [
+            "idRol" => $id_rol,
+            "idUsuario" => $id_user,
+            "authorized" => $auth,
+        ];
+
+        echo json_encode($result);
+    }
+
 	public function usuarios(){
-		$data['data'] = $this->usuariosModel->usuarios();
+		$data['data'] = $this->UsuariosModel->usuarios();
 		echo json_encode($data);
 	}
 
 	public function getUsers(){
-		$rs = $this->usuariosModel->getUsers();
+		$rs = $this->UsuariosModel->getUsers();
 		$data['result'] = count($rs) > 0; 
 		if ($data['result']) {
 			$data['msg'] = '¡Listado de usuarios cargado exitosamente!';
@@ -63,8 +105,21 @@ class Usuario extends BaseController {
         $this->output->set_output(json_encode($data));
 	}
 
+	public function getUsersExternos(){
+		$rs = $this->UsuariosModel->getUsersExternos()->result();
+		$data['result'] = count($rs) > 0; 
+		if ($data['result']) {
+			$data['msg'] = '¡Listado de usuarios cargado exitosamente!';
+			$data['data'] = $rs; 
+		}else {
+			$data['msg'] = '¡No existen registros!';
+		}
+		$this->output->set_content_type("application/json");
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
+
 	public function getAreas(){
-		$rs = $this->usuariosModel->getAreas();
+		$rs = $this->UsuariosModel->getAreas();
 		$data['result'] = count($rs) > 0; 
 		if ($data['result']) {
 			$data['msg'] = '¡Listado de areas cargado exitosamente!';
@@ -111,7 +166,7 @@ class Usuario extends BaseController {
                 $rows[] = $row;
             }
         
-            $response['result'] = $this->generalModel->insertBatch($table, $rows);
+            $response['result'] = $this->GeneralModel->insertBatch($table, $rows);
             
             if ($response['result']) {
                 $response['msg'] = "¡Listado insertado exitosamente!";
@@ -142,7 +197,7 @@ class Usuario extends BaseController {
 		
 		if ($response['result']) {  
 			$data['fechaModificacion'] = $fecha;
-			$response['result'] = $this->generalModel->updateRecord('usuarios', $data, 'idUsuario', $user);
+			$response['result'] = $this->GeneralModel->updateRecord('usuarios', $data, 'idUsuario', $user);
 	
 			if ($response['result']) {
 				$response['msg'] = "¡Usuario actualizado exitosamente!";
@@ -160,7 +215,7 @@ class Usuario extends BaseController {
 	public function getNameUser(){
 		$idEspecialista = $this->input->post("dataValue", true);
 
-		$getNameUser = $this->usuariosModel->getNameUser($idEspecialista)->result();
+		$getNameUser = $this->UsuariosModel->getNameUser($idEspecialista)->result();
 		$response['result'] = count($getNameUser) > 0;
 		if ($response['result']) {
 			$response['msg'] = '¡Listado de usuarios cargado exitosamente!';
@@ -175,7 +230,7 @@ class Usuario extends BaseController {
 	public function decodePass(){
 
 		$dt = $this->input->post('dataValue', true);
-		$data['data'] = $this->usuariosModel->decodePass($dt);
+		$data['data'] = $this->UsuariosModel->decodePass($dt);
 		echo json_encode($data);
 	}
 
@@ -191,11 +246,244 @@ class Usuario extends BaseController {
 					"password" => encriptar($newPass),
 				);
 				
-				$response=$this->generalModel->updateRecord('usuarios', $data, 'idUsuario', $idUsuario);
+				$response=$this->GeneralModel->updateRecord('usuarios', $data, 'idUsuario', $idUsuario);
 				echo json_encode(array("estatus" => true, "msj" => "Contraseña actualizada!" ));
 					
 			}else{
 				echo json_encode(array("estatus" => false, "msj" => "Error en actualizar contraseña"));
 			}	
+	}
+
+	public function updateUserByCH() {
+        $encodedUserData = file_get_contents('php://input'); // Obtener el cuerpo de la solicitud en formato base64
+        $decodedUserData = base64_decode($encodedUserData); // Decodificar los datos base64
+        $userData = json_decode($decodedUserData, true);  // Procesar los datos como desees, por ejemplo, decodificar JSON
+
+		$fecha = date('Y-m-d H:i:s');
+		foreach ($userData as $key => $value) {
+			if (($value !== null || $value !== '') && $key != 'idContrato' && $key != 'idUsuario' ) {
+				$data[$key] = $value;
+			}
+		}
+
+		isset($data["nombre_persona"]) ? $userD['nombre'] = ($data["nombre_persona"] . ' ' . $data["pri_apellido"] . ' ' . $data["sec_apellido"]) : '';
+		isset($data["telefono_personal"]) ? $userD['telPersonal'] = $data["telefono_personal"] : '';
+		isset($data["idpuesto"]) ? $userD['idPuesto'] = intval($data["idpuesto"]) : '';
+		isset($data["idsede"]) ? $userD['idSede'] = intval($data["idsede"]) : '';
+		isset($data["mail_emp"]) ? $userD['correo'] = $data["mail_emp"] : '';
+		isset($data["activo"]) ? $userD['estatus'] = $data["activo"] : '';
+		$userD["fechaModificacion"] = $fecha;
+		isset($data["idarea"]) ? $userD['idArea'] = $data["idarea"] : '';
+		isset($data["sexo"]) ? $userD['sexo'] = $data["sexo"] : '';
+		isset($data["fingreso"]) ? $userD['fechaIngreso'] = $data["fingreso"] : '';
+
+		$idContrato = intval($data["idcontrato"]);
+
+		$response['result'] = isset($idContrato);
+		if ($response['result']) {
+			$data['fechaModificacion'] = $fecha;
+			$response['result'] = $this->GeneralModel->updateRecord('usuarios', $userD, 'idContrato', $idContrato);
+			if ($response['result']) {
+				$response['msg'] = "¡Usuario actualizado exitosamente!";
+			} else {
+				$response['msg'] = "¡Error al intentar actualizar los datos de usuario!";
+			}
+		} else {
+			$response['msg'] = "¡Parámetros inválidos!";
+		}
+
+		$this->output->set_content_type("application/json");
+		$this->output->set_output(json_encode($response));
+	}
+
+	public function login(){
+		$auth = $this->headers('Authorization');
+		$token = null;
+
+		$result = (object) [
+			'status' => 'error',
+			'message' => 'Error'
+		];
+
+		if(!isset($auth)){
+			$result->message = 'Falta header de autorizacion';
+			$this->json($result);
+		}
+
+		$matches = array();
+	    if (preg_match('/Basic (.+)/', $auth, $matches)) {
+	        if (isset($matches[1])) {
+	            $token = $matches[1];
+	        }
+	    }
+
+	    if(!isset($token)){
+			$result->message = 'Falta token de autorizacion';
+			$this->json($result);
+		}
+
+		$decoded = base64_decode($token);
+
+		list($numEmpleado, $password) = explode(":", $decoded);
+
+		$usuario = $this->UsuariosModel->login($numEmpleado, encriptar($password))->row();
+
+		if(!isset($usuario)){
+			$result->message = 'No existe el usuario';
+			$this->json($result);
+		}
+
+		$accesToken = $this->token->generateToken($usuario);
+
+		$result = (object) [
+			'status' => 'ok',
+			'message' => 'Inicio de sesion correcto',
+			'accessToken' => $accesToken,
+		];
+
+		$this->json($result);
+	}
+
+	public function update(){
+		$data = $this->post();
+		$auth = $this->headers('Authorization');
+		$token = null;
+		$numContrato = $this->input->get('numContrato');
+
+		$result = (object) [
+			'status' => 'error',
+			'message' => 'Error'
+		];
+
+		if(!isset($auth)){
+			$result->message = 'Falta header de autorizacion';
+			$this->json($result);
+		}
+
+		$matches = array();
+	    if (preg_match('/Bearer (.+)/', $auth, $matches)) {
+	        if (isset($matches[1])) {
+	            $token = $matches[1];
+	        }
+	    }
+
+	    if(!isset($token)){
+			$result->message = 'Falta token de autorizacion';
+			$this->json($result);
+		}
+
+		$decoded = (object) $this->token->validateToken($token);
+
+		if(!$decoded->status){
+			$result->message = $decoded->message;
+			$this->json($result);
+		}
+
+		$usuario = $decoded->data;
+
+		if($usuario->idRol != 1){
+			$result->message = 'No tiene permisos para esta accion';
+			$this->json($result);
+		}
+
+		if(!isset($numContrato)){
+			$result->message = 'Falta el numero de contrato';
+			$this->json($result);
+		}
+
+		$empleado = $this->UsuariosModel->getUserByNumEmpleado($numContrato);
+		$old_data = (array) $empleado;
+
+		if(!isset($empleado)){
+			$result->message = 'No existe el empleado en la base de datos';
+			$this->json($result);
+		}
+
+		if(!$data){
+			$result->message = 'No hay datos';
+			$this->json($result);
+		}
+
+		$new_data = (array) $data;
+
+		$actualizado = (object) array_replace($old_data, $new_data);
+
+		$is_ok = $this->UsuariosModel->updateUserData($empleado->idUsuario, $actualizado);
+
+		if($is_ok){
+			$result->status = 'ok';
+			$result->message = 'Empleado actualizado';
+			$result->data = $actualizado;
+		}else{
+			$result->message = 'No se pudo actualizar el empleado';
+		}
+
+		$this->json($result);
+	}
+
+	public function baja(){
+		$auth = $this->headers('Authorization');
+		$token = null;
+		$numContrato = $this->input->get('numContrato');
+
+		$result = (object) [
+			'status' => 'error',
+			'message' => 'Error'
+		];
+
+		if(!isset($auth)){
+			$result->message = 'Falta header de autorizacion';
+			$this->json($result);
+		}
+
+		$matches = array();
+	    if (preg_match('/Bearer (.+)/', $auth, $matches)) {
+	        if (isset($matches[1])) {
+	            $token = $matches[1];
+	        }
+	    }
+
+	    if(!isset($token)){
+			$result->message = 'Falta token de autorizacion';
+			$this->json($result);
+		}
+
+		$decoded = (object) $this->token->validateToken($token);
+
+		if(!$decoded->status){
+			$result->message = $decoded->message;
+			$this->json($result);
+		}
+
+		$usuario = $decoded->data;
+
+		if($usuario->idRol != 1){
+			$result->message = 'No tiene permisos para esta accion';
+			$this->json($result);
+		}
+
+		if(!isset($numContrato)){
+			$result->message = 'Falta el numero de contrato';
+			$this->json($result);
+		}
+
+		$empleado = $this->UsuariosModel->getUserByNumEmpleado($numContrato);
+
+		if(!isset($empleado)){
+			$result->message = 'No existe el empleado en la base de datos';
+			$this->json($result);
+		}
+
+		$is_ok = $this->UsuariosModel->setBajaEmpleado($empleado->idUsuario);
+		$this->CitasModel->cancelFromUser($empleado->idUsuario);
+
+		if($is_ok){
+			$result->status = 'ok';
+			$result->message = 'Empleado dado de baja';
+		}else{
+			$result->message = 'No se pudo dar de baja el empleado';
+		}
+
+		$this->json($result);
 	}
 }
