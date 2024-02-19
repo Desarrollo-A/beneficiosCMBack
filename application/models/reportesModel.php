@@ -418,7 +418,7 @@ class ReportesModel extends CI_Model {
 			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
 			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
 			INNER JOIN puestos ps On ps.idPuesto = us.idPuesto
-			WHERE ct.estatusCita = 4 AND ct.fechaModificacion BETWEEN '2024-02-01' AND '2024-02-12'
+			WHERE ct.estatusCita = 4 AND ct.fechaModificacion BETWEEN $fechaI AND $fechaF
 			AND ps.puesto IN ('$area1', '$area2', '$area3', '$area4')");
 			return $query;
 
