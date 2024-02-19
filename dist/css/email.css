@@ -85,13 +85,6 @@ img.g-img + div {
     }
 }
 
-    </style>
-
-    <!-- CSS Reset : END -->
-
-    <!-- Progressive Enhancements : BEGIN -->
-    <style>
-
 	    .primary{
 	background: #30e3ca;
 }
@@ -234,7 +227,7 @@ table{
 	color: rgba(255,255,255,.8);
 }
 .heading-section-white h2{
-	font-family: 
+	font-family: 'Arial';
 	line-height: 1;
 	padding-bottom: 0;
 }

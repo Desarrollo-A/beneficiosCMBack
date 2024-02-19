@@ -10,7 +10,7 @@ class calendarioModel extends CI_Model
             ct.fechaInicio AS occupied, ct.estatusCita AS estatus, ct.idDetalle, us.nombre, ct.idPaciente, ct.idEspecialista, ct.idAtencionXSede, 
             ct.tipoCita, atc.tipoCita as modalidad, atc.idSede ,usEspe.idPuesto, us.telPersonal, usEspe.telPersonal as telefonoEspecialista, ofi.oficina, 
             ofi.ubicación, pue.idArea, sed.sede, atc.idOficina, us.correo, usEspe.correo as correoEspecialista, usEspe.nombre as especialista, 
-            usEspe.sexo as sexoEspecialista, tf.fechasFolio,
+            usEspe.sexo as sexoEspecialista, tf.fechasFolio, ct.idEventoGoogle,
             'color' = CASE
 	            WHEN ct.estatusCita = 1 THEN 'orange'
 	            WHEN ct.estatusCita = 2 THEN 'red'
@@ -81,8 +81,8 @@ class calendarioModel extends CI_Model
         $query = $this->db->query(
             "SELECT CAST(ct.idCita AS VARCHAR(36))  AS id,  ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
             ct.fechaInicio AS occupied, 'date' AS 'type', ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal, us.correo,
-            se.sede, ofi.oficina, ct.idDetalle, ct.idAtencionXSede, us.externo, usEspe.nombre as especialista, 
-            tf.fechasFolio,
+            se.sede, ofi.oficina, ct.idDetalle, ct.idAtencionXSede, us.externo, usEspe.nombre as especialista, ct.fechaCreacion, pue.tipoPuesto,
+            tf.fechasFolio, idEventoGoogle,
             'color' = CASE
 	            WHEN ct.estatusCita = 0 THEN 'red'
 	            WHEN ct.estatusCita = 1 THEN 'orange'
@@ -100,13 +100,13 @@ class calendarioModel extends CI_Model
             WHEN pue.idPuesto = 158 THEN 'quantum balance'
             END
             FROM citas ct
-            INNER JOIN usuarios us ON us.idUsuario = ct.idPaciente
-            INNER JOIN usuarios usEspe ON usEspe.idUsuario = ct.idEspecialista
-            INNER JOIN atencionXSede aps ON ct.idAtencionXSede = aps.idAtencionXSede
-            INNER JOIN sedes se ON se.idSede = aps.idSede
-            LEFT JOIN oficinas ofi ON ofi.idOficina = aps.idOficina
-            INNER JOIN puestos pue ON pue.idPuesto = usEspe.idPuesto
-            LEFT JOIN (SELECT idDetalle, string_agg(FORMAT(fechaInicio, 'HH:mm MMMM d yyyy','es-US'), ' ,') as fechasFolio FROM citas WHERE estatusCita IN(?) AND citas.idCita = idCita GROUP BY citas.idDetalle) tf
+            FULL JOIN usuarios us ON us.idUsuario = ct.idPaciente
+            FULL JOIN usuarios usEspe ON usEspe.idUsuario = ct.idEspecialista
+            FULL JOIN atencionXSede aps ON ct.idAtencionXSede = aps.idAtencionXSede
+            FULL JOIN sedes se ON se.idSede = aps.idSede
+            FULL JOIN oficinas ofi ON ofi.idOficina = aps.idOficina
+            FULL JOIN puestos pue ON pue.idPuesto = usEspe.idPuesto
+            FULL JOIN (SELECT idDetalle, string_agg(FORMAT(fechaInicio, 'HH:mm MMMM d yyyy','es-US'), ' ,') as fechasFolio FROM citas WHERE estatusCita IN(?) AND citas.idCita = idCita GROUP BY citas.idDetalle) tf
             ON tf.idDetalle = ct.idDetalle
             WHERE YEAR(fechaInicio) in (?, ?)
             AND MONTH(fechaInicio) in (?, ?, ?)
@@ -277,9 +277,6 @@ class calendarioModel extends CI_Model
 		AND idCatalogo=1");
         return $query->result_array();
     }
-
-    // **********************************************************
-
     
     public function getBeneficiosPorSede($sede)
 	{
@@ -407,7 +404,7 @@ class calendarioModel extends CI_Model
         $query = $this->db->query(
             "SELECT *FROM citas
             WHERE idPaciente = ? AND MONTH(fechaInicio) = ?
-            AND YEAR(fechaInicio) = ? AND estatusCita IN (4) AND tipoCita IN (1, 2);", array($usuario, $mes, $año)
+            AND YEAR(fechaInicio) = ? AND estatusCita IN (4, 1) AND tipoCita IN (1, 2);", array($usuario, $mes, $año)
         );
 
         return $query;
@@ -448,7 +445,7 @@ class calendarioModel extends CI_Model
         $query = $this->db->query("SELECT CAST(idCita AS VARCHAR(36)) AS id, ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
         ct.fechaInicio AS occupied, ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal, ofi.oficina, ofi.ubicación,
         sed.sede , atc.idOficina, us.correo, usEspe.correo as correoEspecialista, usEspe.nombre as especialista, ct.idDetalle, usEspe.telPersonal as telefonoEspecialista,
-        usEspe.sexo as sexoEspecialista, tf.fechasFolio,
+        usEspe.sexo as sexoEspecialista, tf.fechasFolio, ct.idEventoGoogle,
         beneficio = CASE 
         WHEN pue.idPuesto = 537 THEN 'Nutrición'
         WHEN pue.idPuesto = 585 THEN 'Psicología'
@@ -473,7 +470,7 @@ class calendarioModel extends CI_Model
         $query = $this->db->query("SELECT CAST(idCita AS VARCHAR(36)) AS id, ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
         ct.fechaInicio AS occupied, ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal, ofi.oficina, ofi.ubicación,
         sed.sede , atc.idOficina, us.correo, usEspe.correo as correoEspecialista, usEspe.nombre as especialista, ct.idDetalle, usEspe.telPersonal as telefonoEspecialista,
-        usEspe.sexo as sexoEspecialista, tf.fechasFolio,
+        usEspe.sexo as sexoEspecialista, tf.fechasFolio, ct.idEventoGoogle,
         beneficio = CASE 
         WHEN pue.idPuesto = 537 THEN 'Nutrición'
         WHEN pue.idPuesto = 585 THEN 'Psicología'
@@ -549,7 +546,7 @@ class calendarioModel extends CI_Model
         ct.fechaInicio AS occupied, ct.estatusCita AS estatus, ct.idDetalle, us.nombre, ct.idPaciente, ct.idEspecialista, ct.idAtencionXSede, 
         ct.tipoCita, atc.tipoCita as modalidad, atc.idSede ,usEspe.idPuesto, us.telPersonal, usEspe.telPersonal as telefonoEspecialista, ofi.oficina, ofi.ubicación, pue.idArea,
         sed.sede, atc.idOficina, us.correo, usEspe.correo as correoEspecialista, usEspe.nombre as especialista, usEspe.sexo as sexoEspecialista,
-        tf.fechasFolio,
+        tf.fechasFolio, ct.idEventoGoogle,
         'color' = CASE
             WHEN ct.estatusCita = 1 THEN 'orange'
             WHEN ct.estatusCita = 2 THEN 'red'

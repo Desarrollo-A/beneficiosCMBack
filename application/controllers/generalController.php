@@ -9,76 +9,76 @@ class GeneralController extends BaseController {
 	{
 		parent::__construct();
 		$this->load->database('default');
-		$this->load->model('generalModel');
+		$this->load->model('GeneralModel');
 	}
 
 	public function usuarios(){
-		$data['data'] = $this->generalModel->usuarios();
-		echo json_encode($data);
+		$data['data'] = $this->GeneralModel->usuarios();
+		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
 	public function especialistas(){
-		$data['data'] = $this->generalModel->especialistas();
-		echo json_encode($data);
+		$data['data'] = $this->GeneralModel->especialistas();
+		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
     public function usrCount(){
-		$data['data'] = $this->generalModel->usrCount();
-		echo json_encode($data);
+		$data['data'] = $this->GeneralModel->usrCount();
+		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
     public function citasCount(){
-		$data['data'] = $this->generalModel->citasCount();
-		echo json_encode($data);
+		$data['data'] = $this->GeneralModel->citasCount();
+		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
 	public function getPuesto(){
 		$dt = $this->input->post('dataValue', true);
-		$data['data'] = $this->generalModel->getPuesto($dt)->result();
-		echo json_encode($data);
+		$data['data'] = $this->GeneralModel->getPuesto($dt)->result();
+		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
 	public function getSede(){
 		$dt = $this->input->post('dataValue', true);
-		$data['data'] = $this->generalModel->getSede($dt)->result();
-		echo json_encode($data);
+		$data['data'] = $this->GeneralModel->getSede($dt)->result();
+		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
 	public function getPacientes(){
 		$dt = $this->input->post('dataValue', true);
-		$data['data'] = $this->generalModel->getPacientes($dt)->result();
-		echo json_encode($data);
+		$data['data'] = $this->GeneralModel->getPacientes($dt)->result();
+		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
 	public function getCtAsistidas(){
 		$dt = $this->input->post('dataValue', true);
-		$data['data'] = $this->generalModel->getCtAsistidas($dt)->result();
-		echo json_encode($data);
+		$data['data'] = $this->GeneralModel->getCtAsistidas($dt)->result();
+		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
 	public function getCtCanceladas(){
 		$dt = $this->input->post('dataValue', true);
-		$data['data'] = $this->generalModel->getCtCanceladas($dt)->result();
-		echo json_encode($data);
+		$data['data'] = $this->GeneralModel->getCtCanceladas($dt)->result();
+		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
 	public function getCtPenalizadas(){
 		$dt = $this->input->post('dataValue', true);
-		$data['data'] = $this->generalModel->getCtPenalizadas($dt)->result();
-		echo json_encode($data);
+		$data['data'] = $this->GeneralModel->getCtPenalizadas($dt)->result();
+		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
 	public function getAppointmentHistory(){
 
         $dt = $this->input->post('dataValue', true);
-		$data['data'] = $this->generalModel->getAppointmentHistory($dt)->result();
-		echo json_encode($data);
+		$data['data'] = $this->GeneralModel->getAppointmentHistory($dt)->result();
+		echo json_encode($data, JSON_NUMERIC_CHECK);
 
     }
 
 	public function getEstatusPaciente(){
-        $data['data'] = $this->generalModel->getEstatusPaciente()->result();
-		echo json_encode($data);
+        $data['data'] = $this->GeneralModel->getEstatusPaciente()->result();
+		echo json_encode($data, JSON_NUMERIC_CHECK);
     }
 
 	public function updateEstatusPaciente(){
@@ -95,12 +95,12 @@ class GeneralController extends BaseController {
 						"estatusNut" => $estatus,
 					);
 							
-					$response=$this->generalModel->updateRecord('detallePaciente', $data, 'idDetallePaciente', $id);
-					echo json_encode(array("estatus" => true, "msj" => "Estatus actualizado!" ));
+					$response=$this->GeneralModel->updateRecord('detallePaciente', $data, 'idDetallePaciente', $id);
+					echo json_encode(array("estatus" => true, "msj" => "Estatus actualizado!" ), JSON_NUMERIC_CHECK);
 								
 				}else{
 
-				echo json_encode(array("estatus" => false));
+				echo json_encode(array("estatus" => false), JSON_NUMERIC_CHECK);
 
 				}
 				break;
@@ -111,12 +111,12 @@ class GeneralController extends BaseController {
 						"estatusPsi" => $estatus,
 					);
 							
-					$response=$this->generalModel->updateRecord('detallePaciente', $data, 'idDetallePaciente', $id);
-					echo json_encode(array("estatus" => true, "msj" => "Estatus actualizado!" ));
+					$response=$this->GeneralModel->updateRecord('detallePaciente', $data, 'idDetallePaciente', $id);
+					echo json_encode(array("estatus" => true, "msj" => "Estatus actualizado!" ), JSON_NUMERIC_CHECK);
 								
 				}else{
 
-				echo json_encode(array("estatus" => false));
+				echo json_encode(array("estatus" => false), JSON_NUMERIC_CHECK);
 
 				}
 				break;
@@ -127,12 +127,12 @@ class GeneralController extends BaseController {
 						"estatusQB" => $estatus,
 					);
 							
-					$response=$this->generalModel->updateRecord('detallePaciente', $data, 'idDetallePaciente', $id);
-					echo json_encode(array("estatus" => true, "msj" => "Estatus actualizado!" ));
+					$response=$this->GeneralModel->updateRecord('detallePaciente', $data, 'idDetallePaciente', $id);
+					echo json_encode(array("estatus" => true, "msj" => "Estatus actualizado!" ), JSON_NUMERIC_CHECK);
 								
 				}else{
 
-				echo json_encode(array("estatus" => false));
+				echo json_encode(array("estatus" => false), JSON_NUMERIC_CHECK);
 
 				}
 				break;
@@ -143,15 +143,48 @@ class GeneralController extends BaseController {
 						"estatusGE" => $estatus,
 					);
 							
-					$response=$this->generalModel->updateRecord('detallePaciente', $data, 'idDetallePaciente', $id);
-					echo json_encode(array("estatus" => true, "msj" => "Estatus actualizado!" ));
+					$response=$this->GeneralModel->updateRecord('detallePaciente', $data, 'idDetallePaciente', $id);
+					echo json_encode(array("estatus" => true, "msj" => "Estatus actualizado!" ), JSON_NUMERIC_CHECK);
 								
 				}else{
 
-				echo json_encode(array("estatus" => false));
+				echo json_encode(array("estatus" => false), JSON_NUMERIC_CHECK);
 
 				}
 				break;
 		}			
+	}
+
+	public function getAtencionXsede(){
+		$data['data'] = $this->GeneralModel->getAtencionXsede()->result();
+		echo json_encode($data);
+	}
+
+	public function getSedes(){
+		$data['data'] = $this->GeneralModel->getSedes()->result();
+		echo json_encode($data);
+	}
+
+	public function getOficinas(){
+		$data['data'] = $this->GeneralModel->getOficinas()->result();
+		echo json_encode($data);
+	}
+
+	public function getModalidades(){
+		$data['data'] = $this->GeneralModel->getModalidades()->result();
+		echo json_encode($data);
+	}
+
+	public function getSinAsigSede(){
+		$data['data'] = $this->GeneralModel->getSinAsigSede();
+		echo json_encode($data);
+	}
+
+	public function getCitas(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->GeneralModel->getCitas($dt)->result();
+		
+		$this->output->set_content_type("application/json");
+		$this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
 	}
 }
