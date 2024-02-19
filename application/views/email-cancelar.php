@@ -316,7 +316,10 @@
 			color: rgba(0, 0, 0, 1);
 		}
 
-
+		.icon{
+			width: 10%
+		}
+		
 		@media screen and (max-width: 500px) {}
 	</style>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
@@ -340,8 +343,8 @@
 						<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
 							<tr>
 								<td class="logo" style="text-align: center;">
-									<img src="<?= base_url() ?>dist/img/Logo_CM2.png" alt=""
-										style="width: 100px; max-width: 100px; height: auto; margin: auto; display: block;">
+									<img src="<?= base_url() ?>dist/img/logo1.svg" alt=""
+										style="width: 250px; max-width: 250px; height: auto; margin: auto; display: block;">
 								</td>
 							</tr>
 						</table>
@@ -358,14 +361,19 @@
 						<table>
 							<tr>
 								<td>
-									<div class="text" style="padding: 0 3.5em; text-align: center;">
+									<div class="text" style="padding: 0 3.5em; text-align: left; padding-bottom: 10%">
 										<h2 style="color:#003360"><?= $data["titulo"]?></h2>
 										<h4>Tu reservarción de <strong><?= $data["beneficio"]?></strong> ha sido cancelada</h4>
-										<h4><img src="<?= base_url() ?>dist/img/user.png"> <?= $data["especialista"]?></h4>
-										<h4>Horario reservado</h4>
-										<h5><img src="<?= base_url() ?>dist/img/calendar-alt-solid.png"> <?= $data["fecha"] ?></h5>
-										<h5><img src="<?= base_url() ?>dist/img/clock-regular.png"> <?= $data["horaInicio"] ?> - <?= $data["horaFinal"] ?></h5>
+										<h4><img src="<?= base_url() ?>dist/img/user-solid.png" class="icon"> <?= $data["especialista"]?></h4>
+										<h4>Detalles de la cita:</h4>
+										<h5><img src="<?= base_url() ?>dist/img/calendar-alt-solid.png" class="icon"> <?= $data["fecha"] ?></h5>
+										<h5><img src="<?= base_url() ?>dist/img/clock-regular.png" class="icon"> <?= $data["horaInicio"] ?> - <?= $data["horaFinal"] ?></h5>
 									</div>
+								</td>
+							</tr>
+							<tr>
+								<td class="logo" style="text-align: center;">
+									<img src="<?= base_url() ?>dist/img/Logo_CM2.png" alt="" style="width: 110px; max-width: 110px; height: auto; margin: auto; display: block;">
 								</td>
 							</tr>
 						</table>
@@ -377,8 +385,7 @@
 				style="margin: auto;">
 				<tr>
 					<td class="bg_light" style="text-align: center;">
-						<p>© Ciudad Maderas 2024<!-- <a href="#"
-								style="color: rgba(0,0,0,.8);">Unsubscribe here</a> --></p>
+						<p>© Departamento TI <?= date('YEAR') ?></p>
 					</td>
 				</tr>
 			</table>
