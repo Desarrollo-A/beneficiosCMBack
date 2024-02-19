@@ -317,7 +317,7 @@
 		}
 
 		.icon{
-			width: 10%
+			width: 5%
 		}
 		
 		@media screen and (max-width: 500px) {}

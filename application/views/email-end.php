@@ -317,7 +317,7 @@
 		}
 
 		.icon{
-			width: 10%;
+			width: 5%;
 		}
 		
 		.button {
