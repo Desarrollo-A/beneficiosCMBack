@@ -3,6 +3,7 @@ on: workflow_dispatch
 
 jobs:
   upload-front-on-pruebas:
+
     name: 🎉 Deploy
     runs-on: ubuntu-latest
   
@@ -12,6 +13,7 @@ jobs:
 
       - name: 📂 Upload models
         uses: wlixcc/SFTP-Deploy-Action@v1.2.1
+
         with:
           server: 104.198.134.0
           port: 22
@@ -23,10 +25,12 @@ jobs:
 
       - name: 📂 Upload controllers
         uses: wlixcc/SFTP-Deploy-Action@v1.2.1
+
         with:
           server: 104.198.134.0
           port: 22
           username: prohab
+
           ssh_private_key: ${{ secrets.SFTP_SSH_PRIVATE_KEY }}
           local_path: ./application/controllers/*
           remote_path: /mnt/data/aplicaciones/Prueba/beneficiosmaderasback/controllers/
