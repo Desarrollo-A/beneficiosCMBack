@@ -275,8 +275,56 @@ class GeneralModel extends CI_Model {
             return false;
 
         }
+    }
 
-
+    public function getCitas($dt)
+    {
+        $query = $this->db-> query("SELECT ct.idCita AS id, us.nombre especialista, ps.puesto AS beneficio, sd.sede, op.nombre AS estatus, 
+		CONCAT (CONVERT(DATE,ct.fechaInicio), ' ', FORMAT(ct.fechaInicio, 'HH:mm'), ' - ', FORMAT(ct.fechaFinal, 'HH:mm')) AS horario,
+		ofi.oficina, oxc.nombre AS metodoPago, ct.estatusCita,
+		ISNULL(string_agg(ops.nombre, ', '), 'Sin motivos de cita') AS motivoCita,
+		CASE 
+		WHEN ct.estatusCita IN (2, 7, 8) THEN 'Cancelado'
+		ELSE 'Exitoso'
+		END AS pagoGenerado
+		FROM citas ct
+		LEFT JOIN usuarios us ON us.idUsuario = ct.idEspecialista
+		LEFT JOIN usuarios pa ON pa.idUsuario = ct.idPaciente
+		LEFT JOIN puestos ps ON ps.idPuesto = us.idPuesto
+		LEFT JOIN opcionesPorCatalogo op ON op.idOpcion = ct.estatusCita
+		LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
+		LEFT JOIN sedes sd ON sd.idSede = axs.idSede
+		LEFT JOIN oficinas ofi ON ofi.idOficina = axs.idOficina
+		LEFT JOIN puestos ps2 ON ps2.idPuesto = pa.idPuesto
+		LEFT JOIN areas ar ON ar.idArea = ps2.idArea
+		LEFT JOIN departamentos dep ON dep.idDepto = ar.idDepto
+		LEFT JOIN catalogos cat ON cat.idCatalogo = CASE 
+		WHEN ps.idPuesto = 537 THEN 8
+		WHEN ps.idPuesto = 585 THEN 7
+		WHEN ps.idPuesto = 686 THEN 9
+		WHEN ps.idPuesto = 158 THEN 6
+		ELSE ps.idPuesto END 
+		LEFT JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
+		LEFT JOIN opcionesPorCatalogo oxc ON oxc.idOpcion = dp.metodoPago AND oxc.idCatalogo = 11
+		LEFT JOIN motivosPorCita mpc ON mpc.idCita = ct.idCita
+		  LEFT JOIN opcionesPorCatalogo ops ON ops.idCatalogo = cat.idCatalogo AND ops.idOpcion = mpc.idMotivo	
+		WHERE op.idCatalogo = 2 AND ct.idPaciente = $dt
+		GROUP BY 
+			  ct.idCita, 
+			  pa.idUsuario, 
+			  us.nombre, 
+			  ps.puesto, 
+			  sd.sede, 
+			  ct.titulo, 
+			  op.nombre, 
+			  ct.fechaInicio, 
+			  ct.fechaFinal, 
+			  ofi.oficina, 
+			  oxc.nombre, 
+			  ct.estatusCita, 
+			  ct.fechaModificacion,
+			dep.depto");
+		return $query;
     }
 
 }
