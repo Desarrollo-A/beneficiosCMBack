@@ -348,7 +348,7 @@ class Usuario extends BaseController {
 		$data = $this->post();
 		$auth = $this->headers('Authorization');
 		$token = null;
-		$numEmpleado = $this->input->get('numEmpleado');
+		$numContrato = $this->input->get('numContrato');
 
 		$result = (object) [
 			'status' => 'error',
@@ -386,12 +386,12 @@ class Usuario extends BaseController {
 			$this->json($result);
 		}
 
-		if(!isset($numEmpleado)){
-			$result->message = 'Falta el numero de empleado';
+		if(!isset($numContrato)){
+			$result->message = 'Falta el numero de contrato';
 			$this->json($result);
 		}
 
-		$empleado = $this->UsuariosModel->getUserByNumEmpleado($numEmpleado);
+		$empleado = $this->UsuariosModel->getUserByNumEmpleado($numContrato);
 		$old_data = (array) $empleado;
 
 		if(!isset($empleado)){
@@ -424,7 +424,7 @@ class Usuario extends BaseController {
 	public function baja(){
 		$auth = $this->headers('Authorization');
 		$token = null;
-		$numEmpleado = $this->input->get('numEmpleado');
+		$numContrato = $this->input->get('numContrato');
 
 		$result = (object) [
 			'status' => 'error',
@@ -462,12 +462,12 @@ class Usuario extends BaseController {
 			$this->json($result);
 		}
 
-		if(!isset($numEmpleado)){
-			$result->message = 'Falta el numero de empleado';
+		if(!isset($numContrato)){
+			$result->message = 'Falta el numero de contrato';
 			$this->json($result);
 		}
 
-		$empleado = $this->UsuariosModel->getUserByNumEmpleado($numEmpleado);
+		$empleado = $this->UsuariosModel->getUserByNumEmpleado($numContrato);
 
 		if(!isset($empleado)){
 			$result->message = 'No existe el empleado en la base de datos';
