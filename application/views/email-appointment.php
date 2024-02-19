@@ -11,7 +11,8 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;500&display=swap" rel="stylesheet">
-
+	<script src="https://kit.fontawesome.com/yourcode.js" crossorigin="anonymous"></script>
+	
 	<style type="text/css">
 		* {
 			-ms-text-size-adjust: 100%;
@@ -359,12 +360,12 @@
 										<h4><?= $data["temaEmail"] ?><strong><?= $data["especialidad"] ?></strong></h4>
 										<h4>Especialista que te atiende: <?= $data["especialista"] ?></h4>
 										<h4>Lugar </h4>
-										<h5>Sede: <?= $data["sede"] ?></h5>
-										<h5>Oficina: <?= $data["oficina"] ?></h5>
+										<h5><img src="<?= base_url() ?>dist/img/building-solid.png"> <?= $data["sede"] ?></h5>
+										<h5><img src="<?= base_url() ?>dist/img/map-marked-alt-solid.png">  <?= $data["oficina"] ?></h5>
 										</br>
 										<h4>Horario reservado</h4>
-										<h5>Fecha: <?= $data["fecha"] ?></h5>
-										<h5>Hora: <?= $data["horaInicio"] ?> - <?= $data["horaFinal"] ?></h5>
+										<h5><img src="<?= base_url() ?>dist/img/calendar-alt-solid.png">  <?= $data["fecha"] ?> </h5>
+										<h5><img src="<?= base_url() ?>dist/img/clock-regular.png">  <?= $data["horaInicio"] ?> - <?= $data["horaFinal"] ?></h5>
 									</div>
 								</td>
 							</tr>

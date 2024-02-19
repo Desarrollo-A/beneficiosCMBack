@@ -360,9 +360,9 @@ class CalendarioController extends BaseController{
 			} else if ($checkOccupied->num_rows() > 0) {
 				$response["result"] = false;
 				$response["msg"] = "Horario no disponible";
-			} else if ($checkUser->num_rows() === 0) {
+			} else if ($checkUser->num_rows() > 0) {
 				$response["result"] = false;
-				$response["msg"] = "El paciente no ha ocupado sus beneficios disponibles";
+				$response["msg"] = " El paciente debe finalizar sus beneficios mensuales";
 			} else if (!isset($pass)) {
 				$response["result"] = false;
 				$response["msg"] = "Error en las fechas seleccionadas";
