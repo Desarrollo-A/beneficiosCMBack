@@ -21,7 +21,7 @@ jobs:
           username: prohab
           ssh_private_key: ${{ secrets.SFTP_SSH_PRIVATE_KEY }}
           local_path: ./application/models/*
-          remote_path: /mnt/data/aplicaciones/Prueba/beneficiosmaderasback/models/
+          remote_path: /mnt/data/aplicaciones/BeneficioMaderas/models/
           delete_remote_files: true
 
       - name: 📂 Upload controllers
@@ -32,5 +32,5 @@ jobs:
           username: prohab
           ssh_private_key: ${{ secrets.SFTP_SSH_PRIVATE_KEY }}
           local_path: ./application/controllers/*
-          remote_path: /mnt/data/aplicaciones/Prueba/beneficiosmaderasback/controllers/
+          remote_path: /mnt/data/aplicaciones/BeneficioMaderas/controllers/
           delete_remote_files: true
