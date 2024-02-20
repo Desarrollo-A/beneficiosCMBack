@@ -42,7 +42,7 @@ class ReportesController extends BaseController {
 		{
 			$data = array(
 				"observaciones" => $descripcion,
-				"estatus" => $estatus,
+				"estatusCita" => $estatus,
 				"modificadoPor" => $modificadoPor,
 			);
 			
@@ -83,6 +83,12 @@ class ReportesController extends BaseController {
 	public function getSelectEspe(){
 		$dt = $this->input->post('dataValue', true);
 		$data['data'] = $this->ReportesModel->getSelectEspe($dt)->result();
+		echo json_encode($data, JSON_NUMERIC_CHECK);
+	}
+
+	public function getEspeUser(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->ReportesModel->getEspeUser($dt)->result();
 		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 }

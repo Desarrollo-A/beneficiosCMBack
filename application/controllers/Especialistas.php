@@ -8,6 +8,7 @@ class Especialistas extends BaseController{
         parent::__construct();
 
         $this->load->model('SedesModel');
+        $this->load->model('EspecialistasModel');
     }
 
     public function sedes(){
@@ -75,5 +76,18 @@ class Especialistas extends BaseController{
         }
 
         $this->json($dias);
+    }
+
+    public function meta(){
+        $especialista = $this->input->get('especialista');
+        $inicio = date('Y-m-01');
+        $fin = date('Y-m-t');
+
+        $result = [
+            'meta' => $this->EspecialistasModel->getMeta($especialista)->meta,
+            'total' => $this->EspecialistasModel->getTotal($especialista, $inicio, $fin),
+        ];
+
+        $this->json($result);
     }
 }

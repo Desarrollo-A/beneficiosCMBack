@@ -106,10 +106,10 @@ class DashModel extends CI_Model {
 
 	public function getPregunta($dt){
 
-		$query = $this->db-> query("SELECT DISTINCT ec.idPregunta, pg.pregunta, ec.respuestas, pg.idPregunta, ec.idEncuesta, ec.idEncuestaCreada, ec.idArea  
+		$query = $this->db-> query("SELECT DISTINCT ec.idPregunta, pg.pregunta, ec.respuestas, pg.idPregunta, ec.idEncuesta, ec.idEncuestaCreada, ec.idArea, ec.idPregunta
 		FROM encuestasCreadas ec
-		INNER JOIN preguntasGeneradas pg ON pg.idPregunta = ec.idPregunta
-		WHERE ec.estatus = 1 AND abierta = 1 AND ec.idArea = $dt AND pg.idArea = $dt AND ec.respuestas <= 4");
+		INNER JOIN preguntasGeneradas pg ON pg.idPregunta = ec.idPregunta AND pg.idEncuesta = ec.idEncuesta
+		WHERE ec.estatus = 1 AND (pg.abierta = 1 AND ec.idArea = $dt AND pg.idArea = $dt AND ec.respuestas <= 4)");
 		
 		$result = $query->result();
 
@@ -149,7 +149,7 @@ class DashModel extends CI_Model {
 			FROM encuestasCreadas ec
 			INNER JOIN respuestasGenerales rg ON rg.grupo = ec.respuestas 
 			INNER JOIN preguntasGeneradas pg ON pg.idPregunta = ec.idPregunta
-			WHERE pg.pregunta IN ($idPreguntasString) AND ec.idEncuesta = 1 AND pg.idEncuesta = 1
+			WHERE pg.pregunta IN ($idPreguntasString) AND ec.idEncuesta = $idEncuesta AND pg.idEncuesta = $idEncuesta
 			GROUP BY grupo",
 				array($idEncuesta));
 
@@ -200,6 +200,7 @@ class DashModel extends CI_Model {
         $inicio = $dt["inicio"];
         $fin = $dt["fin"];
 
+        /*
         if($idRol == 1 || $idRol == 4){
             $query = $this->db-> query("SELECT COUNT(*) AS [citas] FROM usuarios us
             INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
@@ -209,7 +210,32 @@ class DashModel extends CI_Model {
             INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
             WHERE us.idUsuario = $idData AND ct.estatusCita = 4 AND fechaFinal BETWEEN '$inicio' AND '$fin'");
         }
+        */
 
-        return $query;
+        $query = "SELECT COUNT(*) AS citas FROM citas
+        	WHERE
+        		idEspecialista = $idData";
+
+        return $this->db->query($query)->result();
+    }
+
+	public function getMetaAdmin($dt){
+
+    	switch($dt){
+			case 537:
+				$query = $this->db-> query("SELECT idAreaBeneficio FROM usuarios WHERE idUsuario = 74");
+				break;
+			case 585:
+				$query = $this->db-> query("SELECT idAreaBeneficio FROM usuarios WHERE idUsuario = 73");
+				break;
+			case 158:
+				$query = $this->db-> query("SELECT idAreaBeneficio FROM usuarios WHERE idUsuario = 72");
+				break;
+			case 686:
+				$query = $this->db-> query("SELECT idAreaBeneficio FROM usuarios WHERE idUsuario = 75");
+				break;
+		}
+
+        return $this->db->query($query)->row()->result();
     }
 }

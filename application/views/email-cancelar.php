@@ -316,7 +316,27 @@
 			color: rgba(0, 0, 0, 1);
 		}
 
+		.icon{
+			width: 5%;
+			filter: contrast(0);
+		}
 
+		.no-margin{
+			margin: 0%;
+			padding: 0%;
+		}
+		.custom-margin1{
+			margin: 1%;
+			padding: 1%;
+		}
+		.custom-font1{
+			font-weight: 800; 
+			color: #003360;
+		}
+		.custom-font2{
+			font-size: 14px;
+		}
+		
 		@media screen and (max-width: 500px) {}
 	</style>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
@@ -333,24 +353,21 @@
 		</div>
 		<div style="max-width: 600px; margin: 0 auto;" class="email-container">
 			<!-- BEGIN BODY -->
-			<table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"
-				style="margin: auto;">
+			<table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: auto;">
 				<tr>
-					<td valign="top" class="bg_white" style="padding: 5em 2.5em 0 2.5em;">
+					<td valign="top" class="bg_white">
 						<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
 							<tr>
-								<td class="logo" style="text-align: center;">
-									<img src="<?= base_url() ?>dist/img/Logo_CM2.png" alt=""
-										style="width: 100px; max-width: 100px; height: auto; margin: auto; display: block;">
+								<td class="logo" style="text-align: center; padding: 5em 2.5em 0 2.5em;">
+									<img src="<?= base_url() ?>dist/img/logo1.png" alt="" style="width: 250px; max-width: 250px; height: auto; margin: auto; display: block;">
 								</td>
 							</tr>
 						</table>
 					</td>
 				</tr><!-- end tr -->
 				<tr>
-					<td valign="middle" class="hero bg_white" style="padding: 3em 0 2em 0;">
-						<img src="<?= base_url() ?>dist/img/<?= $data["imagen"]?>" alt=""
-							style="width: 300px; max-width: 600px; height: auto; margin: auto; display: block;">
+					<td valign="middle" class="hero bg_white">
+						<img src="<?= base_url() ?>dist/img/<?= $data["imagen"]?>" alt="" style="width: 300px; max-width: 600px; height: auto; margin: auto; display: block;">
 					</td>
 				</tr><!-- end tr -->
 				<tr>
@@ -358,14 +375,19 @@
 						<table>
 							<tr>
 								<td>
-									<div class="text" style="padding: 0 3.5em; text-align: center;">
-										<h2 style="color:#003360"><?= $data["titulo"]?></h2>
-										<h4>Tu reservarción de <strong><?= $data["beneficio"]?></strong> ha sido cancelada</h4>
-										<h4>Especialista: <?= $data["especialista"]?></h4>
-										<h4>Horario reservado</h4>
-										<h5>Dia: <?= $data["fecha"] ?></h5>
-										<h5>Hora: <?= $data["horaInicio"] ?> - <?= $data["horaFinal"] ?></h5>
+									<div class="text" style="padding: 0 3.5em; text-align: center; padding-bottom: 10%">
+										<h3 style="color:#003360"><?= $data["titulo"]?></h3>
+										<h4 class="no-margin custom-font2">Tu reservarción de <strong><?= $data["beneficio"]?></strong> ha sido cancelada</h4>
+										<h4 class="custom-font2">Especialista: <?= $data["especialista"]?></h4>
+										<h4 class='custom-font1'>Detalles de la cita</h4>
+										<h5 class="no-margin custom-font2"><img src="<?= base_url() ?>dist/img/calendar-alt-solid.png" class="icon"> Fecha: <?= $data["fecha"] ?></h5>
+										<h5 class="no-margin custom-font2"><img src="<?= base_url() ?>dist/img/clock-regular.png" class="icon"> Horario: <?= $data["horaInicio"] ?> - <?= $data["horaFinal"] ?></h5>
 									</div>
+								</td>
+							</tr>
+							<tr>
+								<td class="logo" style="text-align: center; padding: 1em;">
+									<img src="<?= base_url() ?>dist/img/Logo_CM2.png" alt="" style="width: 110px; max-width: 110px; height: auto; margin: auto; display: block;">
 								</td>
 							</tr>
 						</table>
@@ -377,8 +399,7 @@
 				style="margin: auto;">
 				<tr>
 					<td class="bg_light" style="text-align: center;">
-						<p>© Ciudad Maderas 2024<!-- <a href="#"
-								style="color: rgba(0,0,0,.8);">Unsubscribe here</a> --></p>
+						<p>© Departamento TI <?php echo date("Y"); ?></p>
 					</td>
 				</tr>
 			</table>

@@ -295,4 +295,195 @@ class Usuario extends BaseController {
 		$this->output->set_content_type("application/json");
 		$this->output->set_output(json_encode($response));
 	}
+
+	public function login(){
+		$auth = $this->headers('Authorization');
+		$token = null;
+
+		$result = (object) [
+			'status' => 'error',
+			'message' => 'Error'
+		];
+
+		if(!isset($auth)){
+			$result->message = 'Falta header de autorizacion';
+			$this->json($result);
+		}
+
+		$matches = array();
+	    if (preg_match('/Basic (.+)/', $auth, $matches)) {
+	        if (isset($matches[1])) {
+	            $token = $matches[1];
+	        }
+	    }
+
+	    if(!isset($token)){
+			$result->message = 'Falta token de autorizacion';
+			$this->json($result);
+		}
+
+		$decoded = base64_decode($token);
+
+		list($numEmpleado, $password) = explode(":", $decoded);
+
+		$usuario = $this->UsuariosModel->login($numEmpleado, encriptar($password))->row();
+
+		if(!isset($usuario)){
+			$result->message = 'No existe el usuario';
+			$this->json($result);
+		}
+
+		$accesToken = $this->token->generateToken($usuario);
+
+		$result = (object) [
+			'status' => 'ok',
+			'message' => 'Inicio de sesion correcto',
+			'accessToken' => $accesToken,
+		];
+
+		$this->json($result);
+	}
+
+	public function update(){
+		$data = $this->post();
+		$auth = $this->headers('Authorization');
+		$token = null;
+		$numContrato = $this->input->get('numContrato');
+
+		$result = (object) [
+			'status' => 'error',
+			'message' => 'Error'
+		];
+
+		if(!isset($auth)){
+			$result->message = 'Falta header de autorizacion';
+			$this->json($result);
+		}
+
+		$matches = array();
+	    if (preg_match('/Bearer (.+)/', $auth, $matches)) {
+	        if (isset($matches[1])) {
+	            $token = $matches[1];
+	        }
+	    }
+
+	    if(!isset($token)){
+			$result->message = 'Falta token de autorizacion';
+			$this->json($result);
+		}
+
+		$decoded = (object) $this->token->validateToken($token);
+
+		if(!$decoded->status){
+			$result->message = $decoded->message;
+			$this->json($result);
+		}
+
+		$usuario = $decoded->data;
+
+		if($usuario->idRol != 1){
+			$result->message = 'No tiene permisos para esta accion';
+			$this->json($result);
+		}
+
+		if(!isset($numContrato)){
+			$result->message = 'Falta el numero de contrato';
+			$this->json($result);
+		}
+
+		$empleado = $this->UsuariosModel->getUserByNumEmpleado($numContrato);
+		$old_data = (array) $empleado;
+
+		if(!isset($empleado)){
+			$result->message = 'No existe el empleado en la base de datos';
+			$this->json($result);
+		}
+
+		if(!$data){
+			$result->message = 'No hay datos';
+			$this->json($result);
+		}
+
+		$new_data = (array) $data;
+
+		$actualizado = (object) array_replace($old_data, $new_data);
+
+		$is_ok = $this->UsuariosModel->updateUserData($empleado->idUsuario, $actualizado);
+
+		if($is_ok){
+			$result->status = 'ok';
+			$result->message = 'Empleado actualizado';
+			$result->data = $actualizado;
+		}else{
+			$result->message = 'No se pudo actualizar el empleado';
+		}
+
+		$this->json($result);
+	}
+
+	public function baja(){
+		$auth = $this->headers('Authorization');
+		$token = null;
+		$numContrato = $this->input->get('numContrato');
+
+		$result = (object) [
+			'status' => 'error',
+			'message' => 'Error'
+		];
+
+		if(!isset($auth)){
+			$result->message = 'Falta header de autorizacion';
+			$this->json($result);
+		}
+
+		$matches = array();
+	    if (preg_match('/Bearer (.+)/', $auth, $matches)) {
+	        if (isset($matches[1])) {
+	            $token = $matches[1];
+	        }
+	    }
+
+	    if(!isset($token)){
+			$result->message = 'Falta token de autorizacion';
+			$this->json($result);
+		}
+
+		$decoded = (object) $this->token->validateToken($token);
+
+		if(!$decoded->status){
+			$result->message = $decoded->message;
+			$this->json($result);
+		}
+
+		$usuario = $decoded->data;
+
+		if($usuario->idRol != 1){
+			$result->message = 'No tiene permisos para esta accion';
+			$this->json($result);
+		}
+
+		if(!isset($numContrato)){
+			$result->message = 'Falta el numero de contrato';
+			$this->json($result);
+		}
+
+		$empleado = $this->UsuariosModel->getUserByNumEmpleado($numContrato);
+
+		if(!isset($empleado)){
+			$result->message = 'No existe el empleado en la base de datos';
+			$this->json($result);
+		}
+
+		$is_ok = $this->UsuariosModel->setBajaEmpleado($empleado->idUsuario);
+		$this->CitasModel->cancelFromUser($empleado->idUsuario);
+
+		if($is_ok){
+			$result->status = 'ok';
+			$result->message = 'Empleado dado de baja';
+		}else{
+			$result->message = 'No se pudo dar de baja el empleado';
+		}
+
+		$this->json($result);
+	}
 }

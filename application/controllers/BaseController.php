@@ -27,7 +27,7 @@ abstract class BaseController extends CI_Controller{
         
         //$this->load->helper(array('form','funciones'));
 
-        // $this->load->library('Token');
+        $this->load->library('Token');
         //$this->load->library('GoogleApi');
     }
 
@@ -39,7 +39,11 @@ abstract class BaseController extends CI_Controller{
         }
 
         if(isset($key)){
-            return $data->$key;
+            if(isset($data->$key)){
+                return $data->$key;
+            }else{
+                return null;
+            }
         }
 
         return $data;
@@ -49,11 +53,15 @@ abstract class BaseController extends CI_Controller{
         $data = json_decode( file_get_contents('php://input'));
 
         if(!isset($data)){
-            return;
+            return null;
         }
 
         if(isset($key)){
-            return $data->$key;
+            if(isset($data->$key)){
+                return $data->$key;
+            }else{
+                return null;
+            }
         }
 
         return $data;

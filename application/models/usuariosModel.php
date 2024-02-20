@@ -96,4 +96,57 @@ class UsuariosModel extends CI_Model {
 
 		return $this->db->query($query);
 	}
+
+	public function getUserByNumEmpleado($numContrato){
+		$query = "SELECT
+				idUsuario,
+				numContrato,
+				numEmpleado,
+				nombre,
+				telPersonal,
+				telOficina,
+				idSede,
+				correo,
+				idArea,
+				sexo,
+				fechaIngreso,
+				idPuesto,
+				idContrato
+			FROM usuarios
+			WHERE
+				numContrato='$numContrato'";
+
+		return $this->db->query($query)->row();
+	}
+
+	public function updateUserData($idUsuario, $data){
+		$query = "UPDATE usuarios
+			SET
+				numContrato = '$data->numContrato',
+				numEmpleado = '$data->numEmpleado',
+				nombre = '$data->nombre',
+				telPersonal = '$data->telPersonal',
+				telOficina = '$data->telOficina',
+				idSede = $data->idSede,
+				correo = '$data->correo',
+				idArea = $data->idArea,
+				sexo = '$data->sexo',
+				fechaIngreso = '$data->fechaIngreso',
+				idPuesto = $data->idPuesto,
+				idContrato = '$data->idContrato'
+			WHERE
+				idUsuario=$idUsuario";
+
+		return $this->db->query($query);
+	}
+
+	public function setBajaEmpleado($idUsuario){
+		$query = "UPDATE usuarios
+			SET
+				estatus=0
+			WHERE
+				idUsuario=$idUsuario";
+
+		return $this->db->query($query);
+	}
 }

@@ -359,9 +359,9 @@ class CalendarioController extends BaseController{
 			} else if ($checkOccupied->num_rows() > 0) {
 				$response["result"] = false;
 				$response["msg"] = "Horario no disponible";
-			} else if ($checkUser->num_rows() > 0) {
+			} else if ($checkUser->num_rows() === 0) {
 				$response["result"] = false;
-				$response["msg"] = "El paciente no ha ocupado sus beneficios disponibles";
+				$response["msg"] = " El paciente debe finalizar sus beneficios mensuales";
 			} else if (!isset($pass)) {
 				$response["result"] = false;
 				$response["msg"] = "Error en las fechas seleccionadas";
@@ -712,6 +712,7 @@ class CalendarioController extends BaseController{
 		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
+	
 	public function getAppointmentsByUser()
 	{
 		$year = $this->input->post('dataValue[year]');
@@ -750,7 +751,7 @@ class CalendarioController extends BaseController{
 			case 537:
 				$tipo = 8;
 				break;
-			case 68:
+			case 686:
 				$tipo = 9;
 				break;
 		}
@@ -1242,7 +1243,7 @@ class CalendarioController extends BaseController{
                 $response['data'] = $event;
                 $response['msg'] = "¡Evento registrado en el calendario de google!"; 
             }else {
-                $response['msg'] = "¡No se pudó insertar el evento en el calendario de google!"; 
+                $response['msg'] = "¡No se pudo insertar el evento en el calendario de google!"; 
             }
         }else {
             $response['msg'] = "¡Parámetros inválidos!";
@@ -1329,7 +1330,7 @@ class CalendarioController extends BaseController{
 			'idEventoGoogle' => $dataValue['idEventoGoogle']
 		];
 
-		$update = $this->generalModel->updateRecord("citas", $data, 'idCita', $dataValue["idCita"]);
+		$update = $this->GeneralModel->updateRecord("citas", $data, 'idCita', $dataValue["idCita"]);
 
 		$this->output->set_content_type('application/json');
         $this->output->set_output(json_encode($update, JSON_NUMERIC_CHECK));

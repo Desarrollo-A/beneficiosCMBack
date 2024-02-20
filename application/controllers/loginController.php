@@ -99,10 +99,10 @@ class LoginController extends BaseController {
 			"correo" => isset($datosEmpleado['mail_emp']) ? $datosEmpleado['mail_emp'] : NULL ,
 			"password" => isset($datosEmpleado['password']) ? encriptar($datosEmpleado['password']) : NULL,
 			"estatus" => 1,
-			"idRol" => isset($idRol) ? $idRol : NULL,
-			"sexo" => isset($datosEmpleado['sexo']) ? $datosEmpleado['sexo'] : NULL,
-			"idArea" => isset($datosEmpleado['idarea']) ? $datosEmpleado['idarea'] : NULL,
-			"fechaIngreso" => isset($datosEmpleado['fingreso']) ? $datosEmpleado['fingreso'] : NULL,
+			"idRol" => $idRol,
+			"sexo" => $datosEmpleado['sexo'],
+			"idArea" => $datosEmpleado['idarea'],
+			"fechaIngreso" => $datosEmpleado['fingreso'],
 			"externo" => 0,
 			"creadoPor" => 0,
 			"fechaCreacion" => date('Y-m-d H:i:s'),
@@ -174,6 +174,7 @@ class LoginController extends BaseController {
 		}
 	}
 	
+	}
 	public function me(){
 		$datosSession = json_decode( file_get_contents('php://input'));
 		$arraySession = explode('.',$datosSession->token);
