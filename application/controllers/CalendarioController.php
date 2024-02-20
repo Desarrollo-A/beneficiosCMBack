@@ -1223,7 +1223,7 @@ class CalendarioController extends BaseController{
                 $response['data'] = $event;
                 $response['msg'] = "¡Evento registrado en el calendario de google!"; 
             }else {
-                $response['msg'] = "¡No se pudó insertar el evento en el calendario de google!"; 
+                $response['msg'] = "¡No se pudo insertar el evento en el calendario de google!"; 
             }
         }else {
             $response['msg'] = "¡Parámetros inválidos!";
