@@ -218,4 +218,24 @@ class DashModel extends CI_Model {
 
         return $this->db->query($query)->result();
     }
+
+	public function getMetaAdmin($dt){
+
+    	switch($dt){
+			case 537:
+				$query = $this->db-> query("SELECT idAreaBeneficio FROM usuarios WHERE idUsuario = 74");
+				break;
+			case 585:
+				$query = $this->db-> query("SELECT idAreaBeneficio FROM usuarios WHERE idUsuario = 73");
+				break;
+			case 158:
+				$query = $this->db-> query("SELECT idAreaBeneficio FROM usuarios WHERE idUsuario = 72");
+				break;
+			case 686:
+				$query = $this->db-> query("SELECT idAreaBeneficio FROM usuarios WHERE idUsuario = 75");
+				break;
+		}
+
+        return $this->db->query($query)->row()->result();
+    }
 }

@@ -247,7 +247,7 @@ class ReportesModel extends CI_Model {
 				INNER JOIN detallePaciente dtp ON dtp.idUsuario = us.idUsuario
 				INNER JOIN catalogos cat ON cat.idCatalogo = 13
 				LEFT JOIN opcionesPorCatalogo op ON op.idCatalogo = cat.idCatalogo AND  op.idOpcion = dtp.estatusNut
-				WHERE ct.idEspecialista = 65 AND estatusNut IS NOT null");
+				WHERE ct.idEspecialista = $idUs AND estatusNut IS NOT null");
 				break;
 			case 585:
 				$query = $this->db-> query("SELECT DISTINCT us.idUsuario, us.nombre, dp.depto, sd.sede, ps.puesto, op.nombre AS estPsi FROM citas ct 
@@ -259,7 +259,7 @@ class ReportesModel extends CI_Model {
 				INNER JOIN detallePaciente dtp ON dtp.idUsuario = us.idUsuario
 				INNER JOIN catalogos cat ON cat.idCatalogo = 13
 				LEFT JOIN opcionesPorCatalogo op ON op.idCatalogo = cat.idCatalogo AND  op.idOpcion = dtp.estatusPsi
-				WHERE ct.idEspecialista = 65 AND estatusPsi IS NOT null");
+				WHERE ct.idEspecialista = $idUs AND estatusPsi IS NOT null");
 				break;
 			case 158:
 				$query = $this->db-> query("SELECT DISTINCT us.idUsuario, us.nombre, dp.depto, sd.sede, ps.puesto, op.nombre AS estQB FROM citas ct 
@@ -271,7 +271,7 @@ class ReportesModel extends CI_Model {
 				INNER JOIN detallePaciente dtp ON dtp.idUsuario = us.idUsuario
 				INNER JOIN catalogos cat ON cat.idCatalogo = 13
 				LEFT JOIN opcionesPorCatalogo op ON op.idCatalogo = cat.idCatalogo AND  op.idOpcion = dtp.estatusQB
-				WHERE ct.idEspecialista = 65 AND estatusQB IS NOT null");
+				WHERE ct.idEspecialista = $idUs AND estatusQB IS NOT null");
 				break;
 			case 686:
 				$query = $this->db-> query("SELECT DISTINCT us.idUsuario, us.nombre, dp.depto, sd.sede, ps.puesto, op.nombre AS estGE FROM citas ct 
@@ -283,7 +283,7 @@ class ReportesModel extends CI_Model {
 				INNER JOIN detallePaciente dtp ON dtp.idUsuario = us.idUsuario
 				INNER JOIN catalogos cat ON cat.idCatalogo = 13
 				LEFT JOIN opcionesPorCatalogo op ON op.idCatalogo = cat.idCatalogo AND  op.idOpcion = dtp.estatusGE
-				WHERE ct.idEspecialista = 65 AND estatusGE IS NOT null");
+				WHERE ct.idEspecialista = $idUs AND estatusGE IS NOT null");
 				break;
 		}
 
