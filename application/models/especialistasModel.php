@@ -47,4 +47,6 @@ class EspecialistasModel extends CI_Model {
     	return $this->db->query($query)->result();
     }
 
+	
+
 }
