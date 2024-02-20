@@ -322,7 +322,8 @@
 		}
 
 		.icon{
-			width: 5%
+			width: 5%;
+			filter: contrast(0);
 		}
 
 		.no-margin{
@@ -336,6 +337,9 @@
 		.custom-font1{
 			font-weight: 800; 
 			color: #003360;
+		}
+		.custom-font2{
+			font-size: 14px;
 		}
 
 		@media screen and (max-width: 500px) {}
@@ -373,13 +377,13 @@
 								<td>
 									<div class="text" style="padding: 0 3.5em; text-align: center; padding-bottom: 10%">
 										<h3 style="color:#003360"><?= $data["tituloEmail"] ?></h3>
-										<h4 class="no-margin"><?= $data["temaEmail"] ?><strong>"<?= $data["especialidad"] ?>"</strong></h4>
-										<h4>¿Quién te atenderá? <?= $data["especialista"] ?></h4>
+										<h4 class="no-margin custom-font2"><?= $data["temaEmail"] ?><strong>"<?= $data["especialidad"] ?>"</strong></h4>
+										<h4 class="custom-font2">¿Quién te atenderá? <?= $data["especialista"] ?></h4>
 										<h4 class="custom-font1"> Detalles de la cita</h4>
-										<h5 class='custom-margin1'><img src="<?= base_url() ?>dist/img/building-solid.png" class="icon"> <?= $data["sede"] ?></h5>
-										<h5 class='custom-margin1'><img src="<?= base_url() ?>dist/img/map-marked-alt-solid.png" class="icon">  <?= $data["oficina"] ?></h5>
-										<h5 class='custom-margin1'><img src="<?= base_url() ?>dist/img/calendar-alt-solid.png" class="icon">  <?= $data["fecha"] ?> </h5>
-										<h5 class='custom-margin1'><img src="<?= base_url() ?>dist/img/clock-regular.png" class="icon">  <?= $data["horaInicio"] ?> - <?= $data["horaFinal"] ?></h5>
+										<h5 class='no-margin custom-font2'><img src="<?= base_url() ?>dist/img/building-solid.png" class="icon"> Sede: <?= $data["sede"] ?></h5>
+										<h5 class='no-margin custom-font2'><img src="<?= base_url() ?>dist/img/map-marked-alt-solid.png" class="icon"> Dirección: <?= $data["oficina"] ?></h5>
+										<h5 class='no-margin custom-font2'><img src="<?= base_url() ?>dist/img/calendar-alt-solid.png" class="icon"> Fecha: <?= $data["fecha"] ?> </h5>
+										<h5 class='no-margin custom-font2'><img src="<?= base_url() ?>dist/img/clock-regular.png" class="icon"> Horario: <?= $data["horaInicio"] ?> - <?= $data["horaFinal"] ?></h5>
 									</div>
 								</td>
 							</tr>
