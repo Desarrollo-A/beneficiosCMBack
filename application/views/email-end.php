@@ -317,6 +317,7 @@
 
 		.icon {
 			width: 5%;
+			filter: contrast(0);
 		}
 
 		.btn {
@@ -352,6 +353,10 @@
 		.custom-font1{
 			font-weight: 800; 
 			color: #003360;
+		}
+
+		.custom-font2{
+			font-size: 14px;
 		}
 
 		@media screen and (max-width: 500px) {}
@@ -393,13 +398,13 @@
 								<td>
 									<div class="text" style="text-align: center;">
 										<h3 style="color:#003360"><?= $data["tituloEmail"] ?></h3>
-										<h4 class="no-margin">Tu cita de <strong>"<?= $data["especialidad"] ?>"</strong> ha finalizado con éxito</h4>
-										<h4 class="no-margin">Especialista que te atendio: <?= $data["especialista"] ?></h4>
+										<h4 class="no-margin custom-font2">Tu cita de <strong>"<?= $data["especialidad"] ?>"</strong> ha finalizado con éxito</h4>
+										<h4 class="no-margin custom-font2">Especialista que te atendio: <?= $data["especialista"] ?></h4>
 										<h4 class="custom-font1">Detalles de la cita </h4>
-										<h5 class='custom-margin1'><img src="<?= base_url() ?>dist/img/building-solid.png" class='icon'> <?= $data["sede"] ?></h5>
-										<h5 class='custom-margin1'><img src="<?= base_url() ?>dist/img/map-marked-alt-solid.png" class='icon'> <?= $data["oficina"] ?></h5>
-										<h5 class='custom-margin1'><img src="<?= base_url() ?>dist/img/calendar-alt-solid.png" class='icon'> <?= $data["fecha"] ?></h5>
-										<h5 class='custom-margin1'><img src="<?= base_url() ?>dist/img/clock-regular.png" class='icon'> <?= $data["horaInicio"] ?> - <?= $data["horaFinal"] ?></h5>
+										<h5 class='no-margin custom-font2'><img src="<?= base_url() ?>dist/img/building-solid.png" class='icon'> Sede: <?= $data["sede"] ?></h5>
+										<h5 class='no-margin custom-font2'><img src="<?= base_url() ?>dist/img/map-marked-alt-solid.png" class='icon'> Dirección: <?= $data["oficina"] ?></h5>
+										<h5 class='no-margin custom-font2'><img src="<?= base_url() ?>dist/img/calendar-alt-solid.png" class='icon'> Fecha: <?= $data["fecha"] ?></h5>
+										<h5 class='no-margin custom-font2'><img src="<?= base_url() ?>dist/img/clock-regular.png" class='icon'> Horario: <?= $data["horaInicio"] ?> - <?= $data["horaFinal"] ?></h5>
 										</br>
 										<div class="text center">
 											<a class="btn btn-primary w-100 w-lg-50 align-center" href="<?= $data['link'] ?>" class="btn">Califica tu cita</a>
