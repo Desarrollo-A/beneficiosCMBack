@@ -321,6 +321,22 @@
 			color: rgba(0, 0, 0, 1);
 		}
 
+		.icon{
+			width: 5%
+		}
+
+		.no-margin{
+			margin: 0%;
+			padding: 0%;
+		}
+		.custom-margin1{
+			margin: 1%;
+			padding: 1%;
+		}
+		.custom-font1{
+			font-weight: 800; 
+			color: #003360;
+		}
 
 		@media screen and (max-width: 500px) {}
 	</style>
@@ -335,18 +351,18 @@
 			<!-- BEGIN BODY -->
 			<table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: auto;">
 				<tr>
-					<td valign="top" class="bg_white" style="padding: 5em 2.5em 0 2.5em;">
+					<td valign="top" class="bg_white">
 						<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
 							<tr>
 								<td class="logo" style="text-align: center;">
-									<img src="<?= base_url() ?>dist/img/Logo_CM2.png" alt="" style="width: 100px; max-width: 100px; height: auto; margin: auto; display: block;">
+									<img src="<?= base_url() ?>dist/img/logo1.svg" alt="" style="width: 250px; max-width: 250px; height: auto; margin: auto; display: block;">
 								</td>
 							</tr>
 						</table>
 					</td>
 				</tr><!-- end tr -->
 				<tr>
-					<td valign="middle" class="hero bg_white" style="padding: 3em 0 2em 0;">
+					<td valign="middle" class="hero bg_white">
 						<img src="<?= base_url() ?>dist/img/appointment.png" alt="" style="width: 400px; max-width: 600px; height: auto; margin: auto; display: block;">
 					</td>
 				</tr><!-- end tr -->
@@ -355,31 +371,31 @@
 						<table>
 							<tr>
 								<td>
-									<div class="text" style="padding: 0 3.5em; text-align: center;">
-										<h2 style="color:#003360"><?= $data["tituloEmail"] ?></h2>
-										<h4><?= $data["temaEmail"] ?><strong><?= $data["especialidad"] ?></strong></h4>
-										<h4>Especialista que te atiende: <?= $data["especialista"] ?></h4>
-										<h4>Lugar </h4>
-										<h5><img src="<?= base_url() ?>dist/img/building-solid.png"> <?= $data["sede"] ?></h5>
-										<h5><img src="<?= base_url() ?>dist/img/map-marked-alt-solid.png">  <?= $data["oficina"] ?></h5>
-										</br>
-										<h4>Horario reservado</h4>
-										<h5><img src="<?= base_url() ?>dist/img/calendar-alt-solid.png">  <?= $data["fecha"] ?> </h5>
-										<h5><img src="<?= base_url() ?>dist/img/clock-regular.png">  <?= $data["horaInicio"] ?> - <?= $data["horaFinal"] ?></h5>
+									<div class="text" style="padding: 0 3.5em; text-align: center; padding-bottom: 10%">
+										<h3 style="color:#003360"><?= $data["tituloEmail"] ?></h3>
+										<h4 class="no-margin"><?= $data["temaEmail"] ?><strong>"<?= $data["especialidad"] ?>"</strong></h4>
+										<h4>¿Quién te atenderá? <?= $data["especialista"] ?></h4>
+										<h4 class="custom-font1"> Detalles de la cita</h4>
+										<h5 class='custom-margin1'><img src="<?= base_url() ?>dist/img/building-solid.png" class="icon"> <?= $data["sede"] ?></h5>
+										<h5 class='custom-margin1'><img src="<?= base_url() ?>dist/img/map-marked-alt-solid.png" class="icon">  <?= $data["oficina"] ?></h5>
+										<h5 class='custom-margin1'><img src="<?= base_url() ?>dist/img/calendar-alt-solid.png" class="icon">  <?= $data["fecha"] ?> </h5>
+										<h5 class='custom-margin1'><img src="<?= base_url() ?>dist/img/clock-regular.png" class="icon">  <?= $data["horaInicio"] ?> - <?= $data["horaFinal"] ?></h5>
 									</div>
+								</td>
+							</tr>
+							<tr>
+								<td class="logo" style="text-align: center;">
+									<img src="<?= base_url() ?>dist/img/Logo_CM2.png" alt="" style="width: 110px; max-width: 110px; height: auto; margin: auto; display: block;">
 								</td>
 							</tr>
 						</table>
 					</td>
-				</tr><!-- end tr -->
-				<!-- 1 Column Text + Button : END -->
+				</tr>
 			</table>
 			<table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: auto;">
 				<tr>
 					<td class="bg_light" style="text-align: center;">
-						<p>© Ciudad Maderas 2024
-							<!-- <a href="#"
-								style="color: rgba(0,0,0,.8);">Unsubscribe here</a> -->
+						<p>© Departamento TI <?php echo date("Y"); ?>
 						</p>
 					</td>
 				</tr>

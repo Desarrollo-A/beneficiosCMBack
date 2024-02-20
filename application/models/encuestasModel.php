@@ -93,9 +93,9 @@ class EncuestasModel extends CI_Model {
     {
         $idUsuario = $dt["idUsuario"];
         $vigenciaInicio = $dt["vigenciaInicio"];
-        $vigenciaFin = $dt["vigenciaFin"];
+        $vigenciaFin = "2024-04-02";
         $trimestreInicio = $dt["trimDefault"];
-        $fechaActual = $dt["fechActual"];
+        $fechaActual = "2024-04-02";
 
         $query_citas = $this->db->query("SELECT DISTINCT ct.idCita
         FROM usuarios us
