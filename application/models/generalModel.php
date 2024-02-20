@@ -19,6 +19,11 @@ class GeneralModel extends CI_Model {
 		return $query;
     }
 
+    public function getInfoPuesto($puesto){
+        $query = $this->db-> query("SELECT *FROM puestos WHERE idPuesto = ?", $puesto);
+		return $query;
+    }
+
     public function usrCount()
 	{
 		$query = $this->db-> query("SELECT COUNT(*) AS [usuarios] FROM usuarios");
