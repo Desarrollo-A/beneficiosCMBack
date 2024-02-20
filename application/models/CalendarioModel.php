@@ -12,13 +12,14 @@ class calendarioModel extends CI_Model
             ofi.ubicación, pue.idArea, sed.sede, atc.idOficina, us.correo, usEspe.correo as correoEspecialista, usEspe.nombre as especialista, 
             usEspe.sexo as sexoEspecialista, tf.fechasFolio, ct.idEventoGoogle,
             'color' = CASE
-	            WHEN ct.estatusCita = 1 THEN 'orange'
-	            WHEN ct.estatusCita = 2 THEN 'red'
-	            WHEN ct.estatusCita = 3 THEN 'grey'
-	            WHEN ct.estatusCita = 4 THEN 'green'
-                WHEN ct.estatusCita = 5 THEN 'pink'
-                WHEN ct.estatusCita = 6 THEN 'blue'
-                WHEN ct.estatusCita = 7 THEN 'red'
+                WHEN ct.estatusCita = 1 AND atc.tipoCita = 1 THEN '#ffa500'
+	            WHEN ct.estatusCita = 2 THEN '#ff0000'
+	            WHEN ct.estatusCita = 3 THEN '#808080'
+	            WHEN ct.estatusCita = 4 THEN '#008000'
+                WHEN ct.estatusCita = 5 THEN '#ff4d67'
+                WHEN ct.estatusCita = 6 THEN '#00ffff'
+                WHEN ct.estatusCita = 7 THEN '#ff0000'
+                WHEN ct.estatusCita = 1 AND atc.tipoCita = 2 THEN '#0000ff'
 	        END,
             beneficio = CASE 
             WHEN pue.idPuesto = 537 THEN 'nutrición'
@@ -82,16 +83,17 @@ class calendarioModel extends CI_Model
             "SELECT CAST(ct.idCita AS VARCHAR(36))  AS id,  ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
             ct.fechaInicio AS occupied, 'date' AS 'type', ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal, us.correo,
             se.sede, ofi.oficina, ct.idDetalle, ct.idAtencionXSede, us.externo, usEspe.nombre as especialista, ct.fechaCreacion, pue.tipoPuesto,
-            tf.fechasFolio, idEventoGoogle,
+            tf.fechasFolio, idEventoGoogle, ct.tipoCita, aps.tipoCita as modalidad,
             'color' = CASE
-	            WHEN ct.estatusCita = 0 THEN 'red'
-	            WHEN ct.estatusCita = 1 THEN 'orange'
-	            WHEN ct.estatusCita = 2 THEN 'red'
-	            WHEN ct.estatusCita = 3 THEN 'grey'
-	            WHEN ct.estatusCita = 4 THEN 'green'
-                WHEN ct.estatusCita = 5 THEN 'pink'
-                WHEN ct.estatusCita = 6 THEN 'blue'
-                WHEN ct.estatusCita = 7 THEN 'red'
+	            WHEN ct.estatusCita = 0 THEN '#ff0000'
+	            WHEN ct.estatusCita = 1 AND aps.tipoCita = 1 THEN '#ffa500'
+	            WHEN ct.estatusCita = 2 THEN '#ff0000'
+	            WHEN ct.estatusCita = 3 THEN '#808080'
+	            WHEN ct.estatusCita = 4 THEN '#008000'
+                WHEN ct.estatusCita = 5 THEN '#ff4d67'
+                WHEN ct.estatusCita = 6 THEN '#00ffff'
+                WHEN ct.estatusCita = 7 THEN '#ff0000'
+                WHEN ct.estatusCita = 1 AND aps.tipoCita = 2 THEN '#0000ff'
 	        END,
             beneficio = CASE 
             WHEN pue.idPuesto = 537 THEN 'nutrición'
@@ -548,13 +550,14 @@ class calendarioModel extends CI_Model
         sed.sede, atc.idOficina, us.correo, usEspe.correo as correoEspecialista, usEspe.nombre as especialista, usEspe.sexo as sexoEspecialista,
         tf.fechasFolio, ct.idEventoGoogle,
         'color' = CASE
-            WHEN ct.estatusCita = 1 THEN 'orange'
-            WHEN ct.estatusCita = 2 THEN 'red'
-            WHEN ct.estatusCita = 3 THEN 'grey'
-            WHEN ct.estatusCita = 4 THEN 'green'
-            WHEN ct.estatusCita = 5 THEN 'pink'
-            WHEN ct.estatusCita = 6 THEN 'blue'
-            WHEN ct.estatusCita = 7 THEN 'red'
+                WHEN ct.estatusCita = 1 AND atc.tipoCita = 1 THEN '#ffa500'
+	            WHEN ct.estatusCita = 2 THEN '#ff0000'
+	            WHEN ct.estatusCita = 3 THEN '#808080'
+	            WHEN ct.estatusCita = 4 THEN '#008000'
+                WHEN ct.estatusCita = 5 THEN '#ff4d67'
+                WHEN ct.estatusCita = 6 THEN '#00ffff'
+                WHEN ct.estatusCita = 7 THEN '#ff0000'
+                WHEN ct.estatusCita = 1 AND atc.tipoCita = 2 THEN '#0000ff'
         END,
         beneficio = CASE 
             WHEN pue.idPuesto = 537 THEN 'nutrición'
