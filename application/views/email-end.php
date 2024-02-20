@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml"
-	xmlns:o="urn:schemas-microsoft-com:office:office">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 
 <head>
 	<meta charset="utf-8"> <!-- utf-8 works for most cases -->
@@ -316,11 +315,11 @@
 			color: rgba(0, 0, 0, 1);
 		}
 
-		.icon{
+		.icon {
 			width: 5%;
 		}
-		
-		.button {
+
+		.btn {
 			display: block;
 			width: 115px;
 			height: 25px;
@@ -333,6 +332,28 @@
 			line-height: 25px;
 		}
 
+		.center {
+			margin: auto;
+			width: 50%;
+			padding: 10px;
+			align-items: center;
+			padding-left: 15%;
+  			justify-content: center;
+		}
+		.no-margin{
+			margin: 0%;
+			padding: 0%;
+		}
+		.custom-margin1{
+			margin: 1%;
+			padding: 1%;
+		}
+
+		.custom-font1{
+			font-weight: 800; 
+			color: #003360;
+		}
+
 		@media screen and (max-width: 500px) {}
 	</style>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
@@ -343,58 +364,53 @@
 
 <body width="100%" style="margin: 0; padding: 0 !important; mso-line-height-rule: exactly; background-color: #f1f1f1;">
 	<center style=" width: 100%; background-color: #f1f1f1;">
-		<div
-			style="display: none; font-size: 1px;max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden; mso-hide: all; font-family: sans-serif;">
+		<div style="display: none; font-size: 1px;max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden; mso-hide: all; font-family: sans-serif;">
 			&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;
 		</div>
 		<div style="max-width: 600px; margin: 0 auto;" class="email-container">
 			<!-- BEGIN BODY -->
-			<table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"
-				style="margin: auto;">
+			<table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: auto;">
 				<tr>
-					<td valign="top" class="bg_white" style="padding: 5em 2.5em 0 2.5em;">
+					<td valign="top" class="bg_white">
 						<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
 							<tr>
 								<td class="logo" style="text-align: center;">
-									<img src="<?= base_url() ?>dist/img/logo1.svg" alt=""
-										style="width: 250px; max-width: 250px; height: auto; margin: auto; display: block;">
+									<img src="<?= base_url() ?>dist/img/logo1.svg" alt="" style="width: 250px; max-width: 250px; height: auto; margin: auto; display: block;">
 								</td>
 							</tr>
 						</table>
 					</td>
 				</tr><!-- end tr -->
 				<tr>
-					<td valign="middle" class="hero bg_white" style="padding: 3em 0 2em 0;">
-						<img src="<?= base_url() ?>dist/img/appointment.png" alt=""
-							style="width: 400px; max-width: 600px; height: auto; margin: auto; display: block;">
+					<td valign="middle" class="hero bg_white">
+						<img src="<?= base_url() ?>dist/img/appointment.png" alt="" style="width: 400px; max-width: 600px; height: auto; margin: auto; display: block;">
 					</td>
 				</tr><!-- end tr -->
 				<tr>
-					<td valign="middle" class="hero bg_white" style="padding: 2em 0 4em 0;">
+					<td valign="middle" class="hero bg_white">
 						<table>
 							<tr>
 								<td>
-									<div class="text" style="padding: 0 3.5em; text-align: left;">
-										<h2 style="color:#003360"><?= $data["tituloEmail"]?></h2>
-										<h4>Tu cita de <strong><?= $data["especialidad"]?></strong> se ha finalizado con exito</h4>
-										<h4>Especialista que te atiende: <?= $data["especialista"] ?></h4>
-                                        <h4>Detalles de la cita: </h4>
-                                        <h5><img src="<?= base_url() ?>dist/img/building-solid.png" class='icon'> <?= $data["sede"] ?></h5>
-                                        <h5><img src="<?= base_url() ?>dist/img/map-marked-alt-solid.png" class='icon'> <?= $data["oficina"] ?></h5>
-										<h5><img src="<?= base_url() ?>dist/img/calendar-alt-solid.png" class='icon'> <?= $data["fecha"] ?></h5>
-										<h5><img src="<?= base_url() ?>dist/img/clock-regular.png" class='icon'> <?= $data["horaInicio"] ?> - <?= $data["horaFinal"] ?></h5>
-									</br>
-									<div class="text" style="padding: 0 3.5em; text-align: center; padding-bottom: 20%">
-										<a href="<?= $data['link'] ?>" class="button">Califica tu cita</a>
-									</div>
-										
+									<div class="text" style="text-align: center;">
+										<h3 style="color:#003360"><?= $data["tituloEmail"] ?></h3>
+										<h4 class="no-margin">Tu cita de <strong>"<?= $data["especialidad"] ?>"</strong> ha finalizado con éxito</h4>
+										<h4 class="no-margin">Especialista que te atendio: <?= $data["especialista"] ?></h4>
+										<h4 class="custom-font1">Detalles de la cita </h4>
+										<h5 class='custom-margin1'><img src="<?= base_url() ?>dist/img/building-solid.png" class='icon'> <?= $data["sede"] ?></h5>
+										<h5 class='custom-margin1'><img src="<?= base_url() ?>dist/img/map-marked-alt-solid.png" class='icon'> <?= $data["oficina"] ?></h5>
+										<h5 class='custom-margin1'><img src="<?= base_url() ?>dist/img/calendar-alt-solid.png" class='icon'> <?= $data["fecha"] ?></h5>
+										<h5 class='custom-margin1'><img src="<?= base_url() ?>dist/img/clock-regular.png" class='icon'> <?= $data["horaInicio"] ?> - <?= $data["horaFinal"] ?></h5>
+										</br>
+										<div class="text center">
+											<a class="btn btn-primary w-100 w-lg-50 align-center" href="<?= $data['link'] ?>" class="btn">Califica tu cita</a>
+										</div>
+
 									</div>
 								</td>
 							</tr>
 							<tr>
 								<td class="logo" style="text-align: center;">
-									<img src="<?= base_url() ?>dist/img/Logo_CM2.png" alt=""
-										style="width: 110px; max-width: 110px; height: auto; margin: auto; display: block;">
+									<img src="<?= base_url() ?>dist/img/Logo_CM2.png" alt="" style="width: 110px; max-width: 110px; height: auto; margin: auto; display: block;">
 								</td>
 							</tr>
 						</table>
@@ -402,8 +418,7 @@
 				</tr><!-- end tr -->
 				<!-- 1 Column Text + Button : END -->
 			</table>
-			<table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"
-				style="margin: auto;">
+			<table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: auto;">
 				<tr>
 					<td class="bg_light" style="text-align: center;">
 						<p>© Departamento <?php echo date("Y"); ?></p>
