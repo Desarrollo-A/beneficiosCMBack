@@ -359,7 +359,7 @@
 					<td valign="top" class="bg_white" style="padding: 5em 2.5em 0 2.5em;">
 						<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
 							<tr>
-								<td class="logo" style="text-align: center;">
+								<td class="logo" style="text-align: center; padding: 5em 2.5em 0 2.5em;">
 									<img src="<?= base_url() ?>dist/img/Logo1.png" alt="" style="width: 250px; max-width: 250px; height: auto; margin: auto; display: block;">
 								</td>
 							</tr>
@@ -394,7 +394,7 @@
 								</td>
 							</tr>
 							<tr>
-								<td class="logo" style="text-align: center;">
+								<td class="logo" style="text-align: center; padding: 1em;">
 									<img src="<?= base_url() ?>dist/img/Logo_CM2.png" alt="" style="width: 110px; max-width: 110px; height: auto; margin: auto; display: block;">
 								</td>
 							</tr>
