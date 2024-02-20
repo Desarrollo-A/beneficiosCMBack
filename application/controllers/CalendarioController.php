@@ -360,7 +360,7 @@ class CalendarioController extends BaseController{
 			} else if ($checkOccupied->num_rows() > 0) {
 				$response["result"] = false;
 				$response["msg"] = "Horario no disponible";
-			} else if ($checkUser->num_rows() > 0) {
+			} else if ($checkUser->num_rows() === 0) {
 				$response["result"] = false;
 				$response["msg"] = " El paciente debe finalizar sus beneficios mensuales";
 			} else if (!isset($pass)) {
@@ -752,7 +752,7 @@ class CalendarioController extends BaseController{
 			case 537:
 				$tipo = 8;
 				break;
-			case 68:
+			case 686:
 				$tipo = 9;
 				break;
 		}
