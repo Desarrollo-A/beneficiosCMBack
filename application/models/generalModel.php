@@ -19,6 +19,11 @@ class GeneralModel extends CI_Model {
 		return $query;
     }
 
+    public function getInfoPuesto($puesto){
+        $query = $this->db-> query("SELECT *FROM puestos WHERE idPuesto = ?", $puesto);
+		return $query;
+    }
+
     public function usrCount()
 	{
 		$query = $this->db-> query("SELECT COUNT(*) AS [usuarios] FROM usuarios");
@@ -139,7 +144,7 @@ class GeneralModel extends CI_Model {
         }else if($idRol == 2){
             $query = $this->db-> query("SELECT COUNT(*) AS [cancelada] FROM citas WHERE idPaciente = $idData AND estatusCita = 2");
         }else if($idRol == 3){
-            $query = $this->db-> query("SELECT COUNT(DISTINCT idPaciente) AS [cancelada] FROM citas WHERE idEspecialista = $idData AND estatusCita = 4");
+            $query = $this->db-> query("SELECT COUNT(DISTINCT idPaciente) AS [cancelada] FROM citas WHERE idEspecialista = $idData AND estatusCita = 2");
         }
 
         return $query;
@@ -157,7 +162,7 @@ class GeneralModel extends CI_Model {
         }else if($idRol == 2){
             $query = $this->db-> query("SELECT COUNT(*) AS [penalizada] FROM citas WHERE idPaciente = $idData AND estatusCita = 3");
         }else if($idRol == 3){
-            $query = $this->db-> query("SELECT COUNT(DISTINCT idPaciente) AS [penalizada] FROM citas WHERE idEspecialista = $idData AND estatusCita = 4");
+            $query = $this->db-> query("SELECT COUNT(DISTINCT idPaciente) AS [penalizada] FROM citas WHERE idEspecialista = $idData AND estatusCita = 3");
         }
 
         return $query;

@@ -3,6 +3,7 @@ on: workflow_dispatch
 
 jobs:
   upload-front-on-pruebas:
+
     name: 🎉 Deploy
     runs-on: ubuntu-latest
   
@@ -12,24 +13,27 @@ jobs:
 
       - name: 📂 Upload models
         uses: wlixcc/SFTP-Deploy-Action@v1.2.1
+
         with:
           server: 104.198.134.0
           port: 22
           username: prohab
           ssh_private_key: ${{ secrets.SFTP_SSH_PRIVATE_KEY }}
           local_path: ./application/models/*
-          remote_path: /mnt/data/aplicaciones/Prueba/beneficiosmaderasback/models/
+          remote_path: /mnt/data/aplicaciones/Prueba/beneficiosmaderasback/application/models/
           delete_remote_files: true
 
       - name: 📂 Upload controllers
         uses: wlixcc/SFTP-Deploy-Action@v1.2.1
+
         with:
           server: 104.198.134.0
           port: 22
           username: prohab
+
           ssh_private_key: ${{ secrets.SFTP_SSH_PRIVATE_KEY }}
           local_path: ./application/controllers/*
-          remote_path: /mnt/data/aplicaciones/Prueba/beneficiosmaderasback/controllers/
+          remote_path: /mnt/data/aplicaciones/Prueba/beneficiosmaderasback/application/controllers/
           delete_remote_files: true
 
       - name: 📂 Upload views
@@ -41,6 +45,6 @@ jobs:
           username: prohab
 
           ssh_private_key: ${{ secrets.SFTP_SSH_PRIVATE_KEY }}
-          local_path: ./application/controllers/*
-          remote_path: /mnt/data/aplicaciones/Prueba/beneficiosmaderasback/views/
+          local_path: ./application/views/*
+          remote_path: /mnt/data/aplicaciones/Prueba/beneficiosmaderasback/application/views/
           delete_remote_files: true    

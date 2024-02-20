@@ -10,12 +10,12 @@ class calendarioModel extends CI_Model
             ct.fechaInicio AS occupied, ct.estatusCita AS estatus, ct.idDetalle, us.nombre, ct.idPaciente, ct.idEspecialista, ct.idAtencionXSede, 
             ct.tipoCita, atc.tipoCita as modalidad, atc.idSede ,usEspe.idPuesto, us.telPersonal, usEspe.telPersonal as telefonoEspecialista, ofi.oficina, 
             ofi.ubicación, pue.idArea, sed.sede, atc.idOficina, us.correo, usEspe.correo as correoEspecialista, usEspe.nombre as especialista, 
-            usEspe.sexo as sexoEspecialista, tf.fechasFolio, ct.idEventoGoogle,
+            usEspe.sexo as sexoEspecialista, tf.fechasFolio, ct.idEventoGoogle, ct.evaluacion,
             'color' = CASE
                 WHEN ct.estatusCita = 1 AND atc.tipoCita = 1 THEN '#ffa500'
-	            WHEN ct.estatusCita = 2 THEN '#ff0000'
-	            WHEN ct.estatusCita = 3 THEN '#808080'
-	            WHEN ct.estatusCita = 4 THEN '#008000'
+	              WHEN ct.estatusCita = 2 THEN '#ff0000'
+	              WHEN ct.estatusCita = 3 THEN '#808080'
+	              WHEN ct.estatusCita = 4 THEN '#008000'
                 WHEN ct.estatusCita = 5 THEN '#ff4d67'
                 WHEN ct.estatusCita = 6 THEN '#00ffff'
                 WHEN ct.estatusCita = 7 THEN '#ff0000'
@@ -139,7 +139,29 @@ class calendarioModel extends CI_Model
 
     public function checkOccupied($dataValue, $fechaInicioSuma, $fechaFinalResta){
         $query = $this->db->query(
-            "SELECT *FROM horariosOcupados WHERE 
+            "SELECT *FROM horariosOcupadoss WHERE 
+            ((fechaInicio BETWEEN ? AND ?) 
+            OR (fechaFinal BETWEEN ? AND ?)
+            OR (? BETWEEN fechaInicio AND fechaFinal) 
+            OR (? BETWEEN fechaInicio AND fechaFinal))
+            AND idEspecialista = ?
+            AND estatus = ?",
+            array(
+                $fechaInicioSuma, $fechaFinalResta,
+                $fechaInicioSuma, $fechaFinalResta,
+                $fechaInicioSuma,
+                $fechaFinalResta,
+                $dataValue["idUsuario"],
+                1
+            )
+        );
+
+        return $query;
+    }
+
+    public function checkPresencial($dataValue, $fechaInicioSuma, $fechaFinalResta){
+        $query = $this->db->query(
+            "SELECT *FROM presencialXSede WHERE 
             ((fechaInicio BETWEEN ? AND ?) 
             OR (fechaFinal BETWEEN ? AND ?)
             OR (? BETWEEN fechaInicio AND fechaFinal) 
@@ -390,12 +412,23 @@ class calendarioModel extends CI_Model
         return $query;
     }
 
-    public function getCitasSinEvaluarUsuario($usuario, $beneficio)
+    public function getCitasSinEvaluarUsuario($usuario)
     {
         $query = $this->db->query(
             "SELECT c.*, u.idPuesto FROM citas AS c
             INNER JOIN usuarios as u ON c.idEspecialista = u.idUsuario
-            WHERE c.idPaciente = ? AND u.idPuesto = ? AND evaluacion is NULL AND c.estatusCita IN (?)",array($usuario, $beneficio, 4)
+            WHERE c.idPaciente = ? AND evaluacion is NULL AND c.estatusCita IN (?)",array($usuario, 4)
+        );
+
+        return $query;
+    }
+
+    public function getCitasSinPagarUsuario($usuario)
+    {
+        $query = $this->db->query(
+            "SELECT c.*, u.idPuesto FROM citas AS c
+            INNER JOIN usuarios as u ON c.idEspecialista = u.idUsuario
+            WHERE c.idPaciente = ? AND idDetalle is NULL AND c.estatusCita IN (?);",array($usuario, 6)
         );
 
         return $query;
@@ -447,7 +480,7 @@ class calendarioModel extends CI_Model
         $query = $this->db->query("SELECT CAST(idCita AS VARCHAR(36)) AS id, ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
         ct.fechaInicio AS occupied, ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal, ofi.oficina, ofi.ubicación,
         sed.sede , atc.idOficina, us.correo, usEspe.correo as correoEspecialista, usEspe.nombre as especialista, ct.idDetalle, usEspe.telPersonal as telefonoEspecialista,
-        usEspe.sexo as sexoEspecialista, tf.fechasFolio, ct.idEventoGoogle,
+        usEspe.sexo as sexoEspecialista, tf.fechasFolio, ct.idEventoGoogle, ct.evaluacion,
         beneficio = CASE 
         WHEN pue.idPuesto = 537 THEN 'Nutrición'
         WHEN pue.idPuesto = 585 THEN 'Psicología'
@@ -472,7 +505,7 @@ class calendarioModel extends CI_Model
         $query = $this->db->query("SELECT CAST(idCita AS VARCHAR(36)) AS id, ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
         ct.fechaInicio AS occupied, ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal, ofi.oficina, ofi.ubicación,
         sed.sede , atc.idOficina, us.correo, usEspe.correo as correoEspecialista, usEspe.nombre as especialista, ct.idDetalle, usEspe.telPersonal as telefonoEspecialista,
-        usEspe.sexo as sexoEspecialista, tf.fechasFolio, ct.idEventoGoogle,
+        usEspe.sexo as sexoEspecialista, tf.fechasFolio, ct.idEventoGoogle, ct.evaluacion,
         beneficio = CASE 
         WHEN pue.idPuesto = 537 THEN 'Nutrición'
         WHEN pue.idPuesto = 585 THEN 'Psicología'
@@ -548,7 +581,7 @@ class calendarioModel extends CI_Model
         ct.fechaInicio AS occupied, ct.estatusCita AS estatus, ct.idDetalle, us.nombre, ct.idPaciente, ct.idEspecialista, ct.idAtencionXSede, 
         ct.tipoCita, atc.tipoCita as modalidad, atc.idSede ,usEspe.idPuesto, us.telPersonal, usEspe.telPersonal as telefonoEspecialista, ofi.oficina, ofi.ubicación, pue.idArea,
         sed.sede, atc.idOficina, us.correo, usEspe.correo as correoEspecialista, usEspe.nombre as especialista, usEspe.sexo as sexoEspecialista,
-        tf.fechasFolio, ct.idEventoGoogle,
+        tf.fechasFolio, ct.idEventoGoogle, ct.evaluacion,
         'color' = CASE
                 WHEN ct.estatusCita = 1 AND atc.tipoCita = 1 THEN '#ffa500'
 	            WHEN ct.estatusCita = 2 THEN '#ff0000'
@@ -580,4 +613,24 @@ class calendarioModel extends CI_Model
         return $query;
     }
 
+    public function getSedesDeAtencionEspecialista($idUsuario){
+        $query = $this->db->query(
+        "SELECT ate.idSede as value, sedes.sede as label
+        FROM atencionXSede ate
+        LEFT JOIN sedes ON sedes.idSede=ate.idSede
+        WHERE ate.idEspecialista=? AND ate.tipoCita=?", array($idUsuario, 1));
+
+        return $query;
+    }
+
+    public function getDiasDisponiblesAtencionEspecialista($idUsuario, $idSede){
+        $query = $this->db->query(
+        "SELECT * FROM presencialXSede
+        WHERE idEspecialista=? AND idSede=?
+        AND MONTH(presencialDate) >= MONTH(CAST(GETDATE() AS DATE))
+        AND MONTH(presencialDate) <= MONTH(DATEADD(MONTH, 1, CAST(GETDATE() AS DATE)));", array($idUsuario, $idSede));
+    
+        return $query;
+    }
+    
 }

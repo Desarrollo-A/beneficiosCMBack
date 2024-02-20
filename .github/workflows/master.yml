@@ -6,6 +6,7 @@ on:
 
 jobs:
   upload-front-on-production:
+
     name: 🎉 Deploy
     runs-on: ubuntu-latest
   
@@ -15,25 +16,28 @@ jobs:
 
       - name: 📂 Upload models
         uses: wlixcc/SFTP-Deploy-Action@v1.2.1
+
         with:
           server: 104.198.134.0
           port: 22
           username: prohab
           ssh_private_key: ${{ secrets.SFTP_SSH_PRIVATE_KEY }}
           local_path: ./application/models/*
-          remote_path: /mnt/data/aplicaciones/BeneficioMaderas/models/
-          # delete_remote_files: true
+          remote_path: /mnt/data/aplicaciones/BeneficioMaderas/backend/application/models/
+          delete_remote_files: true
 
       - name: 📂 Upload controllers
         uses: wlixcc/SFTP-Deploy-Action@v1.2.1
+
         with:
           server: 104.198.134.0
           port: 22
           username: prohab
+
           ssh_private_key: ${{ secrets.SFTP_SSH_PRIVATE_KEY }}
           local_path: ./application/controllers/*
-          remote_path: /mnt/data/aplicaciones/BeneficioMaderas/controllers/
-          # delete_remote_files: true
+          remote_path: /mnt/data/aplicaciones/BeneficioMaderas/backend/application/controllers/
+          delete_remote_files: true
 
       - name: 📂 Upload views
         uses: wlixcc/SFTP-Deploy-Action@v1.2.1
@@ -44,6 +48,6 @@ jobs:
           username: prohab
 
           ssh_private_key: ${{ secrets.SFTP_SSH_PRIVATE_KEY }}
-          local_path: ./application/controllers/*
-          remote_path: /mnt/data/aplicaciones/BeneficioMaderas/views/
+          local_path: ./application/views/*
+          remote_path: /mnt/data/aplicaciones/BeneficioMaderas/backend/application/views/
           delete_remote_files: true    
