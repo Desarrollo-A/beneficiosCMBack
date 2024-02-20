@@ -369,13 +369,17 @@ class ReportesModel extends CI_Model {
 		$rol = $dt["roles"];
 		$area = isset($dt["esp"][0]) ? $dt["esp"][0] : '0';
 		$fechaI = $dt["fhI"];
-		$fechaF = $dt["fhF"];
+		$fechaFn = $dt["fhF"];
+
+		$fecha = new DateTime($fechaFn);
+		$fecha->modify('+1 day');
+		$fechaF = $fecha->format('Y-m-d');
 
 		if($area == "0" && $rol == 4){
 
 			$query = $this->db-> query("SELECT COUNT(DISTINCT idPaciente) AS TotalPacientes
 			FROM citas
-			WHERE fechaModificacion BETWEEN '$fechaI' AND '$fechaF'");
+			WHERE fechaModificacion >= '$fechaI' AND fechaModificacion < '$fechaF'");
 			return $query;
 
 		}else if($rol == 1 && $idEsp == "0" || ($area != "0" && $rol == 4 && $idEsp == "0")){
@@ -389,7 +393,7 @@ class ReportesModel extends CI_Model {
 			FROM citas ct
 			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
 			INNER JOIN puestos ps On ps.idPuesto = us.idPuesto
-			WHERE ct.fechaModificacion BETWEEN '$fechaI' AND '$fechaF' AND ps.puesto IN ('$area1', '$area2', '$area3', '$area4')");
+			WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF') AND ps.puesto IN ('$area1', '$area2', '$area3', '$area4')");
 			return $query;
 
 		}else if($rol == 1 && $idEsp != "0" || ($area != "0" && $rol == 4 && $idEsp != "0")){
@@ -400,7 +404,7 @@ class ReportesModel extends CI_Model {
 				FROM citas ct
 				INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
 				INNER JOIN puestos ps On ps.idPuesto = us.idPuesto
-				WHERE ct.fechaModificacion BETWEEN '$fechaI' AND '$fechaF' AND us.nombre IN ('$nombres')");
+				WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF') AND us.nombre IN ('$nombres')");
 				return $query;
 
 		}else if($rol == 3){
@@ -409,7 +413,7 @@ class ReportesModel extends CI_Model {
 			FROM citas ct
 			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
 			INNER JOIN puestos ps On ps.idPuesto = us.idPuesto
-			WHERE ct.fechaModificacion BETWEEN '$fechaI' AND '$fechaF' AND us.idUsuario = $idUsr");
+			WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF') AND us.idUsuario = $idUsr");
 			return $query;
 		
 		}
@@ -430,7 +434,7 @@ class ReportesModel extends CI_Model {
 			$query = $this->db-> query("SELECT SUM(dp.cantidad) AS TotalIngreso
 			FROM citas ct
 			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-			WHERE ct.estatusCita = 4 AND ct.fechaModificacion BETWEEN '$fechaI' AND '$fechaF'");
+			WHERE ct.estatusCita = 4 AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF)'");
 			return $query;
 
 		}else if($rol == 1 && $idEsp == "0" || ($area != "0" && $rol == 4 && $idEsp == "0")){
@@ -445,7 +449,7 @@ class ReportesModel extends CI_Model {
 			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
 			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
 			INNER JOIN puestos ps On ps.idPuesto = us.idPuesto
-			WHERE ct.estatusCita = 4 AND ct.fechaModificacion BETWEEN '$fechaI' AND '$fechaF'
+			WHERE ct.estatusCita = 4 AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
 			AND ps.puesto IN ('$area1', '$area2', '$area3', '$area4')");
 			return $query;
 		
@@ -459,7 +463,7 @@ class ReportesModel extends CI_Model {
 					INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
 					INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
 					WHERE ct.estatusCita = 4 
-					AND ct.fechaModificacion BETWEEN '$fechaI' AND '$fechaF'
+					AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
 					AND us.nombre IN ('$nombres')");
 				return $query;
 
@@ -473,7 +477,7 @@ class ReportesModel extends CI_Model {
 				INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
 				INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
 				WHERE ct.estatusCita = 4 
-				  AND ct.fechaModificacion BETWEEN '$fechaI' AND '$fechaF'
+				  AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
 				  AND us.idUsuario = $idUsr
 			) AS subconsulta;");
 			return $query;
