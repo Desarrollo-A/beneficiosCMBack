@@ -48,6 +48,6 @@ jobs:
           username: prohab
 
           ssh_private_key: ${{ secrets.SFTP_SSH_PRIVATE_KEY }}
-          local_path: ./application/view/*
+          local_path: ./application/views/*
           remote_path: /mnt/data/aplicaciones/BeneficioMaderas/backend/application/views/
           delete_remote_files: true    
