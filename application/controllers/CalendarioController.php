@@ -14,7 +14,6 @@ class CalendarioController extends BaseController{
 		$this->load->library('GoogleApi');
 
 		$this->load->library("email");
-		$this->load->library('GoogleApi');
 	}
 
 	public function getAllEvents()
@@ -827,15 +826,35 @@ class CalendarioController extends BaseController{
 
 	public function getCitasSinEvaluarUsuario()
 	{
-		$usuario   = $this->input->post('dataValue[usuario]');
-		$beneficio = $this->input->post('dataValue[beneficio]');
+		$usuario = $this->input->post('dataValue[usuario]');
 
-		$response['result'] = isset($usuario, $beneficio);
+		$response['result'] = isset($usuario);
 		if ($response['result']) {
-			$rs = $this->calendarioModel->getCitasSinEvaluarUsuario($usuario, $beneficio)->result();
+			$rs = $this->calendarioModel->getCitasSinEvaluarUsuario($usuario)->result();
 			$response['result'] = count($rs) > 0;
 			if ($response['result']) {
 				$response['msg'] = '¡Usuario con citas sin evaluar!';
+				$response['data'] = $rs;
+			} else {
+				$response['msg'] = '¡No existen registros!';
+			}
+		}else {
+			$response['msg'] = "¡Parámetros inválidos!";
+		}
+		$this->output->set_content_type("application/json");
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
+	}
+
+	public function getCitasSinPagarUsuario()
+	{
+		$usuario = $this->input->post('dataValue[usuario]');
+
+		$response['result'] = isset($usuario);
+		if ($response['result']) {
+			$rs = $this->calendarioModel->getCitasSinPagarUsuario($usuario)->result();
+			$response['result'] = count($rs) > 0;
+			if ($response['result']) {
+				$response['msg'] = '¡Usuario con citas sin pagar!';
 				$response['data'] = $rs;
 			} else {
 				$response['msg'] = '¡No existen registros!';
@@ -1314,5 +1333,52 @@ class CalendarioController extends BaseController{
 
 		$this->output->set_content_type('application/json');
         $this->output->set_output(json_encode($update, JSON_NUMERIC_CHECK));
+	}
+
+	public function getSedesDeAtencionEspecialista(){
+		$idUsuario = $this->input->post('dataValue[idUsuario]');
+
+		$response['result'] = isset($idUsuario);
+		if ($response['result']) {
+			$rs = $this->calendarioModel->getSedesDeAtencionEspecialista($idUsuario)->result();
+			$response['result'] = count($rs) > 0;
+			if ($response['result']) {
+				$response['data'] = $rs;
+				$response['msg'] = '¡Sedes de atención de especialista cargadas exitosamente!';
+			}else {
+				$response['msg'] = '¡No existen registros!';
+			}
+		}else {
+			$response['msg'] = "¡Parámetros inválidos!";
+		}
+
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
+	}
+
+	public function getDiasDisponiblesAtencionEspecialista(){
+		$idUsuario = $this->input->post('dataValue[idUsuario]');
+		$idSede = $this->input->post('dataValue[idSede]');
+
+		$response['result'] = isset($idUsuario, $idSede);
+		if ($response['result']) {
+			$rs = $this->calendarioModel->getDiasDisponiblesAtencionEspecialista($idUsuario, $idSede);
+			$response['result'] = count($rs->result()) > 0;
+			if ($response['result']) {
+				$dias = [];
+				foreach ($rs->result_array() as $dia) {
+					array_push($dias, $dia['presencialDate']);
+				}
+				$response['data'] = $dias;
+				$response['msg'] = '¡Sedes de atención de especialista cargadas exitosamente!';
+			}else {
+				$response['msg'] = '¡No existen registros!';
+			}
+		}else {
+			$response['msg'] = "¡Parámetros inválidos!";
+		}
+
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 }
