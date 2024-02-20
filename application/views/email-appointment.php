@@ -382,7 +382,7 @@
 			<table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: auto;">
 				<tr>
 					<td class="bg_light" style="text-align: center;">
-						<p>© Departamento TI <?= date('YEAR') ?>
+						<p>© Departamento TI <?php echo date("Y"); ?>
 						</p>
 					</td>
 				</tr>

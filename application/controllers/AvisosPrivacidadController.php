@@ -38,7 +38,7 @@ class AvisosPrivacidadController extends BaseController
 		$fileExt = pathinfo($file, PATHINFO_EXTENSION);
 		$folder = 'dist/documentos/avisos-privacidad/';
 		$dataExpedienteGenerado = $this->nuevoNombreArchivo($nombreEspecialidad,$file);
-		$id_usuario_actual = $this->session->userdata('id_usuario');
+		$id_usuario_actual = $this->input->post('idUsuario');
 			if ($fileExt != 'pdf') {
 				// SE INTENTÓ SUBIR UN ARCHIVO DIFERENTE A UN .pdf (CORRIDA)
 				echo json_encode(array('code' => 400, 'message' => 'El archivo que se intenta subir no cuenta con la extención .pdf'));
@@ -78,8 +78,8 @@ class AvisosPrivacidadController extends BaseController
 								"tipoEspecialidad" => $idEspecialidad,
 								"creadoPor" => $id_usuario_actual,
 								"fechaCreacion" => date('Y-m-d H:i:s'),
-								"fechaModificacion" => null,
-								"modificadoPor" => null
+								"fechaModificacion" => date('Y-m-d H:i:s'),
+								"modificadoPor" => $id_usuario_actual
 							);
 
 							$result = $this->generalModel->addRecord('historialDocumento', $insertDocumentData);
