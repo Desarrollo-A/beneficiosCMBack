@@ -406,7 +406,7 @@
 				style="margin: auto;">
 				<tr>
 					<td class="bg_light" style="text-align: center;">
-						<p>© Departamento <?=  date("Y") ?></p>
+						<p>© Departamento <?php echo date("Y"); ?></p>
 					</td>
 				</tr>
 			</table>
