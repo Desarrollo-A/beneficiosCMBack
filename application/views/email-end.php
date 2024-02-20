@@ -406,7 +406,7 @@
 										<h5 class='no-margin custom-font2'><img src="<?= base_url() ?>dist/img/calendar-alt-solid.png" class='icon'> Fecha: <?= $data["fecha"] ?></h5>
 										<h5 class='no-margin custom-font2'><img src="<?= base_url() ?>dist/img/clock-regular.png" class='icon'> Horario: <?= $data["horaInicio"] ?> - <?= $data["horaFinal"] ?></h5>
 										</br>
-										<div class="text center">
+										<div class="text center" style="padding: 1em;">
 											<a class="btn btn-primary w-100 w-lg-50 align-center" href="<?= $data['link'] ?>" class="btn">Califica tu cita</a>
 										</div>
 
@@ -414,7 +414,7 @@
 								</td>
 							</tr>
 							<tr>
-								<td class="logo" style="text-align: center;">
+								<td class="logo" style="text-align: center; padding: 1em;">
 									<img src="<?= base_url() ?>dist/img/Logo_CM2.png" alt="" style="width: 110px; max-width: 110px; height: auto; margin: auto; display: block;">
 								</td>
 							</tr>

@@ -394,7 +394,7 @@
 								</td>
 							</tr>
 							<tr>
-								<td class="logo" style="text-align: center;">
+								<td class="logo" style="text-align: center; padding: 1em;">
 									<img src="<?= base_url() ?>dist/img/Logo_CM2.png" alt="" style="width: 110px; max-width: 110px; height: auto; margin: auto; display: block;">
 								</td>
 							</tr>
