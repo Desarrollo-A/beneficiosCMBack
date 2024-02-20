@@ -385,7 +385,7 @@
 				style="margin: auto;">
 				<tr>
 					<td class="bg_light" style="text-align: center;">
-						<p>© Departamento TI <?= date('YEAR') ?></p>
+						<p>© Departamento TI <?php echo date("Y"); ?></p>
 					</td>
 				</tr>
 			</table>
