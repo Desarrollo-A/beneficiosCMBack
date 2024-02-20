@@ -42,7 +42,7 @@ class ReportesController extends BaseController {
 		{
 			$data = array(
 				"observaciones" => $descripcion,
-				"estatus" => $estatus,
+				"estatusCita" => $estatus,
 				"modificadoPor" => $modificadoPor,
 			);
 			

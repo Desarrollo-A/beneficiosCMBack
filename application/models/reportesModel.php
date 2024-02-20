@@ -364,18 +364,21 @@ class ReportesModel extends CI_Model {
 
 	public function getCierrePacientes($dt){
 		
+		$idUsr = $dt["idUsr"];
+		$idEsp = isset($dt["idEsp"][0]) ? $dt["idEsp"][0] : '0';
+		$rol = $dt["roles"];
 		$area = isset($dt["esp"][0]) ? $dt["esp"][0] : '0';
 		$fechaI = $dt["fhI"];
 		$fechaF = $dt["fhF"];
 
-		if($area == "0"){
+		if($area == "0" && $rol == 4){
 
 			$query = $this->db-> query("SELECT COUNT(DISTINCT idPaciente) AS TotalPacientes
 			FROM citas
 			WHERE fechaModificacion BETWEEN '$fechaI' AND '$fechaF'");
 			return $query;
 
-		}else{
+		}else if($rol == 1 && $idEsp == "0" || ($area != "0" && $rol == 4 && $idEsp == "0")){
 
 			$area1 = isset($dt["esp"][0]) ? $dt["esp"][0] : '';
 			$area2 = isset($dt["esp"][1]) ? $dt["esp"][1] : '';
@@ -389,24 +392,48 @@ class ReportesModel extends CI_Model {
 			WHERE ct.fechaModificacion BETWEEN '$fechaI' AND '$fechaF' AND ps.puesto IN ('$area1', '$area2', '$area3', '$area4')");
 			return $query;
 
+		}else if($rol == 1 && $idEsp != "0" || ($area != "0" && $rol == 4 && $idEsp != "0")){
+
+			$nombres = implode("','", $dt["idEsp"]);
+
+				$query = $this->db->query("SELECT COUNT(DISTINCT idPaciente) AS TotalPacientes
+				FROM citas ct
+				INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
+				INNER JOIN puestos ps On ps.idPuesto = us.idPuesto
+				WHERE ct.fechaModificacion BETWEEN '$fechaI' AND '$fechaF' AND us.nombre IN ('$nombres')");
+				return $query;
+
+		}else if($rol == 3){
+
+			$query = $this->db-> query("SELECT COUNT(DISTINCT idPaciente) AS TotalPacientes
+			FROM citas ct
+			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
+			INNER JOIN puestos ps On ps.idPuesto = us.idPuesto
+			WHERE ct.fechaModificacion BETWEEN '$fechaI' AND '$fechaF' AND us.idUsuario = $idUsr");
+			return $query;
+		
 		}
 
 	}
 
 	public function getCierreIngresos($dt){
 		
+		$idUsr = $dt["idUsr"];
+		$idEsp = isset($dt["idEsp"][0]) ? $dt["idEsp"][0] : '0';
+		$rol = $dt["roles"];
 		$area = isset($dt["esp"][0]) ? $dt["esp"][0] : '0';
 		$fechaI = $dt["fhI"];
 		$fechaF = $dt["fhF"];
 
-		if($area == "0"){
+		if($area == "0" && $rol == 4){
 
 			$query = $this->db-> query("SELECT SUM(dp.cantidad) AS TotalIngreso
 			FROM citas ct
 			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
 			WHERE ct.estatusCita = 4 AND ct.fechaModificacion BETWEEN '$fechaI' AND '$fechaF'");
 			return $query;
-		}else{
+
+		}else if($rol == 1 && $idEsp == "0" || ($area != "0" && $rol == 4 && $idEsp == "0")){
 
 			$area1 = isset($dt["esp"][0]) ? $dt["esp"][0] : '';
 			$area2 = isset($dt["esp"][1]) ? $dt["esp"][1] : '';
@@ -418,8 +445,37 @@ class ReportesModel extends CI_Model {
 			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
 			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
 			INNER JOIN puestos ps On ps.idPuesto = us.idPuesto
-			WHERE ct.estatusCita = 4 AND ct.fechaModificacion BETWEEN $fechaI AND $fechaF
+			WHERE ct.estatusCita = 4 AND ct.fechaModificacion BETWEEN '$fechaI' AND '$fechaF'
 			AND ps.puesto IN ('$area1', '$area2', '$area3', '$area4')");
+			return $query;
+		
+		}else if($rol == 1 && $idEsp != "0" || ($area != "0" && $rol == 4 && $idEsp != "0")){
+
+			$nombres = implode("','", $dt["idEsp"]);
+
+				$query = $this->db->query("SELECT SUM(dp.cantidad) AS TotalIngreso
+					FROM citas ct
+					INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
+					INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
+					INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
+					WHERE ct.estatusCita = 4 
+					AND ct.fechaModificacion BETWEEN '$fechaI' AND '$fechaF'
+					AND us.nombre IN ('$nombres')");
+				return $query;
+
+		}else if($rol == 3){
+
+			$query = $this->db-> query("SELECT COALESCE(SUM(TotalIngreso), 0) AS TotalIngreso
+			FROM (
+				SELECT SUM(dp.cantidad) AS TotalIngreso
+				FROM citas ct
+				INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
+				INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
+				INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
+				WHERE ct.estatusCita = 4 
+				  AND ct.fechaModificacion BETWEEN '$fechaI' AND '$fechaF'
+				  AND us.idUsuario = $idUsr
+			) AS subconsulta;");
 			return $query;
 
 		}
