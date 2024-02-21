@@ -10,10 +10,8 @@ class CalendarioController extends BaseController{
 
 		$this->load->model('GeneralModel');
 		$this->load->model('UsuariosModel');
-		
-		$this->load->library('GoogleApi');
-
 		$this->load->library("email");
+		$this->load->library('GoogleApi');
 	}
 
 	public function getAllEvents()
