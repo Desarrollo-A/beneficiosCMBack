@@ -139,7 +139,7 @@ class calendarioModel extends CI_Model
 
     public function checkOccupied($dataValue, $fechaInicioSuma, $fechaFinalResta){
         $query = $this->db->query(
-            "SELECT *FROM horariosOcupadoss WHERE 
+            "SELECT *FROM horariosOcupados WHERE 
             ((fechaInicio BETWEEN ? AND ?) 
             OR (fechaFinal BETWEEN ? AND ?)
             OR (? BETWEEN fechaInicio AND fechaFinal) 
