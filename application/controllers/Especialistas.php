@@ -9,6 +9,7 @@ class Especialistas extends BaseController{
 
         $this->load->model('SedesModel');
         $this->load->model('EspecialistasModel');
+        $this->load->model('CitasModel');
     }
 
     public function sedes(){
@@ -37,6 +38,32 @@ class Especialistas extends BaseController{
         );
 
         foreach ($period as $date) {
+            $today = new DateTime();
+            if($date < $today){
+                $response = [
+                    'status' => 'error',
+                    'message' => "No puedes cambiar un horario de un dia que ya paso.",
+                ];
+
+                $this->json($response);
+            }
+
+            $start_day = $date->format("Y-m-d 00:00:00");
+            $end_day = $date->format("Y-m-d 23:59:59");
+
+            $has_citas = $this->CitasModel->getCitasPendientes($especialista, $sede, $start_day, $end_day);
+            
+            if($has_citas){
+                $day = $date->format("Y-m-d");
+
+                $response = [
+                    'status' => 'error',
+                    'message' => "No puedes cambiar el horario el $day, por que tienes citas pendientes.",
+                ];
+
+                $this->json($response);
+            }
+
             if($sede != 0){
                 $is_ok = $this->SedesModel->addHorarioPresencial($date->format("Y-m-d"), $sede, $especialista);
             }else{
