@@ -344,7 +344,7 @@ class CalendarioController extends BaseController{
 				"titulo" => $dataValue["titulo"],
 				"modificadoPor" => $dataValue["modificadoPor"],
 				"idAtencionXSede" => intval($dataValue["idCatalogo"]),
-				"tipoCita" => 3,
+				"tipoCita" => $reagenda == 1 ? $dataValue['oldEventTipo'] : 3,
 				"idDetalle" => $dataValue["idDetalle"],
 				"idEventoGoogle" => $reagenda == 1 ? $dataValue["idEventoGoogle"] : ''
 			];
@@ -352,17 +352,21 @@ class CalendarioController extends BaseController{
 			$checkUser = $this->UsuariosModel->checkUser($dataValue["idPaciente"], $year, $month);
 			$checkAppointment = $this->calendarioModel->checkAppointment($dataValue, $fechaInicioSuma, $fechaFinalResta);
 			$checkOccupied = $this->calendarioModel->checkOccupied($dataValue, $fechaInicioSuma, $fechaFinalResta);
-
+			// else if ($checkUser->num_rows() === 0 && $reagenda == 1 && $year == date('Y') && $month != date('m') || $checkUser->num_rows() === 0 && $reagenda == 1 && $year != date('Y') && $month == date('m'))
 			if ($checkAppointment->num_rows() > 0) {
 				$response["result"] = false;
 				$response["msg"] = "El paciente ocupo el horario";
 			} else if ($checkOccupied->num_rows() > 0) {
 				$response["result"] = false;
 				$response["msg"] = "Horario no disponible";
-			} else if ($checkUser->num_rows() === 0) {
+			}  else if ($checkUser->num_rows() === 0 && $reagenda == 0) {
 				$response["result"] = false;
 				$response["msg"] = " El paciente debe finalizar sus beneficios mensuales";
-			} else if (!isset($pass)) {
+			} else if($checkUser->num_rows() === 0 && $reagenda == 1 && $month != date('m') || $checkUser->num_rows() === 0 && $reagenda == 1 && $year != date('Y')){
+				$response["result"] = false;
+				$response["msg"] = "Solo se puede reagendar en el mismo mes";
+			} 
+			else if (!isset($pass)) {
 				$response["result"] = false;
 				$response["msg"] = "Error en las fechas seleccionadas";
 			} else {
