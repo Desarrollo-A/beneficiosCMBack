@@ -37,6 +37,15 @@ class Especialistas extends BaseController{
             $end
         );
 
+        if(!iterator_count($period)){
+            $response = [
+                'status' => 'error',
+                'message' => 'Rango de fechas erroneo.',
+            ];
+
+            $this->json($response);
+        }
+
         foreach ($period as $date) {
             $today = new DateTime();
             if($date < $today){
