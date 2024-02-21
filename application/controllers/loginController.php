@@ -174,7 +174,6 @@ class LoginController extends BaseController {
 		}
 	}
 	
-	}
 	public function me(){
 		$datosSession = json_decode( file_get_contents('php://input'));
 		$arraySession = explode('.',$datosSession->token);

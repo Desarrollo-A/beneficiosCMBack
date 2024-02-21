@@ -93,14 +93,19 @@ class EncuestasModel extends CI_Model {
     {
         $idUsuario = $dt["idUsuario"];
         $vigenciaInicio = $dt["vigenciaInicio"];
-        $vigenciaFin = "2024-04-02";
+        
         $trimestreInicio = $dt["trimDefault"];
         $fechaActual = "2024-04-02";
+
+        $fechaFn = "2024-04-02";
+		$fecha = new DateTime($fechaFn);
+		$fecha->modify('+1 day');
+        $vigenciaFin = $fecha->format('Y-m-d');
 
         $query_citas = $this->db->query("SELECT DISTINCT ct.idCita
         FROM usuarios us
         INNER JOIN citas ct ON ct.idPaciente = us.idUsuario
-        WHERE ct.estatusCita = 4 AND us.idUsuario = $idUsuario AND ct.fechaFinal BETWEEN '$vigenciaInicio' AND '$vigenciaFin'");
+        WHERE ct.estatusCita = 4 AND us.idUsuario = $idUsuario AND (ct.fechaFinal >= '$vigenciaInicio' AND ct.fechaFinal < '$vigenciaFin')");
 
         if ($query_citas->num_rows() > 0) {
             
