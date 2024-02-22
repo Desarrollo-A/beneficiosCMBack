@@ -55,7 +55,7 @@ class SedesModel extends CI_Model {
 
     public function getHorariosEspecialista($idEspecialista){
         $query = "SELECT
-        presencialXSede.idEvento AS id,
+        presencialXSede.idEvento AS id_horario,
         presencialXSede.presencialDate AS 'start',
         presencialXSede.presencialDate AS 'end',
         presencialXSede.idSede AS sede,

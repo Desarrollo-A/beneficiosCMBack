@@ -10,6 +10,7 @@ class CalendarioController extends BaseController{
 
 		$this->load->model('GeneralModel');
 		$this->load->model('UsuariosModel');
+		$this->load->model('EspecialistasModel');
 		$this->load->library("email");
 		$this->load->library('GoogleApi');
 	}
@@ -261,8 +262,7 @@ class CalendarioController extends BaseController{
 			$response['result'] = $checkAppointment->num_rows() === 0 && $checkOccupied->num_rows() === 0;
 
 			if ($response['result']) { // Validamos que no tenga registros con horarios repetidos
-				// Obtén la fecha actual
-				$fechaActual = new DateTime();
+				$fechaActual = new DateTime(); // Obtén la fecha actual
 				$fechaActual->modify('+3 hours');
 				$fechaActual = $fechaActual->format('Y-m-d H:i:s');
 				$response['result'] = $fechaInicio > $fechaActual; //Si la fecha de la cita es despues de la actual
@@ -314,13 +314,15 @@ class CalendarioController extends BaseController{
 		$year = date('Y', strtotime($dataValue["fechaInicio"]));
 		$month = date('m', strtotime($dataValue["fechaInicio"]));
 
-		// Obtén la fecha actual
-		$fechaActual = new DateTime();
+		$fechaActual = new DateTime(); // Obtén la fecha actual
 		$fechaActual->modify('+3 hours');
 		$fechaActual = $fechaActual->format('Y/m/d H:i:s');
 		$valid = $dataValue["fechaInicio"] > $fechaActual; //Si la fecha de la cita es despues de la actual
 
 		$reagenda = $dataValue["reagenda"]; // valor 1 es cuando se reagenda
+
+		$time = strtotime($dataValue["fechaInicio"]);
+		$fechaCheck = date('Y-m-d', $time);
 
 		if (!$valid) {
 			$response["result"] = false;
@@ -347,10 +349,11 @@ class CalendarioController extends BaseController{
 				"idEventoGoogle" => $reagenda == 1 ? $dataValue["idEventoGoogle"] : ''
 			];
 
+			$checkModalitie = $this->EspecialistasModel->checkModalitie($dataValue["idUsuario"], $fechaCheck);
 			$checkUser = $this->UsuariosModel->checkUser($dataValue["idPaciente"], $year, $month);
 			$checkAppointment = $this->calendarioModel->checkAppointment($dataValue, $fechaInicioSuma, $fechaFinalResta);
 			$checkOccupied = $this->calendarioModel->checkOccupied($dataValue, $fechaInicioSuma, $fechaFinalResta);
-			// else if ($checkUser->num_rows() === 0 && $reagenda == 1 && $year == date('Y') && $month != date('m') || $checkUser->num_rows() === 0 && $reagenda == 1 && $year != date('Y') && $month == date('m'))
+			
 			if ($checkAppointment->num_rows() > 0) {
 				$response["result"] = false;
 				$response["msg"] = "El paciente ocupo el horario";
@@ -363,10 +366,12 @@ class CalendarioController extends BaseController{
 			} else if($checkUser->num_rows() === 0 && $reagenda == 1 && $month != date('m') || $checkUser->num_rows() === 0 && $reagenda == 1 && $year != date('Y')){
 				$response["result"] = false;
 				$response["msg"] = "Solo se puede reagendar en el mismo mes";
-			} 
-			else if (!isset($pass)) {
+			} else if (!isset($pass)) {
 				$response["result"] = false;
 				$response["msg"] = "Error en las fechas seleccionadas";
+			} else if ($checkModalitie->num_rows() > 0 && $checkModalitie->result()[0]->idSede != $dataValue["idSede"] && $dataValue["modalidad"] == 1){
+				$response["result"] = false;
+				$response["msg"] = "La sede presencial es distinto al del paciente seleccionado";
 			} else {
 				$addRecord = $this->GeneralModel->addRecord("citas", $values);
 

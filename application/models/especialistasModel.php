@@ -47,6 +47,10 @@ class EspecialistasModel extends CI_Model {
     	return $this->db->query($query)->result();
     }
 
-	
+	public function checkModalitie($idEspecialista, $presencialDate){
+		$query = $this->db->query("SELECT idSede from presencialXSede where idEspecialista = ? AND presencialDate = ? ", array($idEspecialista, $presencialDate));
+		
+		return $query;
+	}
 
 }
