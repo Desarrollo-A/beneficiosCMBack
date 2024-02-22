@@ -186,8 +186,6 @@ class DashModel extends CI_Model {
 		}else{
 			return false;
 		}
-
-		
 			}else{
 				return false;
 			}

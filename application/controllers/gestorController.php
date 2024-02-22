@@ -18,25 +18,25 @@ class GestorController extends BaseController {
     public function getOficinasVal(){
 		$dt = $this->input->post('dataValue', true);
 		$data['data'] = $this->GestorModel->getOficinasVal($dt);
-		echo json_encode($data);
+		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
 	public function getEspecialistasVal(){
 		$dt = $this->input->post('dataValue', true);
 		$data['data'] = $this->GestorModel->getEspecialistasVal($dt);
-		echo json_encode($data);
+		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
 	public function getSedeNone(){
 		$dt = $this->input->post('dataValue', true);
 		$data['data'] = $this->GestorModel->getSedeNone($dt);
-		echo json_encode($data);
+		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
 	public function getSedeNoneEsp(){
 		$dt = $this->input->post('dataValue', true);
 		$data['data'] = $this->GestorModel->getSedeNoneEsp($dt);
-		echo json_encode($data);
+		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
 	public function insertAtxSede(){
@@ -117,13 +117,13 @@ class GestorController extends BaseController {
 	public function getEsp(){
 		$dt = $this->input->post('dataValue', true);
 		$data['data'] = $this->GestorModel->getEsp($dt);
-		echo json_encode($data);
+		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
 	public function getAtencionXsedeEsp(){
 		$dt = $this->input->post('dataValue', true);
 		$data['data'] = $this->GestorModel->getAtencionXsedeEsp($dt);
-		echo json_encode($data);
+		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
 	public function getOficinas(){
