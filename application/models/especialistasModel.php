@@ -41,7 +41,8 @@ class EspecialistasModel extends CI_Model {
     	$query = "SELECT *
     		FROM usuarios
     		WHERE
-    			idAreaBeneficio=$idAreaBeneficio
+    			(idAreaBeneficio=$idAreaBeneficio
+			OR idPuesto = $idAreaBeneficio)
     		AND idRol = 3";
 
     	return $this->db->query($query)->result();

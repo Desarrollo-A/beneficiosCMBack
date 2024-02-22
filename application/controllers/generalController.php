@@ -157,27 +157,27 @@ class GeneralController extends BaseController {
 
 	public function getAtencionXsede(){
 		$data['data'] = $this->GeneralModel->getAtencionXsede()->result();
-		echo json_encode($data);
+		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
 	public function getSedes(){
 		$data['data'] = $this->GeneralModel->getSedes()->result();
-		echo json_encode($data);
+		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
 	public function getOficinas(){
 		$data['data'] = $this->GeneralModel->getOficinas()->result();
-		echo json_encode($data);
+		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
 	public function getModalidades(){
 		$data['data'] = $this->GeneralModel->getModalidades()->result();
-		echo json_encode($data);
+		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
 	public function getSinAsigSede(){
 		$data['data'] = $this->GeneralModel->getSinAsigSede();
-		echo json_encode($data);
+		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
 	public function getCitas(){
