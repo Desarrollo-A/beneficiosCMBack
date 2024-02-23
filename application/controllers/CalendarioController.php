@@ -356,7 +356,7 @@ class CalendarioController extends BaseController{
 			
 			if ($checkAppointment->num_rows() > 0) {
 				$response["result"] = false;
-				$response["msg"] = "El paciente ocupo el horario";
+				$response["msg"] = "El horario ya esta ocupado";
 			} else if ($checkOccupied->num_rows() > 0) {
 				$response["result"] = false;
 				$response["msg"] = "Horario no disponible";
