@@ -10,12 +10,23 @@ class ReportesModel extends CI_Model {
 
     public function citas($dt)
 	{
-		if($dt === 'general'){
+		if($dt == 0){
 
 			$query = $this->db-> query("SELECT ct.idCita, pa.idUsuario AS idColab, us.nombre especialista, pa.nombre paciente, ps.puesto AS area, sd.sede,ct.titulo, op.nombre AS estatus, 
 			CONCAT (CONVERT(DATE,ct.fechaInicio), ' ', FORMAT(ct.fechaInicio, 'HH:mm'), ' - ', FORMAT(ct.fechaFinal, 'HH:mm')) AS horario, observaciones, us.sexo, 
 			ofi.oficina, oxc.nombre AS metodoPago, ct.estatusCita, ct.fechaModificacion, dep.depto, op2.nombre AS modalidad,
-			ISNULL(string_agg(ops.nombre, ', '), 'Sin motivos de cita') AS motivoCita,
+			ISNULL(string_agg(ops.nombre, ', '), 'Sin motivos de cita') AS motivoCita, 
+			'color' = CASE
+	            WHEN ct.estatusCita = 0 THEN '#ff0000'
+	            WHEN ct.estatusCita = 1 AND axs.tipoCita = 1 THEN '#ffa500'
+	            WHEN ct.estatusCita = 2 THEN '#ff0000'
+	            WHEN ct.estatusCita = 3 THEN '#808080'
+	            WHEN ct.estatusCita = 4 THEN '#008000'
+                WHEN ct.estatusCita = 5 THEN '#ff4d67'
+                WHEN ct.estatusCita = 6 THEN '#00ffff'
+                WHEN ct.estatusCita = 7 THEN '#ff0000'
+                WHEN ct.estatusCita = 1 AND axs.tipoCita = 2 THEN '#0000ff'
+	        END,
 			CASE 
 			WHEN ct.estatusCita IN (2, 7, 8) THEN 'Cancelado'
 			ELSE 'Exitoso'
@@ -42,7 +53,7 @@ class ReportesModel extends CI_Model {
 			LEFT JOIN opcionesPorCatalogo oxc ON oxc.idOpcion = dp.metodoPago AND oxc.idCatalogo = 11
 			LEFT JOIN motivosPorCita mpc ON mpc.idCita = ct.idCita
   			LEFT JOIN opcionesPorCatalogo ops ON ops.idCatalogo = cat.idCatalogo AND ops.idOpcion = mpc.idMotivo	
-			WHERE op.idCatalogo = 2
+			WHERE op.idCatalogo = 2 AND ct.estatusCita < 6
 			GROUP BY 
   				ct.idCita, 
   				pa.idUsuario, 
@@ -61,16 +72,28 @@ class ReportesModel extends CI_Model {
   				ct.estatusCita, 
   				ct.fechaModificacion,
 				dep.depto,
-				op2.nombre
+				op2.nombre,
+				axs.tipoCita
 			");
 			return $query;
 
-		}else if($dt === 'faltas'){
+		}else if($dt !== 0 && $dt !== 2){
 
 			$query = $this->db-> query("SELECT ct.idCita, pa.idUsuario AS idColab, us.nombre especialista, pa.nombre paciente, ps.puesto AS area, sd.sede,ct.titulo, op.nombre AS estatus, 
 			CONCAT (CONVERT(DATE,ct.fechaInicio), ' ', FORMAT(ct.fechaInicio, 'HH:mm'), ' - ', FORMAT(ct.fechaFinal, 'HH:mm')) AS horario, observaciones, us.sexo, 
 			ofi.oficina, oxc.nombre AS metodoPago, ct.estatusCita, ct.fechaModificacion, dep.depto, op2.nombre AS modalidad,
 			ISNULL(string_agg(ops.nombre, ', '), 'Sin motivos de cita') AS motivoCita,
+			'color' = CASE
+	            WHEN ct.estatusCita = 0 THEN '#ff0000'
+	            WHEN ct.estatusCita = 1 AND axs.tipoCita = 1 THEN '#ffa500'
+	            WHEN ct.estatusCita = 2 THEN '#ff0000'
+	            WHEN ct.estatusCita = 3 THEN '#808080'
+	            WHEN ct.estatusCita = 4 THEN '#008000'
+                WHEN ct.estatusCita = 5 THEN '#ff4d67'
+                WHEN ct.estatusCita = 6 THEN '#00ffff'
+                WHEN ct.estatusCita = 7 THEN '#ff0000'
+                WHEN ct.estatusCita = 1 AND axs.tipoCita = 2 THEN '#0000ff'
+	        END,
 			CASE 
 			WHEN ct.estatusCita IN (2, 7, 8) THEN 'Cancelado'
 			ELSE 'Exitoso'
@@ -97,7 +120,7 @@ class ReportesModel extends CI_Model {
 			LEFT JOIN opcionesPorCatalogo oxc ON oxc.idOpcion = dp.metodoPago AND oxc.idCatalogo = 11
 			LEFT JOIN motivosPorCita mpc ON mpc.idCita = ct.idCita
   			LEFT JOIN opcionesPorCatalogo ops ON ops.idCatalogo = cat.idCatalogo AND ops.idOpcion = mpc.idMotivo	
-			WHERE op.idCatalogo = 2 AND ct.estatusCita = 3
+			WHERE op.idCatalogo = 2 AND ct.estatusCita = $dt
 			GROUP BY 
   				ct.idCita, 
   				pa.idUsuario, 
@@ -116,16 +139,27 @@ class ReportesModel extends CI_Model {
   				ct.estatusCita, 
   				ct.fechaModificacion,
 				dep.depto,
-				op2.nombre
+				op2.nombre,
+				axs.tipoCita
 			");
 			return $query;
-
-		}else if($dt === 'justificadas'){
+		}else if($dt == 2){
 
 			$query = $this->db-> query("SELECT ct.idCita, pa.idUsuario AS idColab, us.nombre especialista, pa.nombre paciente, ps.puesto AS area, sd.sede,ct.titulo, op.nombre AS estatus, 
 			CONCAT (CONVERT(DATE,ct.fechaInicio), ' ', FORMAT(ct.fechaInicio, 'HH:mm'), ' - ', FORMAT(ct.fechaFinal, 'HH:mm')) AS horario, observaciones, us.sexo, 
 			ofi.oficina, oxc.nombre AS metodoPago, ct.estatusCita, ct.fechaModificacion, dep.depto, op2.nombre AS modalidad,
 			ISNULL(string_agg(ops.nombre, ', '), 'Sin motivos de cita') AS motivoCita,
+			'color' = CASE
+	            WHEN ct.estatusCita = 0 THEN '#ff0000'
+	            WHEN ct.estatusCita = 1 AND axs.tipoCita = 1 THEN '#ffa500'
+	            WHEN ct.estatusCita = 2 THEN '#ff0000'
+	            WHEN ct.estatusCita = 3 THEN '#808080'
+	            WHEN ct.estatusCita = 4 THEN '#008000'
+                WHEN ct.estatusCita = 5 THEN '#ff4d67'
+                WHEN ct.estatusCita = 6 THEN '#00ffff'
+                WHEN ct.estatusCita = 7 THEN '#ff0000'
+                WHEN ct.estatusCita = 1 AND axs.tipoCita = 2 THEN '#0000ff'
+	        END,
 			CASE 
 			WHEN ct.estatusCita IN (2, 7, 8) THEN 'Cancelado'
 			ELSE 'Exitoso'
@@ -152,7 +186,7 @@ class ReportesModel extends CI_Model {
 			LEFT JOIN opcionesPorCatalogo oxc ON oxc.idOpcion = dp.metodoPago AND oxc.idCatalogo = 11
 			LEFT JOIN motivosPorCita mpc ON mpc.idCita = ct.idCita
   			LEFT JOIN opcionesPorCatalogo ops ON ops.idCatalogo = cat.idCatalogo AND ops.idOpcion = mpc.idMotivo	
-			WHERE op.idCatalogo = 2 AND ct.estatusCita = 5
+			WHERE op.idCatalogo = 2 AND ct.estatusCita = 2 AND ct.estatusCita = 7
 			GROUP BY 
   				ct.idCita, 
   				pa.idUsuario, 
@@ -171,10 +205,10 @@ class ReportesModel extends CI_Model {
   				ct.estatusCita, 
   				ct.fechaModificacion,
 				dep.depto,
-				op2.nombre
+				op2.nombre,
+				axs.tipoCita
 			");
 			return $query;
-
 		}
 	}
 
@@ -467,6 +501,7 @@ class ReportesModel extends CI_Model {
 		$area = isset($dt["esp"][0]) ? $dt["esp"][0] : '0';
 		$fechaI = $dt["fhI"];
 		$fechaFn = $dt["fhF"];
+		$reporte = $dt["reporte"];
 
 		$mod = isset($dt["modalidad"][0]) ? $dt["modalidad"][0] : '0';
 
@@ -474,12 +509,14 @@ class ReportesModel extends CI_Model {
 		$fecha->modify('+1 day');
 		$fechaF = $fecha->format('Y-m-d');
 
+	if($reporte == 0){
+
 		if($area == "0" && $mod == "0" && $rol == 4){
 
 			$query = $this->db-> query("SELECT SUM(dp.cantidad) AS TotalIngreso
 			FROM citas ct
 			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-			WHERE ct.estatusCita = 4 AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')");
+			WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')");
 			return $query;
 
 		}else if($area != "0" && $rol == 4 && $idEsp == "0" && $mod == "0"){
@@ -491,7 +528,7 @@ class ReportesModel extends CI_Model {
 			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
 			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
 			INNER JOIN puestos ps On ps.idPuesto = us.idPuesto
-			WHERE ct.estatusCita = 4 AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+			WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
 			AND ps.puesto IN ('$ar')");
 			return $query;
 		
@@ -506,7 +543,7 @@ class ReportesModel extends CI_Model {
 			INNER JOIN puestos ps On ps.idPuesto = us.idPuesto
 			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
 			LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-			WHERE ct.estatusCita = 4 AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+			WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
 			AND op2.nombre IN ('$modalidad')");
 			return $query;
 		
@@ -522,7 +559,96 @@ class ReportesModel extends CI_Model {
 			INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
 			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
 			LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-			WHERE ct.estatusCita = 4 
+			WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+			AND us.nombre IN ('$nombres') AND op2.nombre IN ('$modalidad')");
+			return $query;
+
+		}else if($rol == 3 && $mod == "0"){
+
+			$query = $this->db-> query("SELECT COALESCE(SUM(TotalIngreso), 0) AS TotalIngreso
+			FROM (
+			SELECT SUM(dp.cantidad) AS TotalIngreso
+			FROM citas ct
+			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
+			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
+			INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
+			WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+			AND us.idUsuario = $idUsr
+			) AS subconsulta;");
+			return $query;
+
+		}else if($rol == 3 && $mod != "0"){
+
+			$modalidad = implode("','", $dt["modalidad"]);
+
+			$query = $this->db-> query("SELECT COALESCE(SUM(TotalIngreso), 0) AS TotalIngreso
+			FROM (
+			SELECT SUM(dp.cantidad) AS TotalIngreso
+			FROM citas ct
+			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
+			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
+			INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
+			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
+			LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
+			WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+			AND us.idUsuario = $idUsr AND op2.nombre IN ('$modalidad')
+			) AS subconsulta;");
+			return $query;
+
+		}
+
+	}else if($reporte !== 0 && $reporte !== 2)
+	{
+
+		if($area == "0" && $mod == "0" && $rol == 4){
+
+			$query = $this->db-> query("SELECT SUM(dp.cantidad) AS TotalIngreso
+			FROM citas ct
+			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
+			WHERE ct.estatusCita = $reporte AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')");
+			return $query;
+
+		}else if($area != "0" && $rol == 4 && $idEsp == "0" && $mod == "0"){
+
+			$ar = implode("','", $dt["esp"]);
+
+			$query = $this->db-> query("SELECT SUM(dp.cantidad) AS TotalIngreso
+			FROM citas ct
+			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
+			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
+			INNER JOIN puestos ps On ps.idPuesto = us.idPuesto
+			WHERE ct.estatusCita = $reporte AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+			AND ps.puesto IN ('$ar')");
+			return $query;
+		
+		}else if($area == "0" && $rol == 4 && $idEsp == "0" && $mod != "0"){
+
+			$modalidad = implode("','", $dt["modalidad"]);
+
+			$query = $this->db-> query("SELECT SUM(dp.cantidad) AS TotalIngreso
+			FROM citas ct
+			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
+			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
+			INNER JOIN puestos ps On ps.idPuesto = us.idPuesto
+			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
+			LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
+			WHERE ct.estatusCita = $reporte AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+			AND op2.nombre IN ('$modalidad')");
+			return $query;
+		
+		}else if($area != "0" && $rol == 4 && $idEsp != "0" && $mod != "0"){
+
+			$nombres = implode("','", $dt["idEsp"]);
+			$modalidad = implode("','", $dt["modalidad"]);
+
+			$query = $this->db->query("SELECT SUM(dp.cantidad) AS TotalIngreso
+			FROM citas ct
+			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
+			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
+			INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
+			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
+			LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
+			WHERE ct.estatusCita = $reporte
 			AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
 			AND us.nombre IN ('$nombres') AND op2.nombre IN ('$modalidad')");
 			return $query;
@@ -536,7 +662,7 @@ class ReportesModel extends CI_Model {
 			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
 			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
 			INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
-			WHERE ct.estatusCita = 4 
+			WHERE ct.estatusCita = $reporte
 			AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
 			AND us.idUsuario = $idUsr
 			) AS subconsulta;");
@@ -555,13 +681,107 @@ class ReportesModel extends CI_Model {
 			INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
 			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
 			LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-			WHERE ct.estatusCita = 4 
+			WHERE ct.estatusCita = $reporte
 			AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
 			AND us.idUsuario = $idUsr AND op2.nombre IN ('$modalidad')
 			) AS subconsulta;");
 			return $query;
 
 		}
+		
+	}else if($reporte == 2)
+	{
+
+		if($area == "0" && $mod == "0" && $rol == 4){
+
+			$query = $this->db-> query("SELECT SUM(dp.cantidad) AS TotalIngreso
+			FROM citas ct
+			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
+			WHERE ct.estatusCita = 2 AND ct.estatusCita = 7 AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')");
+			return $query;
+
+		}else if($area != "0" && $rol == 4 && $idEsp == "0" && $mod == "0"){
+
+			$ar = implode("','", $dt["esp"]);
+
+			$query = $this->db-> query("SELECT SUM(dp.cantidad) AS TotalIngreso
+			FROM citas ct
+			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
+			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
+			INNER JOIN puestos ps On ps.idPuesto = us.idPuesto
+			WHERE ct.estatusCita = 2 AND ct.estatusCita = 7 AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+			AND ps.puesto IN ('$ar')");
+			return $query;
+		
+		}else if($area == "0" && $rol == 4 && $idEsp == "0" && $mod != "0"){
+
+			$modalidad = implode("','", $dt["modalidad"]);
+
+			$query = $this->db-> query("SELECT SUM(dp.cantidad) AS TotalIngreso
+			FROM citas ct
+			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
+			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
+			INNER JOIN puestos ps On ps.idPuesto = us.idPuesto
+			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
+			LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
+			WHERE ct.estatusCita = 2 AND ct.estatusCita = 7 AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+			AND op2.nombre IN ('$modalidad')");
+			return $query;
+		
+		}else if($area != "0" && $rol == 4 && $idEsp != "0" && $mod != "0"){
+
+			$nombres = implode("','", $dt["idEsp"]);
+			$modalidad = implode("','", $dt["modalidad"]);
+
+			$query = $this->db->query("SELECT SUM(dp.cantidad) AS TotalIngreso
+			FROM citas ct
+			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
+			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
+			INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
+			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
+			LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
+			WHERE ct.estatusCita = 2 AND ct.estatusCita = 7
+			AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+			AND us.nombre IN ('$nombres') AND op2.nombre IN ('$modalidad')");
+			return $query;
+
+		}else if($rol == 3 && $mod == "0"){
+
+			$query = $this->db-> query("SELECT COALESCE(SUM(TotalIngreso), 0) AS TotalIngreso
+			FROM (
+			SELECT SUM(dp.cantidad) AS TotalIngreso
+			FROM citas ct
+			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
+			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
+			INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
+			WHERE ct.estatusCita = 2 AND ct.estatusCita = 7
+			AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+			AND us.idUsuario = $idUsr
+			) AS subconsulta;");
+			return $query;
+
+		}else if($rol == 3 && $mod != "0"){
+
+			$modalidad = implode("','", $dt["modalidad"]);
+
+			$query = $this->db-> query("SELECT COALESCE(SUM(TotalIngreso), 0) AS TotalIngreso
+			FROM (
+			SELECT SUM(dp.cantidad) AS TotalIngreso
+			FROM citas ct
+			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
+			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
+			INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
+			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
+			LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
+			WHERE ct.estatusCita = 2 AND ct.estatusCita = 7
+			AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+			AND us.idUsuario = $idUsr AND op2.nombre IN ('$modalidad')
+			) AS subconsulta;");
+			return $query;
+
+		}
+	}
+		
 	}
 
 	public function getSelectEspe($dt){
