@@ -27,7 +27,7 @@ class LoginController extends BaseController {
 	
 	public function addRegistroEmpleado(){
 		$this->db->trans_begin();
-		$datosEmpleado = $this->input->post('params');
+		$datosEmpleado = $this->input->post('dataValue[params]');
 
 		switch ($datosEmpleado['nsede']){
 			case 'QRO':
@@ -126,13 +126,12 @@ class LoginController extends BaseController {
 			$informacionDePuesto = $this->GeneralModel->getInfoPuesto($insertData["idPuesto"])->row();
 			
 			if (!$informacionDePuesto) {
-				echo json_encode(array("estatus" => -1, "mensaje" => "No hemos encontrado la información del puesto" ), JSON_NUMERIC_CHECK);
+				echo json_encode(array("result" => false, "msg" => "No hemos encontrado la información del puesto" ), JSON_NUMERIC_CHECK);
 			}else {
 				$canRegister = $informacionDePuesto->canRegister;
 
-				var_dump($canRegister);
 				if ($canRegister === 0 || $canRegister === '0') {
-					echo json_encode(array("estatus" => -1, "mensaje" => "Por el momento no puede gozar de los beneficios"), JSON_NUMERIC_CHECK);
+					echo json_encode(array("result" => false, "msg" => "Por el momento no puede gozar de los beneficios"), JSON_NUMERIC_CHECK);
 				}else {
 					$usuarioExiste = $this->GeneralModel->usuarioExiste($insertData["numContrato"]);
 				
@@ -155,22 +154,22 @@ class LoginController extends BaseController {
 							$this->db->trans_rollback();
 							
 							if(strpos($resultado['message'], "UNIQUE")){
-								echo json_encode(array("estatus" => 0, "mensaje" => "El número de empleado ingresado ya se encuentra registrado" ), JSON_NUMERIC_CHECK);
+								echo json_encode(array("result" => false, "msg" => "El número de empleado ingresado ya se encuentra registrado" ), JSON_NUMERIC_CHECK);
 							}else{
-								echo json_encode(array("estatus" => -1, "mensaje" => "Hubo un error al registrase" ), JSON_NUMERIC_CHECK);
+								echo json_encode(array("result" => false, "msg" => "Hubo un error al registrarse" ), JSON_NUMERIC_CHECK);
 							}
 						} else {
 							$this->db->trans_commit();
-							echo json_encode(array("estatus" => 1, "mensaje" => "Te has registrado con éxito"), JSON_NUMERIC_CHECK);
+							echo json_encode(array("result" => true, "msg" => "Te has registrado con éxito"), JSON_NUMERIC_CHECK);
 						}
 					}
 					else{
-						echo json_encode(array("estatus" => -1, "mensaje" => "El número de empleado ingresado ya se encuentra registrado" ), JSON_NUMERIC_CHECK);
+						echo json_encode(array("result" => false, "msg" => "El número de empleado ingresado ya se encuentra registrado" ), JSON_NUMERIC_CHECK);
 					}
 				}
 			}
 		} else {
-			echo json_encode(array("estatus" => -1, "mensaje" => "Faltan valores en tu perfil" ), JSON_NUMERIC_CHECK);
+			echo json_encode(array("result" => false, "msg" => "Faltan valores en tu perfil" ), JSON_NUMERIC_CHECK);
 		}
 	}
   

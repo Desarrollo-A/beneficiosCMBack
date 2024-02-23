@@ -228,78 +228,115 @@ class CalendarioController extends BaseController{
 		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
-	public function createAppointmentByColaborator()
-	{
-		$titulo = $this->input->post('dataValue[titulo]');
-		$idEspecialista = $this->input->post('dataValue[idEspecialista]');
-		$idPaciente = $this->input->post('dataValue[idPaciente]');
-		$observaciones = $this->input->post('dataValue[observaciones]');
-		$fechaInicio = $this->input->post('dataValue[fechaInicio]');
-		$fechaFinal = date('Y-m-d H:i:s', strtotime($fechaInicio . '+1 hour'));
-		$tipoCita = $this->input->post('dataValue[tipoCita]');
-		$idAtencionXSede = $this->input->post('dataValue[idAtencionXSede]');
-		$estatusCita = $this->input->post('dataValue[estatusCita]');
-		$detalle = $this->input->post('dataValue[detallePago]');
-		$idGoogleEvent = $this->input->post('dataValue[idGoogleEvent]');
+public function createAppointmentByColaborator()
+    {
+        $titulo = $this->input->post('dataValue[titulo]');
+        $idEspecialista = $this->input->post('dataValue[idEspecialista]');
+        $idPaciente = $this->input->post('dataValue[idPaciente]');
+        $observaciones = $this->input->post('dataValue[observaciones]');
+        $fechaInicio = $this->input->post('dataValue[fechaInicio]');
+        $fechaFinal = date('Y-m-d H:i:s', strtotime($fechaInicio . '+1 hour'));
+        $tipoCita = $this->input->post('dataValue[tipoCita]');
+        $idAtencionXSede = $this->input->post('dataValue[idAtencionXSede]');
+        $idSede = $this->input->post('dataValue[idSede]');
+        $estatusCita = $this->input->post('dataValue[estatusCita]');
+        $detalle = $this->input->post('dataValue[detallePago]');
+        $idGoogleEvent = $this->input->post('dataValue[idGoogleEvent]');
 
-		$response['result'] = isset(
-			$titulo,
-			$idEspecialista,
-			$idPaciente,
-			$observaciones,
-			$fechaInicio,
-			$fechaFinal,
-			$tipoCita,
-			$idAtencionXSede,
-			$estatusCita
-		);
-		if ($response['result']) { // Validamos que vengan todos los valores de post
-			$dataValue = ["idPaciente" => $idPaciente, "idUsuario" => $idEspecialista];
-			$fechaFinalResta = date('Y/m/d H:i:s', strtotime($fechaFinal . '-1 minute'));
-			$fechaInicioSuma = date('Y/m/d H:i:s', strtotime($fechaInicio . '+1 minute'));
-			$checkAppointment = $this->calendarioModel->checkAppointment($dataValue, $fechaInicioSuma, $fechaFinalResta);
-			$checkOccupied = $this->calendarioModel->checkOccupied($dataValue, $fechaInicioSuma, $fechaFinalResta);
-			$response['result'] = $checkAppointment->num_rows() === 0 && $checkOccupied->num_rows() === 0;
+        $response['result'] = isset(
+            $titulo,
+            $idEspecialista,
+            $idPaciente,
+            $observaciones,
+            $fechaInicio,
+            $fechaFinal,
+            $tipoCita,
+            $idAtencionXSede,
+            $estatusCita
+        );
+        if ($response['result']) { // Validamos que vengan todos los valores de post
+            // Validación para ver que tenga dias disponibles en su sede de manera presencial, que el especialista
+            // brinde la atención en su sede, y si la brinde que sea la unica y en caso que no que tenga dias asignados a esa sede. 
+            if ($tipoCita === "1") { 
+                $sedesatencion = $this->calendarioModel->getSedesDeAtencionEspecialista($idEspecialista);
+                $response['result'] = $sedesatencion->num_rows() > 0;
+                if ($response['result']) {
+                    $response['result'] = $sedesatencion->num_rows() > 1;
+                    if ($response['result']){
+                        foreach ($sedesatencion->result() as $row) {
+                            if ($row->value == $idSede) {
+                                $response['result'] = true;
+                                break;
+                            }
+                        }
+                        if ($response['result']) {
+                            $checkPresencial = $this->calendarioModel->checkPresencial($idSede, $idEspecialista, $tipoCita, $fechaInicio);
+                            $response['result'] = $checkPresencial->num_rows() > 0;
+                            if (!$response['result']) {
+                                $response['msg'] = "¡El especialista cambió los dias de atención!"; 
+                            }
+                        }else {
+                            $response['msg'] = "¡El especialista no brinda o atención en su sede!";
+                        }
+                    }else {
+                        $response['result'] = $sedesatencion->num_rows() === 1 && $sedesatencion->result()[0]->value == $idSede; 
+                        if (!$response['result']) {
+                            $response['msg'] = "¡El especialista no brinda atención en su sede!";
+                        }
+                    }
+                }else {
+                    $response['msg'] = "¡No se encontró el listado de atención del especialista!";
+                }
+            }
 
-			if ($response['result']) { // Validamos que no tenga registros con horarios repetidos
-				$fechaActual = new DateTime(); // Obtén la fecha actual
-				$fechaActual->modify('+3 hours');
-				$fechaActual = $fechaActual->format('Y-m-d H:i:s');
-				$response['result'] = $fechaInicio > $fechaActual; //Si la fecha de la cita es despues de la actual
+            if ($response['result']) {
+                $dataValue = ["idPaciente" => $idPaciente, "idUsuario" => $idEspecialista];
+                $fechaFinalResta = date('Y/m/d H:i:s', strtotime($fechaFinal . '-1 minute'));
+                $fechaInicioSuma = date('Y/m/d H:i:s', strtotime($fechaInicio . '+1 minute'));
+                $checkAppointment = $this->calendarioModel->checkAppointment($dataValue, $fechaInicioSuma, $fechaFinalResta);
+                $checkOccupied = $this->calendarioModel->checkOccupied($dataValue, $fechaInicioSuma, $fechaFinalResta);
+                $response['result'] = $checkAppointment->num_rows() === 0 && $checkOccupied->num_rows() === 0;
+                if ($response['result']) { // Validamos que no tenga registros con horarios repetidos
+                    // Obtén la fecha actual
+                    $fechaActual = new DateTime();
+                    $fechaActual->modify('+3 hours');
+                    $fechaActual = $fechaActual->format('Y-m-d H:i:s');
+                    $response['result'] = $fechaInicio > $fechaActual; //Si la fecha de la cita es despues de la actual
 
-				if ($response['result']) {
-					$values = [
-						"titulo" => $titulo, "idEspecialista" => $idEspecialista,
-						"idPaciente" => $idPaciente, "observaciones" => $observaciones,
-						"fechaInicio" => $fechaInicio, "fechaFinal" => $fechaFinal,
-						"tipoCita" => $tipoCita, "idAtencionXSede" => $idAtencionXSede,
-						"estatusCita" => $estatusCita, "creadoPor" => $idPaciente,
-						"fechaModificacion" => date('Y-m-d H:i:s'), "modificadoPor" => $idPaciente,
-						"idDetalle" => $detalle,
-						"idEventoGoogle" => $idGoogleEvent
-					];
-					$rs = $this->GeneralModel->addRecord("citas", $values);
-					$last_id = $this->db->insert_id();
-					$response["result"] = $rs;
-					$response["data"] = $last_id;
-					if ($response["result"]) {
-						$response["msg"] = "¡Se ha agendado la cita con éxito!";
-					} else {
-						$response["msg"] = "¡Surgió un error al intentar guardar la cita!";
-					}
-				} else {
-					$response['msg'] = "¡Horario de cita dentro del limite de horarios no permitidos!";
-				}
-			} else {
-				$response['msg'] = '¡El horario ya ha sido ocupado!';
-			}
-		}else {
-			$response['msg'] = "¡Parámetros inválidos!";
-		}       
+                    if ($response['result']) {
+                        $values = [
+                            "titulo" => $titulo, "idEspecialista" => $idEspecialista,
+                            "idPaciente" => $idPaciente, "observaciones" => $observaciones,
+                            "fechaInicio" => $fechaInicio, "fechaFinal" => $fechaFinal,
+                            "tipoCita" => $tipoCita, "idAtencionXSede" => $idAtencionXSede,
+                            "estatusCita" => $estatusCita, "creadoPor" => $idPaciente,
+                            "fechaModificacion" => date('Y-m-d H:i:s'), "modificadoPor" => $idPaciente,
+                            "idDetalle" => $detalle,
+                            "idEventoGoogle" => $idGoogleEvent
+                        ];
+                        $rs = $this->GeneralModel->addRecord("citas", $values);
+                        $last_id = $this->db->insert_id();
+                        $response["result"] = $rs;
+                        $response["data"] = $last_id;
+                        if ($response["result"]) {
+                            $response["msg"] = "¡Se ha agendado la cita con éxito!";
+                        } else {
+                            $response["msg"] = "¡Surgió un error al intentar guardar la cita!";
+                        }
+                    } else {
+                        $response['msg'] = "¡Horario de cita dentro del limite de horarios no permitidos!";
+                    }
+                } else {
+                    $response['msg'] = '¡El horario ya ha sido ocupado!';
+                }   
+            }
+        }else {
+            $response['msg'] = "¡Parámetros inválidos!";
+        }       
 
-		$this->output->set_content_type("application/json");
+        $this->output->set_content_type("application/json");
         $this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
-	}
+    }
 
 	public function createAppointment()
 	{

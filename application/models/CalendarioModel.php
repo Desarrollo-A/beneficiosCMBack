@@ -159,23 +159,13 @@ class calendarioModel extends CI_Model
         return $query;
     }
 
-    public function checkPresencial($dataValue, $fechaInicioSuma, $fechaFinalResta){
+    public function checkPresencial($idSede, $idEspecialista, $modalidad, $fecha){
         $query = $this->db->query(
-            "SELECT *FROM presencialXSede WHERE 
-            ((fechaInicio BETWEEN ? AND ?) 
-            OR (fechaFinal BETWEEN ? AND ?)
-            OR (? BETWEEN fechaInicio AND fechaFinal) 
-            OR (? BETWEEN fechaInicio AND fechaFinal))
-            AND idEspecialista = ?
-            AND estatus = ?",
-            array(
-                $fechaInicioSuma, $fechaFinalResta,
-                $fechaInicioSuma, $fechaFinalResta,
-                $fechaInicioSuma,
-                $fechaFinalResta,
-                $dataValue["idUsuario"],
-                1
-            )
+            "SELECT *from presencialXSede AS pxs
+            INNER JOIN atencionXSede AS axs ON axs.idEspecialista = pxs.idEspecialista 
+            WHERE axs.idSede = ? AND axs.idEspecialista = ? AND axs.tipoCita = ? 
+            AND presencialDate = ?;",
+            array( $idSede, $idEspecialista, $modalidad, $fecha )
         );
 
         return $query;
