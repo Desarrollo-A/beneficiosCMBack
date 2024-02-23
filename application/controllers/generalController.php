@@ -68,6 +68,24 @@ class GeneralController extends BaseController {
 		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
+	public function getCtVirtuales()
+    {
+		$dt = $this->input->post('dataValue', true);
+		
+		$data['data'] = $this->GeneralModel->getCtVirtuales($dt)->result();
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
+
+	public function getCtPresenciales()
+    {
+		$dt = $this->input->post('dataValue', true);
+		
+		$data['data'] = $this->GeneralModel->getCtPresenciales($dt)->result();
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
+
 	public function getAppointmentHistory(){
 
         $dt = $this->input->post('dataValue', true);

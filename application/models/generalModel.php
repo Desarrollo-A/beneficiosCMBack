@@ -101,13 +101,13 @@ class GeneralModel extends CI_Model {
         if($idRol == 1 || $idRol == 4){
             $query = $this->db-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS [pacientes] FROM usuarios us
             INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
-            WHERE us.idPuesto = $idData");
+            WHERE us.idPuesto = $idData AND ct.estatusCita = 4");
 
         }else if($idRol == 2){
             $query = $this->db-> query("SELECT COUNT(*) AS [pacientes] FROM citas WHERE idPaciente = $idData");
 
         }else if($idRol == 3){
-            $query = $this->db-> query("SELECT COUNT(DISTINCT idPaciente) AS [pacientes] FROM citas WHERE idEspecialista = $idData");
+            $query = $this->db-> query("SELECT COUNT(DISTINCT idPaciente) AS [pacientes] FROM citas WHERE idEspecialista = $idData AND ct.estatusCita = 4");
 
         }
         
@@ -163,6 +163,62 @@ class GeneralModel extends CI_Model {
             $query = $this->db-> query("SELECT COUNT(*) AS [penalizada] FROM citas WHERE idPaciente = $idData AND estatusCita = 3");
         }else if($idRol == 3){
             $query = $this->db-> query("SELECT COUNT(DISTINCT idPaciente) AS [penalizada] FROM citas WHERE idEspecialista = $idData AND estatusCita = 3");
+        }
+
+        return $query;
+    }
+
+    public function getCtVirtuales($dt)
+    {
+        $idData = $dt["idData"];
+        $idRol = $dt["idRol"];
+
+        if($idRol == 4){
+            $query = $this->db-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS [virtual] FROM usuarios us
+            INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
+			INNER JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
+			INNER JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
+            WHERE us.idPuesto = $idData AND axs.tipoCita = 2");
+        }else if($idRol == 2){
+            $query = $this->db-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS [virtual] FROM usuarios us
+            INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
+			INNER JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
+			INNER JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
+            WHERE ct.idPaciente = $idData AND axs.tipoCita = 2");
+        }else if($idRol == 3){
+            $query = $this->db-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS [virtual] FROM usuarios us
+            INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
+			INNER JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
+			INNER JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
+            WHERE ct.idEspecialista = $idData AND axs.tipoCita = 2");
+        }
+
+        return $query;
+    }
+
+    public function getCtPresenciales($dt)
+    {
+        $idData = $dt["idData"];
+        $idRol = $dt["idRol"];
+
+        if($idRol == 4){
+            $query = $this->db-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS [presencial] FROM usuarios us
+            INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
+			INNER JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
+			INNER JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
+            WHERE us.idPuesto = $idData AND axs.tipoCita = 1");
+        }else if($idRol == 2){
+            $query = $this->db-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS [presencial] FROM usuarios us
+            INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
+			INNER JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
+			INNER JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
+            WHERE ct.idPaciente = $idData AND axs.tipoCita = 1");
+        }else if($idRol == 3){
+            $query = $this->db-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS [presencial] FROM usuarios us
+            INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
+			INNER JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
+			INNER JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
+            WHERE ct.idEspecialista = $idData AND axs.tipoCita = 1");
         }
 
         return $query;
