@@ -12,6 +12,10 @@ class avisosPrivacidadModel extends CI_Model
 		WHEN idOpcion = 2 THEN 537
 		WHEN idOpcion = 3 THEN 686
 		WHEN idOpcion = 4 THEN 158
+		WHEN idOpcion = 585 THEN 585
+		WHEN idOpcion = 537 THEN 537
+		WHEN idOpcion = 686 THEN 686
+		WHEN idOpcion = 158 THEN 158
 		END
 		from opcionesPorCatalogo where idCatalogo = 1");
 		return $query->result_array();

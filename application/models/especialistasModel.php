@@ -41,12 +41,17 @@ class EspecialistasModel extends CI_Model {
     	$query = "SELECT *
     		FROM usuarios
     		WHERE
-    			idAreaBeneficio=$idAreaBeneficio
+    			(idAreaBeneficio=$idAreaBeneficio
+			OR idPuesto = $idAreaBeneficio)
     		AND idRol = 3";
 
     	return $this->db->query($query)->result();
     }
 
-	
+	public function checkModalitie($idEspecialista, $presencialDate){
+		$query = $this->db->query("SELECT idSede from presencialXSede where idEspecialista = ? AND presencialDate = ? ", array($idEspecialista, $presencialDate));
+		
+		return $query;
+	}
 
 }

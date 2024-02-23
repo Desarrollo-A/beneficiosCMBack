@@ -172,7 +172,7 @@ class LoginController extends BaseController {
 			echo json_encode(array("result" => false, "msg" => "Faltan valores en tu perfil" ), JSON_NUMERIC_CHECK);
 		}
 	}
-	
+  
 	public function me(){
 		$datosSession = json_decode( file_get_contents('php://input'));
 		$arraySession = explode('.',$datosSession->token);

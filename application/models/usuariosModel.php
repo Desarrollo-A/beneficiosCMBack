@@ -44,9 +44,10 @@ class UsuariosModel extends CI_Model {
 	public function getNameUser($idEspecialista)
 	{
 		$query = $this->db->query(
-			"SELECT US.*, US.nombre AS nombreCompleto, PS.puesto as nombrePuesto, PS.tipoPuesto FROM usuarios US
+			"SELECT US.*, CONCAT(US.nombre, ' ', '(', SE.sede, ')') AS nombreCompleto, PS.puesto as nombrePuesto, PS.tipoPuesto FROM usuarios US
 			 INNER JOIN puestos PS ON
 			 US.idPuesto = PS.idPuesto
+			 INNER JOIN sedes SE ON SE.idSede = US.idSede
 			 WHERE US.idRol = ?
 			 AND US.estatus = ?
 			 AND US.idSede

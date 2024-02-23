@@ -11,105 +11,19 @@ class Areas extends BaseController{
     }
 
     public function citas(){
+        
         $area = $this->input->get('area');
 
-        $citas = [
-            0 => [
-                'x' => 'Especialista 1',
-                'y' => 20,
-                'goals' => [
-                    0 => [
-                        'name' => 'Meta',
-                        'value' => 100,
-                        'strokeColor' => 'red',
-                    ]
-                ]
-            ],
-            1 => [
-                'x' => 'Especialista 1',
-                'y' => 20,
-                'goals' => [
-                    0 => [
-                        'name' => 'Meta',
-                        'value' => 100,
-                        'strokeColor' => 'red',
-                    ]
-                ]
-            ],
-            2 => [
-                'x' => 'Especialista 1',
-                'y' => 60,
-                'goals' => [
-                    0 => [
-                        'name' => 'Meta',
-                        'value' => 150,
-                        'strokeColor' => 'red',
-                    ]
-                ]
-            ],
-            3 => [
-                'x' => 'Especialista 1',
-                'y' => 50,
-                'goals' => [
-                    0 => [
-                        'name' => 'Meta',
-                        'value' => 100,
-                        'strokeColor' => 'red',
-                    ]
-                ]
-            ],
-            4 => [
-                'x' => 'Especialista 1',
-                'y' => 20,
-                'goals' => [
-                    0 => [
-                        'name' => 'Meta',
-                        'value' => 100,
-                        'strokeColor' => 'red',
-                    ]
-                ]
-            ],
-            5 => [
-                'x' => 'Especialista 1',
-                'y' => 40,
-                'goals' => [
-                    0 => [
-                        'name' => 'Meta',
-                        'value' => 100,
-                        'strokeColor' => 'red',
-                    ]
-                ]
-            ],
-            6 => [
-                'x' => 'Especialista 1',
-                'y' => 20,
-                'goals' => [
-                    0 => [
-                        'name' => 'Meta',
-                        'value' => 100,
-                        'strokeColor' => 'red',
-                    ]
-                ]
-            ],
-            7 => [
-                'x' => 'Especialista 1',
-                'y' => 30,
-                'goals' => [
-                    0 => [
-                        'name' => 'Meta',
-                        'value' => 100,
-                        'strokeColor' => 'red',
-                    ]
-                ]
-            ],
-            
-        ];
+        if(!$area){
+            $area = $this->input->get('puesto');
+        }
 
         $especialistas = $this->EspecialistasModel->getEspecialistasPorArea($area);
+        
         $inicio = date('Y-m-01');
         $fin = date('Y-m-t');
 
-        //$citas = [];
+        $citas = [];
         foreach ($especialistas as $key => $especialista) {
             $result = [
                 'x' => $especialista->nombre,
@@ -123,7 +37,7 @@ class Areas extends BaseController{
                 ]
             ];
 
-            //array_push($citas, $result);
+            array_push($citas, $result);
         }
 
         return $this->json($citas);
