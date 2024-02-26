@@ -28,9 +28,9 @@ class UsuariosModel extends CI_Model {
 
 	public function login($numEmpleado, $password)
 	{
-		$query = $this->db->query("	SELECT u.*, p.idPuesto, p.puesto, p.idArea, p.tipoPuesto, a.idDepto FROM USUARIOS as u
-		INNER JOIN puestos AS p ON u.idPuesto = P.idPuesto
-		INNER JOIN areas AS a ON a.idArea = p.idArea
+		$query = $this->db->query("SELECT u.*, p.idPuesto, p.puesto, p.idArea, p.tipoPuesto, a.idDepto FROM USUARIOS as u
+		FULL JOIN puestos AS p ON u.idPuesto = P.idPuesto
+		FULL JOIN areas AS a ON a.idArea = p.idArea
 		WHERE numEmpleado = ? AND password = ?;", array( $numEmpleado, $password ));
 		return $query;
 	}
@@ -98,56 +98,12 @@ class UsuariosModel extends CI_Model {
 		return $this->db->query($query);
 	}
 
-	public function getUserByNumEmpleado($numContrato){
-		$query = "SELECT
-				idUsuario,
-				numContrato,
-				numEmpleado,
-				nombre,
-				telPersonal,
-				telOficina,
-				idSede,
-				correo,
-				idArea,
-				sexo,
-				fechaIngreso,
-				idPuesto,
-				idContrato
+	public function getUserByNumEmpleado($idContrato){
+		$query = $this->db->query(
+			"SELECT idContrato 
 			FROM usuarios
-			WHERE
-				numContrato='$numContrato'";
+			WHERE idContrato=?", $idContrato);
 
-		return $this->db->query($query)->row();
-	}
-
-	public function updateUserData($idUsuario, $data){
-		$query = "UPDATE usuarios
-			SET
-				numContrato = '$data->numContrato',
-				numEmpleado = '$data->numEmpleado',
-				nombre = '$data->nombre',
-				telPersonal = '$data->telPersonal',
-				telOficina = '$data->telOficina',
-				idSede = $data->idSede,
-				correo = '$data->correo',
-				idArea = $data->idArea,
-				sexo = '$data->sexo',
-				fechaIngreso = '$data->fechaIngreso',
-				idPuesto = $data->idPuesto,
-				idContrato = '$data->idContrato'
-			WHERE
-				idUsuario=$idUsuario";
-
-		return $this->db->query($query);
-	}
-
-	public function setBajaEmpleado($idUsuario){
-		$query = "UPDATE usuarios
-			SET
-				estatus=0
-			WHERE
-				idUsuario=$idUsuario";
-
-		return $this->db->query($query);
+		return $query;
 	}
 }

@@ -10,12 +10,12 @@ class GeneralModel extends CI_Model {
 
     public function usuarios()
 	{
-		$query = $this->db-> query("SELECT *  FROM usuarios");
+		$query = $this->db-> query("SELECT * FROM usuarios");
 		return $query->result();
 	}
 
-    public function usuarioExiste($numContrato){
-        $query = $this->db-> query("SELECT *FROM usuarios WHERE numContrato = ?", $numContrato);
+    public function usuarioExiste($idContrato){
+        $query = $this->db-> query("SELECT *FROM usuarios WHERE idContrato = ?", $idContrato);
 		return $query;
     }
 
