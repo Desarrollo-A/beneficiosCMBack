@@ -204,4 +204,22 @@ class GestorController extends BaseController {
 		$data['data'] = $this->GestorModel->insertSedes($dt);
 	}
 
+	public function checkModalidades(){
+		$dataValue = $this->input->post('dataValue', true);
+
+		$check = $this->GestorModel->checkModalidades($dataValue);
+
+		if($check->num_rows() > 0){
+			$response["result"] = false;
+			$response["msg"] = 'La oficina ya tiene asignada sus modalidades para este especialista';
+		}
+		else{
+			$response["result"] = true;
+			$response["msg"] = 'Modalidades disponibles';
+		}
+
+		$this->output->set_content_type('application/json');
+		$this->output->set_output(json_encode($response));
+	}
+
 }

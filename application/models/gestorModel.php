@@ -204,4 +204,13 @@ class GestorModel extends CI_Model {
 
         return $query;
     }
+
+    public function checkModalidades($dataValue){
+        $query = $this->db->query(
+            "SELECT *FROM atencionXSede where idEspecialista = ? AND idOficina = ? AND tipoCita = ?",
+            array($dataValue["idEspecialista"], $dataValue["idOficina"], $dataValue["modalidad"])
+        );
+
+        return $query;
+    }
 }
