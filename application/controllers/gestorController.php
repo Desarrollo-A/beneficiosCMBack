@@ -50,6 +50,7 @@ class GestorController extends BaseController {
 			'idEspecialista' => $dt2["especialista"],
 			'idSede'         => $dt2["sede"],
 			'idOficina'      => $dt2["oficina"],
+			'idArea'         => $dt2["idArea"] == 0 ? null : $dt2["idArea"],
 		    'tipoCita'       => $dt2["modalidad"],
 			'estatus'        => 1,
 			'creadoPor'      => $dt2["usuario"],
@@ -216,6 +217,24 @@ class GestorController extends BaseController {
 		else{
 			$response["result"] = true;
 			$response["msg"] = 'Modalidades disponibles';
+		}
+
+		$this->output->set_content_type('application/json');
+		$this->output->set_output(json_encode($response));
+	}
+
+	public function getAreas(){
+		$get = $this->GestorModel->getAreas();
+
+		if($get->num_rows() > 0){
+			$response["data"] = $get->result();
+			$response["result"] = true;
+			$response["msg"] = "Se han encontrado registros de áreas";
+		}
+		else{
+			$response["data"] = [];
+			$response["result"] = false;
+			$response["msg"] = "No hay registros de áreas";
 		}
 
 		$this->output->set_content_type('application/json');
