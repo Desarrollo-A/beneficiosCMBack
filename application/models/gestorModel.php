@@ -213,4 +213,16 @@ class GestorModel extends CI_Model {
 
         return $query;
     }
+
+    public function getAreas(){
+        $query = $this->db->query(
+            "SELECT idArea, area, AR.idDepto, CONCAT(area, ' ', '(', DE.depto, ')') as nombre 
+            FROM areas AR 
+            INNER JOIN departamentos DE ON DE.idDepto = AR.idDepto 
+            UNION ALL
+            SELECT 0 as idArea, 'Sin área' as area, NULL as idDepto, 'SIN ÁREA' as nombre
+            ORDER BY idArea");
+
+        return $query;
+    }
 }
