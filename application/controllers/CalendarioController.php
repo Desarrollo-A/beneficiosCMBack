@@ -237,11 +237,13 @@ public function createAppointmentByColaborator()
         $fechaInicio = $this->input->post('dataValue[fechaInicio]');
         $fechaFinal = date('Y-m-d H:i:s', strtotime($fechaInicio . '+1 hour'));
         $tipoCita = $this->input->post('dataValue[tipoCita]');
+		$modalidad = $this->input->post('dataValue[modalidad]');
         $idAtencionXSede = $this->input->post('dataValue[idAtencionXSede]');
         $idSede = $this->input->post('dataValue[idSede]');
         $estatusCita = $this->input->post('dataValue[estatusCita]');
         $detalle = $this->input->post('dataValue[detallePago]');
         $idGoogleEvent = $this->input->post('dataValue[idGoogleEvent]');
+		$fecha = date('Y-m-d H:i:s');
 
         $response['result'] = isset(
             $titulo,
@@ -250,14 +252,15 @@ public function createAppointmentByColaborator()
             $observaciones,
             $fechaInicio,
             $fechaFinal,
-            $tipoCita,
+            $modalidad,
+			$tipoCita,
             $idAtencionXSede,
             $estatusCita
         );
         if ($response['result']) { // Validamos que vengan todos los valores de post
             // Validación para ver que tenga dias disponibles en su sede de manera presencial, que el especialista
             // brinde la atención en su sede, y si la brinde que sea la unica y en caso que no que tenga dias asignados a esa sede. 
-            if ($tipoCita === "1") { 
+            if ($modalidad === "1") { 
                 $sedesatencion = $this->calendarioModel->getSedesDeAtencionEspecialista($idEspecialista);
                 $response['result'] = $sedesatencion->num_rows() > 0;
                 if ($response['result']) {
@@ -270,7 +273,7 @@ public function createAppointmentByColaborator()
                             }
                         }
                         if ($response['result']) {
-                            $checkPresencial = $this->calendarioModel->checkPresencial($idSede, $idEspecialista, $tipoCita, $fechaInicio);
+                            $checkPresencial = $this->calendarioModel->checkPresencial($idSede, $idEspecialista, $modalidad, $fechaInicio);
                             $response['result'] = $checkPresencial->num_rows() > 0;
                             if (!$response['result']) {
                                 $response['msg'] = "¡El especialista cambió los dias de atención!"; 
@@ -310,8 +313,9 @@ public function createAppointmentByColaborator()
                             "fechaInicio" => $fechaInicio, "fechaFinal" => $fechaFinal,
                             "tipoCita" => $tipoCita, "idAtencionXSede" => $idAtencionXSede,
                             "estatusCita" => $estatusCita, "creadoPor" => $idPaciente,
-                            "fechaModificacion" => date('Y-m-d H:i:s'), "modificadoPor" => $idPaciente,
-                            "idDetalle" => $detalle,
+                            "fechaModificacion" => $fecha, 
+							"fechaCreacion" => $fecha,
+							"modificadoPor" => $idPaciente, "idDetalle" => $detalle,
                             "idEventoGoogle" => $idGoogleEvent
                         ];
                         $rs = $this->GeneralModel->addRecord("citas", $values);
@@ -1106,6 +1110,7 @@ public function createAppointmentByColaborator()
 	public function sendMail()
 	{
 		$data = $this->input->post('dataValue', true);
+		$fecha = date('Y-m-d H:i:s');
 
 		$data["data"] = $data;
 		$config['protocol']  = 'smtp';
@@ -1124,7 +1129,8 @@ public function createAppointmentByColaborator()
 		$this->email->from("no-reply@ciudadmaderas.com");
 		$this->email->to($data["correo"]); // 'correo' or 'correo, correo1' or [correo, correo1, correo2].
 		$this->email->message($html_message);
-		$this->email->subject("Citas Beneficios CM - " . date('d/m/Y - H:i:s A '));
+		$subject = "Citas Beneficios CM - " . $fecha;
+		$this->email->subject($subject);
 
 		if ($this->email->send()) {
 			$response["result"] = true;
@@ -1134,7 +1140,19 @@ public function createAppointmentByColaborator()
 			$response["result"] = false;
 			$response["msg"] = "Error al enviar el correo";
 		}
-		
+
+		$logData['fromEmail'] = $config['smtp_user'];
+		$logData['toEmail'] = implode(', ', $data["correo"]); // ['pedro', 'luis', 'equis']
+		$logData['subject'] = $subject;
+		$logData['content'] = $data["view"];
+		$logData['result'] = $response["result"];
+		$logData['estatus'] = 1;
+		$logData['creadoPor'] = $data["idUsuario"];
+		$logData['fechaCreacion'] = $fecha;
+		$logData['modificadoPor'] = $data["idUsuario"];
+		$logData['fechaModificacion'] = $fecha;
+
+		$this->GeneralModel->addRecord("emailLogs", $logData);
 		$this->output->set_content_type('application/json');
 		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
@@ -1142,6 +1160,7 @@ public function createAppointmentByColaborator()
 	public function updateDetallePaciente() {
 		$user  	 = $this->input->post('dataValue[usuario]');
 		$benefit = $this->input->post('dataValue[beneficio]');
+		$fecha   = date("Y-m-d H:i:s");
 
 		$response['result'] = isset($user, $benefit);
 		if ($response['result']) {
@@ -1159,7 +1178,7 @@ public function createAppointmentByColaborator()
 					$values = [
 						$column => 1,
 						"modificadoPor" => $user,
-						"fechaModificacion" => date("Y-m-d H:i:s"),
+						"fechaModificacion" => $fecha,
 					];
 					$updateRecord = $this->GeneralModel->updateRecord("detallePaciente", $values, "idUsuario", $user);
 					if ($updateRecord) {

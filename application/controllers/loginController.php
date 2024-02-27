@@ -104,9 +104,9 @@ class LoginController extends BaseController {
 			"idArea" => $datosEmpleado['idarea'],
 			"fechaIngreso" => $datosEmpleado['fingreso'],
 			"externo" => 0,
-			"creadoPor" => 0,
+			"creadoPor" => 1,
 			"fechaCreacion" => date('Y-m-d H:i:s'),
-			"modificadoPor" => 0,
+			"modificadoPor" => 1,
 			"fechaModificacion" => date('Y-m-d H:i:s'),
 			"idContrato" => isset($datosEmpleado['idcontrato']) ? $datosEmpleado['idcontrato'] : NULL,
 		);

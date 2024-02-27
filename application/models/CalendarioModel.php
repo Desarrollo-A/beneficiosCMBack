@@ -8,8 +8,9 @@ class calendarioModel extends CI_Model
         $query = $this->db->query(
             "SELECT CAST(idCita AS VARCHAR(36)) AS id, ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
             ct.fechaInicio AS occupied, ct.estatusCita AS estatus, ct.idDetalle, us.nombre, ct.idPaciente, ct.idEspecialista, ct.idAtencionXSede, 
-            ct.tipoCita, atc.tipoCita as modalidad, atc.idSede ,usEspe.idPuesto, us.telPersonal, usEspe.telPersonal as telefonoEspecialista, ofi.oficina, 
-            ofi.ubicación, pue.idArea, sed.sede, atc.idOficina, us.correo, usEspe.correo as correoEspecialista, usEspe.nombre as especialista, 
+            ct.tipoCita, atc.tipoCita as modalidad, atc.idSede ,usEspe.idPuesto, us.telPersonal, usEspe.telPersonal as telefonoEspecialista, 
+            CASE WHEN ofi.oficina IS NULL THEN 'VIRTUAL' ELSE ofi.oficina END as 'oficina', CASE WHEN ofi.ubicación IS NULL THEN 'VIRTUAL' ELSE ofi.ubicación END as 'ubicación',
+            pue.idArea, sed.sede, atc.idOficina, us.correo, usEspe.correo as correoEspecialista, usEspe.nombre as especialista, 
             usEspe.sexo as sexoEspecialista, tf.fechasFolio, ct.idEventoGoogle, ct.evaluacion,
             'color' = CASE
                 WHEN ct.estatusCita = 1 AND atc.tipoCita = 1 THEN '#ffa500'
@@ -468,8 +469,9 @@ class calendarioModel extends CI_Model
 
     public function getPendientesPago($idUsuario){
         $query = $this->db->query("SELECT CAST(idCita AS VARCHAR(36)) AS id, ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
-        ct.fechaInicio AS occupied, ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal, ofi.oficina, ofi.ubicación,
-        sed.sede , atc.idOficina, us.correo, usEspe.correo as correoEspecialista, usEspe.nombre as especialista, ct.idDetalle, usEspe.telPersonal as telefonoEspecialista,
+        ct.fechaInicio AS occupied, ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal, CASE WHEN ofi.oficina IS NULL THEN 'VIRTUAL' ELSE ofi.oficina END as 'oficina',
+        CASE WHEN ofi.ubicación IS NULL THEN 'VIRTUAL' ELSE ofi.ubicación END as 'ubicación', sed.sede , atc.idOficina, us.correo, usEspe.correo as correoEspecialista, 
+        usEspe.nombre as especialista, ct.idDetalle, usEspe.telPersonal as telefonoEspecialista,
         usEspe.sexo as sexoEspecialista, tf.fechasFolio, ct.idEventoGoogle, ct.evaluacion,
         beneficio = CASE 
         WHEN pue.idPuesto = 537 THEN 'Nutrición'
@@ -493,8 +495,9 @@ class calendarioModel extends CI_Model
 
     public function getPendientesEvaluacion($idUsuario){
         $query = $this->db->query("SELECT CAST(idCita AS VARCHAR(36)) AS id, ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
-        ct.fechaInicio AS occupied, ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal, ofi.oficina, ofi.ubicación,
-        sed.sede , atc.idOficina, us.correo, usEspe.correo as correoEspecialista, usEspe.nombre as especialista, ct.idDetalle, usEspe.telPersonal as telefonoEspecialista,
+        ct.fechaInicio AS occupied, ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal, CASE WHEN ofi.oficina IS NULL THEN 'VIRTUAL' ELSE ofi.oficina END as 'oficina',
+        CASE WHEN ofi.ubicación IS NULL THEN 'VIRTUAL' ELSE ofi.ubicación END as 'ubicación', sed.sede , atc.idOficina, us.correo, usEspe.correo as correoEspecialista, 
+        usEspe.nombre as especialista, ct.idDetalle, usEspe.telPersonal as telefonoEspecialista,
         usEspe.sexo as sexoEspecialista, tf.fechasFolio, ct.idEventoGoogle, ct.evaluacion,
         beneficio = CASE 
         WHEN pue.idPuesto = 537 THEN 'Nutrición'
@@ -569,8 +572,9 @@ class calendarioModel extends CI_Model
     public function getCitaById($idCita){
         $query = $this->db->query("SELECT CAST(idCita AS VARCHAR(36)) AS id, ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
         ct.fechaInicio AS occupied, ct.estatusCita AS estatus, ct.idDetalle, us.nombre, ct.idPaciente, ct.idEspecialista, ct.idAtencionXSede, 
-        ct.tipoCita, atc.tipoCita as modalidad, atc.idSede ,usEspe.idPuesto, us.telPersonal, usEspe.telPersonal as telefonoEspecialista, ofi.oficina, ofi.ubicación, pue.idArea,
-        sed.sede, atc.idOficina, us.correo, usEspe.correo as correoEspecialista, usEspe.nombre as especialista, usEspe.sexo as sexoEspecialista,
+        ct.tipoCita, atc.tipoCita as modalidad, atc.idSede ,usEspe.idPuesto, us.telPersonal, usEspe.telPersonal as telefonoEspecialista, 
+        CASE WHEN ofi.oficina IS NULL THEN 'VIRTUAL' ELSE ofi.oficina END as 'oficina', CASE WHEN ofi.ubicación IS NULL THEN 'VIRTUAL' ELSE ofi.ubicación END as 'ubicación',
+        pue.idArea, sed.sede, atc.idOficina, us.correo, usEspe.correo as correoEspecialista, usEspe.nombre as especialista, usEspe.sexo as sexoEspecialista,
         tf.fechasFolio, ct.idEventoGoogle, ct.evaluacion,
         'color' = CASE
                 WHEN ct.estatusCita = 1 AND atc.tipoCita = 1 THEN '#ffa500'
