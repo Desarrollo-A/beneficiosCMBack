@@ -99,24 +99,34 @@ class GeneralModel extends CI_Model {
         $idRol = $dt["idRol"];
         $slEs = $dt["slEs"];
         $idUser = $dt["idUser"];
+        $fhI = $dt["fhI"];
+        $fechaFn = $dt["fhF"];
+
+        $fecha = new DateTime($fechaFn);
+        $fecha->modify('+1 day');
+		$fhF = $fecha->format('Y-m-d');
 
         if($idRol == 1 || $idRol == 4){
             if( $slEs == 0){
                 $query = $this->db-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS [pacientes] FROM usuarios us
                 INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
-                WHERE us.idPuesto = $idData AND ct.estatusCita = 4");
+                WHERE us.idPuesto = $idData AND ct.estatusCita = 4 AND 
+				(ct.fechaModificacion >= '$fhI' AND ct.fechaModificacion <= '$fhF')");
             }else if( $slEs != 0 ){
 
                 $query = $this->db-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS [pacientes] FROM usuarios us
                 INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
-                WHERE us.idPuesto = $idData AND ct.estatusCita = 4 AND ct.idEspecialista = $slEs");
+                WHERE us.idPuesto = $idData AND ct.estatusCita = 4 AND ct.idEspecialista = $slEs AND 
+				(ct.fechaModificacion >= '$fhI' AND ct.fechaModificacion <= '$fhF')");
             }
 
         }else if($idRol == 2){
-            $query = $this->db-> query("SELECT COUNT(*) AS [pacientes] FROM citas WHERE idPaciente = $idUser");
+            $query = $this->db-> query("SELECT COUNT(*) AS [pacientes] FROM citas WHERE idPaciente = $idUser AND 
+            (fechaModificacion >= '$fhI' AND fechaModificacion <= '$fhF')");
 
         }else if($idRol == 3){
-            $query = $this->db-> query("SELECT COUNT(DISTINCT idPaciente) AS [pacientes] FROM citas WHERE idEspecialista = $idUser AND estatusCita = 4");
+            $query = $this->db-> query("SELECT COUNT(DISTINCT idPaciente) AS [pacientes] FROM citas WHERE idEspecialista = $idUser AND estatusCita = 4 AND 
+            (fechaModificacion >= '$fhI' AND fechaModificacion <= '$fhF')");
 
         }
         
@@ -129,6 +139,12 @@ class GeneralModel extends CI_Model {
         $idRol = $dt["idRol"];
         $slEs = $dt["slEs"];
         $idUser = $dt["idUser"];
+        $fhI = $dt["fhI"];
+        $fechaFn = $dt["fhF"];
+
+        $fecha = new DateTime($fechaFn);
+        $fecha->modify('+1 day');
+		$fhF = $fecha->format('Y-m-d');
 
         if($idRol == 1 || $idRol == 4){
 
@@ -136,20 +152,24 @@ class GeneralModel extends CI_Model {
 
             $query = $this->db-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS [asistencia] FROM usuarios us
             INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
-            WHERE us.idPuesto = $idData AND ct.estatusCita = 4");
+            WHERE us.idPuesto = $idData AND ct.estatusCita = 4 AND 
+				(ct.fechaModificacion >= '$fhI' AND ct.fechaModificacion <= '$fhF')");
 
             }else if( $slEs != 0 ){
             
             $query = $this->db-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS [asistencia] FROM usuarios us
             INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
-            WHERE us.idPuesto = $idData AND ct.estatusCita = 4 AND ct.idEspecialista = $slEs");
+            WHERE us.idPuesto = $idData AND ct.estatusCita = 4 AND ct.idEspecialista = $slEs AND 
+			(ct.fechaModificacion >= '$fhI' AND ct.fechaModificacion <= '$fhF')");
 
             }
 
         }else if($idRol == 2){
-            $query = $this->db-> query("SELECT COUNT(*) AS [asistencia] FROM citas WHERE idPaciente = $idUser AND estatusCita = 4");
+            $query = $this->db-> query("SELECT COUNT(*) AS [asistencia] FROM citas WHERE idPaciente = $idUser AND estatusCita = 4 AND 
+            (fechaModificacion >= '$fhI' AND fechaModificacion <= '$fhF')");
         }else if($idRol == 3){
-            $query = $this->db-> query("SELECT COUNT(DISTINCT idPaciente) AS [asistencia] FROM citas WHERE idEspecialista = $idUser AND estatusCita = 4");
+            $query = $this->db-> query("SELECT COUNT(DISTINCT idPaciente) AS [asistencia] FROM citas WHERE idEspecialista = $idUser AND estatusCita = 4 AND 
+            (fechaModificacion >= '$fhI' AND fechaModificacion <= '$fhF')");
         }
 
         return $query;
@@ -161,6 +181,12 @@ class GeneralModel extends CI_Model {
         $idRol = $dt["idRol"];
         $slEs = $dt["slEs"];
         $idUser = $dt["idUser"];
+        $fhI = $dt["fhI"];
+        $fechaFn = $dt["fhF"];
+
+        $fecha = new DateTime($fechaFn);
+        $fecha->modify('+1 day');
+		$fhF = $fecha->format('Y-m-d');
 
         if($idRol == 1 || $idRol == 4){
 
@@ -168,20 +194,24 @@ class GeneralModel extends CI_Model {
 
             $query = $this->db-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS [cancelada] FROM usuarios us
             INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
-            WHERE us.idPuesto = $idData AND ct.estatusCita = 2");
+            WHERE us.idPuesto = $idData AND ct.estatusCita = 2 AND 
+			(ct.fechaModificacion >= '$fhI' AND ct.fechaModificacion <= '$fhF')");
 
             }else if( $slEs != 0 ){
                         
                 $query = $this->db-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS [cancelada] FROM usuarios us
                 INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
-                WHERE us.idPuesto = $idData AND ct.estatusCita = 2 AND ct.idEspecialista = $slEs");
+                WHERE us.idPuesto = $idData AND ct.estatusCita = 2 AND ct.idEspecialista = $slEs AND 
+			    (ct.fechaModificacion >= '$fhI' AND ct.fechaModificacion <= '$fhF')");
 
             }
 
         }else if($idRol == 2){
-            $query = $this->db-> query("SELECT COUNT(*) AS [cancelada] FROM citas WHERE idPaciente = $idUser AND estatusCita = 2");
+            $query = $this->db-> query("SELECT COUNT(*) AS [cancelada] FROM citas WHERE idPaciente = $idUser AND estatusCita = 2
+            AND (fechaModificacion >= '$fhI' AND fechaModificacion <= '$fhF')");
         }else if($idRol == 3){
-            $query = $this->db-> query("SELECT COUNT(DISTINCT idPaciente) AS [cancelada] FROM citas WHERE idEspecialista = $idUser AND estatusCita = 2");
+            $query = $this->db-> query("SELECT COUNT(DISTINCT idPaciente) AS [cancelada] FROM citas WHERE idEspecialista = $idUser AND estatusCita = 2
+            AND (fechaModificacion >= '$fhI' AND fechaModificacion <= '$fhF')");
         }
 
         return $query;
@@ -193,6 +223,12 @@ class GeneralModel extends CI_Model {
         $idRol = $dt["idRol"];
         $slEs = $dt["slEs"];
         $idUser = $dt["idUser"];
+        $fhI = $dt["fhI"];
+        $fechaFn = $dt["fhF"];
+
+        $fecha = new DateTime($fechaFn);
+        $fecha->modify('+1 day');
+		$fhF = $fecha->format('Y-m-d');
 
         if($idRol == 1 || $idRol == 4){
 
@@ -200,20 +236,25 @@ class GeneralModel extends CI_Model {
 
             $query = $this->db-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS [penalizada] FROM usuarios us
             INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
-            WHERE us.idPuesto = $idData AND ct.estatusCita = 3");
+            WHERE us.idPuesto = $idData AND ct.estatusCita = 3 AND 
+			(ct.fechaModificacion >= '$fhI' AND ct.fechaModificacion <= '$fhF')");
 
             }else if( $slEs != 0 ){
                         
                 $query = $this->db-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS [penalizada] FROM usuarios us
                 INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
-                WHERE us.idPuesto = $idData AND ct.estatusCita = 3 AND ct.idEspecialista = $slEs");
+                WHERE us.idPuesto = $idData AND ct.estatusCita = 3 AND ct.idEspecialista = $slEs
+                AND 
+			    (ct.fechaModificacion >= '$fhI' AND ct.fechaModificacion <= '$fhF')");
 
             }
 
         }else if($idRol == 2){
-            $query = $this->db-> query("SELECT COUNT(*) AS [penalizada] FROM citas WHERE idPaciente = $idUser AND estatusCita = 3");
+            $query = $this->db-> query("SELECT COUNT(*) AS [penalizada] FROM citas WHERE idPaciente = $idUser AND estatusCita = 3
+            AND (fechaModificacion >= '$fhI' AND fechaModificacion <= '$fhF')");
         }else if($idRol == 3){
-            $query = $this->db-> query("SELECT COUNT(DISTINCT idPaciente) AS [penalizada] FROM citas WHERE idEspecialista = $idUser AND estatusCita = 3");
+            $query = $this->db-> query("SELECT COUNT(DISTINCT idPaciente) AS [penalizada] FROM citas WHERE idEspecialista = $idUser AND estatusCita = 3
+            AND (fechaModificacion >= '$fhI' AND fechaModificacion <= '$fhF')");
         }
 
         return $query;
@@ -225,6 +266,12 @@ class GeneralModel extends CI_Model {
         $idRol = $dt["idRol"];
         $slEs = $dt["slEs"];
         $idUser = $dt["idUser"];
+        $fhI = $dt["fhI"];
+        $fechaFn = $dt["fhF"];
+
+        $fecha = new DateTime($fechaFn);
+        $fecha->modify('+1 day');
+		$fhF = $fecha->format('Y-m-d');
 
         if($idRol == 4){
 
@@ -234,7 +281,8 @@ class GeneralModel extends CI_Model {
             INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
 			INNER JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
 			INNER JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-            WHERE us.idPuesto = $idData AND axs.tipoCita = 2");
+            WHERE us.idPuesto = $idData AND axs.tipoCita = 2 AND 
+		    (ct.fechaModificacion >= '$fhI' AND ct.fechaModificacion <= '$fhF')");
 
             }else if( $slEs != 0 ){
                         
@@ -242,7 +290,8 @@ class GeneralModel extends CI_Model {
                 INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
                 INNER JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
                 INNER JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-                WHERE us.idPuesto = $idData AND axs.tipoCita = 2 AND ct.idEspecialista = $slEs");
+                WHERE us.idPuesto = $idData AND axs.tipoCita = 2 AND ct.idEspecialista = $slEs AND 
+			    (ct.fechaModificacion >= '$fhI' AND ct.fechaModificacion <= '$fhF')");
 
             }
 
@@ -251,13 +300,15 @@ class GeneralModel extends CI_Model {
             INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
 			INNER JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
 			INNER JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-            WHERE ct.idPaciente = $idUser AND axs.tipoCita = 2");
+            WHERE ct.idPaciente = $idUser AND axs.tipoCita = 2 AND 
+			(ct.fechaModificacion >= '$fhI' AND ct.fechaModificacion <= '$fhF')");
         }else if($idRol == 3){
             $query = $this->db-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS [virtual] FROM usuarios us
             INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
 			INNER JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
 			INNER JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-            WHERE ct.idEspecialista = $idUser AND axs.tipoCita = 2");
+            WHERE ct.idEspecialista = $idUser AND axs.tipoCita = 2 AND 
+			(ct.fechaModificacion >= '$fhI' AND ct.fechaModificacion <= '$fhF')");
         }
 
         return $query;
@@ -269,6 +320,12 @@ class GeneralModel extends CI_Model {
         $idRol = $dt["idRol"];
         $slEs = $dt["slEs"];
         $idUser = $dt["idUser"];
+        $fhI = $dt["fhI"];
+        $fechaFn = $dt["fhF"];
+
+        $fecha = new DateTime($fechaFn);
+        $fecha->modify('+1 day');
+		$fhF = $fecha->format('Y-m-d');
 
         if($idRol == 4){
 
@@ -278,7 +335,8 @@ class GeneralModel extends CI_Model {
                 INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
                 INNER JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
                 INNER JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-                WHERE us.idPuesto = $idData AND axs.tipoCita = 1");
+                WHERE us.idPuesto = $idData AND axs.tipoCita = 1 AND 
+			    (ct.fechaModificacion >= '$fhI' AND ct.fechaModificacion <= '$fhF')");
 
             }else if( $slEs != 0 ){
                         
@@ -286,7 +344,8 @@ class GeneralModel extends CI_Model {
                 INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
                 INNER JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
                 INNER JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-                WHERE us.idPuesto = $idData AND axs.tipoCita = 1 AND ct.idEspecialista = $slEs");
+                WHERE us.idPuesto = $idData AND axs.tipoCita = 1 AND ct.idEspecialista = $slEs AND 
+			    (ct.fechaModificacion >= '$fhI' AND ct.fechaModificacion <= '$fhF')");
 
                 }
         }else if($idRol == 2){
@@ -294,13 +353,15 @@ class GeneralModel extends CI_Model {
             INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
 			INNER JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
 			INNER JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-            WHERE ct.idPaciente = $idUser AND axs.tipoCita = 1");
+            WHERE ct.idPaciente = $idUser AND axs.tipoCita = 1 AND 
+			(ct.fechaModificacion >= '$fhI' AND ct.fechaModificacion <= '$fhF')");
         }else if($idRol == 3){
             $query = $this->db-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS [presencial] FROM usuarios us
             INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
 			INNER JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
 			INNER JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-            WHERE ct.idEspecialista = $idUser AND axs.tipoCita = 1");
+            WHERE ct.idEspecialista = $idUser AND axs.tipoCita = 1 AND 
+			(ct.fechaModificacion >= '$fhI' AND ct.fechaModificacion <= '$fhF')");
         }
 
         return $query;
