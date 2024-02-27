@@ -236,7 +236,7 @@ class Usuario extends BaseController {
 	public function updatePass(){
 		$idUsuario = $this->input->post('dataValue[idUsuario]');
 		$password = $this->input->post('dataValue[password]');
-		$newPass= $this->input->post('dataValue[newPassword]');
+		$newPass = $this->input->post('dataValue[newPassword]');
 
 			if(!empty($newPass))
 			{

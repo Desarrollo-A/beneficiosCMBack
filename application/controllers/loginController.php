@@ -79,13 +79,21 @@ class LoginController extends BaseController {
 
 		switch ($datosEmpleado['idpuesto']){
 			case "158":
+				$idRol = 3;
+				$areaBeneficio = 3;
 			case "585":
-			case "686": 
+				$idRol = 3;
+				$areaBeneficio = 6;
+			case "686":
+				$idRol = 3; 
+				$areaBeneficio = 5;
 			case "537":
 				$idRol = 3;
+				$areaBeneficio = 4;
 			break;
 			default:
 				$idRol = 2;
+				$areaBeneficio = NULL;
 			break;
 		}
 
@@ -101,13 +109,13 @@ class LoginController extends BaseController {
 			"estatus" => 1,
 			"idRol" => $idRol,
 			"sexo" => $datosEmpleado['sexo'],
-			"idArea" => $datosEmpleado['idarea'],
 			"fechaIngreso" => $datosEmpleado['fingreso'],
 			"externo" => 0,
 			"creadoPor" => 1,
 			"fechaCreacion" => date('Y-m-d H:i:s'),
 			"modificadoPor" => 1,
 			"fechaModificacion" => date('Y-m-d H:i:s'),
+			"idAreaBeneficio" => $areaBeneficio,
 		);
 
 		$filteredArray = array_filter($insertData, 'strlen');
@@ -118,6 +126,10 @@ class LoginController extends BaseController {
 		}
 
 		if (!isset($datosEmpleado['telefono_personal'])){
+			$longitudArreglo += 1;
+		}
+
+		if (!isset($areaBeneficio) && $idRol == 2){
 			$longitudArreglo += 1;
 		}
 
