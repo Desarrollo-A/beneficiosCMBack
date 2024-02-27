@@ -41,21 +41,84 @@ class GestorController extends BaseController {
 
 	public function insertAtxSede(){
 		$dt = $this->input->post('dataValue', true);
-		$data['data'] = $this->GestorModel->insertAtxSede($dt);
+
+		$dt2 = json_decode($dt, true);
+
+		$checkAxs = $this->GestorModel->checkAxs($dt2);
+
+        $data = [
+			'idEspecialista' => $dt2["especialista"],
+			'idSede'         => $dt2["sede"],
+			'idOficina'      => $dt2["oficina"],
+			'idArea'         => $dt2["idArea"] == 0 ? null : $dt2["idArea"],
+		    'tipoCita'       => $dt2["modalidad"],
+			'estatus'        => 1,
+			'creadoPor'      => $dt2["usuario"],
+			'fechaCreacion'  => date('Y-m-d h:i:s'),
+ 			'modificadoPor'  => $dt2["usuario"],
+			'fechaModificacion'  => date('Y-m-d h:i:s')
+		];
+
+		if($checkAxs->num_rows() > 0){
+			$response["result"] = false;
+			$response["msg"] = 'La atención por sede ya ha sido asignada anteriormente';
+		}
+		else{
+			$data = $this->GeneralModel->addRecord('atencionXSede', $data);
+
+			if($data){
+				$response["result"] = true;
+				$response["msg"] = 'Se registrado la atención por sede';
+			}
+			else{
+				$response["result"] = false;
+				$response["msg"] = 'No se ha guardado el registro';
+			}
+		}
+
+		$this->output->set_content_type('application/json');
+		$this->output->set_output(json_encode($response));
 	}
 
 	public function updateModalidad(){
 
-		$id= $this->input->post('dataValue[idDetallePnt]');
+		$idAts = $this->input->post('dataValue[idDetallePnt]');
 		$modalidad= $this->input->post('dataValue[modalidad]');
 
-		$data = array(
-			"tipoCita" => $modalidad,
-		);
+		$getAxs = $this->GestorModel->getAxs($idAts);
 
-		$response=$this->GeneralModel->updateRecord('atencionXSede', $data, 'idAtencionXSede', $id);
-		echo json_encode(array("estatus" => true, "msj" => "Estatus Actualizado!" ));
-				
+		$checkData = [
+			"especialista" => $getAxs->result()[0]->idEspecialista,
+			"sede"         => $getAxs->result()[0]->idSede,
+			"oficina"      => $getAxs->result()[0]->idOficina,
+			"modalidad"    => intval($modalidad)
+		];
+
+		$checkAxs = $this->GestorModel->checkAxs($checkData);
+
+		if($checkAxs->num_rows() > 0){
+			$response["result"] = false;
+			$response["msg"] = 'La atención por sede ya ha sido asignada anteriormente';
+		}
+		else{
+			$data = array(
+				"tipoCita" => $modalidad
+			);
+
+			$updateRecord = $this->GeneralModel->updateRecord('atencionXSede', $data, 'idAtencionXSede', $idAts);
+
+			if($updateRecord){
+				$response["result"] = true;
+				$response["msg"] = 'Se ha actualizado la atención por sede';
+			}
+			else{
+				$response["result"] = false;
+				$response["msg"] = 'Error al actualizar la atención por sede';
+			}
+		}
+		
+		$this->output->set_content_type('application/json');
+		$this->output->set_output(json_encode($response));
 	}
 
 	public function updateEspecialista(){
@@ -140,6 +203,42 @@ class GestorController extends BaseController {
 	public function insertSedes(){
 		$dt = $this->input->post('dataValue', true);
 		$data['data'] = $this->GestorModel->insertSedes($dt);
+	}
+
+	public function checkModalidades(){
+		$dataValue = $this->input->post('dataValue', true);
+
+		$check = $this->GestorModel->checkModalidades($dataValue);
+
+		if($check->num_rows() > 0){
+			$response["result"] = false;
+			$response["msg"] = 'La oficina ya tiene asignada sus modalidades para este especialista';
+		}
+		else{
+			$response["result"] = true;
+			$response["msg"] = 'Modalidades disponibles';
+		}
+
+		$this->output->set_content_type('application/json');
+		$this->output->set_output(json_encode($response));
+	}
+
+	public function getAreas(){
+		$get = $this->GestorModel->getAreas();
+
+		if($get->num_rows() > 0){
+			$response["data"] = $get->result();
+			$response["result"] = true;
+			$response["msg"] = "Se han encontrado registros de áreas";
+		}
+		else{
+			$response["data"] = [];
+			$response["result"] = false;
+			$response["msg"] = "No hay registros de áreas";
+		}
+
+		$this->output->set_content_type('application/json');
+		$this->output->set_output(json_encode($response));
 	}
 
 }

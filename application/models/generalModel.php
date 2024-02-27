@@ -10,12 +10,12 @@ class GeneralModel extends CI_Model {
 
     public function usuarios()
 	{
-		$query = $this->db-> query("SELECT *  FROM usuarios");
+		$query = $this->db-> query("SELECT * FROM usuarios");
 		return $query->result();
 	}
 
-    public function usuarioExiste($numContrato){
-        $query = $this->db-> query("SELECT *FROM usuarios WHERE numContrato = ?", $numContrato);
+    public function usuarioExiste($idContrato){
+        $query = $this->db-> query("SELECT *FROM usuarios WHERE idContrato = ?", $idContrato);
 		return $query;
     }
 
@@ -97,17 +97,26 @@ class GeneralModel extends CI_Model {
     {
         $idData = $dt["idData"];
         $idRol = $dt["idRol"];
+        $slEs = $dt["slEs"];
+        $idUser = $dt["idUser"];
 
         if($idRol == 1 || $idRol == 4){
-            $query = $this->db-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS [pacientes] FROM usuarios us
-            INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
-            WHERE us.idPuesto = $idData AND ct.estatusCita = 4");
+            if( $slEs == 0){
+                $query = $this->db-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS [pacientes] FROM usuarios us
+                INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
+                WHERE us.idPuesto = $idData AND ct.estatusCita = 4");
+            }else if( $slEs != 0 ){
+
+                $query = $this->db-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS [pacientes] FROM usuarios us
+                INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
+                WHERE us.idPuesto = $idData AND ct.estatusCita = 4 AND ct.idEspecialista = $slEs");
+            }
 
         }else if($idRol == 2){
-            $query = $this->db-> query("SELECT COUNT(*) AS [pacientes] FROM citas WHERE idPaciente = $idData");
+            $query = $this->db-> query("SELECT COUNT(*) AS [pacientes] FROM citas WHERE idPaciente = $idUser");
 
         }else if($idRol == 3){
-            $query = $this->db-> query("SELECT COUNT(DISTINCT idPaciente) AS [pacientes] FROM citas WHERE idEspecialista = $idData AND ct.estatusCita = 4");
+            $query = $this->db-> query("SELECT COUNT(DISTINCT idPaciente) AS [pacientes] FROM citas WHERE idEspecialista = $idUser AND estatusCita = 4");
 
         }
         
@@ -118,15 +127,29 @@ class GeneralModel extends CI_Model {
     {
         $idData = $dt["idData"];
         $idRol = $dt["idRol"];
+        $slEs = $dt["slEs"];
+        $idUser = $dt["idUser"];
 
         if($idRol == 1 || $idRol == 4){
+
+            if( $slEs == 0){
+
             $query = $this->db-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS [asistencia] FROM usuarios us
             INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
             WHERE us.idPuesto = $idData AND ct.estatusCita = 4");
+
+            }else if( $slEs != 0 ){
+            
+            $query = $this->db-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS [asistencia] FROM usuarios us
+            INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
+            WHERE us.idPuesto = $idData AND ct.estatusCita = 4 AND ct.idEspecialista = $slEs");
+
+            }
+
         }else if($idRol == 2){
-            $query = $this->db-> query("SELECT COUNT(*) AS [asistencia] FROM citas WHERE idPaciente = $idData AND estatusCita = 4");
+            $query = $this->db-> query("SELECT COUNT(*) AS [asistencia] FROM citas WHERE idPaciente = $idUser AND estatusCita = 4");
         }else if($idRol == 3){
-            $query = $this->db-> query("SELECT COUNT(DISTINCT idPaciente) AS [asistencia] FROM citas WHERE idEspecialista = $idData AND estatusCita = 4");
+            $query = $this->db-> query("SELECT COUNT(DISTINCT idPaciente) AS [asistencia] FROM citas WHERE idEspecialista = $idUser AND estatusCita = 4");
         }
 
         return $query;
@@ -136,15 +159,29 @@ class GeneralModel extends CI_Model {
     {
         $idData = $dt["idData"];
         $idRol = $dt["idRol"];
+        $slEs = $dt["slEs"];
+        $idUser = $dt["idUser"];
 
         if($idRol == 1 || $idRol == 4){
+
+            if( $slEs == 0){
+
             $query = $this->db-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS [cancelada] FROM usuarios us
             INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
             WHERE us.idPuesto = $idData AND ct.estatusCita = 2");
+
+            }else if( $slEs != 0 ){
+                        
+                $query = $this->db-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS [cancelada] FROM usuarios us
+                INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
+                WHERE us.idPuesto = $idData AND ct.estatusCita = 2 AND ct.idEspecialista = $slEs");
+
+            }
+
         }else if($idRol == 2){
-            $query = $this->db-> query("SELECT COUNT(*) AS [cancelada] FROM citas WHERE idPaciente = $idData AND estatusCita = 2");
+            $query = $this->db-> query("SELECT COUNT(*) AS [cancelada] FROM citas WHERE idPaciente = $idUser AND estatusCita = 2");
         }else if($idRol == 3){
-            $query = $this->db-> query("SELECT COUNT(DISTINCT idPaciente) AS [cancelada] FROM citas WHERE idEspecialista = $idData AND estatusCita = 2");
+            $query = $this->db-> query("SELECT COUNT(DISTINCT idPaciente) AS [cancelada] FROM citas WHERE idEspecialista = $idUser AND estatusCita = 2");
         }
 
         return $query;
@@ -154,15 +191,29 @@ class GeneralModel extends CI_Model {
     {
         $idData = $dt["idData"];
         $idRol = $dt["idRol"];
+        $slEs = $dt["slEs"];
+        $idUser = $dt["idUser"];
 
         if($idRol == 1 || $idRol == 4){
+
+            if( $slEs == 0){
+
             $query = $this->db-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS [penalizada] FROM usuarios us
             INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
             WHERE us.idPuesto = $idData AND ct.estatusCita = 3");
+
+            }else if( $slEs != 0 ){
+                        
+                $query = $this->db-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS [penalizada] FROM usuarios us
+                INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
+                WHERE us.idPuesto = $idData AND ct.estatusCita = 3 AND ct.idEspecialista = $slEs");
+
+            }
+
         }else if($idRol == 2){
-            $query = $this->db-> query("SELECT COUNT(*) AS [penalizada] FROM citas WHERE idPaciente = $idData AND estatusCita = 3");
+            $query = $this->db-> query("SELECT COUNT(*) AS [penalizada] FROM citas WHERE idPaciente = $idUser AND estatusCita = 3");
         }else if($idRol == 3){
-            $query = $this->db-> query("SELECT COUNT(DISTINCT idPaciente) AS [penalizada] FROM citas WHERE idEspecialista = $idData AND estatusCita = 3");
+            $query = $this->db-> query("SELECT COUNT(DISTINCT idPaciente) AS [penalizada] FROM citas WHERE idEspecialista = $idUser AND estatusCita = 3");
         }
 
         return $query;
@@ -172,25 +223,41 @@ class GeneralModel extends CI_Model {
     {
         $idData = $dt["idData"];
         $idRol = $dt["idRol"];
+        $slEs = $dt["slEs"];
+        $idUser = $dt["idUser"];
 
         if($idRol == 4){
+
+            if( $slEs == 0){
+
             $query = $this->db-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS [virtual] FROM usuarios us
             INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
 			INNER JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
 			INNER JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
             WHERE us.idPuesto = $idData AND axs.tipoCita = 2");
+
+            }else if( $slEs != 0 ){
+                        
+                $query = $this->db-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS [virtual] FROM usuarios us
+                INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
+                INNER JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
+                INNER JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
+                WHERE us.idPuesto = $idData AND axs.tipoCita = 2 AND ct.idEspecialista = $slEs");
+
+            }
+
         }else if($idRol == 2){
             $query = $this->db-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS [virtual] FROM usuarios us
             INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
 			INNER JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
 			INNER JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-            WHERE ct.idPaciente = $idData AND axs.tipoCita = 2");
+            WHERE ct.idPaciente = $idUser AND axs.tipoCita = 2");
         }else if($idRol == 3){
             $query = $this->db-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS [virtual] FROM usuarios us
             INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
 			INNER JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
 			INNER JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-            WHERE ct.idEspecialista = $idData AND axs.tipoCita = 2");
+            WHERE ct.idEspecialista = $idUser AND axs.tipoCita = 2");
         }
 
         return $query;
@@ -200,25 +267,40 @@ class GeneralModel extends CI_Model {
     {
         $idData = $dt["idData"];
         $idRol = $dt["idRol"];
+        $slEs = $dt["slEs"];
+        $idUser = $dt["idUser"];
 
         if($idRol == 4){
-            $query = $this->db-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS [presencial] FROM usuarios us
-            INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
-			INNER JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
-			INNER JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-            WHERE us.idPuesto = $idData AND axs.tipoCita = 1");
+
+            if( $slEs == 0){
+                
+                $query = $this->db-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS [presencial] FROM usuarios us
+                INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
+                INNER JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
+                INNER JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
+                WHERE us.idPuesto = $idData AND axs.tipoCita = 1");
+
+            }else if( $slEs != 0 ){
+                        
+                $query = $this->db-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS [presencial] FROM usuarios us
+                INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
+                INNER JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
+                INNER JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
+                WHERE us.idPuesto = $idData AND axs.tipoCita = 1 AND ct.idEspecialista = $slEs");
+
+                }
         }else if($idRol == 2){
             $query = $this->db-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS [presencial] FROM usuarios us
             INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
 			INNER JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
 			INNER JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-            WHERE ct.idPaciente = $idData AND axs.tipoCita = 1");
+            WHERE ct.idPaciente = $idUser AND axs.tipoCita = 1");
         }else if($idRol == 3){
             $query = $this->db-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS [presencial] FROM usuarios us
             INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
 			INNER JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
 			INNER JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-            WHERE ct.idEspecialista = $idData AND axs.tipoCita = 1");
+            WHERE ct.idEspecialista = $idUser AND axs.tipoCita = 1");
         }
 
         return $query;
@@ -244,7 +326,13 @@ class GeneralModel extends CI_Model {
         LEFT JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
 		LEFT JOIN opcionesPorCatalogo oxc ON oxc.idOpcion = dp.metodoPago AND oxc.idCatalogo = 11
 		LEFT JOIN motivosPorCita mpc ON mpc.idCita = ct.idCita
-  		LEFT JOIN opcionesPorCatalogo ops ON ops.idOpcion = mpc.idMotivo	
+		LEFT JOIN catalogos cat ON cat.idCatalogo = CASE 
+			WHEN es.idPuesto = 537 THEN 8
+			WHEN es.idPuesto = 585 THEN 7
+			WHEN es.idPuesto = 686 THEN 9
+			WHEN es.idPuesto = 158 THEN 6
+			ELSE es.idPuesto END 
+  		LEFT JOIN opcionesPorCatalogo ops ON ops.idOpcion = mpc.idMotivo AND ops.idCatalogo = cat.idCatalogo
 		WHERE ct.idPaciente = $idUsuario AND oc.idCatalogo = 2 AND es.idPuesto = $espe
 		GROUP BY us.nombre, es.nombre, ct.idPaciente, ct.titulo, oc.nombre, ct.estatusCita, ct.idDetalle, ct.tipoCita,
 		ct.fechaInicio, ct.fechaFinal
@@ -265,7 +353,13 @@ class GeneralModel extends CI_Model {
             LEFT JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
             LEFT JOIN opcionesPorCatalogo oxc ON oxc.idOpcion = dp.metodoPago AND oxc.idCatalogo = 11
             LEFT JOIN motivosPorCita mpc ON mpc.idCita = ct.idCita
-            LEFT JOIN opcionesPorCatalogo ops ON ops.idOpcion = mpc.idMotivo	
+            LEFT JOIN catalogos cat ON cat.idCatalogo = CASE 
+			WHEN es.idPuesto = 537 THEN 8
+			WHEN es.idPuesto = 585 THEN 7
+			WHEN es.idPuesto = 686 THEN 9
+			WHEN es.idPuesto = 158 THEN 6
+			ELSE es.idPuesto END 
+            LEFT JOIN opcionesPorCatalogo ops ON ops.idOpcion = mpc.idMotivo AND ops.idCatalogo = cat.idCatalogo	
             WHERE ct.idPaciente = $idUsuario AND oc.idCatalogo = 2 AND es.idPuesto = $espe AND es.idUsuario = $idEspe
             GROUP BY us.nombre, es.nombre, ct.idPaciente, ct.titulo, oc.nombre, ct.estatusCita, ct.idDetalle, ct.tipoCita,
             ct.fechaInicio, ct.fechaFinal
@@ -286,7 +380,7 @@ class GeneralModel extends CI_Model {
 
     public function getAtencionXsede(){
         
-        $query = $this->db->query("SELECT axs.idAtencionXSede AS id,axs.idSede, sd.sede, o.oficina, o.ubicación, us.nombre, ps.idPuesto, ps.puesto, op.nombre AS modalidad, axs.estatus
+        $query = $this->db->query("SELECT axs.idAtencionXSede AS id,axs.idSede, sd.sede, axs.idEspecialista, axs.tipoCita, o.idOficina, o.oficina, o.ubicación, us.nombre, ps.idPuesto, ps.puesto, op.nombre AS modalidad, axs.estatus
         FROM atencionXSede axs
         INNER JOIN sedes sd ON sd.idSede = axs.idSede
         INNER JOIN oficinas o ON o.idOficina = axs.idOficina

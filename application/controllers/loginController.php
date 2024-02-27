@@ -90,7 +90,7 @@ class LoginController extends BaseController {
 		}
 
 		$insertData = array(
-			"numContrato" =>  isset($datosEmpleado['num_empleado']) ? $datosEmpleado['num_empleado'] : NULL,
+			"idContrato" => isset($datosEmpleado['idcontrato']) ? $datosEmpleado['idcontrato'] : NULL,
 			"numEmpleado" => isset($datosEmpleado['num_empleado']) ? $datosEmpleado['num_empleado'] : NULL,
 			"nombre" => isset($datosEmpleado['nombre_persona']) ? $datosEmpleado['nombre_persona'].' '.$datosEmpleado['pri_apellido'].' '.$datosEmpleado['sec_apellido'] : NULL,
 			"telPersonal" => isset($datosEmpleado['telefono_personal']) ? $datosEmpleado['telefono_personal'] : NULL,
@@ -108,7 +108,6 @@ class LoginController extends BaseController {
 			"fechaCreacion" => date('Y-m-d H:i:s'),
 			"modificadoPor" => 1,
 			"fechaModificacion" => date('Y-m-d H:i:s'),
-			"idContrato" => isset($datosEmpleado['idcontrato']) ? $datosEmpleado['idcontrato'] : NULL,
 		);
 
 		$filteredArray = array_filter($insertData, 'strlen');
@@ -133,7 +132,7 @@ class LoginController extends BaseController {
 				if ($canRegister === 0 || $canRegister === '0') {
 					echo json_encode(array("result" => false, "msg" => "Por el momento no puede gozar de los beneficios"), JSON_NUMERIC_CHECK);
 				}else {
-					$usuarioExiste = $this->GeneralModel->usuarioExiste($insertData["numContrato"]);
+					$usuarioExiste = $this->GeneralModel->usuarioExiste($insertData["idContrato"]);
 				
 					if($usuarioExiste->num_rows() === 0){
 						$resultado = $this->GeneralModel->addRecord('usuarios',$insertData);
@@ -205,8 +204,8 @@ class LoginController extends BaseController {
 		}else{
 			$datosSesion = array(
 				'id_usuario' 	        => 		$data[0]->idUsuario,
+				'idContrato'            =>      $data[0]->idContrato,
 				'numEmpleado'           =>      $data[0]->numEmpleado,
-				'numContrato'           =>      $data[0]->numContrato,
 				'nombre' 		        => 		$data[0]->nombre,
 				'telPersonal' 		    => 		$data[0]->telPersonal,
 				'idPuesto' 		        => 		$data[0]->idPuesto,
@@ -221,7 +220,7 @@ class LoginController extends BaseController {
 			date_default_timezone_set('America/Mexico_City');
 			$time = time();
                     $dataTimeToken = array(
-						"userId"=>$data[0]->numContrato,
+						"userId"=>$data[0]->idContrato,
                         "iat" => $time, // Tiempo en que inició el token
                         "exp" => $time + (24 * 60 * 60), // Tiempo en el que expirará el token (24 horas)
                     );

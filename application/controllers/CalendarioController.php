@@ -421,10 +421,10 @@ public function createAppointmentByColaborator()
 				if ($addRecord) {
 					$response["result"] = true;
 					$response["data"] = $last_id;
-					$response["msg"] = "Se ha agendado a cita";
+					$response["msg"] = "Se ha agendado la cita";
 				} else {
 					$response["result"] = false;
-					$response["msg"] = "No se ha guardado la cita";
+					$response["msg"] = "Error al agendar";
 				}
 			}
 		}
