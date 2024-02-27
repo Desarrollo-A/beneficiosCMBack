@@ -196,6 +196,7 @@ class Usuario extends BaseController {
 		
 		if ($response['result']) {  
 			$data['fechaModificacion'] = $fecha;
+			$data['modificadoPor'] = $user;
 			$response['result'] = $this->GeneralModel->updateRecord('usuarios', $data, 'idUsuario', $user);
 	
 			if ($response['result']) {
@@ -235,7 +236,7 @@ class Usuario extends BaseController {
 	public function updatePass(){
 		$idUsuario = $this->input->post('dataValue[idUsuario]');
 		$password = $this->input->post('dataValue[password]');
-		$newPass= $this->input->post('dataValue[newPassword]');
+		$newPass = $this->input->post('dataValue[newPassword]');
 
 			if(!empty($newPass))
 			{
