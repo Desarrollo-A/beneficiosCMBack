@@ -43,14 +43,18 @@ class GestorController extends BaseController {
 		$dt = $this->input->post('dataValue', true);
 
 		$dt2 = json_decode($dt, true);
+		$idArea = $dt2["idArea"] == 0 ? null : $dt2["idArea"];
 
-		$checkAxs = $this->GestorModel->checkAxs($dt2);
-
+		if(is_null($idArea))
+			$checkAxs = $this->GestorModel->checkAxsNull($dt2);
+		else
+			$checkAxs = $this->GestorModel->checkAxs($dt2, $idArea);
+		
         $data = [
 			'idEspecialista' => $dt2["especialista"],
 			'idSede'         => $dt2["sede"],
 			'idOficina'      => $dt2["oficina"],
-			'idArea'         => $dt2["idArea"] == 0 ? null : $dt2["idArea"],
+			'idArea'         => $idArea,
 		    'tipoCita'       => $dt2["modalidad"],
 			'estatus'        => 1,
 			'creadoPor'      => $dt2["usuario"],
@@ -91,10 +95,14 @@ class GestorController extends BaseController {
 			"especialista" => $getAxs->result()[0]->idEspecialista,
 			"sede"         => $getAxs->result()[0]->idSede,
 			"oficina"      => $getAxs->result()[0]->idOficina,
+			"idArea"       => $getAxs->result()[0]->idArea,
 			"modalidad"    => intval($modalidad)
 		];
 
-		$checkAxs = $this->GestorModel->checkAxs($checkData);
+		if(is_null($checkData["idArea"]))
+			$checkAxs = $this->GestorModel->checkAxsNull($checkData);
+		else
+			$checkAxs = $this->GestorModel->checkAxs($checkData, $checkData["idArea"]);
 
 		if($checkAxs->num_rows() > 0){
 			$response["result"] = false;
@@ -208,7 +216,10 @@ class GestorController extends BaseController {
 	public function checkModalidades(){
 		$dataValue = $this->input->post('dataValue', true);
 
-		$check = $this->GestorModel->checkModalidades($dataValue);
+		if($dataValue["idArea"] == 0)
+			$check = $this->GestorModel->checkModalidadesNull($dataValue);
+		else
+			$check = $this->GestorModel->checkModalidades($dataValue);
 
 		if($check->num_rows() > 0){
 			$response["result"] = false;
@@ -237,6 +248,51 @@ class GestorController extends BaseController {
 			$response["msg"] = "No hay registros de áreas";
 		}
 
+		$this->output->set_content_type('application/json');
+		$this->output->set_output(json_encode($response));
+	}
+
+	public function updateArea(){
+		$idAts = $this->input->post('dataValue[idDetallePnt]');
+		$idArea = $this->input->post('dataValue[idArea]');
+		$idAreaInsert = $idArea == 0 ? null : $idArea;
+
+		$getAxs = $this->GestorModel->getAxs($idAts);
+
+		$checkData = [
+			"especialista" => $getAxs->result()[0]->idEspecialista,
+			"sede"         => $getAxs->result()[0]->idSede,
+			"oficina"      => $getAxs->result()[0]->idOficina,
+			"idArea"       => $idArea,
+			"modalidad"    => $getAxs->result()[0]->tipoCita
+		];
+
+		if($idArea == 0)
+			$checkAxs = $this->GestorModel->checkAxsNull($checkData);
+		else
+			$checkAxs = $this->GestorModel->checkAxs($checkData, $checkData["idArea"]);
+
+		if($checkAxs->num_rows() > 0){
+			$response["result"] = false;
+			$response["msg"] = 'La atención por sede ya ha sido asignada anteriormente';
+		}
+		else{
+			$data = array(
+				"idArea" => $idAreaInsert
+			);
+
+			$updateRecord = $this->GeneralModel->updateRecord('atencionXSede', $data, 'idAtencionXSede', $idAts);
+
+			if($updateRecord){
+				$response["result"] = true;
+				$response["msg"] = 'Se ha actualizado la atención por sede';
+			}
+			else{
+				$response["result"] = false;
+				$response["msg"] = 'Error al actualizar la atención por sede';
+			}
+		}
+		
 		$this->output->set_content_type('application/json');
 		$this->output->set_output(json_encode($response));
 	}
