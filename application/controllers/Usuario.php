@@ -196,6 +196,7 @@ class Usuario extends BaseController {
 		
 		if ($response['result']) {  
 			$data['fechaModificacion'] = $fecha;
+			$data['modificadoPor'] = $user;
 			$response['result'] = $this->GeneralModel->updateRecord('usuarios', $data, 'idUsuario', $user);
 	
 			if ($response['result']) {

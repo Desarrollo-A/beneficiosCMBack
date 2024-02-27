@@ -253,21 +253,21 @@ class calendarioModel extends CI_Model
             AND ((idPaciente = ?
             AND estatusCita = ?)
             OR (idEspecialista = ? AND estatusCita IN(?, ?)))",
-        array(
-            $fecha_inicio_suma, $fecha_final_resta,
-            $fecha_inicio_suma, $fecha_final_resta,
-            $fecha_inicio_suma,
-            $fecha_final_resta,
-            $dataValue["id"],
-            $dataValue["idPaciente"],
-            1,
-            $dataValue["idUsuario"],
-            1,
-            6
-        )
-    );
+            array(
+                $fecha_inicio_suma, $fecha_final_resta,
+                $fecha_inicio_suma, $fecha_final_resta,
+                $fecha_inicio_suma,
+                $fecha_final_resta,
+                $dataValue["id"],
+                $dataValue["idPaciente"],
+                1,
+                $dataValue["idUsuario"],
+                1,
+                6
+            )
+        );
 
-    return $query;
+        return $query;
     }
 
     public function getIdAtencion($dataValue){
