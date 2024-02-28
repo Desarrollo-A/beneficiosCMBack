@@ -95,7 +95,6 @@ class EncuestasController extends BaseController {
 
 		$idEncuesta= $this->input->post('dataValue[idEncuesta]');
 		$estatus= $this->input->post('dataValue[estatus]');
-		$vigencia= $this->input->post('dataValue[vigencia]');
 		$area= $this->input->post('dataValue[area]');
 
 		$query_idEncuesta = $this->db->query("SELECT * FROM encuestasCreadas WHERE idArea = $area AND estatus = 1");
@@ -112,8 +111,7 @@ class EncuestasController extends BaseController {
 		$response_1=$this->GeneralModel->updateRecord('encuestasCreadas', $data_1, 'idEncuesta', $idEnc);
 
 		$data_2 = array(
-			"estatus" => $estatus,
-			"diasVigencia" => $vigencia
+			"estatus" => $estatus
 		);
 
 		$response_2=$this->GeneralModel->updateRecord('encuestasCreadas', $data_2, 'idEncuesta', $idEncuesta);
