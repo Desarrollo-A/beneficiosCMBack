@@ -230,14 +230,21 @@ class GeneralModel extends CI_Model {
 
     public function getAtencionXsede(){
         
-        $query = $this->db->query("SELECT axs.idAtencionXSede AS id,axs.idSede, sd.sede, axs.idArea, axs.idEspecialista, axs.tipoCita, o.idOficina, o.oficina, o.ubicación, us.nombre, ps.idPuesto, ps.puesto, op.nombre AS modalidad, axs.estatus
+        $query = $this->db->query("SELECT axs.idAtencionXSede AS id,axs.idSede, sd.sede, axs.idArea, axs.idEspecialista, axs.tipoCita, o.idOficina, o.oficina, o.ubicación, us.nombre, ps.idPuesto, ps.puesto, op.nombre AS modalidad, axs.estatus,
+        'nombreArea' = CASE
+            WHEN axs.idArea IS NULL THEN 'SIN ÁREA'
+            WHEN axs.idArea IS NOT NULL THEN CONCAT(ar.area, ' ', '(', dt.depto, ')')
+        END
         FROM atencionXSede axs
         INNER JOIN sedes sd ON sd.idSede = axs.idSede
         INNER JOIN oficinas o ON o.idOficina = axs.idOficina
         INNER JOIN usuarios us ON us.idUsuario = axs.idEspecialista
         INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
         INNER JOIN catalogos ct ON ct.idCatalogo = 5
+        LEFT JOIN areas ar ON ar.idArea = axs.idArea
+        LEFT JOIN departamentos dt ON dt.idDepto = ar.idDepto 
         INNER JOIN opcionesPorCatalogo op ON op.idCatalogo = ct.idCatalogo AND op.idOpcion = axs.tipoCita");
+        
         return $query;
 
     }

@@ -297,4 +297,26 @@ class GestorController extends BaseController {
 		$this->output->set_output(json_encode($response));
 	}
 
+	public function updateEstatus(){
+		$dataValue = $this->input->post("dataValue", true);
+		$id = $dataValue["idDetallePnt"];
+
+		$data = [
+			"estatus" => intval($dataValue["estatus"])
+		];
+
+		$updateRecord = $this->GeneralModel->updateRecord("atencionXSede", $data, "idAtencionXSede", $id);
+
+		if($updateRecord){
+			$response["result"] = true;
+			$response["msg"] = "Se ha actualizado el estatus";
+		}
+		else{
+			$response["result"] = false;
+			$response["msg"] = "Ha ocurrido un error al actualizar";
+		}
+
+		$this->output->set_content_type('application/json');
+		$this->output->set_output(json_encode($response));
+	}
 }
