@@ -162,11 +162,9 @@ class calendarioModel extends CI_Model
 
     public function checkPresencial($idSede, $idEspecialista, $modalidad, $fecha){
         $query = $this->db->query(
-            "SELECT *from presencialXSede AS pxs
-            INNER JOIN atencionXSede AS axs ON axs.idEspecialista = pxs.idEspecialista 
-            WHERE axs.idSede = ? AND axs.idEspecialista = ? AND axs.tipoCita = ? 
-            AND presencialDate = ?;",
-            array( $idSede, $idEspecialista, $modalidad, $fecha )
+            "SELECT *from presencialXSede as pxs
+            WHERE pxs.idSede = ? AND pxs.idEspecialista = ? AND presencialDate = ?;",
+            array( $idSede, $idEspecialista, $fecha)
         );
 
         return $query;
