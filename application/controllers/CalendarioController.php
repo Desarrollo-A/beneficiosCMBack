@@ -266,7 +266,8 @@ public function createAppointmentByColaborator()
                 if ($response['result']) {
                     $response['result'] = $sedesatencion->num_rows() > 1;
                     if ($response['result']){
-                        foreach ($sedesatencion->result() as $row) {
+						$response['result'] = false;
+						foreach ($sedesatencion->result() as $row) {
                             if ($row->value == $idSede) {
                                 $response['result'] = true;
                                 break;
