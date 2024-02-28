@@ -321,16 +321,17 @@
 		}
 
 		.btn {
-			display: block;
-			width: 115px;
+			width: 210px;
 			height: 25px;
 			background: #4E9CAF;
 			padding: 10px;
-			text-align: center;
 			border-radius: 5px;
 			color: white;
 			font-weight: bold;
 			line-height: 25px;
+			text-align: center;
+			display: block;
+    		justify-content: center;
 		}
 
 		.center {
@@ -414,7 +415,7 @@
 								</td>
 							</tr>
 							<tr>
-								<td class="logo" style="text-align: center; padding: 1em;">
+								<td class="logo" style="text-align: center; padding: 5em;">
 									<img src="<?= base_url() ?>dist/img/Logo_CM2.png" alt="" style="width: 110px; max-width: 110px; height: auto; margin: auto; display: block;">
 								</td>
 							</tr>
@@ -425,7 +426,7 @@
 			</table>
 			<table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: auto;">
 				<tr>
-					<td class="bg_light" style="text-align: center;">
+					<td class="bg_light" style="text-align: center; padding-left: 3em">
 						<p>© Departamento <?php echo date("Y"); ?></p>
 					</td>
 				</tr>
