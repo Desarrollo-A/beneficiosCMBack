@@ -222,8 +222,15 @@ class ReportesModel extends CI_Model {
 		
 		switch($area){
 			case 537:
-				$query = $this->db-> query("SELECT dp.idDetallePaciente AS id, us.idUsuario, us.nombre, dep.depto, sd.sede, pu.puesto,
-				us.correo, sd.sede, op.nombre AS estNut
+				$query = $this->db-> query("SELECT DISTINCT dp.idDetallePaciente AS id, 
+                us.idUsuario, 
+                us.nombre, 
+                dep.depto, 
+                sd.sede, 
+                pu.puesto,
+                us.correo, 
+                sd.sede,
+				op.nombre AS estNut
 				FROM detallePaciente dp 
 				INNER JOIN usuarios us ON us.idUsuario = dp.idUsuario
 				INNER JOIN areas ar ON ar.idArea = us.idArea
@@ -231,12 +238,21 @@ class ReportesModel extends CI_Model {
 				INNER JOIN puestos pu ON pu.idPuesto = us.idPuesto
 				INNER JOIN sedes sd ON sd.idSede = us.idSede
 				INNER JOIN catalogos ct ON ct.idCatalogo = 13
+				INNER JOIN usuarios us2 ON us2.idRol = 3 AND us2.idPuesto = 537
+				INNER JOIN citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = us2.idUsuario
 				LEFT JOIN opcionesPorCatalogo op ON op.idCatalogo = ct.idCatalogo AND  op.idOpcion = dp.estatusNut
-				WHERE estatusNut IS NOT null");
+				WHERE estatusNut IS NOT null AND ci.estatusCita = 4");
 				break;
 			case 585:
-				$query = $this->db-> query("SELECT dp.idDetallePaciente AS id, us.idUsuario, us.nombre, dep.depto, sd.sede, pu.puesto,
-				us.correo, sd.sede, op.nombre AS estPsi
+				$query = $this->db-> query("SELECT DISTINCT dp.idDetallePaciente AS id, 
+                us.idUsuario, 
+                us.nombre, 
+                dep.depto, 
+                sd.sede, 
+                pu.puesto,
+                us.correo, 
+                sd.sede, 
+				op.nombre AS estPsi
 				FROM detallePaciente dp 
 				INNER JOIN usuarios us ON us.idUsuario = dp.idUsuario
 				INNER JOIN areas ar ON ar.idArea = us.idArea
@@ -244,12 +260,21 @@ class ReportesModel extends CI_Model {
 				INNER JOIN puestos pu ON pu.idPuesto = us.idPuesto
 				INNER JOIN sedes sd ON sd.idSede = us.idSede
 				INNER JOIN catalogos ct ON ct.idCatalogo = 13
+				INNER JOIN usuarios us2 ON us2.idRol = 3 AND us2.idPuesto = 585
+				INNER JOIN citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = us2.idUsuario
 				LEFT JOIN opcionesPorCatalogo op ON op.idCatalogo = ct.idCatalogo AND  op.idOpcion = dp.estatusPsi
-				WHERE estatusPsi IS NOT null");
+				WHERE estatusPsi IS NOT null AND ci.estatusCita = 4");
 				break;
 			case 158:
-				$query = $this->db-> query("SELECT dp.idDetallePaciente AS id, us.idUsuario, us.nombre, dep.depto, sd.sede, pu.puesto,
-				us.correo, sd.sede, op.nombre AS estQB
+				$query = $this->db-> query("SELECT DISTINCT dp.idDetallePaciente AS id, 
+                us.idUsuario, 
+                us.nombre, 
+                dep.depto, 
+                sd.sede, 
+                pu.puesto,
+                us.correo, 
+                sd.sede, 
+                op.nombre AS estQB
 				FROM detallePaciente dp 
 				INNER JOIN usuarios us ON us.idUsuario = dp.idUsuario
 				INNER JOIN areas ar ON ar.idArea = us.idArea
@@ -257,12 +282,21 @@ class ReportesModel extends CI_Model {
 				INNER JOIN puestos pu ON pu.idPuesto = us.idPuesto
 				INNER JOIN sedes sd ON sd.idSede = us.idSede
 				INNER JOIN catalogos ct ON ct.idCatalogo = 13
+				INNER JOIN usuarios us2 ON us2.idRol = 3 AND us2.idPuesto = 158
+				INNER JOIN citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = us2.idUsuario
 				LEFT JOIN opcionesPorCatalogo op ON op.idCatalogo = ct.idCatalogo AND  op.idOpcion = dp.estatusQB
-				WHERE estatusQB IS NOT null");
+				WHERE estatusQB IS NOT NULL AND ci.estatusCita = 4");
 				break;
 			case 686:
-				$query = $this->db-> query("SELECT dp.idDetallePaciente AS id, us.idUsuario, us.nombre, dep.depto, sd.sede, pu.puesto,
-				us.correo, sd.sede, op.nombre AS estGE
+				$query = $this->db-> query("SELECT DISTINCT dp.idDetallePaciente AS id, 
+                us.idUsuario, 
+                us.nombre, 
+                dep.depto, 
+                sd.sede, 
+                pu.puesto,
+                us.correo, 
+                sd.sede,
+				op.nombre AS estGE
 				FROM detallePaciente dp 
 				INNER JOIN usuarios us ON us.idUsuario = dp.idUsuario
 				INNER JOIN areas ar ON ar.idArea = us.idArea
@@ -270,8 +304,10 @@ class ReportesModel extends CI_Model {
 				INNER JOIN puestos pu ON pu.idPuesto = us.idPuesto
 				INNER JOIN sedes sd ON sd.idSede = us.idSede
 				INNER JOIN catalogos ct ON ct.idCatalogo = 13
+				INNER JOIN usuarios us2 ON us2.idRol = 3 AND us2.idPuesto = 686
+				INNER JOIN citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = us2.idUsuario
 				LEFT JOIN opcionesPorCatalogo op ON op.idCatalogo = ct.idCatalogo AND  op.idOpcion = dp.estatusGE
-				WHERE estatusGE IS NOT null");
+				WHERE estatusGE IS NOT null AND ci.estatusCita = 4");
 				break;
 		}
 	}else if($idRol == 3){
@@ -286,8 +322,9 @@ class ReportesModel extends CI_Model {
 				INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
 				INNER JOIN detallePaciente dtp ON dtp.idUsuario = us.idUsuario
 				INNER JOIN catalogos cat ON cat.idCatalogo = 13
+				INNER JOIN citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = $idUs
 				LEFT JOIN opcionesPorCatalogo op ON op.idCatalogo = cat.idCatalogo AND  op.idOpcion = dtp.estatusNut
-				WHERE ct.idEspecialista = $idUs AND estatusNut IS NOT null");
+				WHERE ct.idEspecialista = $idUs AND estatusNut IS NOT null AND ci.estatusCita = 4");
 				break;
 			case 585:
 				$query = $this->db-> query("SELECT DISTINCT us.idUsuario, us.nombre, dp.depto, sd.sede, ps.puesto, op.nombre AS estPsi FROM citas ct 
@@ -298,8 +335,9 @@ class ReportesModel extends CI_Model {
 				INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
 				INNER JOIN detallePaciente dtp ON dtp.idUsuario = us.idUsuario
 				INNER JOIN catalogos cat ON cat.idCatalogo = 13
+				INNER JOIN citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = $idUs
 				LEFT JOIN opcionesPorCatalogo op ON op.idCatalogo = cat.idCatalogo AND  op.idOpcion = dtp.estatusPsi
-				WHERE ct.idEspecialista = $idUs AND estatusPsi IS NOT null");
+				WHERE ct.idEspecialista = $idUs AND estatusPsi IS NOT null AND ci.estatusCita = 4");
 				break;
 			case 158:
 				$query = $this->db-> query("SELECT DISTINCT us.idUsuario, us.nombre, dp.depto, sd.sede, ps.puesto, op.nombre AS estQB FROM citas ct 
@@ -310,8 +348,9 @@ class ReportesModel extends CI_Model {
 				INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
 				INNER JOIN detallePaciente dtp ON dtp.idUsuario = us.idUsuario
 				INNER JOIN catalogos cat ON cat.idCatalogo = 13
+				INNER JOIN citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = $idUs
 				LEFT JOIN opcionesPorCatalogo op ON op.idCatalogo = cat.idCatalogo AND  op.idOpcion = dtp.estatusQB
-				WHERE ct.idEspecialista = $idUs AND estatusQB IS NOT null");
+				WHERE ct.idEspecialista = $idUs AND estatusQB IS NOT null AND ci.estatusCita = 4");
 				break;
 			case 686:
 				$query = $this->db-> query("SELECT DISTINCT us.idUsuario, us.nombre, dp.depto, sd.sede, ps.puesto, op.nombre AS estGE FROM citas ct 
@@ -322,8 +361,9 @@ class ReportesModel extends CI_Model {
 				INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
 				INNER JOIN detallePaciente dtp ON dtp.idUsuario = us.idUsuario
 				INNER JOIN catalogos cat ON cat.idCatalogo = 13
+				INNER JOIN citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = $idUs
 				LEFT JOIN opcionesPorCatalogo op ON op.idCatalogo = cat.idCatalogo AND  op.idOpcion = dtp.estatusGE
-				WHERE ct.idEspecialista = $idUs AND estatusGE IS NOT null");
+				WHERE ct.idEspecialista = $idUs AND estatusGE IS NOT null AND ci.estatusCita = 4");
 				break;
 		}
 

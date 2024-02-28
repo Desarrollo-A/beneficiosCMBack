@@ -42,12 +42,7 @@ class GestorModel extends CI_Model {
 
         $query = $this->db-> query("SELECT idUsuario, nombre FROM usuarios WHERE idRol = 3 AND idPuesto = $dt");
         
-        if($query->num_rows() > 0){
-            return $query->result();
-        }
-        else{
-            return false;
-        }
+        return $query->result();
     }
 
     public function getSedeNone($dt)
