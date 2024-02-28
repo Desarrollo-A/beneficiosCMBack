@@ -317,7 +317,8 @@
 		}
 
 		.icon{
-			width: 5%
+			width: 4%;
+			filter: contrast(0);
 		}
 
 		.no-margin{
@@ -332,7 +333,9 @@
 			font-weight: 800; 
 			color: #003360;
 		}
-		
+		.custom-font2{
+			font-size: 14px;
+		}
 
 		@media screen and (max-width: 500px) {}
 	</style>
@@ -356,8 +359,8 @@
 					<td valign="top" class="bg_white" style="padding: 5em 2.5em 0 2.5em;">
 						<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
 							<tr>
-								<td class="logo" style="text-align: center;">
-									<img src="<?= base_url() ?>dist/img/Logo1.svg" alt="" style="width: 250px; max-width: 250px; height: auto; margin: auto; display: block;">
+								<td class="logo" style="text-align: center; padding: 5em 2.5em 0 2.5em;">
+									<img src="<?= base_url() ?>dist/img/Logo1.png" alt="" style="width: 250px; max-width: 250px; height: auto; margin: auto; display: block;">
 								</td>
 							</tr>
 						</table>
@@ -378,20 +381,20 @@
 										<h3 style="color:#003360"><?= $data["titulo"]?></h3>
 										<h4 class="no-margin">Se ha reagendado tu cita de <strong><?= $data["beneficio"]?></strong></h4>
 										<h4>Especialista que te atiende: <?= $data["especialista"] ?></h4>
-                                        <h4 class="custom-font1">Detalles de la cita: </h4>
-                                        <h5 class="custom-margin1"><img src="<?= base_url() ?>dist/img/building-solid.png" class="icon"> <?= $data["sede"] ?></h5>
-                                        <h5 class="custom-margin1"><img src="<?= base_url() ?>dist/img/map-marked-alt-solid.png" class="icon">  <?= $data["oficina"] ?></h5>
-										<h5 class="custom-margin1"><img src="<?= base_url() ?>dist/img/calendar-alt-solid.png" class="icon"> <?= $data["fecha"] ?></h5>
-										<h5 class="custom-margin1"><img src="<?= base_url() ?>dist/img/clock-regular.png" class="icon"> <?= $data["horaInicio"] ?> - <?= $data["horaFinal"] ?></h5>
+                                        <h4 class="custom-font1">Detalles de la cita </h4>
+                                        <h5 class="no-margin custom-font2"><img src="<?= base_url() ?>dist/img/building-solid.png" class="icon"> Sede: <?= $data["sede"] ?></h5>
+                                        <h5 class="no-margin custom-font2"><img src="<?= base_url() ?>dist/img/map-marked-alt-solid.png" class="icon"> Dirección: <?= $data["oficina"] ?></h5>
+										<h5 class="no-margin custom-font2"><img src="<?= base_url() ?>dist/img/calendar-alt-solid.png" class="icon"> Fecha: <?= $data["fecha"] ?></h5>
+										<h5 class="custom-font2"><img src="<?= base_url() ?>dist/img/clock-regular.png" class="icon"> Horario: <?= $data["horaInicio"] ?> - <?= $data["horaFinal"] ?></h5>
                                     </br>
-                                        <h4 style="color: red"><strong> Horario cancelado:</strong> </h4>
-										<h5 class="custom-margin1"><img src="<?= base_url() ?>dist/img/calendar-alt-solid.png" class="icon"> <?= $data["fechaOld"] ?></h5>
-										<h5 class="custom-margin1"><img src="<?= base_url() ?>dist/img/clock-regular.png" class="icon"> <?= $data["horaInicioOld"] ?> - <?= $data["horaFinalOld"] ?></h5>
+                                        <h4 style="color: red"><strong> Horario cancelado:</strong></h4>
+										<h5 class="no-margin custom-font2"><img src="<?= base_url() ?>dist/img/calendar-alt-solid.png" class="icon"> Fecha: <?= $data["fechaOld"] ?></h5>
+										<h5 class="no-margin custom-font2"><img src="<?= base_url() ?>dist/img/clock-regular.png" class="icon"> Horario: <?= $data["horaInicioOld"] ?> - <?= $data["horaFinalOld"] ?></h5>
 									</div>
 								</td>
 							</tr>
 							<tr>
-								<td class="logo" style="text-align: center;">
+								<td class="logo" style="text-align: center; padding: 1em;">
 									<img src="<?= base_url() ?>dist/img/Logo_CM2.png" alt="" style="width: 110px; max-width: 110px; height: auto; margin: auto; display: block;">
 								</td>
 							</tr>

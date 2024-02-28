@@ -68,6 +68,24 @@ class GeneralController extends BaseController {
 		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
+	public function getCtVirtuales()
+    {
+		$dt = $this->input->post('dataValue', true);
+		
+		$data['data'] = $this->GeneralModel->getCtVirtuales($dt)->result();
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
+
+	public function getCtPresenciales()
+    {
+		$dt = $this->input->post('dataValue', true);
+		
+		$data['data'] = $this->GeneralModel->getCtPresenciales($dt)->result();
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
+
 	public function getAppointmentHistory(){
 
         $dt = $this->input->post('dataValue', true);
@@ -157,27 +175,27 @@ class GeneralController extends BaseController {
 
 	public function getAtencionXsede(){
 		$data['data'] = $this->GeneralModel->getAtencionXsede()->result();
-		echo json_encode($data);
+		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
 	public function getSedes(){
 		$data['data'] = $this->GeneralModel->getSedes()->result();
-		echo json_encode($data);
+		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
 	public function getOficinas(){
 		$data['data'] = $this->GeneralModel->getOficinas()->result();
-		echo json_encode($data);
+		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
 	public function getModalidades(){
 		$data['data'] = $this->GeneralModel->getModalidades()->result();
-		echo json_encode($data);
+		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
 	public function getSinAsigSede(){
 		$data['data'] = $this->GeneralModel->getSinAsigSede();
-		echo json_encode($data);
+		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
 	public function getCitas(){

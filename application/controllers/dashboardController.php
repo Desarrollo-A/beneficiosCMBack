@@ -89,7 +89,7 @@ class DashboardController extends BaseController {
 
 	public function getCountRespuestas(){
 		$dt = $this->input->post('dataValue', true);
-
+		
 		$data['data'] = $this->DashModel->getCountRespuestas($dt);
 		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
@@ -101,4 +101,12 @@ class DashboardController extends BaseController {
 		$data['data'] = $this->DashModel->getMetas($dt)->result();
 		echo json_encode($data, JSON_NUMERIC_CHECK);
     }
+
+	public function getMetaAdmin(){
+
+		$dt = $this->input->post('dataValue', true);
+
+		$data['data'] = $this->EspecialistasModel->getMetaAdmin($dt);
+		echo json_encode($data, JSON_NUMERIC_CHECK);
+	}
 }

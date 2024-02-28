@@ -133,34 +133,33 @@ class Usuario extends BaseController {
 
 	public function insertBatchUsers()
     {
-        $json = file_get_contents('php://input');
-        $params = json_decode($json, true);
-
-        $table = $params['nombreTabla'];
-        $data = $params['data'];
+        $table = $this->input->post('dataValue[tabla]');
+        $data  = $this->input->post('dataValue[data]');
     
-        $response['result'] = isset($table, $data) && !empty($data);
+        $response['result'] = isset($table, $data); // && !empty($data);
         if ($response['result']) {
             $fecha = date('Y-m-d H:i:s');
-            $complemento = date('Ymd');
+            $complemento = date('YmdHis');
             $rows = array();
-            foreach ($data as $col) {
-                $iniciales = getIniciales($col['nombre']); // 
+            foreach ($data as $user) {
+                $iniciales = getIniciales($user['nombre']); // 
                 $row = array(
-                    'numContrato' => isset($col['nombre']) ? $iniciales.$complemento : null,
-                    'numEmpleado' => isset($col['nombre']) ? $iniciales.$complemento : null,
-                    'nombre' => isset($col['nombre']) ? $col['nombre'] : null,
-                    'telPersonal' => isset($col['telPersonal']) ? $col['telPersonal'] : null,
-                    'area' => isset($col['area']) ? $col['area'] : null,
-					'idPuesto' => isset($col['idPuesto']) ? $col['idPuesto'] : null,
-                    'oficina' => isset($col['oficina']) ? $col['oficina'] : null,
-                    'sede' => isset($col['sede']) ? $col['sede'] : null,
-                    'correo' => isset($col['correo']) ? $col['correo'] : null,
-                    'password' => isset($col['password']) ? encriptar($col['password']) : encriptar('Tempo01@'),
+                    'idContrato' => $complemento,
+                    'numEmpleado' => $iniciales.$complemento,
+                    'nombre' => $user['nombre'],
+                    'telPersonal' => isset($user['telPersonal']) ? $user['telPersonal'] : null,
+                    'idArea' => null,
+					'idPuesto' => null,
+                    'idSede' => null,
+					'sexo' => $user['sexo'],
+					'externo' => 1,
+					'idRol' => 2,
+                    'correo' => isset($user['correo']) ? $user['correo'] : null,
+                    'password' => encriptar('Tempo01@'),
                     'estatus' => 1,
-					'creadoPor' => 1,
+					'creadoPor' => $user['creadoPor'],
                     'fechaCreacion' => $fecha,
-                    'modificadoPor' => 1,
+                    'modificadoPor' => $user['creadoPor'],
                     'fechaModificacion' => $fecha,
                 );
                 $rows[] = $row;
@@ -177,17 +176,17 @@ class Usuario extends BaseController {
             $response['msg'] = "¡Parametros invalidos!";
         }
         $this->output->set_content_type("application/json");
-        $this->output->set_output(json_encode($response));
+        $this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
     }
 
 	public function updateUser() {
 		$fecha = date('Y-m-d H:i:s');
-		$user = $this->input->post('idUsuario');
+		$user = $this->input->post('dataValue[idUsuario]');
 		
 		$data = array();
 	
 		// Recorre $_POST y agrega los campos con valores (incluido 0) al array $data
-		foreach ($this->input->post() as $key => $value) {
+		foreach ($this->input->post('dataValue') as $key => $value) {
 			if (($value !== null || $value !== '') && $key != 'idUsuario') {
 				$data[$key] = $value;
 			}
@@ -197,6 +196,7 @@ class Usuario extends BaseController {
 		
 		if ($response['result']) {  
 			$data['fechaModificacion'] = $fecha;
+			$data['modificadoPor'] = $user;
 			$response['result'] = $this->GeneralModel->updateRecord('usuarios', $data, 'idUsuario', $user);
 	
 			if ($response['result']) {
@@ -228,17 +228,15 @@ class Usuario extends BaseController {
 	}
 
 	public function decodePass(){
-
 		$dt = $this->input->post('dataValue', true);
 		$data['data'] = $this->UsuariosModel->decodePass($dt);
 		echo json_encode($data);
 	}
 
 	public function updatePass(){
-
 		$idUsuario = $this->input->post('dataValue[idUsuario]');
 		$password = $this->input->post('dataValue[password]');
-		$newPass= $this->input->post('dataValue[newPassword]');
+		$newPass = $this->input->post('dataValue[newPassword]');
 
 			if(!empty($newPass))
 			{
@@ -254,60 +252,18 @@ class Usuario extends BaseController {
 			}	
 	}
 
-	public function updateUserByCH() {
-        $encodedUserData = file_get_contents('php://input'); // Obtener el cuerpo de la solicitud en formato base64
-        $decodedUserData = base64_decode($encodedUserData); // Decodificar los datos base64
-        $userData = json_decode($decodedUserData, true);  // Procesar los datos como desees, por ejemplo, decodificar JSON
-
-		$fecha = date('Y-m-d H:i:s');
-		foreach ($userData as $key => $value) {
-			if (($value !== null || $value !== '') && $key != 'idContrato' && $key != 'idUsuario' ) {
-				$data[$key] = $value;
-			}
-		}
-
-		isset($data["nombre_persona"]) ? $userD['nombre'] = ($data["nombre_persona"] . ' ' . $data["pri_apellido"] . ' ' . $data["sec_apellido"]) : '';
-		isset($data["telefono_personal"]) ? $userD['telPersonal'] = $data["telefono_personal"] : '';
-		isset($data["idpuesto"]) ? $userD['idPuesto'] = intval($data["idpuesto"]) : '';
-		isset($data["idsede"]) ? $userD['idSede'] = intval($data["idsede"]) : '';
-		isset($data["mail_emp"]) ? $userD['correo'] = $data["mail_emp"] : '';
-		isset($data["activo"]) ? $userD['estatus'] = $data["activo"] : '';
-		$userD["fechaModificacion"] = $fecha;
-		isset($data["idarea"]) ? $userD['idArea'] = $data["idarea"] : '';
-		isset($data["sexo"]) ? $userD['sexo'] = $data["sexo"] : '';
-		isset($data["fingreso"]) ? $userD['fechaIngreso'] = $data["fingreso"] : '';
-
-		$idContrato = intval($data["idcontrato"]);
-
-		$response['result'] = isset($idContrato);
-		if ($response['result']) {
-			$data['fechaModificacion'] = $fecha;
-			$response['result'] = $this->GeneralModel->updateRecord('usuarios', $userD, 'idContrato', $idContrato);
-			if ($response['result']) {
-				$response['msg'] = "¡Usuario actualizado exitosamente!";
-			} else {
-				$response['msg'] = "¡Error al intentar actualizar los datos de usuario!";
-			}
-		} else {
-			$response['msg'] = "¡Parámetros inválidos!";
-		}
-
-		$this->output->set_content_type("application/json");
-		$this->output->set_output(json_encode($response));
-	}
-
-	public function login(){
+	public function loginCH(){
 		$auth = $this->headers('Authorization');
 		$token = null;
 
 		$result = (object) [
-			'status' => 'error',
-			'message' => 'Error'
+			'result' => 'error',
+			'msg' => 'Error'
 		];
 
 		if(!isset($auth)){
-			$result->message = 'Falta header de autorizacion';
-			$this->json($result);
+			$result->msg = 'Falta header de autorizacion';
+			$this->json($result, JSON_NUMERIC_CHECK);
 		}
 
 		$matches = array();
@@ -318,8 +274,8 @@ class Usuario extends BaseController {
 	    }
 
 	    if(!isset($token)){
-			$result->message = 'Falta token de autorizacion';
-			$this->json($result);
+			$result->msg = 'Falta token de autorizacion';
+			$this->json($result, JSON_NUMERIC_CHECK);
 		}
 
 		$decoded = base64_decode($token);
@@ -329,35 +285,36 @@ class Usuario extends BaseController {
 		$usuario = $this->UsuariosModel->login($numEmpleado, encriptar($password))->row();
 
 		if(!isset($usuario)){
-			$result->message = 'No existe el usuario';
-			$this->json($result);
+			$result->msg = 'No existe el usuario';
+			$this->json($result, JSON_NUMERIC_CHECK);
 		}
 
-		$accesToken = $this->token->generateToken($usuario);
+		$accessToken = $this->token->generateToken($usuario);
 
 		$result = (object) [
-			'status' => 'ok',
-			'message' => 'Inicio de sesion correcto',
-			'accessToken' => $accesToken,
+			'result' => true,
+			'msg' => '¡Inicio de sesión exitoso!',
+			'accessToken' => $accessToken,
 		];
 
-		$this->json($result);
+		$this->json($result, JSON_NUMERIC_CHECK);
 	}
 
-	public function update(){
-		$data = $this->post();
+	public function updateCH(){
+		$new_data = $this->input->POST();
 		$auth = $this->headers('Authorization');
 		$token = null;
-		$numContrato = $this->input->get('numContrato');
+		$idContrato = $this->input->POST('idcontrato');
+		$fecha = date('Y-m-d H:i:s');
 
 		$result = (object) [
-			'status' => 'error',
-			'message' => 'Error'
+			'result' => false,
+			'msg' => 'Error'
 		];
 
 		if(!isset($auth)){
-			$result->message = 'Falta header de autorizacion';
-			$this->json($result);
+			$result->msg = 'Falta header de autorizacion';
+			$this->json($result, JSON_NUMERIC_CHECK);
 		}
 
 		$matches = array();
@@ -368,72 +325,98 @@ class Usuario extends BaseController {
 	    }
 
 	    if(!isset($token)){
-			$result->message = 'Falta token de autorizacion';
-			$this->json($result);
+			$result->msg = 'Falta token de autorización';
+			$this->json($result, JSON_NUMERIC_CHECK);
 		}
 
 		$decoded = (object) $this->token->validateToken($token);
 
 		if(!$decoded->status){
-			$result->message = $decoded->message;
-			$this->json($result);
+			$result->msg = $decoded->message;
+			$this->json($result, JSON_NUMERIC_CHECK);
 		}
 
 		$usuario = $decoded->data;
 
 		if($usuario->idRol != 1){
-			$result->message = 'No tiene permisos para esta accion';
-			$this->json($result);
+			$result->msg = 'No tiene permisos para esta acción';
+			$this->json($result, JSON_NUMERIC_CHECK);
 		}
 
-		if(!isset($numContrato)){
-			$result->message = 'Falta el numero de contrato';
-			$this->json($result);
+		if(!isset($idContrato)){
+			$result->msg = 'Falta el id de contrato';
+			$this->json($result, JSON_NUMERIC_CHECK);
 		}
 
-		$empleado = $this->UsuariosModel->getUserByNumEmpleado($numContrato);
-		$old_data = (array) $empleado;
+		$empleado = $this->UsuariosModel->getUserByNumEmpleado($idContrato)->row();
 
 		if(!isset($empleado)){
-			$result->message = 'No existe el empleado en la base de datos';
-			$this->json($result);
+			$result->msg = 'No existe el empleado en la base de datos';
+			$this->json($result, JSON_NUMERIC_CHECK);
 		}
 
-		if(!$data){
-			$result->message = 'No hay datos';
-			$this->json($result);
+		if(!$new_data){
+			$result->msg = 'No hay datos';
+			$this->json($result, JSON_NUMERIC_CHECK);
 		}
 
-		$new_data = (array) $data;
+		$new_data = (array) $new_data;
+		$data = array();
 
-		$actualizado = (object) array_replace($old_data, $new_data);
+		if (isset($new_data["nombre_persona"]) || isset($new_data["pri_apellido"]) || isset($new_data["sec_apellido"])) {
+			$data['nombre'] = '';
+			if (isset($new_data["nombre_persona"])) {
+				$data['nombre'] .= $new_data["nombre_persona"];
+			}
+			if (isset($new_data["pri_apellido"])) {
+				$data['nombre'] .= ' ' . $new_data["pri_apellido"];
+			}
+			if (isset($new_data["sec_apellido"])) {
+				$data['nombre'] .= ' ' . $new_data["sec_apellido"];
+			}
+			$data['nombre'] = trim($data['nombre']); // Elimina espacios al inicio y al final
+		}
 
-		$is_ok = $this->UsuariosModel->updateUserData($empleado->idUsuario, $actualizado);
+		isset($new_data["num_empleado"]) 	  ? $data['numEmpleado']  = $new_data["num_empleado"] : '';
+		isset($new_data["telefono_personal"]) ? $data['telPersonal']  = $new_data["telefono_personal"] : '';
+		isset($new_data["tel_oficina"]) 	  ? $data['telOficina']   = $new_data["tel_oficina"] : '';
+		isset($new_data["idpuesto"]) 		  ? $data['idPuesto'] 	  = $new_data["idpuesto"] : '';
+		isset($new_data["idsede"]) 			  ? $data['idSede'] 	  = $new_data["idsede"] : '';
+		isset($new_data["mail_emp"]) 		  ? $data['correo'] 	  = $new_data["mail_emp"] : '';
+		isset($new_data["activo"]) 			  ? $data['estatus'] 	  = $new_data["activo"] : '';
+		isset($new_data["sexo"]) 			  ? $data['sexo'] 		  = $new_data["sexo"] : '';
+		isset($new_data["fingreso"]) 		  ? $data['fechaIngreso'] = $new_data["fingreso"] : '';
+		
+		$data["fechaModificacion"] = $fecha;
+		$data["modificadoPor"] = 1;
 
-		if($is_ok){
-			$result->status = 'ok';
-			$result->message = 'Empleado actualizado';
-			$result->data = $actualizado;
+		$updated = $this->GeneralModel->updateRecord("usuarios", $data, "idContrato", $idContrato);
+
+		if($updated){
+			$result->result = true;
+			$result->msg = 'Empleado actualizado';
+			$result->data = $data;
 		}else{
-			$result->message = 'No se pudo actualizar el empleado';
+			$result->msg = 'No se pudo actualizar el empleado';
 		}
 
-		$this->json($result);
+		$this->json($result, JSON_NUMERIC_CHECK);
 	}
 
-	public function baja(){
+	public function bajaCH(){
 		$auth = $this->headers('Authorization');
 		$token = null;
-		$numContrato = $this->input->get('numContrato');
+		$idContrato = $this->input->POST('idcontrato');
+		$fecha = date('Y-m-d H:i:s');
 
 		$result = (object) [
-			'status' => 'error',
-			'message' => 'Error'
+			'result' => false,
+			'msg' => 'Error'
 		];
 
 		if(!isset($auth)){
-			$result->message = 'Falta header de autorizacion';
-			$this->json($result);
+			$result->msg = 'Falta header de autorización';
+			$this->json($result, JSON_NUMERIC_CHECK);
 		}
 
 		$matches = array();
@@ -444,46 +427,49 @@ class Usuario extends BaseController {
 	    }
 
 	    if(!isset($token)){
-			$result->message = 'Falta token de autorizacion';
-			$this->json($result);
+			$result->msg = 'Falta token de autorización';
+			$this->json($result, JSON_NUMERIC_CHECK);
 		}
 
 		$decoded = (object) $this->token->validateToken($token);
 
 		if(!$decoded->status){
-			$result->message = $decoded->message;
-			$this->json($result);
+			$result->msg = $decoded->message;
+			$this->json($result, JSON_NUMERIC_CHECK);
 		}
 
 		$usuario = $decoded->data;
 
 		if($usuario->idRol != 1){
-			$result->message = 'No tiene permisos para esta accion';
-			$this->json($result);
+			$result->msg = 'No tiene permisos para esta acción';
+			$this->json($result, JSON_NUMERIC_CHECK);
 		}
 
-		if(!isset($numContrato)){
-			$result->message = 'Falta el numero de contrato';
-			$this->json($result);
+		if(!isset($idContrato)){
+			$result->msg = 'Falta el id de contrato';
+			$this->json($result, JSON_NUMERIC_CHECK);
 		}
 
-		$empleado = $this->UsuariosModel->getUserByNumEmpleado($numContrato);
+		$empleado = $this->UsuariosModel->getUserByNumEmpleado($idContrato)->row();
 
 		if(!isset($empleado)){
-			$result->message = 'No existe el empleado en la base de datos';
-			$this->json($result);
+			$result->msg = 'No existe el empleado en la base de datos';
+			$this->json($result, JSON_NUMERIC_CHECK);
 		}
 
-		$is_ok = $this->UsuariosModel->setBajaEmpleado($empleado->idUsuario);
-		$this->CitasModel->cancelFromUser($empleado->idUsuario);
+		$data["estatus"] = 0;
+		$data["fechaModificacion"] = $fecha;
+		$data["modificadoPor"] = 1;
 
-		if($is_ok){
-			$result->status = 'ok';
-			$result->message = 'Empleado dado de baja';
+		$updated = $this->GeneralModel->updateRecord("usuarios", $data, "idContrato", $idContrato);
+
+		if($updated){
+			$result->result = true;
+			$result->msg = 'Empleado dado de baja';
 		}else{
-			$result->message = 'No se pudo dar de baja el empleado';
+			$result->msg = 'No se pudo dar de baja el empleado';
 		}
 
-		$this->json($result);
+		$this->json($result, JSON_NUMERIC_CHECK);
 	}
 }

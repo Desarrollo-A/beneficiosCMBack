@@ -69,5 +69,4 @@ application/libraries/google-api/*
 application/migrations/*
 application/third_party/*
 
-
 *.pdf

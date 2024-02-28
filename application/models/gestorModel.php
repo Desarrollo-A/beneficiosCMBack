@@ -80,51 +80,6 @@ class GestorModel extends CI_Model {
         
     }
 
-    public function insertAtxSede($dt)
-    {
-        $data = json_decode($dt, true);
-
-        $datosValidos = true;
-
-        if (isset($data)) {
-
-                $idEspecialista = $data["especialista"];
-                $idSede = $data["sede"];
-                $idOficina = $data["oficina"];
-                $tipoCita = $data["modalidad"];
-                $idUsuario = $data["usuario"];
-
-				if (empty($idEspecialista) ||
-                    empty($idSede) ||
-                    empty($idOficina) ||
-                    empty($tipoCita) ||
-                    empty($idUsuario)) {
-
-					echo json_encode(array("estatus" => false, "msj" => "Faltan datos!" ));
-					$datosValidos = false;
-
-				}else{
-
-                    $query = $this->db->query("INSERT INTO atencionXSede
-                    (idEspecialista, idSede, idOficina, tipoCita, estatus, creadoPor, fechaCreacion, modificadoPor)
-                    VALUES (?, ?, ?, ?, ?, ?, GETDATE(), ?)", 
-                    array($idEspecialista, $idSede, $idOficina, $tipoCita, 1, $idUsuario, $idUsuario ));
-                    
-                    $this->db->trans_complete();
-
-                    if ($this->db->trans_status() === FALSE) {
-                        echo "Error al realizar el registro";
-                    } else {
-                        echo json_encode(array("estatus" => true, "msj" => "Registro realizado exitosamente" ));
-                    }
-                
-                }
-
-        } else {
-			echo json_encode(array("estatus" => false, "msj" => "Error Faltan Datos" ));
-		}
-    }
-
     public function getAtencionXsedeEsp($dt)
     {
         $query = $this->db-> query("SELECT axs.idAtencionXSede AS id,axs.idSede, sd.sede, o.oficina, o.ubicación, us.nombre, ps.idPuesto, ps.puesto, op.nombre AS modalidad, axs.estatus
@@ -237,4 +192,53 @@ class GestorModel extends CI_Model {
 		}
     }
 
+    public function checkAxs($dt, $idArea){
+        $query = $this->db->query("SELECT *from atencionXSede where idEspecialista = ? AND idSede = ? AND idOficina = ? AND idArea = ? AND tipoCita = ?",
+        array($dt["especialista"], $dt["sede"], $dt["oficina"], $idArea, $dt["modalidad"]));
+
+        return $query;
+    }
+
+    public function checkAxsNull($dt){
+        $query = $this->db->query("SELECT *from atencionXSede where idEspecialista = ? AND idSede = ? AND idOficina = ? AND idArea IS NULL AND tipoCita = ?", 
+        array($dt["especialista"], $dt["sede"], $dt["oficina"], $dt["modalidad"]));
+
+        return $query;
+    }
+
+    public function getAxs($idAts){
+        $query = $this->db->query("SELECT *from atencionXSede WHERE idAtencionXSede = ?", $idAts);
+
+        return $query;
+    }
+
+    public function checkModalidadesNull($dataValue){
+        $query = $this->db->query(
+            "SELECT *FROM atencionXSede where idEspecialista = ? AND idOficina = ? AND tipoCita = ?",
+            array($dataValue["idEspecialista"], $dataValue["idOficina"], $dataValue["modalidad"])
+        );
+
+        return $query;
+    }
+
+    public function checkModalidades($dataValue){
+        $query = $this->db->query(
+            "SELECT *FROM atencionXSede where idEspecialista = ? AND idOficina = ? AND idArea = ? AND tipoCita = ?",
+            array($dataValue["idEspecialista"], $dataValue["idOficina"], $dataValue["idArea"], $dataValue["modalidad"])
+        );
+
+        return $query;
+    }
+
+    public function getAreas(){
+        $query = $this->db->query(
+            "SELECT idArea, area, AR.idDepto, CONCAT(area, ' ', '(', DE.depto, ')') as nombre 
+            FROM areas AR 
+            INNER JOIN departamentos DE ON DE.idDepto = AR.idDepto 
+            UNION ALL
+            SELECT 0 as idArea, 'Sin área' as area, NULL as idDepto, 'SIN ÁREA' as nombre
+            ORDER BY idArea");
+
+        return $query;
+    }
 }

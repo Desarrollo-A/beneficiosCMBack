@@ -8,17 +8,19 @@ class calendarioModel extends CI_Model
         $query = $this->db->query(
             "SELECT CAST(idCita AS VARCHAR(36)) AS id, ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
             ct.fechaInicio AS occupied, ct.estatusCita AS estatus, ct.idDetalle, us.nombre, ct.idPaciente, ct.idEspecialista, ct.idAtencionXSede, 
-            ct.tipoCita, atc.tipoCita as modalidad, atc.idSede ,usEspe.idPuesto, us.telPersonal, usEspe.telPersonal as telefonoEspecialista, ofi.oficina, 
-            ofi.ubicación, pue.idArea, sed.sede, atc.idOficina, us.correo, usEspe.correo as correoEspecialista, usEspe.nombre as especialista, 
-            usEspe.sexo as sexoEspecialista, tf.fechasFolio, ct.idEventoGoogle,
+            ct.tipoCita, atc.tipoCita as modalidad, atc.idSede ,usEspe.idPuesto, us.telPersonal, usEspe.telPersonal as telefonoEspecialista, 
+            CASE WHEN ofi.oficina IS NULL THEN 'VIRTUAL' ELSE ofi.oficina END as 'oficina', CASE WHEN ofi.ubicación IS NULL THEN 'VIRTUAL' ELSE ofi.ubicación END as 'ubicación',
+            pue.idArea, sed.sede, atc.idOficina, us.correo, usEspe.correo as correoEspecialista, usEspe.nombre as especialista, 
+            usEspe.sexo as sexoEspecialista, tf.fechasFolio, ct.idEventoGoogle, ct.evaluacion,
             'color' = CASE
-	            WHEN ct.estatusCita = 1 THEN 'orange'
-	            WHEN ct.estatusCita = 2 THEN 'red'
-	            WHEN ct.estatusCita = 3 THEN 'grey'
-	            WHEN ct.estatusCita = 4 THEN 'green'
-                WHEN ct.estatusCita = 5 THEN 'pink'
-                WHEN ct.estatusCita = 6 THEN 'blue'
-                WHEN ct.estatusCita = 7 THEN 'red'
+                WHEN ct.estatusCita = 1 AND atc.tipoCita = 1 THEN '#ffa500'
+	              WHEN ct.estatusCita = 2 THEN '#ff0000'
+	              WHEN ct.estatusCita = 3 THEN '#808080'
+	              WHEN ct.estatusCita = 4 THEN '#008000'
+                WHEN ct.estatusCita = 5 THEN '#ff4d67'
+                WHEN ct.estatusCita = 6 THEN '#00ffff'
+                WHEN ct.estatusCita = 7 THEN '#ff0000'
+                WHEN ct.estatusCita = 1 AND atc.tipoCita = 2 THEN '#0000ff'
 	        END,
             beneficio = CASE 
             WHEN pue.idPuesto = 537 THEN 'nutrición'
@@ -82,16 +84,17 @@ class calendarioModel extends CI_Model
             "SELECT CAST(ct.idCita AS VARCHAR(36))  AS id,  ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
             ct.fechaInicio AS occupied, 'date' AS 'type', ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal, us.correo,
             se.sede, ofi.oficina, ct.idDetalle, ct.idAtencionXSede, us.externo, usEspe.nombre as especialista, ct.fechaCreacion, pue.tipoPuesto,
-            tf.fechasFolio, idEventoGoogle,
+            tf.fechasFolio, idEventoGoogle, ct.tipoCita, aps.tipoCita as modalidad, aps.idSede,
             'color' = CASE
-	            WHEN ct.estatusCita = 0 THEN 'red'
-	            WHEN ct.estatusCita = 1 THEN 'orange'
-	            WHEN ct.estatusCita = 2 THEN 'red'
-	            WHEN ct.estatusCita = 3 THEN 'grey'
-	            WHEN ct.estatusCita = 4 THEN 'green'
-                WHEN ct.estatusCita = 5 THEN 'pink'
-                WHEN ct.estatusCita = 6 THEN 'blue'
-                WHEN ct.estatusCita = 7 THEN 'red'
+	            WHEN ct.estatusCita = 0 THEN '#ff0000'
+	            WHEN ct.estatusCita = 1 AND aps.tipoCita = 1 THEN '#ffa500'
+	            WHEN ct.estatusCita = 2 THEN '#ff0000'
+	            WHEN ct.estatusCita = 3 THEN '#808080'
+	            WHEN ct.estatusCita = 4 THEN '#008000'
+                WHEN ct.estatusCita = 5 THEN '#ff4d67'
+                WHEN ct.estatusCita = 6 THEN '#00ffff'
+                WHEN ct.estatusCita = 7 THEN '#ff0000'
+                WHEN ct.estatusCita = 1 AND aps.tipoCita = 2 THEN '#0000ff'
 	        END,
             beneficio = CASE 
             WHEN pue.idPuesto = 537 THEN 'nutrición'
@@ -152,6 +155,18 @@ class calendarioModel extends CI_Model
                 $dataValue["idUsuario"],
                 1
             )
+        );
+
+        return $query;
+    }
+
+    public function checkPresencial($idSede, $idEspecialista, $modalidad, $fecha){
+        $query = $this->db->query(
+            "SELECT *from presencialXSede AS pxs
+            INNER JOIN atencionXSede AS axs ON axs.idEspecialista = pxs.idEspecialista 
+            WHERE axs.idSede = ? AND axs.idEspecialista = ? AND axs.tipoCita = ? 
+            AND presencialDate = ?;",
+            array( $idSede, $idEspecialista, $modalidad, $fecha )
         );
 
         return $query;
@@ -238,21 +253,21 @@ class calendarioModel extends CI_Model
             AND ((idPaciente = ?
             AND estatusCita = ?)
             OR (idEspecialista = ? AND estatusCita IN(?, ?)))",
-        array(
-            $fecha_inicio_suma, $fecha_final_resta,
-            $fecha_inicio_suma, $fecha_final_resta,
-            $fecha_inicio_suma,
-            $fecha_final_resta,
-            $dataValue["id"],
-            $dataValue["idPaciente"],
-            1,
-            $dataValue["idUsuario"],
-            1,
-            6
-        )
-    );
+            array(
+                $fecha_inicio_suma, $fecha_final_resta,
+                $fecha_inicio_suma, $fecha_final_resta,
+                $fecha_inicio_suma,
+                $fecha_final_resta,
+                $dataValue["id"],
+                $dataValue["idPaciente"],
+                1,
+                $dataValue["idUsuario"],
+                1,
+                6
+            )
+        );
 
-    return $query;
+        return $query;
     }
 
     public function getIdAtencion($dataValue){
@@ -388,12 +403,23 @@ class calendarioModel extends CI_Model
         return $query;
     }
 
-    public function getCitasSinEvaluarUsuario($usuario, $beneficio)
+    public function getCitasSinEvaluarUsuario($usuario)
     {
         $query = $this->db->query(
             "SELECT c.*, u.idPuesto FROM citas AS c
             INNER JOIN usuarios as u ON c.idEspecialista = u.idUsuario
-            WHERE c.idPaciente = ? AND u.idPuesto = ? AND evaluacion is NULL AND c.estatusCita IN (?)",array($usuario, $beneficio, 4)
+            WHERE c.idPaciente = ? AND evaluacion is NULL AND c.estatusCita IN (?)",array($usuario, 4)
+        );
+
+        return $query;
+    }
+
+    public function getCitasSinPagarUsuario($usuario)
+    {
+        $query = $this->db->query(
+            "SELECT c.*, u.idPuesto FROM citas AS c
+            INNER JOIN usuarios as u ON c.idEspecialista = u.idUsuario
+            WHERE c.idPaciente = ? AND idDetalle is NULL AND c.estatusCita IN (?);",array($usuario, 6)
         );
 
         return $query;
@@ -443,9 +469,10 @@ class calendarioModel extends CI_Model
 
     public function getPendientesPago($idUsuario){
         $query = $this->db->query("SELECT CAST(idCita AS VARCHAR(36)) AS id, ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
-        ct.fechaInicio AS occupied, ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal, ofi.oficina, ofi.ubicación,
-        sed.sede , atc.idOficina, us.correo, usEspe.correo as correoEspecialista, usEspe.nombre as especialista, ct.idDetalle, usEspe.telPersonal as telefonoEspecialista,
-        usEspe.sexo as sexoEspecialista, tf.fechasFolio, ct.idEventoGoogle,
+        ct.fechaInicio AS occupied, ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal, CASE WHEN ofi.oficina IS NULL THEN 'VIRTUAL' ELSE ofi.oficina END as 'oficina',
+        CASE WHEN ofi.ubicación IS NULL THEN 'VIRTUAL' ELSE ofi.ubicación END as 'ubicación', sed.sede , atc.idOficina, us.correo, usEspe.correo as correoEspecialista, 
+        usEspe.nombre as especialista, ct.idDetalle, usEspe.telPersonal as telefonoEspecialista,
+        usEspe.sexo as sexoEspecialista, tf.fechasFolio, ct.idEventoGoogle, ct.evaluacion,
         beneficio = CASE 
         WHEN pue.idPuesto = 537 THEN 'Nutrición'
         WHEN pue.idPuesto = 585 THEN 'Psicología'
@@ -468,9 +495,10 @@ class calendarioModel extends CI_Model
 
     public function getPendientesEvaluacion($idUsuario){
         $query = $this->db->query("SELECT CAST(idCita AS VARCHAR(36)) AS id, ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
-        ct.fechaInicio AS occupied, ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal, ofi.oficina, ofi.ubicación,
-        sed.sede , atc.idOficina, us.correo, usEspe.correo as correoEspecialista, usEspe.nombre as especialista, ct.idDetalle, usEspe.telPersonal as telefonoEspecialista,
-        usEspe.sexo as sexoEspecialista, tf.fechasFolio, ct.idEventoGoogle,
+        ct.fechaInicio AS occupied, ct.estatusCita AS estatus, us.nombre, ct.idPaciente, us.telPersonal, CASE WHEN ofi.oficina IS NULL THEN 'VIRTUAL' ELSE ofi.oficina END as 'oficina',
+        CASE WHEN ofi.ubicación IS NULL THEN 'VIRTUAL' ELSE ofi.ubicación END as 'ubicación', sed.sede , atc.idOficina, us.correo, usEspe.correo as correoEspecialista, 
+        usEspe.nombre as especialista, ct.idDetalle, usEspe.telPersonal as telefonoEspecialista,
+        usEspe.sexo as sexoEspecialista, tf.fechasFolio, ct.idEventoGoogle, ct.evaluacion,
         beneficio = CASE 
         WHEN pue.idPuesto = 537 THEN 'Nutrición'
         WHEN pue.idPuesto = 585 THEN 'Psicología'
@@ -544,17 +572,19 @@ class calendarioModel extends CI_Model
     public function getCitaById($idCita){
         $query = $this->db->query("SELECT CAST(idCita AS VARCHAR(36)) AS id, ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
         ct.fechaInicio AS occupied, ct.estatusCita AS estatus, ct.idDetalle, us.nombre, ct.idPaciente, ct.idEspecialista, ct.idAtencionXSede, 
-        ct.tipoCita, atc.tipoCita as modalidad, atc.idSede ,usEspe.idPuesto, us.telPersonal, usEspe.telPersonal as telefonoEspecialista, ofi.oficina, ofi.ubicación, pue.idArea,
-        sed.sede, atc.idOficina, us.correo, usEspe.correo as correoEspecialista, usEspe.nombre as especialista, usEspe.sexo as sexoEspecialista,
-        tf.fechasFolio, ct.idEventoGoogle,
+        ct.tipoCita, atc.tipoCita as modalidad, atc.idSede ,usEspe.idPuesto, us.telPersonal, usEspe.telPersonal as telefonoEspecialista, 
+        CASE WHEN ofi.oficina IS NULL THEN 'VIRTUAL' ELSE ofi.oficina END as 'oficina', CASE WHEN ofi.ubicación IS NULL THEN 'VIRTUAL' ELSE ofi.ubicación END as 'ubicación',
+        pue.idArea, sed.sede, atc.idOficina, us.correo, usEspe.correo as correoEspecialista, usEspe.nombre as especialista, usEspe.sexo as sexoEspecialista,
+        tf.fechasFolio, ct.idEventoGoogle, ct.evaluacion,
         'color' = CASE
-            WHEN ct.estatusCita = 1 THEN 'orange'
-            WHEN ct.estatusCita = 2 THEN 'red'
-            WHEN ct.estatusCita = 3 THEN 'grey'
-            WHEN ct.estatusCita = 4 THEN 'green'
-            WHEN ct.estatusCita = 5 THEN 'pink'
-            WHEN ct.estatusCita = 6 THEN 'blue'
-            WHEN ct.estatusCita = 7 THEN 'red'
+                WHEN ct.estatusCita = 1 AND atc.tipoCita = 1 THEN '#ffa500'
+	            WHEN ct.estatusCita = 2 THEN '#ff0000'
+	            WHEN ct.estatusCita = 3 THEN '#808080'
+	            WHEN ct.estatusCita = 4 THEN '#008000'
+                WHEN ct.estatusCita = 5 THEN '#ff4d67'
+                WHEN ct.estatusCita = 6 THEN '#00ffff'
+                WHEN ct.estatusCita = 7 THEN '#ff0000'
+                WHEN ct.estatusCita = 1 AND atc.tipoCita = 2 THEN '#0000ff'
         END,
         beneficio = CASE 
             WHEN pue.idPuesto = 537 THEN 'nutrición'
@@ -577,4 +607,24 @@ class calendarioModel extends CI_Model
         return $query;
     }
 
+    public function getSedesDeAtencionEspecialista($idUsuario){
+        $query = $this->db->query(
+        "SELECT ate.idSede as value, sedes.sede as label
+        FROM atencionXSede ate
+        LEFT JOIN sedes ON sedes.idSede=ate.idSede
+        WHERE ate.idEspecialista=? AND ate.tipoCita=?", array($idUsuario, 1));
+
+        return $query;
+    }
+
+    public function getDiasDisponiblesAtencionEspecialista($idUsuario, $idSede){
+        $query = $this->db->query(
+        "SELECT * FROM presencialXSede
+        WHERE idEspecialista=? AND idSede=?
+        AND MONTH(presencialDate) >= MONTH(CAST(GETDATE() AS DATE))
+        AND MONTH(presencialDate) <= MONTH(DATEADD(MONTH, 1, CAST(GETDATE() AS DATE)));", array($idUsuario, $idSede));
+    
+        return $query;
+    }
+    
 }
