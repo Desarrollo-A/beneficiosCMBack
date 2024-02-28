@@ -279,9 +279,9 @@ class EncuestasModel extends CI_Model {
                         $idEspecialista[] = $row->idEspecialista;
                     }
 
-					$query = $this->db->query("INSERT INTO encuestasContestadas (idPregunta, idRespuesta, idEspecialista, idArea, idEncuesta, fechaCreacion, idUsuario ) 
+					$query = $this->db->query("INSERT INTO encuestasContestadas (idPregunta, idRespuesta, idEspecialista, idArea, idEncuesta, fechaCreacion, idUsuario, creadoPor, modificadoPor ) 
 					VALUES (?, ?, ?, ?, ?, GETDATE(), ?)", 
-					array($idPregunta, $resp, $idEspecialista, $idArea, $idEncuesta, $idUsuario ));
+					array($idPregunta, $resp, $idEspecialista, $idArea, $idEncuesta, $idUsuario, $idUsuario, $idUsuario ));
 					
 					/* $queryPreguntasGeneradas = $this->db->query("INSERT INTO preguntasGeneradas (idPregunta, pregunta, estatus, abierta, especialidad, idEncuesta) 
 					VALUES (?, ?, 1, ?, ?, ?)", 
@@ -386,10 +386,10 @@ class EncuestasModel extends CI_Model {
     public function getEncuestasCreadas($dt){
 
         $query = $this->db->query("WITH cte AS (
-            SELECT idEncuesta, fechaCreacion, estatus, ROW_NUMBER() OVER (PARTITION BY idEncuesta ORDER BY fechaCreacion DESC) AS rn, diasVigencia
+            SELECT idEncuesta, fechaCreacion, estatus, ROW_NUMBER() OVER (PARTITION BY idEncuesta ORDER BY fechaCreacion DESC) AS rn
             FROM encuestasCreadas
             WHERE idArea = $dt)
-            SELECT idEncuesta, fechaCreacion, estatus, diasVigencia
+            SELECT idEncuesta, fechaCreacion, estatus
             FROM cte WHERE rn = 1");
 
         return $query;
@@ -408,33 +408,5 @@ class EncuestasModel extends CI_Model {
         rn = 1 AND estatus = 1");
 
         return $query;
-    }
-
-    public function getValidEncContestada($dt){
-    
-        $query1 = $this->db-> query("SELECT DISTINCT ec.idEncuesta
-		FROM encuestasCreadas ec
-		INNER JOIN preguntasGeneradas pg ON pg.idPregunta = ec.idPregunta
-		WHERE ec.estatus = 1 AND abierta = 1 AND ec.idArea = $dt");
-
-        if ($query1->num_rows() > 0) {
-
-            $idEncuesta = '';
-            foreach ($query1->result() as $row) {
-                $idEncuesta = $row->idEncuesta;;
-            }
-
-            $query2 = $this->db-> query("SELECT * FROM encuestasContestadas WHERE idEncuesta = $idEncuesta");
-
-            if ($query2->num_rows() > 0) {
-                return true;
-            }else{
-                return false;
-            }
-
-        }else{
-            return false;
-        }
-
     }
 }
