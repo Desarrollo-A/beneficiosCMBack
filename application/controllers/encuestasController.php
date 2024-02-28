@@ -115,8 +115,13 @@ class EncuestasController extends BaseController {
 		);
 
 		$this->GeneralModel->updateRecord('encuestasCreadas', $data_2, 'idEncuesta', $idEncuesta);
-		echo json_encode(array("estatus" => true, "msj" => "Estatus Actualizado!" ), JSON_NUMERIC_CHECK);
+		$this->db->trans_complete();
 				
+		if ($this->db->trans_status() === FALSE) {
+			echo json_encode(array("estatus" => false, "msj" => "Error en actualizar el estatus"), JSON_NUMERIC_CHECK);
+		} else {
+			echo json_encode(array("estatus" => true, "msj" => "Estatus Actualizado!"), JSON_NUMERIC_CHECK);
+		}
 	}
 
 	public function updateVigencia(){
