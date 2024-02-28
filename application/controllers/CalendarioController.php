@@ -408,7 +408,7 @@ public function createAppointmentByColaborator()
 				$response["msg"] = "Error en las fechas seleccionadas";
 			} else if ($checkModalitie->num_rows() > 0 && $checkModalitie->result()[0]->idSede != $dataValue["idSede"] && $dataValue["modalidad"] == 1){
 				$response["result"] = false;
-				$response["msg"] = "La sede presencial es distinto al del paciente seleccionado";
+				$response["msg"] = "La sede presencial es distinta al del paciente seleccionado";
 			} else {
 				$addRecord = $this->GeneralModel->addRecord("citas", $values);
 
