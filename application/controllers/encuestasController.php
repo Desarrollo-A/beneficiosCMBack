@@ -108,13 +108,13 @@ class EncuestasController extends BaseController {
 			"estatus" => 0,
 		);
 
-		$response_1=$this->GeneralModel->updateRecord('encuestasCreadas', $data_1, 'idEncuesta', $idEnc);
+		$this->GeneralModel->updateRecord('encuestasCreadas', $data_1, 'idEncuesta', $idEnc);
 
 		$data_2 = array(
 			"estatus" => $estatus
 		);
 
-		$response_2=$this->GeneralModel->updateRecord('encuestasCreadas', $data_2, 'idEncuesta', $idEncuesta);
+		$this->GeneralModel->updateRecord('encuestasCreadas', $data_2, 'idEncuesta', $idEncuesta);
 		echo json_encode(array("estatus" => true, "msj" => "Estatus Actualizado!" ), JSON_NUMERIC_CHECK);
 				
 	}

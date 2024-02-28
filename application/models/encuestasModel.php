@@ -386,10 +386,10 @@ class EncuestasModel extends CI_Model {
     public function getEncuestasCreadas($dt){
 
         $query = $this->db->query("WITH cte AS (
-            SELECT idEncuesta, fechaCreacion, estatus, ROW_NUMBER() OVER (PARTITION BY idEncuesta ORDER BY fechaCreacion DESC) AS rn, diasVigencia
+            SELECT idEncuesta, fechaCreacion, estatus, ROW_NUMBER() OVER (PARTITION BY idEncuesta ORDER BY fechaCreacion DESC) AS rn
             FROM encuestasCreadas
             WHERE idArea = $dt)
-            SELECT idEncuesta, fechaCreacion, estatus, diasVigencia
+            SELECT idEncuesta, fechaCreacion, estatus
             FROM cte WHERE rn = 1");
 
         return $query;
