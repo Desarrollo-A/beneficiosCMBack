@@ -333,13 +333,18 @@ class calendarioModel extends CI_Model
         $query = $this->db->query(
             "SELECT u.idUsuario as id, u.idPuesto, p.puesto, u.nombre AS especialista,
             axs.idAtencionXSede, axs.idSede AS idSedeAtiende, se.sede as lugarAtiende, axs.idOficina as oficinaAtiende, 
-            axs.tipoCita, oxc.nombre AS modalidad, o.ubicación as ubicacionOficina
+            axs.tipoCita, oxc.nombre, o.ubicación as ubicacionOficina,
+            'modalidad' = CASE
+                WHEN AXS.idArea IS NULL THEN oxc.nombre
+                WHEN AXS.idArea IS NOT NULL THEN CONCAT(oxc.nombre, ' ', '(', ar.area, ')')
+            END
             FROM usuarios AS u 
             RIGHT JOIN atencionXSede AS AXS ON AXS.idEspecialista = U.idUsuario
             INNER JOIN opcionesPorCatalogo AS oxc ON oxc.idOpcion= axs.tipoCita
             INNER JOIN sedes AS S ON S.idSede = U.idSede
-            LEFT JOIN oficinas as o ON o.idoficina = axs.idOficina
+            LEFT JOIN oficinas AS o ON o.idoficina = axs.idOficina
             INNER JOIN puestos AS p ON p.idPuesto = u.idPuesto
+            LEFT JOIN areas AS ar ON ar.idArea = AXS.idArea
             FULL JOIN sedes AS se ON se.idSede = axs.idSede
             WHERE u.estatus = 1 AND s.estatus = 1 AND axs.estatus = 1  AND u.idRol = 3 AND oxc.idCatalogo = 5
             AND axs.idSede = ? AND u.idUsuario = ?", array($sede, $especialista));
