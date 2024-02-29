@@ -195,7 +195,14 @@ class GestorModel extends CI_Model {
     }
 
     public function checkAxsNull($dt){
-        $query = $this->db->query("SELECT *from atencionXSede where idEspecialista = ? AND idSede = ? AND idOficina = ? AND idArea IS NULL AND tipoCita = ?", 
+        $query = $this->db->query("SELECT *from atencionXSede where idEspecialista = ? AND idSede = ? AND idOficina = ? AND (idArea IS NULL OR idArea IS NOT NULL) AND tipoCita = ?", 
+        array($dt["especialista"], $dt["sede"], $dt["oficina"], $dt["modalidad"]));
+
+        return $query;
+    }
+
+    public function checkAxsMod($dt){
+        $query = $this->db->query("SELECT *from atencionXSede where idEspecialista = ? AND idSede = ? AND idOficina = ? AND (idArea IS NULL OR idArea IS NOT NULL) AND tipoCita = ?", 
         array($dt["especialista"], $dt["sede"], $dt["oficina"], $dt["modalidad"]));
 
         return $query;

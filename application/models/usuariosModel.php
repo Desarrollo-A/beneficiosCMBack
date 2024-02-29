@@ -44,16 +44,16 @@ class UsuariosModel extends CI_Model {
 	public function getNameUser($idEspecialista)
 	{
 		$query = $this->db->query(
-			"SELECT US.*, CONCAT(US.nombre, ' ', '(', SE.sede, ')') AS nombreCompleto, PS.puesto as nombrePuesto, PS.tipoPuesto FROM usuarios US
+			"SELECT US.*, PS.idArea, CONCAT(US.nombre, ' ', '(', SE.sede, ')') AS nombreCompleto, PS.puesto as nombrePuesto, PS.tipoPuesto FROM usuarios US
 			 INNER JOIN puestos PS ON
 			 US.idPuesto = PS.idPuesto
 			 INNER JOIN sedes SE ON SE.idSede = US.idSede
 			 WHERE US.idRol = ?
 			 AND US.estatus = ?
 			 AND US.idSede
-			 IN( select distinct idSede from atencionXSede where idEspecialista = ?)
+			 IN ( select distinct idSede from atencionXSede where idEspecialista = ? )
 			 UNION
-			 SELECT US2.*, CONCAT('(Lamat)', ' ', US2.nombre) AS nombreCompleto,'nombrePuesto' = 'na', 'tipoPuesto' = 'na' FROM usuarios US2 where externo = 1",
+			 SELECT US2.*, NULL AS idArea, CONCAT('(Lamat)', ' ', US2.nombre) AS nombreCompleto, 'nombrePuesto' = 'na', 'tipoPuesto' = 'na' FROM usuarios US2 where externo = 1",
 			 array( 2, 1, $idEspecialista )
 		);
 		
