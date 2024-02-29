@@ -328,26 +328,17 @@ class calendarioModel extends CI_Model
         return $query;
     }
 
-    public function getModalidadesEspecialista($sede, $especialista)
+    public function getModalidadesEspecialista($sede, $especialista, $area)
     {
         $query = $this->db->query(
-            "SELECT u.idUsuario as id, u.idPuesto, p.puesto, u.nombre AS especialista,
-            axs.idAtencionXSede, axs.idSede AS idSedeAtiende, se.sede as lugarAtiende, axs.idOficina as oficinaAtiende, 
-            axs.tipoCita, oxc.nombre, o.ubicación as ubicacionOficina,
-            'modalidad' = CASE
-                WHEN AXS.idArea IS NULL THEN oxc.nombre
-                WHEN AXS.idArea IS NOT NULL THEN CONCAT(oxc.nombre, ' ', '(', ar.area, ')')
-            END
-            FROM usuarios AS u 
-            RIGHT JOIN atencionXSede AS AXS ON AXS.idEspecialista = U.idUsuario
-            INNER JOIN opcionesPorCatalogo AS oxc ON oxc.idOpcion= axs.tipoCita
-            INNER JOIN sedes AS S ON S.idSede = U.idSede
-            LEFT JOIN oficinas AS o ON o.idoficina = axs.idOficina
-            INNER JOIN puestos AS p ON p.idPuesto = u.idPuesto
-            LEFT JOIN areas AS ar ON ar.idArea = AXS.idArea
-            FULL JOIN sedes AS se ON se.idSede = axs.idSede
-            WHERE u.estatus = 1 AND s.estatus = 1 AND axs.estatus = 1  AND u.idRol = 3 AND oxc.idCatalogo = 5
-            AND axs.idSede = ? AND u.idUsuario = ?", array($sede, $especialista));
+            "SELECT modalidad = CASE WHEN tipoCita = 1 then 'PRESENCIAL' WHEN tipoCita = 2 THEN 'EN LíNEA' END,
+            us.idUsuario as id, us.idPuesto, us.nombre AS especialista, o.ubicación as ubicacionOficina, axs.tipoCita, axs.idAtencionXSede, se.sede as lugarAtiende
+            FROM atencionXSede axs
+            INNER JOIN usuarios us ON us.idUsuario = axs.idEspecialista
+            LEFT JOIN oficinas o ON o.idoficina = axs.idOficina
+            INNER JOIN sedes se ON se.idSede = us.idSede
+            WHERE axs.estatus = ? AND axs.idSede = ? AND ((idEspecialista = ? AND idArea is NULL ) OR (idEspecialista = ? AND idArea = ?))", 
+            array(1, $sede, $especialista, $especialista, $area));
 
         return $query;
     }

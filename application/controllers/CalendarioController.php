@@ -382,7 +382,7 @@ public function createAppointmentByColaborator()
 				"modificadoPor" => $dataValue["modificadoPor"],
 				"idAtencionXSede" => intval($dataValue["idCatalogo"]),
 				"tipoCita" => $reagenda == 1 ? $dataValue['oldEventTipo'] : 3,
-				"idDetalle" => $dataValue["idDetalle"],
+				"idDetalle" => $dataValue["idDetalle"] == 0 ? NULL : $dataValue["idDetalle"],
 				"idEventoGoogle" => $reagenda == 1 ? $dataValue["idEventoGoogle"] : ''
 			];
 
@@ -737,10 +737,11 @@ public function createAppointmentByColaborator()
 	{
 		$sede = $this->input->post('dataValue[sede]');
 		$especialista = $this->input->post('dataValue[especialista]');
+		$area = $this->input->post('dataValue[area]');
 
 		$response['result'] = isset($sede, $especialista);
 		if ($response['result']) {
-			$rs = $this->calendarioModel->getModalidadesEspecialista($sede, $especialista)->result();
+			$rs = $this->calendarioModel->getModalidadesEspecialista($sede, $especialista, $area)->result();
 			$response['result'] = count($rs) > 0;
 			if ($response['result']) {
 				$response['msg'] = '¡Listado de modalidades cargado exitosamente!';
@@ -756,7 +757,6 @@ public function createAppointmentByColaborator()
 		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
-	
 	public function getAppointmentsByUser()
 	{
 		$year = $this->input->post('dataValue[year]');
