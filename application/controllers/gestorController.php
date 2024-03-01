@@ -264,7 +264,7 @@ class GestorController extends BaseController {
 		}
 
 		$this->output->set_content_type('application/json');
-		$this->output->set_output(json_encode($response));
+		$this->output->set_output(json_encode($response), JSON_NUMERIC_CHECK);
 	}
 
 	public function updateArea(){

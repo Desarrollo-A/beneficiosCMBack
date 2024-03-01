@@ -336,7 +336,7 @@ class calendarioModel extends CI_Model
             INNER JOIN usuarios us ON us.idUsuario = axs.idEspecialista
             LEFT JOIN oficinas o ON o.idoficina = axs.idOficina
             INNER JOIN sedes se ON se.idSede = us.idSede
-            WHERE axs.estatus = ? AND axs.idSede = ? AND ((idEspecialista = ? AND idArea is NULL ) OR (idEspecialista = ? AND idArea = ?))", 
+            WHERE axs.estatus = ? AND axs.idSede = ? AND ((axs.idEspecialista = ? AND axs.idArea is NULL ) OR (axs.idEspecialista = ? AND axs.idArea = ?))", 
             array(1, $sede, $especialista, $especialista, $area));
 
         return $query;
