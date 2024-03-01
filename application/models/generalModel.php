@@ -506,6 +506,17 @@ class GeneralModel extends CI_Model {
 		CONCAT (CONVERT(DATE,ct.fechaInicio), ' ', FORMAT(ct.fechaInicio, 'HH:mm'), ' - ', FORMAT(ct.fechaFinal, 'HH:mm')) AS horario,
 		ofi.oficina, oxc.nombre AS metodoPago, ct.estatusCita,
 		ISNULL(string_agg(ops.nombre, ', '), 'Sin motivos de cita') AS motivoCita,
+        'color' = CASE
+	        WHEN ct.estatusCita = 0 THEN '#ff0000'
+	        WHEN ct.estatusCita = 1 AND axs.tipoCita = 1 THEN '#ffa500'
+	        WHEN ct.estatusCita = 2 THEN '#ff0000'
+	        WHEN ct.estatusCita = 3 THEN '#808080'
+	        WHEN ct.estatusCita = 4 THEN '#008000'
+            WHEN ct.estatusCita = 5 THEN '#ff4d67'
+            WHEN ct.estatusCita = 6 THEN '#00ffff'
+            WHEN ct.estatusCita = 7 THEN '#ff0000'
+            WHEN ct.estatusCita = 1 AND axs.tipoCita = 2 THEN '#0000ff'
+	    END,
 		CASE 
 		WHEN ct.estatusCita IN (2, 7, 8) THEN 'Cancelado'
 		ELSE 'Exitoso'
@@ -546,7 +557,8 @@ class GeneralModel extends CI_Model {
 			  oxc.nombre, 
 			  ct.estatusCita, 
 			  ct.fechaModificacion,
-			dep.depto");
+			  dep.depto,
+			  axs.tipoCita");
 		return $query;
     }
 

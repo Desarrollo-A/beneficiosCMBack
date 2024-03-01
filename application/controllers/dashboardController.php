@@ -124,4 +124,10 @@ class DashboardController extends BaseController {
 		$this->output->set_content_type('application/json');
         $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
 	}
+
+	public function getEsp(){
+		$areas = $this->input->get('areas');
+		$data = $this->DashModel->getEsp($areas);
+		$this->json($data);
+	}
 }
