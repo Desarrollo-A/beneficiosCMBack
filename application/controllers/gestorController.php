@@ -217,7 +217,7 @@ class GestorController extends BaseController {
 		$this->output->set_content_type('application/json');
         $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
 	}
-
+ 
 	public function insertOficinas(){
 		$dt = $this->input->post('dataValue', true);
 		$data['data'] = $this->GestorModel->insertOficinas($dt);
@@ -264,7 +264,7 @@ class GestorController extends BaseController {
 		}
 
 		$this->output->set_content_type('application/json');
-		$this->output->set_output(json_encode($response), JSON_NUMERIC_CHECK);
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
 	public function updateArea(){
@@ -282,10 +282,7 @@ class GestorController extends BaseController {
 			"modalidad"    => $getAxs->result()[0]->tipoCita
 		];
 
-		if($idArea == 0)
-			$checkAxs = $this->GestorModel->checkAxsNull($checkData);
-		else
-			$checkAxs = $this->GestorModel->checkAxs($checkData, $checkData["idArea"]);
+		$checkAxs = $this->GestorModel->checkAxsId($checkData, $checkData["idArea"], $idAts);
 
 		if($checkAxs->num_rows() > 0){
 			$response["result"] = false;
