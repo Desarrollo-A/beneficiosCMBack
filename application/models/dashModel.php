@@ -271,4 +271,12 @@ class DashModel extends CI_Model
 
 		return $this->db->query($query)->row()->result();
 	}
+
+	public function getEsp($dt)
+    {
+
+        $query = $this->db-> query("SELECT idUsuario, nombre FROM usuarios WHERE idRol = 3 AND idPuesto = $dt");
+        
+        return $query->result();
+    }
 }
