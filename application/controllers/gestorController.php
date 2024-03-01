@@ -190,13 +190,19 @@ class GestorController extends BaseController {
 	}
 
 	public function getEsp(){
-		$areas = $this->input->get('areas');
-		$data = $this->GestorModel->getEsp($areas);
-		// $this->output->set_content_type('application/json');
-        // $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+        $dt = $this->input->post('dataValue', true);
+        $data['data'] = $this->GestorModel->getEsp($dt);
+        echo json_encode($data, JSON_NUMERIC_CHECK);
+    }
 
-		$this->json($data);
-	}
+	// public function getEsp(){
+	// 	$areas = $this->input->get('areas');
+	// 	$data = $this->GestorModel->getEsp($areas);
+	// 	// $this->output->set_content_type('application/json');
+    //     // $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+
+	// 	$this->json($data);
+	// }
 
 	public function getAtencionXsedeEsp(){
 		$dt = $this->input->post('dataValue', true);
@@ -240,7 +246,7 @@ class GestorController extends BaseController {
 		}
 
 		$this->output->set_content_type('application/json');
-		$this->output->set_output(json_encode($response));
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
 	public function getAreas(){
