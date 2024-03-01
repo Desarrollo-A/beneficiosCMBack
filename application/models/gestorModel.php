@@ -188,8 +188,16 @@ class GestorModel extends CI_Model {
     }
 
     public function checkAxs($dt, $idArea){
-        $query = $this->db->query("SELECT *from atencionXSede where idEspecialista = ? AND idSede = ? AND idOficina = ? AND idArea = ? AND tipoCita = ?",
+        $query = $this->db->query("SELECT *from atencionXSede where idEspecialista = ? AND idSede = ? AND idOficina = ? AND (idArea = ? OR idArea IS NULL) AND tipoCita = ?",
         array($dt["especialista"], $dt["sede"], $dt["oficina"], $idArea, $dt["modalidad"]));
+
+        return $query;
+    }
+
+    
+    public function checkAxsId($dt, $idArea, $idAts){
+        $query = $this->db->query("SELECT *from atencionXSede where idEspecialista = ? AND idSede = ? AND idOficina = ? AND (idArea = ? OR idArea IS NULL) AND tipoCita = ? AND idAtencionXSede != ?",
+        array($dt["especialista"], $dt["sede"], $dt["oficina"], $idArea, $dt["modalidad"], $idAts));
 
         return $query;
     }
@@ -225,7 +233,7 @@ class GestorModel extends CI_Model {
 
     public function checkModalidades($dataValue){
         $query = $this->db->query(
-            "SELECT *FROM atencionXSede where idEspecialista = ? AND idOficina = ? AND idArea = ? AND tipoCita = ?",
+            "SELECT *FROM atencionXSede where idEspecialista = ? AND idOficina = ? AND (idArea = ? OR idArea IS NULL) AND tipoCita = ?",
             array($dataValue["idEspecialista"], $dataValue["idOficina"], $dataValue["idArea"], $dataValue["modalidad"])
         );
 
