@@ -12,6 +12,7 @@ class Usuario extends BaseController {
 		$this->load->model('UsuariosModel');
 		$this->load->model('GeneralModel');
 		$this->load->model('MenuModel');
+		$this->load->library("email");
 
 		$this->load->helper(array('form','funciones'));
 	}
@@ -471,5 +472,47 @@ class Usuario extends BaseController {
 		}
 
 		$this->json($result, JSON_NUMERIC_CHECK);
+	}
+
+	public function sendMail() {
+
+			$correo = $this->input->post('dataValue', true);
+
+			$config['protocol']  = 'smtp';
+			$config['smtp_host'] = 'smtp.gmail.com';
+			$config['smtp_user'] = 'testemail@ciudadmaderas.com';
+			$config['smtp_pass'] = 'Feb2024@Te#';
+			$config['smtp_port'] = 465;
+			$config['charset']   = 'utf-8';
+			$config['mailtype']  = 'html';
+			$config['newline']   = "\r\n"; 
+			$config['smtp_crypto']   = 'ssl';
+
+			$data["data"] = substr(md5(time()), 0, 6);
+			
+			$html_message = $this->load->view("email-verificacion", $data, true);
+					
+			$this->load->library("email");
+			$this->email->initialize($config);
+			$this->email->from("no-reply@ciudadmaderas.com");
+			$this->email->to("programador.analista32@ciudadmaderas.com");
+			$this->email->message($html_message);
+			$this->email->subject("Código de verificación Beneficios CDM");
+
+			$this->db->query("DELETE FROM tokenRegistro WHERE correo = '$correo'");
+
+			if ($this->email->send()) {
+				echo json_encode(array("estatus" => true, "msj" => "Envio exitoso" ), JSON_NUMERIC_CHECK); 
+				$this->db->query("INSERT INTO tokenRegistro (correo, token, fechaCreacion) 
+					VALUES (?,?, GETDATE())", 
+					array($correo, $data));
+			} else {
+				echo json_encode(array("estatus" => false, "msj" => "A ocurrido un error"), JSON_NUMERIC_CHECK);
+			}
+	}
+
+	public function getToken(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->UsuariosModel->getToken($dt);
 	}
 }
