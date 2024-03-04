@@ -5,7 +5,8 @@
 class UsuariosModel extends CI_Model {
 	public function __construct()
 	{
-		
+		$this->ch        = $this->load->database('ch', TRUE);
+        $this->beneficio = $this->load->database('beneficio', TRUE);
 	}
 
     public function usuarios()
@@ -34,6 +35,188 @@ class UsuariosModel extends CI_Model {
 		WHERE numEmpleado = ? AND password = ?;", array( $numEmpleado, $password ));
 		return $query;
 	}
+
+	public function login_view_mysql($numEmpleado, $password)
+	{
+		$query = $this->ch->query("SELECT u.*, p.idPuesto, p.puesto, p.idArea, p.tipoPuesto, a.idDepto FROM v_USUARIOS
+		WHERE numEmpleado = ? AND password = ?;", array( $numEmpleado, $password ));
+		return $query;
+	}
+
+	public function login_view_sql($numEmpleado, $password)
+	{
+		$query = $this->beneficios->query("SELECT u.*, p.idPuesto, p.puesto, p.idArea, p.tipoPuesto, a.idDepto FROM v_USUARIOS
+		WHERE numEmpleado = ? AND password = ?;", array( $numEmpleado, $password ));
+		return $query;
+	}
+
+	// public function loginFusion2($numEmpleado, $password)
+	// {
+	// 	$usuarios_ch = $this->ch->query("CALL sp_usuarios()")->result();
+		
+	// 	$this->beneficio->query("
+	// 	CREATE TABLE #tmpUsuarios (
+	// 	idContrato VARCHAR(100),
+	// 	numEmpleado VARCHAR(100),
+	// 	idSede INT,
+	// 	sexo VARCHAR(3),
+	// 	idPuesto INT,
+	// 	nombrePersona VARCHAR(100),
+	// 	priApellido VARCHAR(100),
+	// 	secApellido VARCHAR(100),
+	// 	fIngreso DATE,
+	// 	nSede VARCHAR(50),
+	// 	activo INT,
+	// 	mailEmp VARCHAR(255),
+	// 	nPuesto VARCHAR(255),
+	// 	telefonoPersonal VARCHAR(15)
+	// 	)"
+	// 	)->result();
+
+	// 	// Insertar los resultados del procedimiento almacenado en la tabla temporal
+	// 	foreach ($usuarios_ch as $user) {
+	// 		$this->beneficios->insert('#tmpUsuarios', $user);
+	// 	}
+
+	// 	$query = $this->beneficios->query("SELECT * FROM #tmpUsuarios
+	// 	WHERE numEmpleado = ? AND password = ?;", array( $numEmpleado, $password ));
+	// 	return $query;
+	// }
+
+	// ----------------------------------------------------------------------------------
+	// ----------------------------------------------------------------------------------
+	// ----------------------------------------------------------------------------------
+	// ----------------------------------------------------------------------------------
+
+	// 1: SQLSRV CON SP
+	public function loginFusion($numEmpleado, $password)
+	{	
+    	$usuarios_ch = $this->ch->query("CALL sp_usuarios()")->result();
+
+    	$this->beneficio->query("
+    	    CREATE TABLE #tmpUsuarios (
+    	        idContrato VARCHAR(100),
+    	        numEmpleado VARCHAR(100),
+    	        idSede INT,
+    	        sexo VARCHAR(3),
+    	        idPuesto INT,
+    	        nombrePersona VARCHAR(100),
+    	        priApellido VARCHAR(100),
+    	        secApellido VARCHAR(100),
+    	        fIngreso DATE,
+    	        nSede VARCHAR(50),
+    	        activo INT,
+    	        mailEmp VARCHAR(255),
+    	        nPuesto VARCHAR(255),
+    	        telefonoPersonal VARCHAR(15)
+    	    )
+    	");
+
+    	// Insertar los resultados del procedimiento almacenado en la tabla temporal
+    	foreach ($usuarios_ch as $user) {
+    	    $this->beneficio->query("
+    	        INSERT INTO #tmpUsuarios (idContrato, numEmpleado, idSede, sexo, idPuesto, nombrePersona, priApellido, secApellido, fIngreso, nSede, activo, mailEmp, nPuesto, telefonoPersonal)
+    	        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    	        array($user->idContrato, $user->numEmpleado, $user->idSede, $user->sexo, $user->idPuesto, $user->nombrePersona, $user->priApellido, $user->secApellido, $user->fIngreso, $user->nSede, $user->activo, $user->mailEmp, $user->nPuesto, $user->telefonoPersonal)
+    	    );
+    	}
+
+    	// Aquí necesitarías ajustar la consulta para buscar la contraseña en el lugar correcto
+    	$query = $this->beneficio->query("
+		SELECT * FROM usuarios as u
+		INNER JOIN #tmpUsuarios as tmpu ON u.idContrato = tmpu.idContrato
+		WHERE numEmpleado = ? AND password = ?;", array($numEmpleado, $password));
+
+    	return $query;
+	}
+
+	// SQLSRV CON VISTA
+	public function loginFusion2($numEmpleado, $password)
+	{	
+    	$usuarios_ch = $this->ch->query("SELECT *FROM v_usuarios")->result();
+
+    	$this->beneficio->query("
+    	    CREATE TABLE #tmpUsuarios (
+    	        idContrato VARCHAR(100),
+    	        numEmpleado VARCHAR(100),
+    	        idSede INT,
+    	        sexo VARCHAR(3),
+    	        idPuesto INT,
+    	        nombrePersona VARCHAR(100),
+    	        priApellido VARCHAR(100),
+    	        secApellido VARCHAR(100),
+    	        fIngreso DATE,
+    	        nSede VARCHAR(50),
+    	        activo INT,
+    	        mailEmp VARCHAR(255),
+    	        nPuesto VARCHAR(255),
+    	        telefonoPersonal VARCHAR(15)
+    	    )
+    	");
+
+    	// Insertar los resultados del procedimiento almacenado en la tabla temporal
+    	foreach ($usuarios_ch as $user) {
+    	    $this->beneficio->query("
+    	        INSERT INTO #tmpUsuarios (idContrato, numEmpleado, idSede, sexo, idPuesto, nombrePersona, priApellido, secApellido, fIngreso, nSede, activo, mailEmp, nPuesto, telefonoPersonal)
+    	        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    	        array($user->idContrato, $user->numEmpleado, $user->idSede, $user->sexo, $user->idPuesto, $user->nombrePersona, $user->priApellido, $user->secApellido, $user->fIngreso, $user->nSede, $user->activo, $user->mailEmp, $user->nPuesto, $user->telefonoPersonal)
+    	    );
+    	}
+
+    	// Aquí necesitarías ajustar la consulta para buscar la contraseña en el lugar correcto
+    	$query = $this->beneficio->query("
+		SELECT * FROM usuarios as u
+		INNER JOIN #tmpUsuarios as tmpu ON u.idContrato = tmpu.idContrato
+		WHERE numEmpleado = ? AND password = ?;", array($numEmpleado, $password));
+
+    	return $query;
+	}
+
+	// MYSQL CON VIEW
+	public function loginFusion3($numEmpleado, $password)
+	{	
+    	// Aquí necesitarías ajustar la consulta para buscar la contraseña en el lugar correcto
+    	$query = $this->ch->query("
+		SELECT * FROM usuarios_bnfcs as u
+		INNER JOIN v_usuarios as tmpu ON u.idContrato = tmpu.idContrato
+		WHERE numEmpleado = ? AND password = ?;", array($numEmpleado, $password));
+
+    	return $query;
+	}
+
+	// MYSQL CON SP
+	public function loginFusion4($numEmpleado, $password)
+	{	
+		$query =  $this->ch->query("CALL sp_usuarios()");
+		$usuarios_ch = $query->result();
+	
+		// Liberar los resultados
+		$query->free_result();
+		$this->ch->close();
+	
+		// Reabrir la conexión
+		$this->ch->reconnect();
+	
+		// Crear una tabla temporal
+		$this->ch->query("CREATE TEMPORARY TABLE tmpUsuarios (idContrato VARCHAR(100),numEmpleado VARCHAR(100),idSede INT,sexo VARCHAR(3),idPuesto INT,nombrePersona VARCHAR(100),priApellido VARCHAR(100),secApellido VARCHAR(100),fIngreso DATE,nSede INT,activo INT,mailEmp VARCHAR(255),nPuesto VARCHAR(255),telefonoPersonal VARCHAR(15))");
+	
+		// Insertar los resultados del procedimiento almacenado en la tabla temporal
+		foreach ($usuarios_ch as $usuario) {
+			$this->ch->insert('tmpUsuarios', $usuario);
+		}
+	
+		$query = $this->ch->query("
+		SELECT * FROM usuarios_bnfcs as u
+		INNER JOIN tmpUsuarios as tmpu ON u.idContrato = tmpu.idContrato
+		WHERE numEmpleado = ? AND password = ?;", array($numEmpleado, $password));
+
+    	return $query;
+	}
+
+// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
 
 	public function getAreas()
 	{
