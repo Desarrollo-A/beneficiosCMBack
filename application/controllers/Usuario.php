@@ -480,8 +480,8 @@ class Usuario extends BaseController {
 
 			$config['protocol']  = 'smtp';
 			$config['smtp_host'] = 'smtp.gmail.com';
-			$config['smtp_user'] = 'testemail@ciudadmaderas.com';
-			$config['smtp_pass'] = 'Feb2024@Te#';
+			$config['smtp_user'] = 'no-reply@ciudadmaderas.com';
+			$config['smtp_pass'] = 'JDe64%8q5D';
 			$config['smtp_port'] = 465;
 			$config['charset']   = 'utf-8';
 			$config['mailtype']  = 'html';
@@ -495,7 +495,7 @@ class Usuario extends BaseController {
 			$this->load->library("email");
 			$this->email->initialize($config);
 			$this->email->from("no-reply@ciudadmaderas.com");
-			$this->email->to("programador.analista32@ciudadmaderas.com");
+			$this->email->to($correo);
 			$this->email->message($html_message);
 			$this->email->subject("Código de verificación Beneficios CDM");
 
