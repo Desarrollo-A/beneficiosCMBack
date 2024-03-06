@@ -106,4 +106,20 @@ class UsuariosModel extends CI_Model {
 
 		return $query;
 	}
+
+	public function getToken($dt)
+    {
+		$dt_array = json_decode($dt, true);
+
+		$correo = $dt_array["correo"];
+        $token = $dt_array["token"]["codigo"];
+
+        $query = $this->db->query("SELECT * FROM tokenRegistro WHERE correo = '\"$correo\"' AND token = '$token'");
+
+		if ($query->num_rows() > 0) {
+			echo json_encode(array("estatus" => true, "msj" => "Código correcto" ), JSON_NUMERIC_CHECK); 
+		}else{
+			echo json_encode(array("estatus" => false, "msj" => "El código insertado no es correcto"), JSON_NUMERIC_CHECK);
+		}
+    }
 }
