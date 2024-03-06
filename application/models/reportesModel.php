@@ -14,7 +14,7 @@ class ReportesModel extends CI_Model {
 
 			$query = $this->db-> query("SELECT ct.idCita, pa.idUsuario AS idColab, us.nombre especialista, pa.nombre paciente, ps.puesto AS area, sd.sede,ct.titulo, op.nombre AS estatus, 
 			CONCAT (CONVERT(DATE,ct.fechaInicio), ' ', FORMAT(ct.fechaInicio, 'HH:mm'), ' - ', FORMAT(ct.fechaFinal, 'HH:mm')) AS horario, observaciones, us.sexo, 
-			ofi.oficina, oxc.nombre AS metodoPago, ct.estatusCita, ct.fechaModificacion, dep.depto, op2.nombre AS modalidad,
+			ofi.oficina, oxc.nombre AS metodoPago, ct.estatusCita, ct.fechaInicio, dep.depto, op2.nombre AS modalidad,
 			ISNULL(string_agg(ops.nombre, ', '), 'Sin motivos de cita') AS motivoCita, 
 			'color' = CASE
 	            WHEN ct.estatusCita = 0 THEN '#ff0000'
@@ -81,7 +81,7 @@ class ReportesModel extends CI_Model {
 
 			$query = $this->db-> query("SELECT ct.idCita, pa.idUsuario AS idColab, us.nombre especialista, pa.nombre paciente, ps.puesto AS area, sd.sede,ct.titulo, op.nombre AS estatus, 
 			CONCAT (CONVERT(DATE,ct.fechaInicio), ' ', FORMAT(ct.fechaInicio, 'HH:mm'), ' - ', FORMAT(ct.fechaFinal, 'HH:mm')) AS horario, observaciones, us.sexo, 
-			ofi.oficina, oxc.nombre AS metodoPago, ct.estatusCita, ct.fechaModificacion, dep.depto, op2.nombre AS modalidad,
+			ofi.oficina, oxc.nombre AS metodoPago, ct.estatusCita, ct.fechaInicio, dep.depto, op2.nombre AS modalidad,
 			ISNULL(string_agg(ops.nombre, ', '), 'Sin motivos de cita') AS motivoCita,
 			'color' = CASE
 	            WHEN ct.estatusCita = 0 THEN '#ff0000'
@@ -147,7 +147,7 @@ class ReportesModel extends CI_Model {
 
 			$query = $this->db-> query("SELECT ct.idCita, pa.idUsuario AS idColab, us.nombre especialista, pa.nombre paciente, ps.puesto AS area, sd.sede,ct.titulo, op.nombre AS estatus, 
 			CONCAT (CONVERT(DATE,ct.fechaInicio), ' ', FORMAT(ct.fechaInicio, 'HH:mm'), ' - ', FORMAT(ct.fechaFinal, 'HH:mm')) AS horario, observaciones, us.sexo, 
-			ofi.oficina, oxc.nombre AS metodoPago, ct.estatusCita, ct.fechaModificacion, dep.depto, op2.nombre AS modalidad,
+			ofi.oficina, oxc.nombre AS metodoPago, ct.estatusCita, ct.fechaInicio, dep.depto, op2.nombre AS modalidad,
 			ISNULL(string_agg(ops.nombre, ', '), 'Sin motivos de cita') AS motivoCita,
 			'color' = CASE
 	            WHEN ct.estatusCita = 0 THEN '#ff0000'
@@ -583,23 +583,29 @@ class ReportesModel extends CI_Model {
 
 		if($area == "0" && $mod == "0" && $rol == 4){
 
-			$query = $this->db-> query("SELECT SUM(dp.cantidad) AS TotalIngreso
+			$query = $this->db-> query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
+			FROM (
+				SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
 			FROM citas ct
 			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-			WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')");
+			WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+			) AS sub");
 			return $query;
 
 		}else if($area != "0" && $rol == 4 && $idEsp == "0" && $mod == "0"){
 
 			$ar = implode("','", $dt["esp"]);
 
-			$query = $this->db-> query("SELECT SUM(dp.cantidad) AS TotalIngreso
+			$query = $this->db-> query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
+			FROM (
+				SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
 			FROM citas ct
 			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
 			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
 			INNER JOIN puestos ps On ps.idPuesto = us.idPuesto
 			WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-			AND ps.puesto IN ('$ar')");
+			AND ps.puesto IN ('$ar')
+			) AS sub");
 			return $query;
 
 		}else if($area != "0" && $rol == 4 && $idEsp != "0" && $mod == "0"){
@@ -607,20 +613,25 @@ class ReportesModel extends CI_Model {
 			$nombres = implode("','", $dt["idEsp"]);
 			$ar = implode("','", $dt["esp"]);
 	
-			$query = $this->db->query("SELECT SUM(dp.cantidad) AS TotalIngreso
+			$query = $this->db->query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
+			FROM (
+				SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
 			FROM citas ct
 			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
 			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
 			INNER JOIN puestos ps On ps.idPuesto = us.idPuesto
 			WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-			AND ps.puesto IN ('$ar') AND us.nombre IN ('$nombres')");
+			AND ps.puesto IN ('$ar') AND us.nombre IN ('$nombres')
+			) AS sub");
 			return $query;
 		
 		}else if($area == "0" && $rol == 4 && $idEsp == "0" && $mod != "0"){
 
 			$modalidad = implode("','", $dt["modalidad"]);
 
-			$query = $this->db-> query("SELECT SUM(dp.cantidad) AS TotalIngreso
+			$query = $this->db-> query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
+			FROM (
+				SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
 			FROM citas ct
 			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
 			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
@@ -628,7 +639,8 @@ class ReportesModel extends CI_Model {
 			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
 			LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
 			WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-			AND op2.nombre IN ('$modalidad')");
+			AND op2.nombre IN ('$modalidad')
+			) AS sub");
 			return $query;
 
 		}else if($area != "0" && $rol == 4 && $idEsp == "0" && $mod != "0"){
@@ -636,7 +648,9 @@ class ReportesModel extends CI_Model {
 			$modalidad = implode("','", $dt["modalidad"]);
 			$ar = implode("','", $dt["esp"]);
 
-			$query = $this->db-> query("SELECT SUM(dp.cantidad) AS TotalIngreso
+			$query = $this->db-> query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
+			FROM (
+				SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
 			FROM citas ct
 			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
 			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
@@ -644,7 +658,8 @@ class ReportesModel extends CI_Model {
 			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
 			LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
 			WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-			AND op2.nombre IN ('$modalidad') AND ps.puesto IN ('$ar')");
+			AND op2.nombre IN ('$modalidad') AND ps.puesto IN ('$ar')
+			) AS sub");
 			return $query;	
 		
 		}else if($area != "0" && $rol == 4 && $idEsp != "0" && $mod != "0"){
@@ -652,7 +667,9 @@ class ReportesModel extends CI_Model {
 			$nombres = implode("','", $dt["idEsp"]);
 			$modalidad = implode("','", $dt["modalidad"]);
 
-			$query = $this->db->query("SELECT SUM(dp.cantidad) AS TotalIngreso
+			$query = $this->db->query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
+			FROM (
+				SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
 			FROM citas ct
 			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
 			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
@@ -660,21 +677,25 @@ class ReportesModel extends CI_Model {
 			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
 			LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
 			WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-			AND us.nombre IN ('$nombres') AND op2.nombre IN ('$modalidad')");
+			AND us.nombre IN ('$nombres') AND op2.nombre IN ('$modalidad')
+			) AS sub");
 			return $query;
 
 		}else if($rol == 3 && $mod == "0"){
 
 			$query = $this->db-> query("SELECT COALESCE(SUM(TotalIngreso), 0) AS TotalIngreso
 			FROM (
-			SELECT SUM(dp.cantidad) AS TotalIngreso
-			FROM citas ct
-			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-			INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
-			WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-			AND us.idUsuario = $idUsr
-			) AS subconsulta;");
+				SELECT SUM(distinct_ct.cantidad) AS TotalIngreso
+				FROM (
+					SELECT DISTINCT ct.idDetalle, dp.cantidad
+					FROM citas ct
+					INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
+					INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
+					INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
+					WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+					AND us.idUsuario = $idUsr
+				) AS distinct_ct
+			) AS subconsulta");
 			return $query;
 
 		}else if($rol == 3 && $mod != "0"){
@@ -683,15 +704,18 @@ class ReportesModel extends CI_Model {
 
 			$query = $this->db-> query("SELECT COALESCE(SUM(TotalIngreso), 0) AS TotalIngreso
 			FROM (
-			SELECT SUM(dp.cantidad) AS TotalIngreso
-			FROM citas ct
-			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-			INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
-			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
-			LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-			WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-			AND us.idUsuario = $idUsr AND op2.nombre IN ('$modalidad')
+				SELECT SUM(distinct_ct.cantidad) AS TotalIngreso
+			FROM (
+				SELECT DISTINCT ct.idDetalle, dp.cantidad
+				FROM citas ct
+				INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
+				INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
+				INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
+				LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
+				LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
+				WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+				AND us.idUsuario = $idUsr AND op2.nombre IN ('$modalidad')
+				) AS distinct_ct
 			) AS subconsulta;");
 			return $query;
 
@@ -702,23 +726,29 @@ class ReportesModel extends CI_Model {
 
 		if($area == "0" && $mod == "0" && $rol == 4){
 
-			$query = $this->db-> query("SELECT SUM(dp.cantidad) AS TotalIngreso
+			$query = $this->db-> query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
+			FROM (
+				SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
 			FROM citas ct
 			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-			WHERE ct.estatusCita = $reporte AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')");
+			WHERE ct.estatusCita = $reporte AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+			) AS sub");
 			return $query;
 
 		}else if($area != "0" && $rol == 4 && $idEsp == "0" && $mod == "0"){
 
 			$ar = implode("','", $dt["esp"]);
 
-			$query = $this->db-> query("SELECT SUM(dp.cantidad) AS TotalIngreso
+			$query = $this->db-> query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
+			FROM (
+				SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
 			FROM citas ct
 			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
 			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
 			INNER JOIN puestos ps On ps.idPuesto = us.idPuesto
 			WHERE ct.estatusCita = $reporte AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-			AND ps.puesto IN ('$ar')");
+			AND ps.puesto IN ('$ar')
+			) AS sub");
 			return $query;
 
 		}else if($area != "0" && $rol == 4 && $idEsp != "0" && $mod == "0"){
@@ -726,20 +756,25 @@ class ReportesModel extends CI_Model {
 			$nombres = implode("','", $dt["idEsp"]);
 			$ar = implode("','", $dt["esp"]);
 	
-			$query = $this->db->query("SELECT SUM(dp.cantidad) AS TotalIngreso
+			$query = $this->db->query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
+			FROM (
+				SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
 			FROM citas ct
 			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
 			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
 			INNER JOIN puestos ps On ps.idPuesto = us.idPuesto
 			WHERE ct.estatusCita = $reporte AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-			AND ps.puesto IN ('$ar') AND us.nombre IN ('$nombres')");
+			AND ps.puesto IN ('$ar') AND us.nombre IN ('$nombres')
+			) AS sub");
 			return $query;
 		
 		}else if($area == "0" && $rol == 4 && $idEsp == "0" && $mod != "0"){
 
 			$modalidad = implode("','", $dt["modalidad"]);
 
-			$query = $this->db-> query("SELECT SUM(dp.cantidad) AS TotalIngreso
+			$query = $this->db-> query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
+			FROM (
+				SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
 			FROM citas ct
 			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
 			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
@@ -747,7 +782,8 @@ class ReportesModel extends CI_Model {
 			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
 			LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
 			WHERE ct.estatusCita = $reporte AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-			AND op2.nombre IN ('$modalidad')");
+			AND op2.nombre IN ('$modalidad')
+			) AS sub");
 			return $query;
 		
 		}else if($area != "0" && $rol == 4 && $idEsp != "0" && $mod != "0"){
@@ -755,7 +791,9 @@ class ReportesModel extends CI_Model {
 			$nombres = implode("','", $dt["idEsp"]);
 			$modalidad = implode("','", $dt["modalidad"]);
 
-			$query = $this->db->query("SELECT SUM(dp.cantidad) AS TotalIngreso
+			$query = $this->db->query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
+			FROM (
+				SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
 			FROM citas ct
 			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
 			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
@@ -764,7 +802,8 @@ class ReportesModel extends CI_Model {
 			LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
 			WHERE ct.estatusCita = $reporte
 			AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-			AND us.nombre IN ('$nombres') AND op2.nombre IN ('$modalidad')");
+			AND us.nombre IN ('$nombres') AND op2.nombre IN ('$modalidad')
+			) AS sub");
 			return $query;
 
 		}else if($area != "0" && $rol == 4 && $idEsp == "0" && $mod != "0"){
@@ -772,7 +811,9 @@ class ReportesModel extends CI_Model {
 			$modalidad = implode("','", $dt["modalidad"]);
 			$ar = implode("','", $dt["esp"]);
 
-			$query = $this->db-> query("SELECT SUM(dp.cantidad) AS TotalIngreso
+			$query = $this->db-> query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
+			FROM (
+				SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
 			FROM citas ct
 			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
 			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
@@ -780,21 +821,25 @@ class ReportesModel extends CI_Model {
 			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
 			LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
 			WHERE ct.estatusCita = $reporte AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-			AND op2.nombre IN ('$modalidad') AND ps.puesto IN ('$ar')");
+			AND op2.nombre IN ('$modalidad') AND ps.puesto IN ('$ar')
+			) AS sub");
 			return $query;	
 
 		}else if($rol == 3 && $mod == "0"){
 
 			$query = $this->db-> query("SELECT COALESCE(SUM(TotalIngreso), 0) AS TotalIngreso
 			FROM (
-			SELECT SUM(dp.cantidad) AS TotalIngreso
-			FROM citas ct
-			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-			INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
-			WHERE ct.estatusCita = $reporte
-			AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-			AND us.idUsuario = $idUsr
+			SELECT SUM(distinct_ct.cantidad) AS TotalIngreso
+			FROM (
+				SELECT DISTINCT ct.idDetalle, dp.cantidad
+				FROM citas ct
+				INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
+				INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
+				INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
+				WHERE ct.estatusCita = $reporte
+				AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+				AND us.idUsuario = $idUsr
+				) AS distinct_ct
 			) AS subconsulta;");
 			return $query;
 
@@ -804,16 +849,19 @@ class ReportesModel extends CI_Model {
 
 			$query = $this->db-> query("SELECT COALESCE(SUM(TotalIngreso), 0) AS TotalIngreso
 			FROM (
-			SELECT SUM(dp.cantidad) AS TotalIngreso
-			FROM citas ct
-			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-			INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
-			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
-			LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-			WHERE ct.estatusCita = $reporte
-			AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-			AND us.idUsuario = $idUsr AND op2.nombre IN ('$modalidad')
+			SELECT SUM(distinct_ct.cantidad) AS TotalIngreso
+			FROM (
+				SELECT DISTINCT ct.idDetalle, dp.cantidad
+				FROM citas ct
+				INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
+				INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
+				INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
+				LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
+				LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
+				WHERE ct.estatusCita = $reporte
+				AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+				AND us.idUsuario = $idUsr AND op2.nombre IN ('$modalidad')
+				) AS distinct_ct
 			) AS subconsulta;");
 			return $query;
 
@@ -824,30 +872,38 @@ class ReportesModel extends CI_Model {
 
 		if($area == "0" && $mod == "0" && $rol == 4){
 
-			$query = $this->db-> query("SELECT SUM(dp.cantidad) AS TotalIngreso
+			$query = $this->db-> query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
+			FROM (
+				SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
 			FROM citas ct
 			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-			WHERE ct.estatusCita = 2 AND ct.estatusCita = 7 AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')");
+			WHERE ct.estatusCita = 2 AND ct.estatusCita = 7 AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+			) AS sub");
 			return $query;
 
 		}else if($area != "0" && $rol == 4 && $idEsp == "0" && $mod == "0"){
 
 			$ar = implode("','", $dt["esp"]);
 
-			$query = $this->db-> query("SELECT SUM(dp.cantidad) AS TotalIngreso
+			$query = $this->db-> query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
+			FROM (
+				SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
 			FROM citas ct
 			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
 			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
 			INNER JOIN puestos ps On ps.idPuesto = us.idPuesto
 			WHERE ct.estatusCita = 2 AND ct.estatusCita = 7 AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-			AND ps.puesto IN ('$ar')");
+			AND ps.puesto IN ('$ar')
+			) AS sub");
 			return $query;
 		
 		}else if($area == "0" && $rol == 4 && $idEsp == "0" && $mod != "0"){
 
 			$modalidad = implode("','", $dt["modalidad"]);
 
-			$query = $this->db-> query("SELECT SUM(dp.cantidad) AS TotalIngreso
+			$query = $this->db-> query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
+			FROM (
+				SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
 			FROM citas ct
 			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
 			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
@@ -855,7 +911,8 @@ class ReportesModel extends CI_Model {
 			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
 			LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
 			WHERE ct.estatusCita = 2 AND ct.estatusCita = 7 AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-			AND op2.nombre IN ('$modalidad')");
+			AND op2.nombre IN ('$modalidad')
+			) AS sub");
 			return $query;
 
 		}else if($area != "0" && $rol == 4 && $idEsp != "0" && $mod == "0"){
@@ -863,13 +920,16 @@ class ReportesModel extends CI_Model {
 			$nombres = implode("','", $dt["idEsp"]);
 			$ar = implode("','", $dt["esp"]);
 
-			$query = $this->db->query("SELECT SUM(dp.cantidad) AS TotalIngreso
+			$query = $this->db->query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
+			FROM (
+				SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
 			FROM citas ct
 			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
 			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
 			INNER JOIN puestos ps On ps.idPuesto = us.idPuesto
 			WHERE ct.estatusCita = 2 AND ct.estatusCita = 7 AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-			AND ps.puesto IN ('$ar') AND us.nombre IN ('$nombres')");
+			AND ps.puesto IN ('$ar') AND us.nombre IN ('$nombres')
+			) AS sub");
 			return $query;
 		
 		}else if($area != "0" && $rol == 4 && $idEsp != "0" && $mod != "0"){
@@ -877,7 +937,9 @@ class ReportesModel extends CI_Model {
 			$nombres = implode("','", $dt["idEsp"]);
 			$modalidad = implode("','", $dt["modalidad"]);
 
-			$query = $this->db->query("SELECT SUM(dp.cantidad) AS TotalIngreso
+			$query = $this->db->query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
+			FROM (
+				SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
 			FROM citas ct
 			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
 			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
@@ -886,7 +948,8 @@ class ReportesModel extends CI_Model {
 			LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
 			WHERE ct.estatusCita = 2 AND ct.estatusCita = 7
 			AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-			AND us.nombre IN ('$nombres') AND op2.nombre IN ('$modalidad')");
+			AND us.nombre IN ('$nombres') AND op2.nombre IN ('$modalidad')
+			) AS sub");
 			return $query;
 
 		}else if($area != "0" && $rol == 4 && $idEsp == "0" && $mod != "0"){
@@ -894,7 +957,9 @@ class ReportesModel extends CI_Model {
 			$modalidad = implode("','", $dt["modalidad"]);
 			$ar = implode("','", $dt["esp"]);
 
-			$query = $this->db-> query("SELECT SUM(dp.cantidad) AS TotalIngreso
+			$query = $this->db-> query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
+			FROM (
+				SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
 			FROM citas ct
 			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
 			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
@@ -903,21 +968,25 @@ class ReportesModel extends CI_Model {
 			LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
 			WHERE ct.estatusCita = 2 AND ct.estatusCita = 7 
 			AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-			AND op2.nombre IN ('$modalidad') AND ps.puesto IN ('$ar')");
+			AND op2.nombre IN ('$modalidad') AND ps.puesto IN ('$ar')
+			) AS sub");
 			return $query;	
 
 		}else if($rol == 3 && $mod == "0"){
 
 			$query = $this->db-> query("SELECT COALESCE(SUM(TotalIngreso), 0) AS TotalIngreso
 			FROM (
-			SELECT SUM(dp.cantidad) AS TotalIngreso
-			FROM citas ct
-			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-			INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
-			WHERE ct.estatusCita = 2 AND ct.estatusCita = 7
-			AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-			AND us.idUsuario = $idUsr
+			SELECT SUM(distinct_ct.cantidad) AS TotalIngreso
+			FROM (
+				SELECT DISTINCT ct.idDetalle, dp.cantidad
+				FROM citas ct
+				INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
+				INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
+				INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
+				WHERE ct.estatusCita = 2 AND ct.estatusCita = 7
+				AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+				AND us.idUsuario = $idUsr
+				) AS distinct_ct
 			) AS subconsulta;");
 			return $query;
 
@@ -927,16 +996,19 @@ class ReportesModel extends CI_Model {
 
 			$query = $this->db-> query("SELECT COALESCE(SUM(TotalIngreso), 0) AS TotalIngreso
 			FROM (
-			SELECT SUM(dp.cantidad) AS TotalIngreso
-			FROM citas ct
-			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-			INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
-			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
-			LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-			WHERE ct.estatusCita = 2 AND ct.estatusCita = 7
-			AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-			AND us.idUsuario = $idUsr AND op2.nombre IN ('$modalidad')
+			SELECT SUM(distinct_ct.cantidad) AS TotalIngreso
+			FROM (
+				SELECT DISTINCT ct.idDetalle, dp.cantidad
+				FROM citas ct
+				INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
+				INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
+				INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
+				LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
+				LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
+				WHERE ct.estatusCita = 2 AND ct.estatusCita = 7
+				AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+				AND us.idUsuario = $idUsr AND op2.nombre IN ('$modalidad')
+				) AS distinct_ct
 			) AS subconsulta;");
 			return $query;
 
