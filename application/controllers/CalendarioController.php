@@ -833,15 +833,14 @@ public function createAppointmentByColaborator()
 	public function isPrimeraCita()
 	{
 		$usuario = $this->input->post('dataValue[usuario]');
-		$especialista = $this->input->post('dataValue[especialista]');
+		$beneficio = $this->input->post('dataValue[beneficio]');
 
-		$response['result'] = isset($usuario, $especialista);
+		$response['result'] = isset($usuario, $beneficio);
 		if ($response['result']) {
-			$rs = $this->calendarioModel->isPrimeraCita($usuario, $especialista)->result();
-			$response['result'] = count($rs) > 0;
+			$rs = $this->calendarioModel->isPrimeraCita($usuario, $beneficio)->result();
+			$response['result'] = count($rs) == 0;
 			if ($response['result']) {
 				$response['msg'] = '¡Usuario con registros de citas!';
-				// $response['data'] = $rs;
 			} else {
 				$response['msg'] = '¡No existen registros!';
 			}
@@ -1025,20 +1024,26 @@ public function createAppointmentByColaborator()
 	}
 
 	public function registrarTransaccionPago(){
+		$fecha = date('Y-m-d H:i:s');
 		$usuario = $this->input->post('dataValue[usuario]');
 		$folio = $this->input->post('dataValue[folio]');
+		$referencia = $this->input->post('dataValue[referencia]');
 		$concepto = $this->input->post('dataValue[concepto]');
 		$cantidad = $this->input->post('dataValue[cantidad]');
 		$metodoPago = $this->input->post('dataValue[metodoPago]');
-		$fecha = date('Y-m-d H:i:s');
+		$estatusPago = $this->input->post('dataValue[estatusPago]');
+		$fechaPago = $metodoPago === 11 ? $fecha : $this->input->post('dataValue[fechaPago]');
 		
-		$response['result'] = isset($usuario, $folio, $concepto, $cantidad, $metodoPago, $fecha);
+		$response['result'] = isset($usuario, $folio, $referencia, $concepto, $cantidad, $metodoPago, $estatusPago, $fechaPago);
 		if ($response['result']) {
 			$values = [
 				"folio" => $folio,
 				"idConcepto" => $concepto,
+				"referencia" => $referencia,
 				"cantidad" => $cantidad,
 				"metodoPago" => $metodoPago,
+				"estatusPago" => $estatusPago,
+				"fechaPago" => $fechaPago,
 				"estatus" => 1,
 				"creadoPor" => $usuario,
 				"fechaCreacion" => $fecha,
@@ -1047,12 +1052,33 @@ public function createAppointmentByColaborator()
 			];
 			$response["result"] = $this->GeneralModel->addRecord("detallePagos", $values);
 			if ($response["result"]) {
-				$response["msg"] = "¡Se ha generado el detalle de pago con éxito!";
 				$rs = $this->calendarioModel->getDetallePago($folio)->result();
+
 				if (!empty($rs) && isset($rs[0]->idDetalle)) {
 					$response["data"] = $rs[0]->idDetalle;
+					// $referencia = 'U88-PSIC-U150-C93';
+					$partes = explode('-', $referencia);
+					$ultimoDatoReferencia = end($partes);
+
+					$idCita = substr($ultimoDatoReferencia, 1); //Cortamos la inicial del dato que es una letra para extraer solo el numero del id
+
+					if ($concepto == 1) { // Actualizamos el id de cita
+						$upd = [
+							"idDetalle" => $rs[0]->idDetalle,
+							"modificadoPor" => 1,
+							"fechaModificacion" => $fecha 
+						];
+						$response["result"] = $this->GeneralModel->updateRecord("citas", $upd, 'idCita', $idCita);
+						if ($response["result"]) {
+							$response["msg"] = "¡Se ha generado el detalle de pago de cita con éxito!";
+						}else {
+							$response["msg"] = "¡Surgió un error al enlazar la cita con el pago!";
+						}
+					}else {
+						$response["msg"] = "¡Se ha generado el detalle de pago con éxito!";
+					}
 				} else {
-					$response["data"] = null;
+					$response["msg"] = 'No se pudo consultar los datos de detalle de pago';
 				}
 			} 
 			else {
