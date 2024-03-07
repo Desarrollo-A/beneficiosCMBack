@@ -33,7 +33,7 @@ class Api extends BaseController{
 
 	public function confirmarPago()
 	{
-        $fecha = date('Y-m-d H:i:s');
+		$fecha = date('Y-m-d H:i:s');
 		$usuario = 1; //Banco
 		$folio = $this->input->post('cl_folio');
 		$referencia = $this->input->post('cl_referencia');
@@ -45,10 +45,8 @@ class Api extends BaseController{
 		$hash = $this->input->post('hash');
 
         $cadena = $folio.'|'.$concepto.'|'.$referencia.'|'.$cantidad.'|'.$fechaPago.'|'.$metodoPago.'|'.$estatusPago.'|';
-		$key = APPPATH . '../dist/keys/public_key_Banbajio.pem';
-		$cadenaEncriptada = SignData($cadena, $key);
-
-        $response['result'] = $hash === $cadenaEncriptada;
+		$key = APPPATH . '..\dist\keys\public_key_BB.pem';
+		$response['result'] = VerifyData($hash, $cadena, $key);
 		if ($response['result']) {
 			$values = [
 				"folio" => $folio,
@@ -64,17 +62,22 @@ class Api extends BaseController{
 				"modificadoPor" => $usuario,
 				"fechaModificacion" => $fecha
 			];
-			$response["result"] = $this->GeneralModel->addRecord("detallePagos", $values);
+			$rs = $this->GeneralModel->addRecord("detallePagos", $values);
+			$last_id = $this->db->insert_id();
+			$response["result"] = $rs;
 			if ($response["result"]) {
-				$rs = $this->calendarioModel->getDetallePago($folio)->result();
-				if (!empty($rs) && isset($rs[0]->idDetalle)) {					
+				if (isset($last_id)) {					
 					$partes = explode('-', $referencia); // Sacamos el ultimo dato de la referencia
 					$idCita = substr(end($partes), 1); //Cortamos la inicial del dato que es una letra para extraer solo el numero del id
-
 					if ($concepto == 1) { // Actualizamos el id de cita
-						$response["result"] = $this->GeneralModel->updateRecord("citas", ["idDetalle" => $rs[0]->idDetalle], 'idCita', $idCita);
+						$upd = [
+							"idDetalle" => $last_id,
+							"modificadoPor" => $usuario,
+							"fechaModificacion" => $fecha,
+						];
+						$response["result"] = $this->GeneralModel->updateRecord("citas", $upd, 'idCita', $idCita);
 						if ($response["result"]) {
-							$response["msg"] = "¡Se ha generado el detalle de pago de cita con éxito!";
+							$response["msg"] = "estatus_notificacion=0";
 						}else {
 							$response["msg"] = "¡Surgió un error al enlazar la cita con el pago!";
 						}
@@ -82,20 +85,17 @@ class Api extends BaseController{
 						$response["msg"] = "¡Se ha generado el detalle de pago con éxito!";
 					}
 				} else {
-					$response["msg"] = 'No se pudo consultar los datos de detalle de pago';
+					$response["msg"] = 'No se encontró la información del detalle de pago';
 				}
 			} 
 			else {
-				$response["msg"] = "¡Surgió un error al intentar generar el detalle de pago!";
+				$response["msg"] = "¡Surgió un error al intentar registrar el detalle de pago!";
 			}
 		} else{
 			$response['msg'] = "¡Parámetros inválidos!";
 		}
-
-		// 'estatus_notificacion=0' 
-		// $response
 		
 		$this->output->set_content_type('application/json');
-		$this->output->set_output(json_encode('estatus_notificacion=0', JSON_NUMERIC_CHECK));
+		$this->output->set_output(json_encode($response['msg'], JSON_NUMERIC_CHECK));
     }
 }
