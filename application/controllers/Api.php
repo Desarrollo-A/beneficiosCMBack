@@ -45,7 +45,7 @@ class Api extends BaseController{
 		$hash = $this->input->post('hash');
 
         $cadena = $folio.'|'.$concepto.'|'.$referencia.'|'.$cantidad.'|'.$fechaPago.'|'.$metodoPago.'|'.$estatusPago.'|';
-		$key = APPPATH . '..\dist\keys\public_key_BB.pem';
+		$key = APPPATH . '../dist/keys/public_key_BB.pem';
 		$response['result'] = VerifyData($hash, $cadena, $key);
 		if ($response['result']) {
 			$values = [
