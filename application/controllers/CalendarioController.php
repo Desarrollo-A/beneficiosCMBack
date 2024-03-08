@@ -1025,14 +1025,18 @@ public function createAppointmentByColaborator()
 	}
 
 	public function registrarTransaccionPago(){
-		$usuario = $this->input->post('dataValue[usuario]');
-		$folio = $this->input->post('dataValue[folio]');
-		$concepto = $this->input->post('dataValue[concepto]');
-		$cantidad = $this->input->post('dataValue[cantidad]');
-		$metodoPago = $this->input->post('dataValue[metodoPago]');
-		$fecha = date('Y-m-d H:i:s');
+		$usuario     = $this->input->post('dataValue[usuario]');
+		$folio       = $this->input->post('dataValue[folio]');
+		$referencia  = $this->input->post('dataValue[referencia]');
+		$concepto    = $this->input->post('dataValue[concepto]');
+		$cantidad    = $this->input->post('dataValue[cantidad]');
+		$metodoPago  = $this->input->post('dataValue[metodoPago]');
+		$estatusPago = $this->input->post('dataValue[estatusPago]');
+		$fechaPago   = $this->input->post('dataValue[fechaPago]');
+		$cita		 = $this->input->post('dataValue[idCita]');
+		$fecha       = date('Y-m-d H:i:s');
 		
-		$response['result'] = isset($usuario, $folio, $concepto, $cantidad, $metodoPago, $fecha);
+		$response['result'] = isset($usuario, $folio, $referencia, $concepto, $cantidad, $metodoPago, $estatusPago, $fechaPago, $fecha);
 		if ($response['result']) {
 			$values = [
 				"folio" => $folio,
@@ -1043,7 +1047,10 @@ public function createAppointmentByColaborator()
 				"creadoPor" => $usuario,
 				"fechaCreacion" => $fecha,
 				"modificadoPor" => $usuario,
-				"fechaModificacion" => $fecha
+				"fechaModificacion" => $fecha,
+				"estatusPago" => $estatusPago,
+				"fechaPago" => $fechaPago,
+				"referencia" => $referencia,
 			];
 			$response["result"] = $this->GeneralModel->addRecord("detallePagos", $values);
 			if ($response["result"]) {
