@@ -6,8 +6,8 @@ require_once(APPPATH . "/controllers/BaseController.php");
 class Api extends BaseController{
     public function __construct(){
 		parent::__construct();
-		
-		$this->load->model('ApiModel');
+
+		$this->load->model('GeneralModel');
 		$this->load->helper(array('form','funciones'));
 	}
 
@@ -94,6 +94,9 @@ class Api extends BaseController{
 		} else{
 			$response['msg'] = "¡Parámetros inválidos!";
 		}
+
+		// 'estatus_notificacion=0' 
+		// $response
 		
 		$this->output->set_content_type('application/json');
 		$this->output->set_output(json_encode($response['msg'], JSON_NUMERIC_CHECK));
