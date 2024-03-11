@@ -1032,11 +1032,10 @@ public function createAppointmentByColaborator()
 		$cantidad    = $this->input->post('dataValue[cantidad]');
 		$metodoPago  = $this->input->post('dataValue[metodoPago]');
 		$estatusPago = $this->input->post('dataValue[estatusPago]');
-		$fechaPago   = $this->input->post('dataValue[fechaPago]');
-		$cita		 = $this->input->post('dataValue[idCita]');
+		$idCita		 = $this->input->post('dataValue[idCita]');
 		$fecha       = date('Y-m-d H:i:s');
 		
-		$response['result'] = isset($usuario, $folio, $referencia, $concepto, $cantidad, $metodoPago, $estatusPago, $fechaPago, $fecha);
+		$response['result'] = isset($usuario, $folio, $referencia, $concepto, $cantidad, $metodoPago, $estatusPago, $fecha);
 		if ($response['result']) {
 			$values = [
 				"folio" => $folio,
@@ -1049,17 +1048,28 @@ public function createAppointmentByColaborator()
 				"modificadoPor" => $usuario,
 				"fechaModificacion" => $fecha,
 				"estatusPago" => $estatusPago,
-				"fechaPago" => $fechaPago,
+				"fechaPago" => $fecha,
 				"referencia" => $referencia,
 			];
-			$response["result"] = $this->GeneralModel->addRecord("detallePagos", $values);
+			$rs = $this->GeneralModel->addRecord("detallePagos", $values);
+			$last_id = $this->db->insert_id();
+			$response["result"] = $rs;
 			if ($response["result"]) {
 				$response["msg"] = "¡Se ha generado el detalle de pago con éxito!";
-				$rs = $this->calendarioModel->getDetallePago($folio)->result();
-				if (!empty($rs) && isset($rs[0]->idDetalle)) {
+				if (isset($idCita)) {
+					$upd = [
+						"modificadoPor" => $usuario,
+						"fechaModificacion" => $fecha,
+						"idDetalle" => $last_id
+					];
+					$response["result"] = $this->GeneralModel->updateRecord("citas", $upd, 'idCita', $idCita);
+					if ($response["result"]) {
+						$response["msg"] = "¡El detalle de pago se  ha registrado exitosamente!";
+					}else {
+						$response["msg"] = "¡Se ha generado el detalle de pago con éxito!";
+					}
+				}else {
 					$response["data"] = $rs[0]->idDetalle;
-				} else {
-					$response["data"] = null;
 				}
 			} 
 			else {
