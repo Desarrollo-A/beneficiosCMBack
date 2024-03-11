@@ -130,4 +130,32 @@ class DashboardController extends BaseController {
 		$data = $this->DashModel->getEsp($areas);
 		$this->json($data);
 	}
+
+	public function getCtDisponibles(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->DashModel->getCtDisponibles($dt)->result();
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
+
+	public function getCtAsistidas(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->DashModel->getCtAsistidas($dt)->result();
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
+
+	public function getCtCanceladas(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->DashModel->getCtCanceladas($dt)->result();
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
+
+	public function getCtPenalizadas(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->DashModel->getCtPenalizadas($dt)->result();
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
 }

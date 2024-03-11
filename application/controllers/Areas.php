@@ -12,11 +12,8 @@ class Areas extends BaseController{
 
     public function citas(){
         
-        $area = $this->input->get('area');
-
-        if(!$area){
-            $area = $this->input->get('puesto');
-        }
+        $area = $this->input->get('areas');
+        $mes = $this->input->get('mes');
 
         $especialistas = $this->EspecialistasModel->getEspecialistasPorArea($area);
         
@@ -27,12 +24,12 @@ class Areas extends BaseController{
         foreach ($especialistas as $key => $especialista) {
             $result = [
                 'x' => $especialista->nombre,
-                'y' => $this->EspecialistasModel->getTotal($especialista->idUsuario, $inicio, $fin),
+                'y' => $this->EspecialistasModel->getTotal($especialista->idUsuario, $mes),
                 'goals' => [
                     0 => [
                         'name' => 'Meta',
                         'value' => $this->EspecialistasModel->getMeta($especialista->idUsuario)->meta,
-                        'strokeColor' => 'red',
+                        'strokeColor' => '#2FF665',
                     ]
                 ]
             ];

@@ -222,4 +222,35 @@ class GeneralController extends BaseController {
 		$this->output->set_content_type("application/json");
 		$this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
 	}
+
+	public function getEstatusCitas(){
+		$data['data'] = $this->GeneralModel->getEstatusCitas()->result();
+		
+		$this->output->set_content_type("application/json");
+		$this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
+
+	public function getCountEstatusCitas(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->GeneralModel->getCountEstatusCitas($dt)->result();
+		
+		$this->output->set_content_type("application/json");
+		$this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
+
+	public function getCountModalidades(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->GeneralModel->getCountModalidades($dt)->result();
+		
+		$this->output->set_content_type("application/json");
+		$this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
+
+	public function getCountPacientes(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->GeneralModel->getCountPacientes($dt)->result();
+		
+		$this->output->set_content_type("application/json");
+		$this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
 }

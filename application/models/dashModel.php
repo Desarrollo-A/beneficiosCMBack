@@ -143,9 +143,9 @@ class DashModel extends CI_Model
 
 				$query_pregunta = $this->db->query(
 					"SELECT DISTINCT pg.pregunta  
-			FROM encuestasCreadas ec
-			INNER JOIN preguntasGeneradas pg ON pg.idPregunta = ec.idPregunta
-			WHERE ec.estatus = 1 AND abierta = 1 AND pg.idArea = ? AND pg.idPregunta = ? AND ec.idPregunta = ?",
+					FROM encuestasCreadas ec
+					INNER JOIN preguntasGeneradas pg ON pg.idPregunta = ec.idPregunta
+					WHERE ec.estatus = 1 AND abierta = 1 AND pg.idArea = ? AND pg.idPregunta = ? AND ec.idPregunta = ?",
 					array($idEspecialidad, $idPregunta, $idPregunta)
 				);
 
@@ -160,11 +160,11 @@ class DashModel extends CI_Model
 
 					$query = $this->db->query(
 						"SELECT STRING_AGG(rg.respuesta, ', ') AS respuestas, rg.grupo  
-			FROM encuestasCreadas ec
-			INNER JOIN respuestasGenerales rg ON rg.grupo = ec.respuestas 
-			INNER JOIN preguntasGeneradas pg ON pg.idPregunta = ec.idPregunta
-			WHERE pg.pregunta IN ($idPreguntasString) AND ec.idEncuesta = $idEncuesta AND pg.idEncuesta = $idEncuesta
-			GROUP BY grupo",
+						FROM encuestasCreadas ec
+						INNER JOIN respuestasGenerales rg ON rg.grupo = ec.respuestas 
+						INNER JOIN preguntasGeneradas pg ON pg.idPregunta = ec.idPregunta
+						WHERE pg.pregunta IN ($idPreguntasString) AND ec.idEncuesta = $idEncuesta AND pg.idEncuesta = $idEncuesta
+						GROUP BY grupo",
 						array($idEncuesta)
 					);
 
@@ -190,6 +190,7 @@ class DashModel extends CI_Model
 			$idEspecialista = isset($dt[2]["idEspecialista"]) ? $dt[2]["idEspecialista"] : 0;
 			$fhI = isset($dt[4]["fhI"]) ? $dt[4]["fhI"] : $dt[5]["fhI"];
         	$fechaFn = isset($dt[5]["fhF"]) ? $dt[5]["fhF"] : $dt[6]["fhF"];
+			$area = isset($dt[6]["idArea"]) ? $dt[6]["idArea"] : $dt[7]["idArea"];
 
 			$fecha = new DateTime($fechaFn);
 			$fecha->modify('+1 day');
@@ -203,13 +204,27 @@ class DashModel extends CI_Model
 				($idRol != 0 && $idRol != 2)
 			) {
 
-				$query = $this->db->query("SELECT rg.respuesta, COUNT(*) AS cantidad, (COUNT(*) * 100.0 / SUM(COUNT(*)) OVER ()) AS porcentaje, 
-				ec.idPregunta, ec.idArea, ec.idEncuesta
-				FROM encuestasContestadas ec
-				INNER JOIN respuestasGenerales rg ON rg.idRespuestaGeneral = ec.idRespuesta
-				WHERE ec.idEncuesta = $idEncuesta AND ec.idPregunta = $idPregunta AND ec.idEspecialista = $idEspecialista
-				AND (ec.fechaCreacion >= '$fhI' AND ec.fechaCreacion <= '$fhF')
-				GROUP BY rg.respuesta, ec.idPregunta, ec.idArea, ec.idEncuesta");
+				if($idEspecialista == 0){
+
+					$query = $this->db->query("SELECT rg.respuesta, COUNT(*) AS cantidad, (COUNT(*) * 100.0 / SUM(COUNT(*)) OVER ()) AS porcentaje, 
+					ec.idPregunta, ec.idArea, ec.idEncuesta
+					FROM encuestasContestadas ec
+					INNER JOIN respuestasGenerales rg ON rg.idRespuestaGeneral = ec.idRespuesta
+					WHERE ec.idEncuesta = $idEncuesta AND ec.idPregunta = $idPregunta AND ec.idArea = $area
+					AND (ec.fechaCreacion >= '$fhI' AND ec.fechaCreacion <= '$fhF')
+					GROUP BY rg.respuesta, ec.idPregunta, ec.idArea, ec.idEncuesta");
+
+				}else{
+
+					$query = $this->db->query("SELECT rg.respuesta, COUNT(*) AS cantidad, (COUNT(*) * 100.0 / SUM(COUNT(*)) OVER ()) AS porcentaje, 
+					ec.idPregunta, ec.idArea, ec.idEncuesta
+					FROM encuestasContestadas ec
+					INNER JOIN respuestasGenerales rg ON rg.idRespuestaGeneral = ec.idRespuesta
+					WHERE ec.idEncuesta = $idEncuesta AND ec.idPregunta = $idPregunta AND ec.idEspecialista = $idEspecialista
+					AND (ec.fechaCreacion >= '$fhI' AND ec.fechaCreacion <= '$fhF')
+					GROUP BY rg.respuesta, ec.idPregunta, ec.idArea, ec.idEncuesta");
+					
+				}
 
 				if ($query->num_rows() > 0) {
 
@@ -278,5 +293,39 @@ class DashModel extends CI_Model
         $query = $this->db-> query("SELECT idUsuario, nombre FROM usuarios WHERE idRol = 3 AND idPuesto = $dt");
         
         return $query->result();
+    }
+
+	public function getCtDisponibles($dt)
+    {
+
+        $query = $this->db-> query("SELECT COUNT(idCita) AS total
+		FROM citas 
+		WHERE idPaciente = $dt
+		AND estatusCita = 4 
+		AND YEAR(fechaFinal) = YEAR(GETDATE())
+		AND MONTH(fechaFinal) = MONTH(GETDATE())");
+        
+        return $query;
+    }
+
+	public function getCtAsistidas($dt)
+    {
+        $query = $this->db-> query("SELECT COUNT(*) AS [asistencia] FROM citas WHERE idPaciente = $dt AND estatusCita = 4");
+
+        return $query;
+    }
+
+    public function getCtCanceladas($dt)
+    {
+        $query = $this->db-> query("SELECT COUNT(*) AS [cancelada] FROM citas WHERE idPaciente = $dt AND estatusCita = 2");
+
+        return $query;
+    }
+
+    public function getCtPenalizadas($dt)
+    {
+            $query = $this->db-> query("SELECT COUNT(*) AS [penalizada] FROM citas WHERE idPaciente = $dt AND estatusCita = 3");
+
+        return $query;
     }
 }

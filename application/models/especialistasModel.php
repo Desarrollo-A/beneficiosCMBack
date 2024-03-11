@@ -20,19 +20,18 @@ class EspecialistasModel extends CI_Model {
 			FROM usuarios us
 			LEFT JOIN areasBeneficios ab ON ab.idAreaBeneficio = us.idAreaBeneficio
 			LEFT JOIN metasPorEspecialista mpe ON mpe.idEspecialista = us.idUsuario
-			WHERE 
-				us.idUsuario = $idEspecialista";
+			WHERE us.idUsuario = $idEspecialista";
 
         return $this->db->query($query)->row();
     }
 
-    public function getTotal($idEspecialista, $fechaInicio, $fechaFin)
+    public function getTotal($idEspecialista, $mes)
     {
         $query = "SELECT * FROM citas
         	WHERE
         		idEspecialista = $idEspecialista
         	AND estatusCita = 4
-			AND fechaFinal BETWEEN '$fechaInicio' AND '$fechaFin'";
+			AND MONTH(fechaFinal) = $mes";
 
         return $this->db->query($query)->num_rows();
     }

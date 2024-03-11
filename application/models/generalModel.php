@@ -562,4 +562,162 @@ class GeneralModel extends CI_Model {
 		return $query;
     }
 
+    public function getEstatusCitas(){
+        
+        $query = $this->db->query("SELECT idOpcion, nombre, 'color' = CASE
+        WHEN idOpcion = 1 THEN '#ffa500'
+        WHEN idOpcion = 2 THEN '#ff0000'
+        WHEN idOpcion = 3 THEN '#808080'
+        WHEN idOpcion = 4 THEN '#008000'
+        WHEN idOpcion = 5 THEN '#ff4d67'
+        WHEN idOpcion = 6 THEN '#00ffff'
+        END
+        FROM opcionesPorCatalogo WHERE idCatalogo = 2 AND idOpcion NOT IN (7, 8, 9);");
+        return $query;
+
+    }
+
+    public function getCountEstatusCitas($dt){
+
+        $area = $dt["area"];
+        $especialidad = $dt["espe"];
+        $fhI = $dt["fhI"];
+        $fechaFn = $dt["fhF"];
+
+        $fecha = new DateTime($fechaFn);
+        $fecha->modify('+1 day');
+		$fhF = $fecha->format('Y-m-d');
+
+        if($especialidad == 0){
+
+            $query = $this->db->query("SELECT 
+            COUNT(CASE WHEN ct.estatusCita = 1 THEN ct.idPaciente END) AS asistir,
+            COUNT(CASE WHEN ct.estatusCita = 2 OR ct.estatusCita = 7 THEN ct.idPaciente END) AS cancelada,
+            COUNT(CASE WHEN ct.estatusCita = 3 THEN ct.idPaciente END) AS penalizada,
+            COUNT(CASE WHEN ct.estatusCita = 4 THEN ct.idPaciente END) AS asistencia,
+            COUNT(CASE WHEN ct.estatusCita = 5 THEN ct.idPaciente END) AS justificada,
+            COUNT(CASE WHEN ct.estatusCita = 6 THEN ct.idPaciente END) AS pendiente,
+            COUNT(ct.idCita) AS citas
+            FROM usuarios us
+            INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
+            WHERE us.idPuesto = $area AND
+            (ct.fechaFinal >= '$fhI' AND ct.fechaFinal <= '$fhF')");
+
+        }else{
+
+            $query = $this->db->query("SELECT 
+            COUNT(CASE WHEN ct.estatusCita = 1 THEN ct.idPaciente END) AS asistir,
+            COUNT(CASE WHEN ct.estatusCita = 2 OR ct.estatusCita = 7 THEN ct.idPaciente END) AS cancelada,
+            COUNT(CASE WHEN ct.estatusCita = 3 THEN ct.idPaciente END) AS penalizada,
+            COUNT(CASE WHEN ct.estatusCita = 4 THEN ct.idPaciente END) AS asistencia,
+            COUNT(CASE WHEN ct.estatusCita = 5 THEN ct.idPaciente END) AS justificada,
+            COUNT(CASE WHEN ct.estatusCita = 6 THEN ct.idPaciente END) AS pendiente,
+            COUNT(ct.idCita) AS citas
+            FROM usuarios us
+            INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
+            WHERE us.idPuesto = $area AND
+            (ct.fechaFinal >= '$fhI' AND ct.fechaFinal <= '$fhF')
+            AND us.idUsuario = $especialidad");
+
+        }
+        
+        return $query;
+
+    }
+
+    public function getCountModalidades($dt){
+
+        $area = $dt["area"];
+        $especialidad = $dt["espe"];
+        $fhI = $dt["fhI"];
+        $fechaFn = $dt["fhF"];
+
+        $fecha = new DateTime($fechaFn);
+        $fecha->modify('+1 day');
+		$fhF = $fecha->format('Y-m-d');
+
+        if($especialidad == 0){
+
+            $query = $this->db->query("SELECT 
+			COUNT(CASE WHEN axs.tipoCita = 2 THEN ct.idPaciente END) AS virtual,
+			COUNT(CASE WHEN axs.tipoCita = 1 THEN ct.idPaciente END) AS presencial
+			FROM usuarios us
+            INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
+			INNER JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
+			INNER JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
+            WHERE us.idPuesto = $area AND
+		    (ct.fechaFinal >= '$fhI' AND ct.fechaFinal <= '$fhF')");
+
+        }else{
+
+            $query = $this->db->query("SELECT 
+			COUNT(CASE WHEN axs.tipoCita = 2 THEN ct.idPaciente END) AS virtual,
+			COUNT(CASE WHEN axs.tipoCita = 1 THEN ct.idPaciente END) AS presencial
+			FROM usuarios us
+            INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
+			INNER JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
+			INNER JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
+            WHERE us.idPuesto = $area AND
+		    (ct.fechaFinal >= '$fhI' AND ct.fechaFinal <= '$fhF')
+            AND us.idUsuario = $especialidad");
+
+        }
+        
+        return $query;
+
+    }
+
+    public function getCountPacientes($dt){
+
+        $especialidad = $dt["espe"];
+        $rol = $dt["idRol"];
+
+        if($rol == 4){
+
+            $query = $this->db->query("SELECT
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 1 THEN ct.idPaciente END) AS enero,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 2 THEN ct.idPaciente END) AS febrero,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 3 THEN ct.idPaciente END) AS marzo,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 4 THEN ct.idPaciente END) AS abril,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 5 THEN ct.idPaciente END) AS mayo,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 6 THEN ct.idPaciente END) AS junio,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 7 THEN ct.idPaciente END) AS julio,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 8 THEN ct.idPaciente END) AS agosto,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 9 THEN ct.idPaciente END) AS septiembre,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 10 THEN ct.idPaciente END) AS octubre,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 11 THEN ct.idPaciente END) AS noviembre,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 12 THEN ct.idPaciente END) AS diciembre,
+            COUNT(DISTINCT ct.idPaciente) AS total
+            FROM usuarios us
+            INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
+            WHERE ct.estatusCita = 4
+            AND YEAR(ct.fechaFinal) = YEAR(GETDATE())");
+
+        }else{
+
+            $query = $this->db->query("SELECT
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 1 THEN ct.idPaciente END) AS enero,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 2 THEN ct.idPaciente END) AS febrero,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 3 THEN ct.idPaciente END) AS marzo,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 4 THEN ct.idPaciente END) AS abril,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 5 THEN ct.idPaciente END) AS mayo,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 6 THEN ct.idPaciente END) AS junio,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 7 THEN ct.idPaciente END) AS julio,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 8 THEN ct.idPaciente END) AS agosto,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 9 THEN ct.idPaciente END) AS septiembre,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 10 THEN ct.idPaciente END) AS octubre,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 11 THEN ct.idPaciente END) AS noviembre,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 12 THEN ct.idPaciente END) AS diciembre,
+            COUNT(DISTINCT ct.idPaciente) AS total
+            FROM usuarios us
+            INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
+            WHERE ct.estatusCita = 4
+            AND YEAR(ct.fechaFinal) = YEAR(GETDATE())
+            AND us.idUsuario = $especialidad");
+
+        }
+        
+        return $query;
+
+    }
 }

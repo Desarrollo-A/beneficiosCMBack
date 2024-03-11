@@ -116,12 +116,11 @@ class Especialistas extends BaseController{
 
     public function meta(){
         $especialista = $this->input->get('especialista');
-        $inicio = date('Y-m-01');
-        $fin = date('Y-m-t');
+        $mes = $this->input->get('mes');
 
         $result = [
             'meta' => $this->EspecialistasModel->getMeta($especialista)->meta,
-            'total' => $this->EspecialistasModel->getTotal($especialista, $inicio, $fin),
+            'total' => $this->EspecialistasModel->getTotal($especialista, $mes),
         ];
 
         $this->json($result);
