@@ -472,4 +472,9 @@ class Usuario extends BaseController {
 
 		$this->json($result, JSON_NUMERIC_CHECK);
 	}
+
+	public function usuariosPrueba(){
+		$data['data'] = $this->UsuariosModel->usuariosPrueba()->result();
+		$this->json($data, JSON_NUMERIC_CHECK);;
+	}
 }

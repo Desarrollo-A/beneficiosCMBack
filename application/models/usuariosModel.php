@@ -7,6 +7,7 @@ class UsuariosModel extends CI_Model {
 	{
 		$this->ch        = $this->load->database('ch', TRUE);
         $this->beneficio = $this->load->database('beneficio', TRUE);
+		$this->pp        = $this->load->database('pp', TRUE);
 	}
 
     public function usuarios()
@@ -289,4 +290,16 @@ class UsuariosModel extends CI_Model {
 
 		return $query;
 	}
+
+	public function usuariosPrueba()
+	{	
+    	// Aquí necesitarías ajustar la consulta para buscar la contraseña en el lugar correcto
+    	$query = $this->pp->query("
+		SELECT * FROM PRUEBA_beneficiosCM.usuarios AS us
+		INNER JOIN PRUEBA_CH.beneficioscm_vista_usuarios AS us2 
+		ON us.idContrato = us2.num_empleado;");
+
+    	return $query;
+	}
+
 }
