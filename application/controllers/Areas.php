@@ -8,6 +8,7 @@ class Areas extends BaseController{
         parent::__construct();
 
         $this->load->model('EspecialistasModel');
+        $this->ch = $this->load->database('ch', TRUE);
     }
 
     public function citas(){
@@ -19,7 +20,7 @@ class Areas extends BaseController{
         
         $inicio = date('Y-m-01');
         $fin = date('Y-m-t');
-
+        
         $citas = [];
         foreach ($especialistas as $key => $especialista) {
             $result = [

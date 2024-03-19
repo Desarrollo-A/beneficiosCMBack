@@ -6,7 +6,7 @@ require_once(APPPATH . "/controllers/BaseController.php");
 class Especialistas extends BaseController{
     public function __construct(){
         parent::__construct();
-
+        $this->ch = $this->load->database('ch', TRUE);
         $this->load->model('SedesModel');
         $this->load->model('EspecialistasModel');
         $this->load->model('CitasModel');

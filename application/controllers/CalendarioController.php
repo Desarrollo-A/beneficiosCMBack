@@ -16,31 +16,31 @@ class CalendarioController extends BaseController{
 	}
 
 	public function getAllEvents()
-	{
+    {
 
-		$dataValue = $this->input->post("dataValue", true);
-		$year = $dataValue["year"];
-		$month = $dataValue["month"];
-		$idUsuario = $dataValue["idUsuario"];
+        $dataValue = $this->input->post("dataValue", true);
+        $year = $dataValue["year"];
+        $month = $dataValue["month"];
+        $idUsuario = $dataValue["idUsuario"];
 
-		$dates = [
-			"month1" => $month1 = ($month - 1) === 0 ? 12 : ($month - 1),
-			"month2" => $month2 = ($month + 1) > 12 ? 1 : ($month + 1),
-			"year1" => $year1 =  intval($month) === 1 ? $year - 1 : $year,
-			"year2" => $year2 =  intval($month) === 12 ? $year + 1 : $year
-		];
+        $dates = [
+            "month1" => $month1 = ($month - 1) === 0 ? 12 : ($month - 1),
+            "month2" => $month2 = ($month + 1) > 12 ? 1 : ($month + 1),
+            "year1" => $year1 =  intval($month) === 1 ? $year - 1 : $year,
+            "year2" => $year2 =  intval($month) === 12 ? $year + 1 : $year
+        ];
 
-		$occupied = $this->calendarioModel->getOccupied($year, $month, $idUsuario, $dates);
-		$appointment = $this->calendarioModel->getAppointment($year, $month, $idUsuario, $dates);
+        $occupied = $this->calendarioModel->getOccupied($month, $idUsuario, $dates);
+        $appointment = $this->calendarioModel->getAppointment($month, $idUsuario, $dates);
 
-		if ($occupied->num_rows() > 0 || $appointment->num_rows() > 0)
-			$response["events"] = array_merge($occupied->result(), $appointment->result());
-		else
-			$response["events"] = array();
+        if ($occupied->num_rows() > 0 || $appointment->num_rows() > 0)
+            $response["events"] = array_merge($occupied->result(), $appointment->result());
+        else
+            $response["events"] = array();
 
-		$this->output->set_content_type('application/json');
-		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
-	}
+        $this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
+    }
 
 	public function getAllEventsWithRange()
 	{
@@ -237,13 +237,13 @@ public function createAppointmentByColaborator()
         $fechaInicio = $this->input->post('dataValue[fechaInicio]');
         $fechaFinal = date('Y-m-d H:i:s', strtotime($fechaInicio . '+1 hour'));
         $tipoCita = $this->input->post('dataValue[tipoCita]');
-		$modalidad = $this->input->post('dataValue[modalidad]');
+        $modalidad = $this->input->post('dataValue[modalidad]');
         $idAtencionXSede = $this->input->post('dataValue[idAtencionXSede]');
         $idSede = $this->input->post('dataValue[idSede]');
         $estatusCita = $this->input->post('dataValue[estatusCita]');
         $detalle = $this->input->post('dataValue[detallePago]');
         $idGoogleEvent = $this->input->post('dataValue[idGoogleEvent]');
-		$fecha = date('Y-m-d H:i:s');
+        $fecha = date('Y-m-d H:i:s');
 
         $response['result'] = isset(
             $titulo,
@@ -253,7 +253,7 @@ public function createAppointmentByColaborator()
             $fechaInicio,
             $fechaFinal,
             $modalidad,
-			$tipoCita,
+            $tipoCita,
             $idAtencionXSede,
             $estatusCita
         );
@@ -266,15 +266,15 @@ public function createAppointmentByColaborator()
                 if ($response['result']) {
                     $response['result'] = $sedesatencion->num_rows() > 1;
                     if ($response['result']){
-						$response['result'] = false;
-						foreach ($sedesatencion->result() as $row) {
+                        $response['result'] = false;
+                        foreach ($sedesatencion->result() as $row) {
                             if ($row->value == $idSede) {
                                 $response['result'] = true;
                                 break;
                             }
                         }
                         if ($response['result']) {
-                            $checkPresencial = $this->calendarioModel->checkPresencial($idSede, $idEspecialista, $modalidad, $fechaInicio);
+                            $checkPresencial = $this->calendarioModel->checkPresencial($idSede, $idEspecialista, $fechaInicio);
                             $response['result'] = $checkPresencial->num_rows() > 0;
                             if (!$response['result']) {
                                 $response['msg'] = "¡El especialista cambió los dias de atención!"; 
@@ -813,22 +813,22 @@ public function createAppointmentByColaborator()
 
 	public function getOficinaByAtencion()
 	{
-		$sede = $this->input->post('dataValue[sede]');
-		$beneficio = $this->input->post('dataValue[beneficio]');
-		$especialista = $this->input->post('dataValue[especialista]');
-		$modalidad = $this->input->post('dataValue[modalidad]');
+        $sede = $this->input->post('dataValue[sede]');
+        $beneficio = $this->input->post('dataValue[beneficio]');
+        $especialista = $this->input->post('dataValue[especialista]');
+        $modalidad = $this->input->post('dataValue[modalidad]');
 
-		$rs = $this->calendarioModel->getOficinaByAtencion($sede, $beneficio, $especialista, $modalidad)->result();
-		$response['result'] = count($rs) > 0;
-		if ($response['result']) {
-			$response['msg'] = '¡Datos de oficina cargados exitosamente!';
-			$response['data'] = $rs;
-		} else {
-			$response['msg'] = '¡No existen registros!';
-		}
-		$this->output->set_content_type("application/json");
-		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
-	}
+        $rs = $this->calendarioModel->getOficinaByAtencion($sede, $especialista, $modalidad)->result();
+        $response['result'] = count($rs) > 0;
+        if ($response['result']) {
+            $response['msg'] = '¡Datos de oficina cargados exitosamente!';
+            $response['data'] = $rs;
+        } else {
+            $response['msg'] = '¡No existen registros!';
+        }
+        $this->output->set_content_type("application/json");
+        $this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
+    }
 
 	public function isPrimeraCita()
 	{

@@ -10,6 +10,7 @@ class DashboardController extends BaseController {
 		parent::__construct();
 		header('Access-Control-Allow-Origin: *');
 		$this->load->database('default');
+		$this->ch = $this->load->database('ch', TRUE);
 		$this->load->model('UsuariosModel');
 		$this->load->model('ReportesModel');
 		$this->load->model('EspecialistasModel');

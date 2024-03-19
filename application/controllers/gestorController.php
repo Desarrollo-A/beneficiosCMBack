@@ -12,6 +12,7 @@ class GestorController extends BaseController {
 		$this->load->database('default');
 		$this->load->model('GestorModel');
 		$this->load->model('GeneralModel');
+		$this->ch = $this->load->database('ch', TRUE);
 
 	}
 
@@ -67,12 +68,21 @@ class GestorController extends BaseController {
 			'fechaModificacion'  => date('Y-m-d h:i:s')
 		];
 
-		if($checkAxs->num_rows() > 0){
+		/* $query = $this->ch-> query("SELECT *
+		FROM PRUEBA_beneficiosCM.atencionxsede
+		WHERE idEspecialista = AND idSede = ");
+
+		if ($query->num_rows() > 0) {
+			$response["result"] = false;
+			$response["msg"] = 'La atención por sede ya ha sido asignada anteriormente';
+		} */
+		/* else */ if($checkAxs->num_rows() > 0){
 			$response["result"] = false;
 			$response["msg"] = 'La atención por sede ya ha sido asignada anteriormente';
 		}
 		else{
-			$data = $this->GeneralModel->addRecord('atencionXSede', $data);
+			/* $data = $this->GeneralModel->addRecord('atencionXSede', $data); */
+			$data = $this->GeneralModel->addRecord('atencionxsede', $data);
 
 			if($data){
 				$response["result"] = true;
@@ -117,7 +127,9 @@ class GestorController extends BaseController {
 				"tipoCita" => $modalidad
 			);
 
-			$updateRecord = $this->GeneralModel->updateRecord('atencionXSede', $data, 'idAtencionXSede', $idAts);
+			/* $updateRecord = $this->GeneralModel->updateRecord('atencionXSede', $data, 'idAtencionXSede', $idAts); */
+
+			$updateRecord = $this->GeneralModel->updateRecord('atencionxsede', $data, 'idAtencionXSede', $idAts);
 
 			if($updateRecord){
 				$response["result"] = true;
@@ -142,7 +154,7 @@ class GestorController extends BaseController {
 			"idEspecialista" => $idEspe,
 		);
 
-		$response=$this->GeneralModel->updateRecord('atencionXSede', $data, 'idAtencionXSede', $id);
+		$response=$this->GeneralModel->updateRecord('PRUEBA_beneficiosCM.atencionxsede', $data, 'idAtencionXSede', $id);
 		echo json_encode(array("estatus" => true, "msj" => "Estatus Actualizado!" ));
 				
 	}
@@ -275,16 +287,24 @@ class GestorController extends BaseController {
 
 		$checkAxs = $this->GestorModel->checkAxsId($checkData, $checkData["idArea"], $idAts);
 
+		$checkAxsArea = $this->GestorModel->checkAxsArea($checkData, $checkData["idArea"], $idAts);
+
 		if($checkAxs->num_rows() > 0){
 			$response["result"] = false;
 			$response["msg"] = 'La atención por sede ya ha sido asignada anteriormente';
+		}
+		else if($idArea == '0' && $checkAxsArea->num_rows() > 0 ){
+			$response["result"] = false;
+			$response["msg"] = 'No puede haber más atenciónes con esa área';
 		}
 		else{
 			$data = array(
 				"idArea" => $idAreaInsert
 			);
 
-			$updateRecord = $this->GeneralModel->updateRecord('atencionXSede', $data, 'idAtencionXSede', $idAts);
+			/* $updateRecord = $this->GeneralModel->updateRecord('atencionXSede', $data, 'idAtencionXSede', $idAts); */
+
+			$updateRecord = $this->GeneralModel->updateRecord('PRUEBA_beneficiosCM.atencionxsede', $data, 'idAtencionXSede', $idAts);
 
 			if($updateRecord){
 				$response["result"] = true;
@@ -308,7 +328,9 @@ class GestorController extends BaseController {
 			"estatus" => intval($dataValue["estatus"])
 		];
 
-		$updateRecord = $this->GeneralModel->updateRecord("atencionXSede", $data, "idAtencionXSede", $id);
+		/* $updateRecord = $this->GeneralModel->updateRecord("atencionXSede", $data, "idAtencionXSede", $id); */
+
+		$updateRecord = $this->GeneralModel->updateRecord("PRUEBA_beneficiosCM.atencionxsede", $data, "idAtencionXSede", $id);
 
 		if($updateRecord){
 			$response["result"] = true;

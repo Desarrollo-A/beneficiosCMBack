@@ -9,6 +9,7 @@ class Usuario extends BaseController {
 	{
 		parent::__construct();
 		$this->load->database('default');
+		$this->ch = $this->load->database('ch', TRUE);
 		$this->load->model('UsuariosModel');
 		$this->load->model('GeneralModel');
 		$this->load->model('MenuModel');
@@ -499,12 +500,12 @@ class Usuario extends BaseController {
 			$this->email->message($html_message);
 			$this->email->subject("Código de verificación Beneficios CDM");
 
-			$this->db->query("DELETE FROM tokenRegistro WHERE correo = '$correo'");
+			$this->ch->query("DELETE FROM PRUEBA_beneficiosCM.tokenregistro WHERE correo = '?'", $correo);
 
 			if ($this->email->send()) {
 				echo json_encode(array("estatus" => true, "msj" => "Envio exitoso" ), JSON_NUMERIC_CHECK); 
-				$this->db->query("INSERT INTO tokenRegistro (correo, token, fechaCreacion) 
-					VALUES (?,?, GETDATE())", 
+				$this->ch->query("INSERT INTO PRUEBA_beneficiosCM.tokenregistro (correo, token, fechaCreacion) 
+					VALUES (?,?, NOW())", 
 					array($correo, $data));
 			} else {
 				echo json_encode(array("estatus" => false, "msj" => "A ocurrido un error"), JSON_NUMERIC_CHECK);
@@ -515,4 +516,31 @@ class Usuario extends BaseController {
 		$dt = $this->input->post('dataValue', true);
 		$data['data'] = $this->UsuariosModel->getToken($dt);
 	}
+
+	public function prueba(){
+
+		$data['data'] = $this->UsuariosModel->prueba()->result();
+		$this->output->set_content_type('application/json');
+		$this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
+
+	public function getUserByNumEmp(){
+        $user = $this->input->post('dataValue[num_empleado]');
+        $response['result'] = isset($user);
+        if ($response['result']) {
+            $rs = $this->UsuariosModel->getUserByNumEmp($user)->result();
+            $response['result'] = count($rs) > 0;
+            if ($response['result']) {
+                $response['msg'] = '¡Colaborador consultado exitosamente!';
+                $response['data'] = $rs;
+            } else {
+                $response['msg'] = '¡No existen el colaborador!';
+            }
+        }else {
+            $response['msg'] = "¡Parámetros inválidos!";
+        }
+
+        $this->output->set_content_type("application/json");
+        $this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
+    }
 }
