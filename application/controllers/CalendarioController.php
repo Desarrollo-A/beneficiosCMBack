@@ -1025,17 +1025,14 @@ public function createAppointmentByColaborator()
 	}
 
 	public function registrarTransaccionPago(){
-		$usuario     = $this->input->post('dataValue[usuario]');
-		$folio       = $this->input->post('dataValue[folio]');
-		$referencia  = $this->input->post('dataValue[referencia]');
-		$concepto    = $this->input->post('dataValue[concepto]');
-		$cantidad    = $this->input->post('dataValue[cantidad]');
-		$metodoPago  = $this->input->post('dataValue[metodoPago]');
-		$estatusPago = $this->input->post('dataValue[estatusPago]');
-		$idCita		 = $this->input->post('dataValue[idCita]');
-		$fecha       = date('Y-m-d H:i:s');
+		$usuario = $this->input->post('dataValue[usuario]');
+		$folio = $this->input->post('dataValue[folio]');
+		$concepto = $this->input->post('dataValue[concepto]');
+		$cantidad = $this->input->post('dataValue[cantidad]');
+		$metodoPago = $this->input->post('dataValue[metodoPago]');
+		$fecha = date('Y-m-d H:i:s');
 		
-		$response['result'] = isset($usuario, $folio, $referencia, $concepto, $cantidad, $metodoPago, $estatusPago, $fecha);
+		$response['result'] = isset($usuario, $folio, $concepto, $cantidad, $metodoPago, $fecha);
 		if ($response['result']) {
 			$values = [
 				"folio" => $folio,
@@ -1046,30 +1043,16 @@ public function createAppointmentByColaborator()
 				"creadoPor" => $usuario,
 				"fechaCreacion" => $fecha,
 				"modificadoPor" => $usuario,
-				"fechaModificacion" => $fecha,
-				"estatusPago" => $estatusPago,
-				"fechaPago" => $fecha,
-				"referencia" => $referencia,
+				"fechaModificacion" => $fecha
 			];
-			$rs = $this->GeneralModel->addRecord("detallePagos", $values);
-			$last_id = $this->db->insert_id();
-			$response["result"] = $rs;
+			$response["result"] = $this->GeneralModel->addRecord("detallePagos", $values);
 			if ($response["result"]) {
 				$response["msg"] = "¡Se ha generado el detalle de pago con éxito!";
-				if (isset($idCita)) {
-					$upd = [
-						"modificadoPor" => $usuario,
-						"fechaModificacion" => $fecha,
-						"idDetalle" => $last_id
-					];
-					$response["result"] = $this->GeneralModel->updateRecord("citas", $upd, 'idCita', $idCita);
-					if ($response["result"]) {
-						$response["msg"] = "¡El detalle de pago se  ha registrado exitosamente!";
-					}else {
-						$response["msg"] = "¡Se ha generado el detalle de pago con éxito!";
-					}
-				}else {
+				$rs = $this->calendarioModel->getDetallePago($folio)->result();
+				if (!empty($rs) && isset($rs[0]->idDetalle)) {
 					$response["data"] = $rs[0]->idDetalle;
+				} else {
+					$response["data"] = null;
 				}
 			} 
 			else {
