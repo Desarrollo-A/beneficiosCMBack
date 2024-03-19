@@ -8,6 +8,7 @@ class EncuestasController extends BaseController {
 	public function __construct()
 	{
 		parent::__construct();
+		$this->ch = $this->load->database('ch', TRUE);
 		$this->load->database('default');
 		$this->load->model('EncuestasModel');
 		$this->load->model('GeneralModel');
@@ -97,7 +98,10 @@ class EncuestasController extends BaseController {
 		$estatus= $this->input->post('dataValue[estatus]');
 		$area= $this->input->post('dataValue[area]');
 
-		$query_idEncuesta = $this->db->query("SELECT * FROM encuestasCreadas WHERE idArea = $area AND estatus = 1");
+		/* $query_idEncuesta = $this->db->query("SELECT * FROM encuestasCreadas WHERE idArea = $area AND estatus = 1"); */
+
+		$query_idEncuesta = $this->ch->query("SELECT * 
+		FROM PRUEBA_beneficiosCM.encuestascreadas WHERE idArea = $area AND estatus = 1");
 
         $idEnc = 0;
         foreach ($query_idEncuesta->result() as $row) {
@@ -108,13 +112,13 @@ class EncuestasController extends BaseController {
 			"estatus" => 0,
 		);
 
-		$this->GeneralModel->updateRecord('encuestasCreadas', $data_1, 'idEncuesta', $idEnc);
+		$this->GeneralModel->updateRecord('PRUEBA_beneficiosCM.encuestascreadas', $data_1, 'idEncuesta', $idEnc);
 
 		$data_2 = array(
 			"estatus" => $estatus
 		);
 
-		$this->GeneralModel->updateRecord('encuestasCreadas', $data_2, 'idEncuesta', $idEncuesta);
+		$this->GeneralModel->updateRecord('PRUEBA_beneficiosCM.encuestascreadas', $data_2, 'idEncuesta', $idEncuesta);
 		$this->db->trans_complete();
 				
 		if ($this->db->trans_status() === FALSE) {

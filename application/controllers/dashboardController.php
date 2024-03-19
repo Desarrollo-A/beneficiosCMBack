@@ -10,6 +10,7 @@ class DashboardController extends BaseController {
 		parent::__construct();
 		header('Access-Control-Allow-Origin: *');
 		$this->load->database('default');
+		$this->ch = $this->load->database('ch', TRUE);
 		$this->load->model('UsuariosModel');
 		$this->load->model('ReportesModel');
 		$this->load->model('EspecialistasModel');
@@ -129,5 +130,33 @@ class DashboardController extends BaseController {
 		$areas = $this->input->get('areas');
 		$data = $this->DashModel->getEsp($areas);
 		$this->json($data);
+	}
+
+	public function getCtDisponibles(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->DashModel->getCtDisponibles($dt)->result();
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
+
+	public function getCtAsistidas(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->DashModel->getCtAsistidas($dt)->result();
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
+
+	public function getCtCanceladas(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->DashModel->getCtCanceladas($dt)->result();
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
+
+	public function getCtPenalizadas(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->DashModel->getCtPenalizadas($dt)->result();
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
 	}
 }

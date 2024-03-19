@@ -7,7 +7,7 @@ class AvisosPrivacidadController extends BaseController
 	public function __construct()
 	{
 		parent::__construct();
-
+		$this->ch = $this->load->database('ch', TRUE);
 		$this->load->model('calendarioModel');
 		$this->load->model('avisosPrivacidadModel');
 		$this->load->model('generalModel');
@@ -59,7 +59,7 @@ class AvisosPrivacidadController extends BaseController
 									"fechaModificacion" => date_format($dataExpedienteGenerado['date'], "Y-m-d H:i:s"),
 									"modificadoPor" => $this->session->userdata('id_usuario')
 								);
-								$result = $this->generalModel->updateRecord("historialDocumento", $updateDocumentData, "idDocumento", $idDocumento);
+								$result = $this->generalModel->updateRecord("PRUEBA_beneficiosCM.historialdocumento", $updateDocumentData, "idDocumento", $idDocumento);
 								$archivoAnterior = $validacionRama[0]['expediente'];
 								$rutaArchivo = 'dist/documentos/avisos-privacidad/';
 								$rutaEliminarArchivo =  $rutaArchivo.$archivoAnterior;
@@ -73,7 +73,7 @@ class AvisosPrivacidadController extends BaseController
 							$insertDocumentData = array(
 								"movimiento" => 'Se sube un nuevo archivo por usuario',
 								"expediente" => $dataExpedienteGenerado['expediente'],
-								"status" => 1,
+								"estatus" => 1,
 								"tipoDocumento" => 1,
 								"tipoEspecialidad" => $idEspecialidad,
 								"creadoPor" => $id_usuario_actual,
@@ -82,7 +82,7 @@ class AvisosPrivacidadController extends BaseController
 								"modificadoPor" => $id_usuario_actual
 							);
 
-							$result = $this->generalModel->addRecord('historialDocumento', $insertDocumentData);
+							$result = $this->generalModel->addRecord('PRUEBA_beneficiosCM.historialdocumento', $insertDocumentData);
 						}
 						return ($result)
 							? print_r(json_encode(array('code' => 200, 'message'=>'Se ha editado correctamente')))

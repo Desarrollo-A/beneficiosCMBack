@@ -8,6 +8,7 @@ class ReportesController extends BaseController {
 	public function __construct()
 	{
 		parent::__construct();
+		$this->ch = $this->load->database('ch', TRUE);
 		$this->load->database('default');
 		$this->load->model('UsuariosModel');
 		$this->load->model('ReportesModel');
@@ -46,7 +47,7 @@ class ReportesController extends BaseController {
 				"modificadoPor" => $modificadoPor,
 			);
 			
-			$response=$this->GeneralModel->updateRecord('citas', $data, 'idCita', $idCita);
+			$response=$this->GeneralModel->updateRecord('PRUEBA_beneficiosCM.citas', $data, 'idCita', $idCita);
 			echo json_encode(array("estatus" => true, "msj" => "Observación Registrada!" ), JSON_NUMERIC_CHECK);
 				
 		}else{
