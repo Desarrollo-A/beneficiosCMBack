@@ -1003,7 +1003,7 @@ class calendarioModel extends CI_Model
             WHERE idEspecialista = ?
             AND idSede = ( 
                 SELECT idSede FROM PRUEBA_beneficiosCM.usuarios AS us 
-				INNER JOIN AS PRUEBA_CH.beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato 
+				INNER JOIN PRUEBA_CH.beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato 
 				WHERE idUsuario = ? ) AND estatus = ?", 
             array($dataValue["idUsuario"], $dataValue["idUsuario"], 1)
         );
@@ -1047,7 +1047,7 @@ class calendarioModel extends CI_Model
         $query = $this->ch->query(
             "SELECT ct.idCita FROM PRUEBA_beneficiosCM.citas AS ct
             INNER JOIN PRUEBA_beneficiosCM.usuarios as us ON ct.idEspecialista = us.idUsuario
-            INNER JOIN AS PRUEBA_CH.beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato 
+            INNER JOIN PRUEBA_CH.beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato 
             WHERE ct.idPaciente = ? AND us2.idpuesto = ? AND ct.estatusCita IN (1, 6);",array($usuario, $beneficio)
         );
 

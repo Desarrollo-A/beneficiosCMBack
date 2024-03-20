@@ -7,12 +7,12 @@ class CalendarioController extends BaseController{
     public function __construct(){
 		parent::__construct();
 		$this->load->model('calendarioModel');
-
 		$this->load->model('GeneralModel');
 		$this->load->model('UsuariosModel');
 		$this->load->model('EspecialistasModel');
 		$this->load->library("email");
 		$this->load->library('GoogleApi');
+		$this->ch = $this->load->database('ch', TRUE);
 	}
 
 	public function getAllEvents()
@@ -113,7 +113,7 @@ class CalendarioController extends BaseController{
 			$checkAppointment = $this->calendarioModel->checkAppointmentNormal($dataValue, $fechaInicioSuma, $fechaFinalResta);
 
 			if ($checkOccupied->num_rows() < 1 && $checkAppointment->num_rows() < 1 && isset($pass)) {
-				$addRecord = $this->GeneralModel->addRecord("horariosOcupados", $values);
+				$addRecord = $this->GeneralModel->addRecord("horariosocupados", $values);
 
 				if ($addRecord) {
 					$response["result"] = true;
@@ -320,7 +320,7 @@ public function createAppointmentByColaborator()
                             "idEventoGoogle" => $idGoogleEvent
                         ];
                         $rs = $this->GeneralModel->addRecord("citas", $values);
-                        $last_id = $this->db->insert_id();
+                        $last_id = $this->ch->insert_id();
                         $response["result"] = $rs;
                         $response["data"] = $last_id;
                         if ($response["result"]) {
@@ -417,7 +417,7 @@ public function createAppointmentByColaborator()
 			} else {
 				$addRecord = $this->GeneralModel->addRecord("citas", $values);
 
-				$last_id = $this->db->insert_id();
+				$last_id = $this->ch->insert_id();
 				
 				if ($addRecord) {
 					$response["result"] = true;
@@ -838,7 +838,7 @@ public function createAppointmentByColaborator()
 		$response['result'] = isset($usuario, $especialista);
 		if ($response['result']) {
 			$rs = $this->calendarioModel->isPrimeraCita($usuario, $especialista)->result();
-			$response['result'] = count($rs) > 0;
+			$response['result'] = count($rs) === 0;
 			if ($response['result']) {
 				$response['msg'] = '¡Usuario con registros de citas!';
 				// $response['data'] = $rs;
@@ -943,11 +943,12 @@ public function createAppointmentByColaborator()
 	{
 		$especialista = $this->input->post('dataValue[especialista]');
 		$sede         = $this->input->post('dataValue[sede]');
+		$area         = $this->input->post('dataValue[area]');
 		$modalidad    = $this->input->post('dataValue[modalidad]');
 
 		$response['result'] = isset($especialista, $sede, $modalidad);
 		if ($response['result']) {
-			$rs = $this->calendarioModel->getAtencionPorSede($especialista, $sede, $modalidad)->result();
+			$rs = $this->calendarioModel->getAtencionPorSede($especialista, $sede, $area, $modalidad)->result();
 			$response['result'] = count($rs) > 0;
 			if ($response['result']) {
 				$response['msg'] = '¡Datos de atencion por sede consultados!';
@@ -1045,7 +1046,7 @@ public function createAppointmentByColaborator()
 				"modificadoPor" => $usuario,
 				"fechaModificacion" => $fecha
 			];
-			$response["result"] = $this->GeneralModel->addRecord("detallePagos", $values);
+			$response["result"] = $this->GeneralModel->addRecord("detallepagos", $values);
 			if ($response["result"]) {
 				$response["msg"] = "¡Se ha generado el detalle de pago con éxito!";
 				$rs = $this->calendarioModel->getDetallePago($folio)->result();
@@ -1153,7 +1154,7 @@ public function createAppointmentByColaborator()
 		$logData['modificadoPor'] = $data["idUsuario"];
 		$logData['fechaModificacion'] = $fecha;
 
-		$this->GeneralModel->addRecord("emailLogs", $logData);
+		$this->GeneralModel->addRecord("emaillogs", $logData);
 		$this->output->set_content_type('application/json');
 		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
@@ -1181,7 +1182,7 @@ public function createAppointmentByColaborator()
 						"modificadoPor" => $user,
 						"fechaModificacion" => $fecha,
 					];
-					$updateRecord = $this->GeneralModel->updateRecord("detallePaciente", $values, "idUsuario", $user);
+					$updateRecord = $this->GeneralModel->updateRecord("detallepaciente", $values, "idUsuario", $user);
 					if ($updateRecord) {
 						$response['msg'] = '¡Registro de estatus actualizado!';
 					}else {
