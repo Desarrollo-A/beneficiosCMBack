@@ -32,13 +32,12 @@ class CitasModel extends CI_Model{
             AND citas.fechaInicio BETWEEN '$fechaInicio' AND '$fechaFinal'"; */
 
             $query = "SELECT *
-            FROM PRUEBA_beneficiosCM.citas
-            LEFT JOIN atencionxsede ON citas.idAtencionXSede = atencionXSede.idAtencionXSede
-            WHERE
-                citas.idEspecialista='$idEspecialista'
-            AND citas.estatusCita IN (1)
-            AND NOT atencionxsede.idSede = '$idSede'
-            AND citas.fechaInicio BETWEEN '$fechaInicio' AND '$fechaFinal'";
+            FROM PRUEBA_beneficiosCM.citas as ct
+            LEFT JOIN atencionxsede as axs ON ct.idAtencionXSede = axs.idAtencionXSede
+            WHERE ct.idEspecialista='$idEspecialista'
+            AND ct.estatusCita IN (1)
+            AND NOT axs.idSede = '$idSede'
+            AND ct.fechaInicio BETWEEN '$fechaInicio' AND '$fechaFinal'";
 
         return $this->ch->query($query)->result_array();
     }

@@ -1085,10 +1085,11 @@ class calendarioModel extends CI_Model
             INNER JOIN PRUEBA_beneficiosCM.atencionxsede AS aps ON ct.idAtencionXSede = aps.idAtencionXSede
             INNER JOIN PRUEBA_CH.beneficioscm_vista_sedes AS se ON se.idsede = aps.idSede
             LEFT JOIN PRUEBA_CH.beneficioscm_vista_oficinas AS ofi ON ofi.idoficina = aps.idOficina
-            LEFT JOIN (SELECT idDetalle, GROUP_CONCAT(FORMAT(fechaInicio, 'HH:mm MMMM d yyyy','es-US'), ' ,') AS fechasFolio FROM PRUEBA_beneficiosCM.citas WHERE estatusCita IN(1) AND citas.idCita = idCita GROUP BY citas.idDetalle) AS tf
+            LEFT JOIN (SELECT idDetalle, GROUP_CONCAT(FORMAT(fechaInicio, 'HH:mm MMMM d yyyy','es-US'), ' ,') AS fechasFolio FROM PRUEBA_beneficiosCM.citas 
+            WHERE estatusCita IN( ? ) AND citas.idCita = idCita GROUP BY citas.idDetalle) AS tf
             ON tf.idDetalle = ct.idDetalle
-           WHERE YEAR(fechaInicio) in (?, ?)
-            AND MONTH(fechaInicio) in (?, ?, ?)
+            WHERE YEAR(fechaInicio) IN (?, ?)
+            AND MONTH(fechaInicio) IN (?, ?, ?)
             AND ct.idEspecialista = ?
             AND ct.estatusCita IN(?, ?, ?, ?, ?, ?, ?)",
             array( 8, $dates["year1"], $dates["year2"], $dates["month1"], $month, $dates["month2"], $idUsuario, 1, 2, 3, 4, 5, 6, 7 )
