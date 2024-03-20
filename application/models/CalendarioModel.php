@@ -939,8 +939,8 @@ class calendarioModel extends CI_Model
             "SELECT idUnico as id, titulo as title, fechaInicio as 'start', fechaFinal as 'end',
             'purple' AS 'color', estatus, 'cancel' AS 'type'
             FROM PRUEBA_beneficiosCM.horariosocupados
-            WHERE YEAR(fechaInicio)  (, ??)
-            AND MONTH(fechaInicio)  (?, ?, ?)
+            WHERE YEAR(fechaInicio) IN (?, ?)
+            AND MONTH(fechaInicio) IN (?, ?, ?)
             AND idEspecialista = ?  
             AND estatus = ?",
             array( $dates["year1"], $dates["year2"], $dates["month1"], $month, $dates["month2"], $idUsuario, 1 )
