@@ -1148,10 +1148,10 @@ class calendarioModel extends CI_Model
         CASE WHEN ofi.direccion IS NULL THEN 'VIRTUAL' ELSE ofi.direccion END as 'ubicación', sed.nsede AS sede, atc.idOficina, us2.mail_emp as correo, usEspe2.mail_emp as correoEspecialista, 
         CONCAT(usEspe2.nombre_persona, usEspe2.pri_apellido, usEspe2.sec_apellido) AS especialista, ct.idDetalle, usEspe2.telefono_personal as telefonoEspecialista,
         usEspe2.sexo as sexoEspecialista, tf.fechasFolio, ct.idEventoGoogle, ct.evaluacion,
-        CASE WHEN us cEspe2.idPuesto = 537 THEN 'Nutrición'
-        WHEN usEspe2.idPuesto = 585 THEN 'Psicología'
-        WHEN usEspe2.idPuesto = 686 THEN 'Guía espiritual'
-        WHEN usEspe2.idPuesto = 158 THEN 'Quantum balance'
+        CASE WHEN usEspe2.idpuesto = 537 THEN 'Nutrición'
+        WHEN usEspe2.idpuesto = 585 THEN 'Psicología'
+        WHEN usEspe2.idpuesto = 686 THEN 'Guía espiritual'
+        WHEN usEspe2.idpuesto = 158 THEN 'Quantum balance'
         END AS beneficio
         FROM PRUEBA_beneficiosCM.citas AS ct
         INNER JOIN PRUEBA_beneficiosCM.usuarios AS us ON us.idUsuario = ct.idPaciente
