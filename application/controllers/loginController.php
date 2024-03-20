@@ -11,6 +11,7 @@ class LoginController extends BaseController {
 		$this->load->model('UsuariosModel');
 		$this->load->model('GeneralModel');
 		$this->load->model('menuModel');
+        $this->ch = $this->load->database('ch', TRUE);
 
 		$this->load->helper(array('form','funciones'));
 	}
@@ -26,7 +27,7 @@ class LoginController extends BaseController {
 	}
 	
 	public function addRegistroEmpleado(){
-        $this->db->trans_begin();
+        $this->ch->trans_begin();
         $datosEmpleado = $this->input->post('dataValue[params]');
 
         switch ($datosEmpleado['idpuesto']){
@@ -62,7 +63,7 @@ class LoginController extends BaseController {
             "fechaModificacion" => date('Y-m-d H:i:s'),
         );
 
-        $informacionDePuesto = $this->GeneralModel->getInfoPuesto($insertData["idPuesto"])->row();
+        $informacionDePuesto = $this->GeneralModel->getInfoPuesto($datosEmpleado['idcontrato'])->row();
         
         if (!$informacionDePuesto) {
             echo json_encode(array("result" => false, "msg" => "No hemos encontrado la información del puesto" ), JSON_NUMERIC_CHECK);
@@ -75,7 +76,7 @@ class LoginController extends BaseController {
             
                 if($usuarioExiste->num_rows() === 0){
                     $resultado = $this->GeneralModel->addRecord('usuarios',$insertData);
-                    $last_id = $this->db->insert_id();
+                    $last_id = $this->ch->insert_id();
                     
                     $insertData = array(
                         "idUsuario" => $last_id,
@@ -86,10 +87,10 @@ class LoginController extends BaseController {
                         "fechaModificacion" => date('Y-m-d H:i:s')
                     );
     
-                    $resultado = $this->GeneralModel->addRecord('detallePaciente', $insertData);
+                    $resultado = $this->GeneralModel->addRecord('detallepaciente', $insertData);
     
-                    if ($this->db->trans_status() === FALSE){
-                        $this->db->trans_rollback();
+                    if ($this->ch->trans_status() === FALSE){
+                        $this->ch->trans_rollback();
                         
                         if(strpos($resultado['message'], "UNIQUE")){
                             echo json_encode(array("result" => false, "msg" => "El número de empleado ingresado ya se encuentra registrado" ), JSON_NUMERIC_CHECK);
@@ -97,7 +98,7 @@ class LoginController extends BaseController {
                             echo json_encode(array("result" => false, "msg" => "Hubo un error al registrarse" ), JSON_NUMERIC_CHECK);
                         }
                     } else {
-                        $this->db->trans_commit();
+                        $this->ch->trans_commit();
                         echo json_encode(array("result" => true, "msg" => "Te has registrado con éxito"), JSON_NUMERIC_CHECK);
                     }
                 }

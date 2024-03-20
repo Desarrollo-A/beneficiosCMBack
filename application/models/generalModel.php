@@ -14,17 +14,22 @@ class GeneralModel extends CI_Model {
 		return $query->result();
 	} */
 
-    /* public function usuarioExiste($idContrato){
-        $query = $this->db-> query("SELECT *FROM usuarios WHERE idContrato = ?", $idContrato);
-		return $query;
-    } */
+    public function usuarioExiste($idContrato){
+        /* $query = $this->db-> query("SELECT * FROM usuarios WHERE idContrato = ?", $idContrato); */
 
-    public function getInfoPuesto($puesto){
+        $query = $this->ch-> query("SELECT * FROM PRUEBA_beneficiosCM.usuarios WHERE idContrato = ?", $idContrato);
+		return $query;
+    }
+
+    public function getInfoPuesto($contrato){
         /* $query = $this->db-> query("SELECT *FROM puestos WHERE idPuesto = ?", $puesto); */
 
-        $query = $this->ch-> query("SELECT puestos.idpuesto AS idPuesto, puestos.nom_puesto AS puesto, puestos.tipo_puesto AS tipoPuesto,  
-        puestos.idarea AS idArea, puestos.estatus_puesto AS estatus
-        FROM PRUEBA_CH.beneficioscm_vista_puestos AS puestos WHERE idPuesto = ?", $puesto);
+        $query = $this->ch-> query("SELECT ps.idpuesto AS idPuesto, ps.nom_puesto AS puesto, ps.tipo_puesto AS tipoPuesto,  
+        ps.idarea AS idArea, ps.estatus_puesto AS estatus, dp.canRegister 
+        FROM PRUEBA_CH.beneficioscm_vista_usuarios AS us
+        INNER JOIN PRUEBA_CH.beneficioscm_vista_puestos ps ON ps.idpuesto = us.idpuesto
+        LEFT JOIN datopuesto dp ON dp.idPuesto = ps.idpuesto 
+        WHERE us.idcontrato = ?", $contrato);
         return $query;
     }
 
