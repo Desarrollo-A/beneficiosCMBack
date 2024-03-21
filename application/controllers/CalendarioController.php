@@ -13,6 +13,7 @@ class CalendarioController extends BaseController{
 		$this->load->model('EspecialistasModel');
 		$this->load->library("email");
 		$this->load->library('GoogleApi');
+		$this->ch = $this->load->database('ch', TRUE);
 	}
 
 	public function getAllEvents()
@@ -113,7 +114,7 @@ class CalendarioController extends BaseController{
 			$checkAppointment = $this->calendarioModel->checkAppointmentNormal($dataValue, $fechaInicioSuma, $fechaFinalResta);
 
 			if ($checkOccupied->num_rows() < 1 && $checkAppointment->num_rows() < 1 && isset($pass)) {
-				$addRecord = $this->GeneralModel->addRecord("horariosOcupados", $values);
+				$addRecord = $this->GeneralModel->addRecord("horariosocupados", $values);
 
 				if ($addRecord) {
 					$response["result"] = true;
@@ -185,7 +186,7 @@ class CalendarioController extends BaseController{
 					$response["msg"] = "Horario no disponible";
 				}
 			} else {
-				$updateRecord = $this->GeneralModel->updateRecord("horariosOcupados", $values, "idUnico", $dataValue["id"]);
+				$updateRecord = $this->GeneralModel->updateRecord("horariosocupados", $values, "idUnico", $dataValue["id"]);
 
 				if ($updateRecord) {
 					$response["result"] = true;
@@ -214,7 +215,7 @@ class CalendarioController extends BaseController{
 			"fechaModificacion" => date('Y/m/d H:i:s')
 		];
 
-		$updateRecord = $this->GeneralModel->updateRecord("horariosOcupados", $values, "idUnico", $dataValue["eventId"]);
+		$updateRecord = $this->GeneralModel->updateRecord("horariosocupados", $values, "idUnico", $dataValue["eventId"]);
 
 		if ($updateRecord) {
 			$response["result"] = true;
@@ -320,7 +321,7 @@ public function createAppointmentByColaborator()
                             "idEventoGoogle" => $idGoogleEvent
                         ];
                         $rs = $this->GeneralModel->addRecord("citas", $values);
-                        $last_id = $this->db->insert_id();
+                        $last_id = $this->ch->insert_id();
                         $response["result"] = $rs;
                         $response["data"] = $last_id;
                         if ($response["result"]) {
@@ -673,7 +674,7 @@ public function createAppointmentByColaborator()
 		try {
 			$updateRecord = $this->GeneralModel->updateRecord("citas", $valuesUpdate, "idCita", $idCita);
 			if ($updateRecord) {
-				$insertBatch = $this->GeneralModel->insertBatch("motivosPorCita", $valuesAdd);
+				$insertBatch = $this->GeneralModel->insertBatch("motivosporcita", $valuesAdd);
 
 				if ($insertBatch) {
 					$response["result"] = true;
@@ -743,7 +744,7 @@ public function createAppointmentByColaborator()
 		$sede = $this->input->post('dataValue[sede]');
 		$especialista = $this->input->post('dataValue[especialista]');
 		$area = $this->input->post('dataValue[area]');
-
+		
 		$response['result'] = isset($sede, $especialista);
 		if ($response['result']) {
 			$rs = $this->calendarioModel->getModalidadesEspecialista($sede, $especialista, $area)->result();

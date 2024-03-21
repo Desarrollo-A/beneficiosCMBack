@@ -628,7 +628,7 @@ class calendarioModel extends CI_Model
             INNER JOIN PRUEBA_beneficiosCM.atencionxsede AS atc ON atc.idAtencionXSede = ct.idAtencionXSede 
             LEFT JOIN PRUEBA_CH.beneficioscm_vista_oficinas AS ofi ON ofi.idoficina = atc.idOficina 
             INNER JOIN PRUEBA_CH.beneficioscm_vista_sedes AS sed ON sed.idsede = atc.idSede 
-            LEFT JOIN (SELECT idDetalle, GROUP_CONCAT(FORMAT(fechaInicio, '%H:%i %M %e %Y')) as fechasFolio FROM PRUEBA_beneficiosCM.citas WHERE estatusCita IN(8) GROUP BY idDetalle) tf ON tf.idDetalle = ct.idDetalle 
+            LEFT JOIN (SELECT idDetalle, GROUP_CONCAT(DATE_FORMAT(fechaInicio, '%d / %m / %Y A las %H:%i horas.'), '') AS fechasFolio FROM PRUEBA_beneficiosCM.citas WHERE estatusCita IN(8) GROUP BY idDetalle) tf ON tf.idDetalle = ct.idDetalle 
             WHERE YEAR(fechaInicio) = ? AND MONTH(fechaInicio) = ? AND ct.idPaciente = ? AND ct.estatusCita IN(?, ?, ?, ?, ?, ?, ?);",
             array( $year, $month, $idUsuario, 1, 2, 3, 4, 5, 6, 7)
         );
@@ -927,7 +927,7 @@ class calendarioModel extends CI_Model
         INNER join PRUEBA_beneficiosCM.atencionxsede AS atc  ON atc.idAtencionXSede = ct.idAtencionXSede  
         LEFT join PRUEBA_CH.beneficioscm_vista_oficinas AS ofi ON ofi.idoficina = atc.idOficina
         INNER JOIN PRUEBA_CH.beneficioscm_vista_sedes AS s ON s.idsede = atc.idSede
-                    LEFT JOIN (SELECT idDetalle, GROUP_CONCAT(FORMAT(fechaInicio, '%H:%i %M %e %Y')) as fechasFolio FROM PRUEBA_beneficiosCM.citas WHERE estatusCita IN(8) GROUP BY idDetalle) tf ON tf.idDetalle = ct.idDetalle 
+                    LEFT JOIN (SELECT idDetalle, GROUP_CONCAT(DATE_FORMAT(fechaInicio, '%d / %m / %Y A las %H:%i horas.'), '') AS fechasFolio FROM PRUEBA_beneficiosCM.citas WHERE estatusCita IN(8) GROUP BY idDetalle) tf ON tf.idDetalle = ct.idDetalle 
         WHERE idCita = ?",
         array( $idCita ));
 
@@ -939,8 +939,8 @@ class calendarioModel extends CI_Model
             "SELECT idUnico as id, titulo as title, fechaInicio as 'start', fechaFinal as 'end',
             'purple' AS 'color', estatus, 'cancel' AS 'type'
             FROM PRUEBA_beneficiosCM.horariosocupados
-            WHERE YEAR(fechaInicio)  (, ??)
-            AND MONTH(fechaInicio)  (?, ?, ?)
+            WHERE YEAR(fechaInicio) IN(?, ?)
+            AND MONTH(fechaInicio) IN(?, ?, ?)
             AND idEspecialista = ?  
             AND estatus = ?",
             array( $dates["year1"], $dates["year2"], $dates["month1"], $month, $dates["month2"], $idUsuario, 1 )
@@ -1085,10 +1085,11 @@ class calendarioModel extends CI_Model
             INNER JOIN PRUEBA_beneficiosCM.atencionxsede AS aps ON ct.idAtencionXSede = aps.idAtencionXSede
             INNER JOIN PRUEBA_CH.beneficioscm_vista_sedes AS se ON se.idsede = aps.idSede
             LEFT JOIN PRUEBA_CH.beneficioscm_vista_oficinas AS ofi ON ofi.idoficina = aps.idOficina
-            LEFT JOIN (SELECT idDetalle, GROUP_CONCAT(FORMAT(fechaInicio, 'HH:mm MMMM d yyyy','es-US'), ' ,') AS fechasFolio FROM PRUEBA_beneficiosCM.citas WHERE estatusCita IN(1) AND citas.idCita = idCita GROUP BY citas.idDetalle) AS tf
+            LEFT JOIN (SELECT idDetalle, GROUP_CONCAT(DATE_FORMAT(fechaInicio, '%d / %m / %Y A las %H:%i horas.'), '') AS fechasFolio FROM PRUEBA_beneficiosCM.citas 
+            WHERE estatusCita IN( ? ) AND citas.idCita = idCita GROUP BY citas.idDetalle) AS tf
             ON tf.idDetalle = ct.idDetalle
-           WHERE YEAR(fechaInicio) in (?, ?)
-            AND MONTH(fechaInicio) in (?, ?, ?)
+            WHERE YEAR(fechaInicio) IN (?, ?)
+            AND MONTH(fechaInicio) IN (?, ?, ?)
             AND ct.idEspecialista = ?
             AND ct.estatusCita IN(?, ?, ?, ?, ?, ?, ?)",
             array( 8, $dates["year1"], $dates["year2"], $dates["month1"], $month, $dates["month2"], $idUsuario, 1, 2, 3, 4, 5, 6, 7 )
@@ -1161,7 +1162,7 @@ class calendarioModel extends CI_Model
         INNER JOIN PRUEBA_beneficiosCM.atencionxsede AS atc ON atc.idAtencionXSede = ct.idAtencionXSede
         LEFT join PRUEBA_CH.beneficioscm_vista_oficinas AS ofi ON ofi.idoficina = atc.idOficina
         INNER join PRUEBA_CH.beneficioscm_vista_sedes AS sed ON sed.idSede = atc.idSede
-		  LEFT JOIN (SELECT idDetalle, GROUP_CONCAT(FORMAT(fechaInicio, '%H:%i %M %e %Y')) as fechasFolio FROM PRUEBA_beneficiosCM.citas WHERE estatusCita IN(8) GROUP BY idDetalle) tf ON tf.idDetalle = ct.idDetalle 
+		  LEFT JOIN (SELECT idDetalle, GROUP_CONCAT(DATE_FORMAT(fechaInicio, '%d / %m / %Y A las %H:%i horas.'), '') AS fechasFolio FROM PRUEBA_beneficiosCM.citas WHERE estatusCita IN(8) GROUP BY idDetalle) tf ON tf.idDetalle = ct.idDetalle 
         WHERE ct.estatusCita IN(?) AND ct.idPaciente = ?", array(6, $idUsuario));
 
         return $query;
@@ -1187,7 +1188,7 @@ class calendarioModel extends CI_Model
             INNER JOIN PRUEBA_beneficiosCM.atencionxsede AS atc ON atc.idAtencionXSede = ct.idAtencionXSede  
             LEFT join PRUEBA_CH.beneficioscm_vista_oficinas AS ofi ON ofi.idoficina = atc.idOficina
             INNER join PRUEBA_CH.beneficioscm_vista_sedes AS sed ON sed.idSede = atc.idSede
-		    LEFT JOIN (SELECT idDetalle, GROUP_CONCAT(FORMAT(fechaInicio, '%H:%i %M %e %Y')) as fechasFolio FROM PRUEBA_beneficiosCM.citas WHERE estatusCita IN(8) GROUP BY idDetalle) tf ON tf.idDetalle = ct.idDetalle 
+		    LEFT JOIN (SELECT idDetalle, GROUP_CONCAT(DATE_FORMAT(fechaInicio, '%d / %m / %Y A las %H:%i horas.'), '') AS fechasFolio FROM PRUEBA_beneficiosCM.citas WHERE estatusCita IN(8) GROUP BY idDetalle) tf ON tf.idDetalle = ct.idDetalle 
             WHERE ct.estatusCita IN(?) AND ct.evaluacion is NULL AND ct.idPaciente = ?", array(4, $idUsuario));
 
         return $query;
