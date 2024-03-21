@@ -280,7 +280,7 @@ public function createAppointmentByColaborator()
                                 $response['msg'] = "¡El especialista cambió los dias de atención!"; 
                             }
                         }else {
-                            $response['msg'] = "¡El especialista no brinda o atención en su sede!";
+                            $response['msg'] = "¡El especialista no brinda la atención en su sede!";
                         }
                     }else {
                         $response['result'] = $sedesatencion->num_rows() === 1 && $sedesatencion->result()[0]->value == $idSede; 
