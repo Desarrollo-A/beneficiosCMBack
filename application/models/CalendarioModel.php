@@ -636,7 +636,7 @@ class calendarioModel extends CI_Model
         return $query;
     }
 
-    public function getBeneficiosPorSede($sede)
+    public function getBeneficiosPorSede($sede, $area)
 	{
         $query = $this->ch->query(
             "SELECT DISTINCT us2.idpuesto as 'idPuesto', us2.npuesto as 'puesto'
@@ -648,7 +648,7 @@ class calendarioModel extends CI_Model
             LEFT JOIN PRUEBA_CH.beneficioscm_vista_oficinas as ofi ON ofi.idoficina = axs.idOficina
             LEFT JOIN PRUEBA_CH.beneficioscm_vista_sedes AS so ON so.idsede = ofi.idsede
             WHERE us.estatus = 1 AND s.estatus_sede = 1 AND axs.estatus = 1  AND us.idRol = 3 AND opc.idCatalogo = 5
-            AND axs.idSede = 1 ;", $sede
+            AND (axs.idSede = ? AND (axs.idArea IS NULL OR axs.idArea = ?)) ;", array($sede, $area)
         );
 
         return $query;

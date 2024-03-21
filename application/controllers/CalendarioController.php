@@ -695,10 +695,11 @@ public function createAppointmentByColaborator()
 	public function getBeneficiosPorSede()
 	{
 		$sede = $this->input->post('dataValue[sede]');
+		$area = $this->input->post('dataValue[area]');
 
 		$response['result'] = isset($sede);
 		if ($response['result']) {
-			$rs = $this->calendarioModel->getBeneficiosPorSede($sede)->result();
+			$rs = $this->calendarioModel->getBeneficiosPorSede($sede, $area)->result();
 			$response['result'] = count($rs) > 0;
 			if ($response['result']) {
 				$response['msg'] = '¡Listado de beneficios cargado exitosamente!';
