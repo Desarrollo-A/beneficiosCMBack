@@ -141,8 +141,8 @@ class GestorModel extends CI_Model {
         /* $query = $this->db->query("SELECT *from atencionXSede where idEspecialista = ? AND idSede = ? AND idOficina = ? AND (idArea = ? OR idArea IS NULL) AND tipoCita = ?",
         array($dt["especialista"], $dt["sede"], $dt["oficina"], $idArea, $dt["modalidad"])); */
 
-        $query = $this->ch->query("SELECT *from PRUEBA_beneficiosCM.atencionxsede where idEspecialista = ? AND idSede = ? AND idOficina = ? AND (idArea = ? OR idArea IS NULL) AND tipoCita = ?",
-        array($dt["especialista"], $dt["sede"], $dt["oficina"], $idArea, $dt["modalidad"]));
+        $query = $this->ch->query("SELECT *from PRUEBA_beneficiosCM.atencionxsede where idEspecialista = ? AND idSede = ? AND (idArea = ? OR idArea IS NULL) AND tipoCita = ?",
+        array($dt["especialista"], $dt["sede"], $idArea, $dt["modalidad"]));
 
         return $query;
     }
@@ -152,8 +152,8 @@ class GestorModel extends CI_Model {
         /* $query = $this->db->query("SELECT *from atencionXSede where idEspecialista = ? AND idSede = ? AND idOficina = ? AND (idArea = ? OR idArea IS NULL) AND tipoCita = ? AND idAtencionXSede != ?",
         array($dt["especialista"], $dt["sede"], $dt["oficina"], $idArea, $dt["modalidad"], $idAts)); */
 
-        $query = $this->ch->query("SELECT *from PRUEBA_beneficiosCM.atencionxsede where idEspecialista = ? AND idSede = ? AND idOficina = ? AND (idArea = ? OR idArea IS NULL) AND tipoCita = ? AND idAtencionXSede != ?",
-        array($dt["especialista"], $dt["sede"], $dt["oficina"], $idArea, $dt["modalidad"], $idAts));
+        $query = $this->ch->query("SELECT *from PRUEBA_beneficiosCM.atencionxsede where idEspecialista = ? AND idSede = ? AND (idArea = ? OR idArea IS NULL) AND tipoCita = ? AND idAtencionXSede != ?",
+        array($dt["especialista"], $dt["sede"], $idArea, $dt["modalidad"], $idAts));
 
         return $query;
     }
@@ -161,8 +161,8 @@ class GestorModel extends CI_Model {
     public function checkAxsArea($dt, $idAts){
 
         $query = $this->ch->query("SELECT *from PRUEBA_beneficiosCM.atencionxsede 
-        where idEspecialista = ? AND idSede = ? AND idOficina = ? AND tipoCita = ? AND idAtencionXSede != ? AND idArea IS NOT NULL",
-        array($dt["especialista"], $dt["sede"], $dt["oficina"], $dt["modalidad"], $idAts));
+        where idEspecialista = ? AND idSede = ? AND tipoCita = ? AND idAtencionXSede != ? AND idArea IS NOT NULL",
+        array($dt["especialista"], $dt["sede"], $dt["modalidad"], $idAts));
 
         return $query;
     }
@@ -171,8 +171,8 @@ class GestorModel extends CI_Model {
         /* $query = $this->db->query("SELECT *from atencionXSede where idEspecialista = ? AND idSede = ? AND idOficina = ? AND (idArea IS NULL OR idArea IS NOT NULL) AND tipoCita = ?", 
         array($dt["especialista"], $dt["sede"], $dt["oficina"], $dt["modalidad"])); */
 
-        $query = $this->ch->query("SELECT *from PRUEBA_beneficiosCM.atencionxsede where idEspecialista = ? AND idSede = ? AND idOficina = ? AND (idArea IS NULL OR idArea IS NOT NULL) AND tipoCita = ?", 
-        array($dt["especialista"], $dt["sede"], $dt["oficina"], $dt["modalidad"]));
+        $query = $this->ch->query("SELECT *from PRUEBA_beneficiosCM.atencionxsede where idEspecialista = ? AND idSede = ? AND (idArea IS NULL OR idArea IS NOT NULL) AND tipoCita = ?", 
+        array($dt["especialista"], $dt["sede"], $dt["modalidad"]));
 
         return $query;
     }
@@ -181,8 +181,8 @@ class GestorModel extends CI_Model {
         /* $query = $this->db->query("SELECT *from atencionXSede where idEspecialista = ? AND idSede = ? AND idOficina = ? AND (idArea IS NULL OR idArea IS NOT NULL) AND tipoCita = ?", 
         array($dt["especialista"], $dt["sede"], $dt["oficina"], $dt["modalidad"])); */
 
-        $query = $this->ch->query("SELECT *from PRUEBA_beneficiosCM.atencionxsede where idEspecialista = ? AND idSede = ? AND idOficina = ? AND (idArea IS NULL OR idArea IS NOT NULL) AND tipoCita = ?", 
-        array($dt["especialista"], $dt["sede"], $dt["oficina"], $dt["modalidad"]));
+        $query = $this->ch->query("SELECT *from PRUEBA_beneficiosCM.atencionxsede where idEspecialista = ? AND idSede = ? AND (idArea IS NULL OR idArea IS NOT NULL) AND tipoCita = ?", 
+        array($dt["especialista"], $dt["sede"], $dt["modalidad"]));
 
         return $query;
     }
@@ -201,8 +201,8 @@ class GestorModel extends CI_Model {
         ); */
 
         $query = $this->ch->query(
-            "SELECT *FROM PRUEBA_beneficiosCM.atencionxsede where idEspecialista = ? AND idOficina = ? AND tipoCita = ?",
-            array($dataValue["idEspecialista"], $dataValue["idOficina"], $dataValue["modalidad"])
+            "SELECT *FROM PRUEBA_beneficiosCM.atencionxsede where idEspecialista = ? AND tipoCita = ?",
+            array($dataValue["idEspecialista"], $dataValue["modalidad"])
         );
 
         return $query;
@@ -215,8 +215,8 @@ class GestorModel extends CI_Model {
         ); */
 
         $query = $this->ch->query(
-            "SELECT *FROM PRUEBA_beneficiosCM.atencionxsede where idEspecialista = ? AND idOficina = ? AND (idArea = ? OR idArea IS NULL) AND tipoCita = ?",
-            array($dataValue["idEspecialista"], $dataValue["idOficina"], $dataValue["idArea"], $dataValue["modalidad"])
+            "SELECT *FROM PRUEBA_beneficiosCM.atencionxsede where idEspecialista = ? AND (idArea = ? OR idArea IS NULL) AND tipoCita = ?",
+            array($dataValue["idEspecialista"], $dataValue["idArea"], $dataValue["modalidad"])
         );
 
         return $query;

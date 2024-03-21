@@ -678,7 +678,7 @@ class calendarioModel extends CI_Model
             "SELECT CASE WHEN tipoCita = 1 then 'PRESENCIAL' WHEN tipoCita = 2 THEN 'EN LíNEA' END AS 'modalidad', us.idUsuario as id,
             us2.idpuesto,  CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista,
             ofi.direccion as ubicacionOficina, axs.tipoCita, axs.idAtencionXSede, us2.nsede as lugarAtiende 
-            FROM PRUEBA_beneficiosCM.atencionxsede AS axs 
+            FROM PRUEBA_beneficiosCM.atencionxsede AS axs
             INNER JOIN PRUEBA_beneficiosCM.usuarios AS us ON us.idUsuario = axs.idEspecialista 
             INNER JOIN PRUEBA_CH.beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
             LEFT JOIN PRUEBA_CH.beneficioscm_vista_oficinas AS ofi ON ofi.idoficina = axs.idOficina 
