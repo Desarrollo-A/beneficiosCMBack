@@ -1049,7 +1049,9 @@ public function createAppointmentByColaborator()
 			$response["result"] = $this->GeneralModel->addRecord("detallepagos", $values);
 			if ($response["result"]) {
 				$response["msg"] = "¡Se ha generado el detalle de pago con éxito!";
+	
 				$rs = $this->calendarioModel->getDetallePago($folio)->result();
+				
 				if (!empty($rs) && isset($rs[0]->idDetalle)) {
 					$response["data"] = $rs[0]->idDetalle;
 				} else {

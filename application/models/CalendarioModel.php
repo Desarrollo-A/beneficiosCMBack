@@ -640,7 +640,7 @@ class calendarioModel extends CI_Model
 	{
         $query = $this->ch->query(
             "SELECT DISTINCT us2.idpuesto as 'idPuesto', us2.npuesto as 'puesto'
-            FROM PRUEBA_beneficiosCM.usuarios AS us 
+            FROM PRUEBA_beneficiosCM.usuarios AS us
             INNER JOIN PRUEBA_CH.beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
             RIGHT JOIN PRUEBA_beneficiosCM.atencionxsede AS axs ON axs.idEspecialista = us.idUsuario
             INNER JOIN PRUEBA_beneficiosCM.opcionesporcatalogo AS opc ON opc.idOpcion= axs.tipoCita
@@ -1057,7 +1057,7 @@ class calendarioModel extends CI_Model
     public function getAppointment($month, $idUsuario, $dates){
         $query = $this->ch->query(
             "SELECT TRIM(CAST(ct.idCita AS CHAR(36))) AS id,  ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end',
-            ct.fechaInicio AS occupied, 'date' AS 'type', ct.estatusCita AS estatus, CONCAT(us2.nombre_persona, us2.pri_apellido, us2.sec_apellido) AS nombre, ct.idPaciente, us2.telefono_personal AS telPersonal, us2.mail_emp AS correo,
+            ct.fechaInicio AS occupied, 'date' AS 'type', ct.estatusCita AS estatus, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre, ct.idPaciente, us2.telefono_personal AS telPersonal, us2.mail_emp AS correo,
             se.nsede AS sede, ofi.noficina as oficina, ct.idDetalle, ct.idAtencionXSede, us.externo, CONCAT(usEspCH.nombre_persona, usEspCH.pri_apellido, usEspCH.sec_apellido) as especialista, ct.fechaCreacion, usEspCH.tipo_puesto AS tipoPuesto,
             tf.fechasFolio, idEventoGoogle, ct.tipoCita, aps.tipoCita as modalidad, aps.idSede,
             CASE
