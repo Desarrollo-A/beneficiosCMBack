@@ -6,9 +6,9 @@ require_once(APPPATH . "/controllers/BaseController.php");
 class Api extends BaseController{
     public function __construct(){
 		parent::__construct();
-
 		$this->load->model('GeneralModel');
 		$this->load->helper(array('form','funciones'));
+		$this->ch = $this->load->database('ch', TRUE);
 	}
 
     public function index()
@@ -63,8 +63,8 @@ class Api extends BaseController{
 		// 		"modificadoPor" => $usuario,
 		// 		"fechaModificacion" => $fecha
 		// 	];
-		// 	$rs = $this->GeneralModel->addRecord("detallePagos", $values);
-		// 	$last_id = $this->db->insert_id();
+		// 	$rs = $this->GeneralModel->addRecord("detallepagos", $values);
+		// 	$last_id = $this->ch->insert_id();
 		// 	$response["result"] = $rs;
 		// 	if ($response["result"]) {
 		// 		if (isset($last_id)) {					

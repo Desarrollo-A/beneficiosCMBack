@@ -939,8 +939,8 @@ class calendarioModel extends CI_Model
             "SELECT idUnico as id, titulo as title, fechaInicio as 'start', fechaFinal as 'end',
             'purple' AS 'color', estatus, 'cancel' AS 'type'
             FROM PRUEBA_beneficiosCM.horariosocupados
-            WHERE YEAR(fechaInicio) IN(?, ?)
-            AND MONTH(fechaInicio) IN(?, ?, ?)
+            WHERE YEAR(fechaInicio) IN (?, ?)
+            AND MONTH(fechaInicio) IN (?, ?, ?)
             AND idEspecialista = ?  
             AND estatus = ?",
             array( $dates["year1"], $dates["year2"], $dates["month1"], $month, $dates["month2"], $idUsuario, 1 )
@@ -1003,7 +1003,7 @@ class calendarioModel extends CI_Model
             WHERE idEspecialista = ?
             AND idSede = ( 
                 SELECT idSede FROM PRUEBA_beneficiosCM.usuarios AS us 
-				INNER JOIN AS PRUEBA_CH.beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato 
+				INNER JOIN PRUEBA_CH.beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato 
 				WHERE idUsuario = ? ) AND estatus = ?", 
             array($dataValue["idUsuario"], $dataValue["idUsuario"], 1)
         );
@@ -1047,7 +1047,7 @@ class calendarioModel extends CI_Model
         $query = $this->ch->query(
             "SELECT ct.idCita FROM PRUEBA_beneficiosCM.citas AS ct
             INNER JOIN PRUEBA_beneficiosCM.usuarios as us ON ct.idEspecialista = us.idUsuario
-            INNER JOIN AS PRUEBA_CH.beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato 
+            INNER JOIN PRUEBA_CH.beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato 
             WHERE ct.idPaciente = ? AND us2.idpuesto = ? AND ct.estatusCita IN (1, 6);",array($usuario, $beneficio)
         );
 
@@ -1149,10 +1149,10 @@ class calendarioModel extends CI_Model
         CASE WHEN ofi.direccion IS NULL THEN 'VIRTUAL' ELSE ofi.direccion END as 'ubicación', sed.nsede AS sede, atc.idOficina, us2.mail_emp as correo, usEspe2.mail_emp as correoEspecialista, 
         CONCAT(usEspe2.nombre_persona, usEspe2.pri_apellido, usEspe2.sec_apellido) AS especialista, ct.idDetalle, usEspe2.telefono_personal as telefonoEspecialista,
         usEspe2.sexo as sexoEspecialista, tf.fechasFolio, ct.idEventoGoogle, ct.evaluacion,
-        CASE WHEN us cEspe2.idPuesto = 537 THEN 'Nutrición'
-        WHEN usEspe2.idPuesto = 585 THEN 'Psicología'
-        WHEN usEspe2.idPuesto = 686 THEN 'Guía espiritual'
-        WHEN usEspe2.idPuesto = 158 THEN 'Quantum balance'
+        CASE WHEN usEspe2.idpuesto = 537 THEN 'Nutrición'
+        WHEN usEspe2.idpuesto = 585 THEN 'Psicología'
+        WHEN usEspe2.idpuesto = 686 THEN 'Guía espiritual'
+        WHEN usEspe2.idpuesto = 158 THEN 'Quantum balance'
         END AS beneficio
         FROM PRUEBA_beneficiosCM.citas AS ct
         INNER JOIN PRUEBA_beneficiosCM.usuarios AS us ON us.idUsuario = ct.idPaciente

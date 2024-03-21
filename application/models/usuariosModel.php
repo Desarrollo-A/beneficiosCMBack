@@ -34,7 +34,7 @@ class UsuariosModel extends CI_Model {
         "SELECT us.idUsuario, us.idContrato, us2.num_empleado AS 'numEmpleado',
         CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre,
         us2.telefono_personal AS telPersonal, us2.mail_emp AS 'correo', us.password, us2.sexo, us.externo, us.idRol, 
-        us2.fingreso AS 'fechaIngreso',
+        us2.fingreso AS 'fechaIngreso', us2.tipo_puesto AS 'tipoPuesto',
         us2.idsede AS 'idSede', us2.nsede AS 'sede', us2.idpuesto AS 'idPuesto', us2.npuesto AS 'puesto', us2.idarea AS 'idArea', 
         us2.narea as 'area', us2.iddepto AS 'idDepto', us2.ndepto as 'departamento', us.idAreaBeneficio, 
         us.estatus, us.creadoPor, us.fechaCreacion, us.modificadoPor, us.fechaModificacion  
