@@ -109,12 +109,12 @@ class UsuariosModel extends CI_Model {
 
 	public function decodePass($dt)
 	{
-
 		if(!empty($dt))
 		{
 			$query = $this->ch-> query("SELECT password 
-			FROM PRUEBA_beneficiosCM.usuarios us
-			WHERE us.idUsuario = ?", $dt);
+			FROM PRUEBA_CH.beneficioscm_vista_usuarios us2 
+			INNER JOIN PRUEBA_beneficiosCM.usuarios us ON us.idContrato = us2.idcontrato
+			WHERE us2.num_empleado = ?", $dt);
 
 			$pass = '';
 			foreach ($query->result() as $row) {
