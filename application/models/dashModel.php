@@ -367,6 +367,7 @@ class DashModel extends CI_Model
 		$query = $this->ch-> query("SELECT COUNT(idCita) AS total
 		FROM PRUEBA_beneficiosCM.citas 
 		WHERE idPaciente = $dt
+		AND estatusCita = 4 
 		AND YEAR(fechaFinal) = YEAR(NOW())
 		AND MONTH(fechaFinal) = MONTH(NOW())");
         
