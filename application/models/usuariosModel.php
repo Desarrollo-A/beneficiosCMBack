@@ -75,7 +75,7 @@ class UsuariosModel extends CI_Model {
 																																
 
 		$query = $this->ch->query(
-			"SELECT US.*, SE.idsede AS idSede, PS.idArea, us2.tipo_puesto AS tipoPuesto, us2.fingreso AS fechaIngreso, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, ' ', '(', SE.nsede, ')')) AS nombreCompleto, 
+			"SELECT US.*, SE.idsede AS idSede, PS.idArea, us2.tipo_puesto AS tipoPuesto, us2.fingreso AS fechaIngreso, CONCAT(CONCAT (us2.nombre_persona,' ',us2.pri_apellido,' ',us2.sec_apellido), ' ', '(', SE.nsede, ')') AS nombreCompleto, 
 			 PS.nom_puesto as nombrePuesto, PS.tipo_puesto
 			 FROM ". $this->schema_cm .".usuarios US
 			 INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = US.idContrato
@@ -86,7 +86,7 @@ class UsuariosModel extends CI_Model {
 			 AND us2.idsede
 			 IN ( SELECT DISTINCT idSede FROM atencionxsede WHERE idEspecialista = ? )
 			 UNION
-			 SELECT US2.*, NULL AS idSede, NULL AS idArea, NULL AS tipoPuesto, us3.fingreso, CONCAT('(Lamat)', ' ', CONCAT(IFNULL(us3.nombre_persona, ''), ' ', IFNULL(us3.pri_apellido, ''), ' ', IFNULL(us3.sec_apellido, '')) AS nombreCompleto, 'nombrePuesto' = 'na', 'tipoPuesto' = 'na' 
+			 SELECT US2.*, NULL AS idSede, NULL AS idArea, NULL AS tipoPuesto, us3.fingreso, CONCAT('(Lamat)', ' ', CONCAT(IFNULL(us3.nombre_persona, ''), ' ', IFNULL(us3.pri_apellido, ''), ' ', IFNULL(us3.sec_apellido, ''))) AS nombreCompleto, 'nombrePuesto' = 'na', 'tipoPuesto' = 'na' 
 			 FROM usuarios US2 
 			 INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us3 ON us3.idcontrato = US2.idContrato
 			 WHERE externo = 1",
