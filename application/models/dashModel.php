@@ -6,6 +6,9 @@ class DashModel extends CI_Model
 {
 	public function __construct()
 	{
+		$this->schema_cm = $this->config->item('schema_cm');
+        $this->schema_ch = $this->config->item('schema_ch');
+		$this->ch = $this->load->database('ch', TRUE);
 		parent::__construct();
 		$this->schema_cm = $this->config->item('schema_cm');
         $this->schema_ch = $this->config->item('schema_ch');
@@ -109,7 +112,6 @@ class DashModel extends CI_Model
 
 	public function getPregunta($dt)
 	{
-
 		/* $query = $this->db->query("SELECT DISTINCT ec.idPregunta, pg.pregunta, ec.respuestas, pg.idPregunta, ec.idEncuesta, ec.idEncuestaCreada, ec.idArea, ec.idPregunta
 		FROM encuestasCreadas ec
 		INNER JOIN preguntasGeneradas pg ON pg.idPregunta = ec.idPregunta AND pg.idEncuesta = ec.idEncuesta

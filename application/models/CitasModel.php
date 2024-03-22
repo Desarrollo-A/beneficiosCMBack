@@ -4,6 +4,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
 class CitasModel extends CI_Model{
     public function __construct()
     {
+        $this->schema_cm = $this->config->item('schema_cm');
+        $this->schema_ch = $this->config->item('schema_ch');
+        $this->ch = $this->load->database('ch', TRUE);
         parent::__construct();
     }
 
@@ -14,7 +17,7 @@ class CitasModel extends CI_Model{
             WHERE
                 idPaciente=$idUsuario"; */
 
-        $query = "UPDATE PRUEBA_beneficiosCM.citas
+        $query = "UPDATE ". $this->schema_cm .".citas
         SET estatusCita=2
         WHERE idPaciente=$idUsuario";
 
@@ -32,7 +35,7 @@ class CitasModel extends CI_Model{
             AND citas.fechaInicio BETWEEN '$fechaInicio' AND '$fechaFinal'"; */
 
             $query = "SELECT *
-            FROM PRUEBA_beneficiosCM.citas as ct
+            FROM ". $this->schema_cm .".citas as ct
             LEFT JOIN atencionxsede as axs ON ct.idAtencionXSede = axs.idAtencionXSede
             WHERE ct.idEspecialista='$idEspecialista'
             AND ct.estatusCita IN (1)

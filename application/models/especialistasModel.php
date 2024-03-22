@@ -5,6 +5,9 @@
 class EspecialistasModel extends CI_Model {
 	public function __construct()
 	{
+		$this->schema_cm = $this->config->item('schema_cm');
+        $this->schema_ch = $this->config->item('schema_ch');
+		$this->ch = $this->load->database('ch', TRUE);
 		parent::__construct();
 		$this->schema_cm = $this->config->item('schema_cm');
         $this->schema_ch = $this->config->item('schema_ch');
@@ -44,8 +47,7 @@ class EspecialistasModel extends CI_Model {
         		idEspecialista = $idEspecialista
         	AND estatusCita = 4
 			AND MONTH(fechaFinal) = $mes"; */
-
-			$query = "SELECT * FROM ". $this->schema_cm .".citas
+			$query = "SELECT * FROM ". $this->schema_ch .".citas
         	WHERE
         		idEspecialista = $idEspecialista
         	AND estatusCita = 4
@@ -75,9 +77,7 @@ class EspecialistasModel extends CI_Model {
 
 	public function checkModalitie($idEspecialista, $presencialDate){
 		/* $query = $this->db->query("SELECT idSede from presencialXSede where idEspecialista = ? AND presencialDate = ? ", array($idEspecialista, $presencialDate)); */
-		
 		$query = $this->ch->query("SELECT idSede from ". $this->schema_cm .".presencialxsede where idEspecialista = ? AND presencialDate = ? ", array($idEspecialista, $presencialDate));
-
 		return $query;
 	}
 

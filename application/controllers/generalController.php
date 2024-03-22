@@ -8,9 +8,7 @@ class GeneralController extends BaseController {
 	public function __construct()
 	{
 		parent::__construct();
-		$this->load->database('default');
 		$this->load->model('GeneralModel');
-		$this->ch = $this->load->database('ch', TRUE);
 	}
 
 	public function usuarios(){
