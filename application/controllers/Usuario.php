@@ -230,9 +230,13 @@ class Usuario extends BaseController {
 	}
 
 	public function decodePass(){
-		$dt = $this->input->post('dataValue', true);
+		$token = $this->headers('Token');
+		$array = json_decode(base64_decode(explode(".", $token)[1]));
+		$dt = $array->numEmpleado;
+
 		$data['data'] = $this->UsuariosModel->decodePass($dt);
-		echo json_encode($data);
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
 	}
 
 	public function updatePass(){
