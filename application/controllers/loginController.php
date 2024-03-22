@@ -10,7 +10,7 @@ class LoginController extends BaseController {
 		parent::__construct();
 		$this->load->model('UsuariosModel');
 		$this->load->model('GeneralModel');
-		$this->load->model('menuModel');
+		$this->load->model('MenuModel');
         $this->ch = $this->load->database('ch', TRUE);
 
 		$this->load->helper(array('form','funciones'));

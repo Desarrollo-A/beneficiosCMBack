@@ -9,7 +9,7 @@ class MenuModel extends CI_Model {
     public function checkAuth($path, $id_user, $id_rol){
         /* $item = $this->db->query("SELECT * FROM menu WHERE path = '$path'")->row(); */
 
-        $item = $this->ch->query("SELECT * FROM PRUEBA_beneficiosCM.menu WHERE path = '$path'")->row();
+        $item = $this->ch->query("SELECT * FROM ". $this->schema_cm .".menu WHERE path = '$path'")->row();
 
         $auth = false;
         if($item){
@@ -35,11 +35,11 @@ class MenuModel extends CI_Model {
 
         /* $items = $this->db->query("SELECT * FROM menu WHERE father IS NULL ORDER BY posOrder")->result_array(); */
 
-        $items = $this->ch->query("SELECT * FROM PRUEBA_beneficiosCM.menu WHERE father IS NULL ORDER BY posOrder")->result_array();
+        $items = $this->ch->query("SELECT * FROM ". $this->schema_cm .".menu WHERE father IS NULL ORDER BY posOrder")->result_array();
 
         $menus = array();
         foreach ($items as $key_i => $item) {
-            $children = $this->ch->query("SELECT * FROM PRUEBA_beneficiosCM.menu WHERE father=$item[id] ORDER BY posOrder")->result_array();
+            $children = $this->ch->query("SELECT * FROM ". $this->schema_cm .".menu WHERE father=$item[id] ORDER BY posOrder")->result_array();
 
             $childs = array();
             foreach ($children as $key_c => $child) {
