@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
-class calendarioModel extends CI_Model
+class CalendarioModel extends CI_Model
 {
     public function __construct()
 	{
