@@ -6,6 +6,7 @@ class AvisosPrivacidadController extends BaseController
 {
 	public function __construct()
 	{
+		parent::__construct();
 		$this->ch = $this->load->database('ch', TRUE);
 		$this->load->model('CalendarioModel');
 		$this->load->model('AvisosPrivacidadModel');
@@ -13,7 +14,6 @@ class AvisosPrivacidadController extends BaseController
 		$this->load->model('UsuariosModel');
 		
 		date_default_timezone_set('America/Mexico_City');
-		parent::__construct();
 	}
 
 	function getEspecialidades(){

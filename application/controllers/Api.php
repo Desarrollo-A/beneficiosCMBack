@@ -5,10 +5,10 @@ require_once(APPPATH . "/controllers/BaseController.php");
 
 class Api extends BaseController{
     public function __construct(){
+		parent::__construct();
 		$this->load->model('GeneralModel');
 		$this->load->helper(array('form','funciones'));
 		$this->ch = $this->load->database('ch', TRUE);
-		parent::__construct();
 	}
 
     public function index()

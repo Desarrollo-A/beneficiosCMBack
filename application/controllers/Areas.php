@@ -5,10 +5,9 @@ require_once(APPPATH . "/controllers/BaseController.php");
 
 class Areas extends BaseController{
     public function __construct(){
-        
+        parent::__construct();
         $this->load->model('EspecialistasModel');
         $this->ch = $this->load->database('ch', TRUE);
-        parent::__construct();
     }
 
     public function citas(){
