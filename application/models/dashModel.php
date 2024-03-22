@@ -7,6 +7,8 @@ class DashModel extends CI_Model
 	public function __construct()
 	{
 		parent::__construct();
+		$this->schema_cm = $this->config->item('schema_cm');
+        $this->schema_ch = $this->config->item('schema_ch');
 	}
 
 	/* public function citasCountStatus()
@@ -114,8 +116,8 @@ class DashModel extends CI_Model
 		WHERE ec.estatus = 1 AND (pg.abierta = 1 AND ec.idArea = $dt AND pg.idArea = $dt AND ec.respuestas <= 4)"); */
 
 		$query = $this->ch->query("SELECT DISTINCT ec.idPregunta, pg.pregunta, ec.respuestas, pg.idPregunta, ec.idEncuesta, ec.idEncuestaCreada, ec.idArea, ec.idPregunta
-		FROM PRUEBA_beneficiosCM.encuestascreadas ec
-		INNER JOIN PRUEBA_beneficiosCM.preguntasgeneradas pg ON pg.idPregunta = ec.idPregunta AND pg.idEncuesta = ec.idEncuesta
+		FROM ". $this->schema_cm .".encuestascreadas ec
+		INNER JOIN ". $this->schema_cm .".preguntasgeneradas pg ON pg.idPregunta = ec.idPregunta AND pg.idEncuesta = ec.idEncuesta
 		WHERE ec.estatus = 1 AND (pg.abierta = 1 AND ec.idArea = $dt AND pg.idArea = $dt AND ec.respuestas <= 4)");
 
 		$result = $query->result();
@@ -156,8 +158,8 @@ class DashModel extends CI_Model
 
 				$query_pregunta = $this->ch->query(
 					"SELECT DISTINCT pg.pregunta  
-					FROM PRUEBA_beneficiosCM.encuestascreadas ec
-					INNER JOIN PRUEBA_beneficiosCM.preguntasgeneradas pg ON pg.idPregunta = ec.idPregunta
+					FROM ". $this->schema_cm .".encuestascreadas ec
+					INNER JOIN ". $this->schema_cm .".preguntasgeneradas pg ON pg.idPregunta = ec.idPregunta
 					WHERE ec.estatus = 1 AND abierta = 1 AND pg.idArea = ? AND pg.idPregunta = ? AND ec.idPregunta = ?",
 					array($idEspecialidad, $idPregunta, $idPregunta)
 				);
@@ -183,7 +185,7 @@ class DashModel extends CI_Model
 
 					$query = $this->ch->query(
 						"SELECT GROUP_CONCAT(rg.respuesta SEPARATOR ', ') AS respuestas, rg.grupo  
-						FROM PRUEBA_beneficiosCM.encuestascreadas ec
+						FROM ". $this->schema_cm .".encuestascreadas ec
 						INNER JOIN respuestasgenerales rg ON rg.grupo = ec.respuestas 
 						INNER JOIN preguntasgeneradas pg ON pg.idPregunta = ec.idPregunta
 						WHERE pg.pregunta IN ($idPreguntasString) AND ec.idEncuesta = $idEncuesta AND pg.idEncuesta = $idEncuesta
@@ -244,10 +246,10 @@ class DashModel extends CI_Model
 					ec.idPregunta, 
 					ec.idArea, 
 					ec.idEncuesta
-					FROM PRUEBA_beneficiosCM.encuestascontestadas ec
-					INNER JOIN PRUEBA_beneficiosCM.respuestasgenerales rg ON rg.idRespuestaGeneral = ec.idRespuesta
+					FROM ". $this->schema_cm .".encuestascontestadas ec
+					INNER JOIN ". $this->schema_cm .".respuestasgenerales rg ON rg.idRespuestaGeneral = ec.idRespuesta
 					CROSS JOIN 
-					(SELECT COUNT(*) AS total FROM PRUEBA_beneficiosCM.encuestascontestadas WHERE idEncuesta = $idEncuesta AND idPregunta = $idPregunta AND idArea = $area) AS total_count
+					(SELECT COUNT(*) AS total FROM ". $this->schema_cm .".encuestascontestadas WHERE idEncuesta = $idEncuesta AND idPregunta = $idPregunta AND idArea = $area) AS total_count
 					WHERE ec.idEncuesta = $idEncuesta AND ec.idPregunta = $idPregunta AND ec.idArea = $area
 					AND (ec.fechaCreacion >= '$fhI' AND ec.fechaCreacion <= '$fhF')
 					GROUP BY rg.respuesta, ec.idPregunta, ec.idArea, ec.idEncuesta;");
@@ -269,10 +271,10 @@ class DashModel extends CI_Model
 					ec.idPregunta, 
 					ec.idArea, 
 					ec.idEncuesta
-					FROM PRUEBA_beneficiosCM.encuestascontestadas ec
-					INNER JOIN PRUEBA_beneficiosCM.respuestasgenerales rg ON rg.idRespuestaGeneral = ec.idRespuesta
+					FROM ". $this->schema_cm .".encuestascontestadas ec
+					INNER JOIN ". $this->schema_cm .".respuestasgenerales rg ON rg.idRespuestaGeneral = ec.idRespuesta
 					CROSS JOIN 
-					(SELECT COUNT(*) AS total FROM PRUEBA_beneficiosCM.encuestascontestadas WHERE idEncuesta = $idEncuesta AND idPregunta = $idPregunta AND idArea = $area) AS total_count
+					(SELECT COUNT(*) AS total FROM ". $this->schema_cm .".encuestascontestadas WHERE idEncuesta = $idEncuesta AND idPregunta = $idPregunta AND idArea = $area) AS total_count
 					WHERE ec.idEncuesta = $idEncuesta AND ec.idPregunta = $idPregunta AND ec.idEspecialista = $idEspecialista
 					AND (ec.fechaCreacion >= '$fhI' AND ec.fechaCreacion <= '$fhF')
 					GROUP BY rg.respuesta, ec.idPregunta, ec.idArea, ec.idEncuesta;");
@@ -347,8 +349,8 @@ class DashModel extends CI_Model
 		FROM usuarios WHERE idRol = 3 AND idPuesto = $dt"); */
 
 		$query = $this->ch-> query("SELECT idUsuario, CONCAT(us2.nombre_persona,' ',us2.pri_apellido,' ',us2.sec_apellido) AS nombre
-		FROM PRUEBA_beneficiosCM.usuarios us
-		INNER JOIN PRUEBA_CH.beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
+		FROM ". $this->schema_cm .".usuarios us
+		INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
 		WHERE idRol = 3 AND us2.idpuesto = $dt");
         
         return $query->result();
@@ -365,7 +367,7 @@ class DashModel extends CI_Model
 		AND MONTH(fechaFinal) = MONTH(GETDATE())"); */
 
 		$query = $this->ch-> query("SELECT COUNT(idCita) AS total
-		FROM PRUEBA_beneficiosCM.citas 
+		FROM ". $this->schema_cm .".citas 
 		WHERE idPaciente = $dt
 		AND estatusCita = 4 
 		AND YEAR(fechaFinal) = YEAR(NOW())
@@ -379,7 +381,7 @@ class DashModel extends CI_Model
         /* $query = $this->db-> query("SELECT COUNT(*) AS [asistencia] FROM citas WHERE idPaciente = $dt AND estatusCita = 4"); */
 
 		$query = $this->ch-> query("SELECT COUNT(*) AS `asistencia` 
-		FROM PRUEBA_beneficiosCM.citas 
+		FROM ". $this->schema_cm .".citas 
 		WHERE idPaciente = $dt AND estatusCita = 4;");
 
         return $query;
@@ -390,7 +392,7 @@ class DashModel extends CI_Model
         /* $query = $this->db-> query("SELECT COUNT(*) AS [cancelada] FROM citas WHERE idPaciente = $dt AND estatusCita = 2"); */
 		
 		$query = $this->ch-> query("SELECT COUNT(*) AS `cancelada` 
-		FROM PRUEBA_beneficiosCM.citas 
+		FROM ". $this->schema_cm .".citas 
 		WHERE idPaciente = 2 AND estatusCita = 2;");
         return $query;
     }
@@ -400,7 +402,7 @@ class DashModel extends CI_Model
             /* $query = $this->db-> query("SELECT COUNT(*) AS [penalizada] FROM citas WHERE idPaciente = $dt AND estatusCita = 3"); */
 
 			$query = $this->ch-> query("SELECT COUNT(*) AS `penalizada` 
-			FROM PRUEBA_beneficiosCM.citas 
+			FROM ". $this->schema_cm .".citas 
 			WHERE idPaciente = 2 AND estatusCita = 3;");
         	return $query;
     }
