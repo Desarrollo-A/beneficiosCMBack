@@ -287,7 +287,7 @@ class GestorController extends BaseController {
 
 		$checkAxs = $this->GestorModel->checkAxsId($checkData, $checkData["idArea"], $idAts);
 
-		$checkAxsArea = $this->GestorModel->checkAxsArea($checkData, $checkData["idArea"], $idAts);
+		$checkAxsArea = $this->GestorModel->checkAxsArea($checkData, $idAts);
 
 		if($checkAxs->num_rows() > 0){
 			$response["result"] = false;

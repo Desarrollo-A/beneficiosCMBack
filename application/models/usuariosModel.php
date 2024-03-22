@@ -111,12 +111,12 @@ class UsuariosModel extends CI_Model {
 
 	public function decodePass($dt)
 	{
-
 		if(!empty($dt))
 		{
 			$query = $this->ch-> query("SELECT password 
 			FROM ". $this->schema_cm .".usuarios us
 			WHERE us.idUsuario = ?", $dt);
+
 
 			$pass = '';
 			foreach ($query->result() as $row) {
