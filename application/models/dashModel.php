@@ -395,7 +395,7 @@ class DashModel extends CI_Model
 		
 		$query = $this->ch-> query("SELECT COUNT(*) AS `cancelada` 
 		FROM ". $this->schema_cm .".citas 
-		WHERE idPaciente = 2 AND estatusCita = 2;");
+		WHERE idPaciente = $dt AND estatusCita = 2;");
         return $query;
     }
 
@@ -405,7 +405,15 @@ class DashModel extends CI_Model
 
 			$query = $this->ch-> query("SELECT COUNT(*) AS `penalizada` 
 			FROM ". $this->schema_cm .".citas 
-			WHERE idPaciente = 2 AND estatusCita = 3;");
+			WHERE idPaciente = $dt AND estatusCita = 3;");
         	return $query;
     }
+
+	public function getCarrusel()
+    {
+		$query = $this->ch-> query("SELECT * FROM ". $this->schema_cm .".novedadesdashboard WHERE estatus = 1");
+        return $query;
+
+    }
+
 }
