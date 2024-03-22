@@ -47,7 +47,7 @@ class EspecialistasModel extends CI_Model {
         		idEspecialista = $idEspecialista
         	AND estatusCita = 4
 			AND MONTH(fechaFinal) = $mes"; */
-			$query = "SELECT * FROM ". $this->schema_ch .".citas
+			$query = "SELECT * FROM ". $this->schema_cm .".citas
         	WHERE
         		idEspecialista = $idEspecialista
         	AND estatusCita = 4
