@@ -6,7 +6,7 @@ require_once(APPPATH . "/controllers/BaseController.php");
 class CalendarioController extends BaseController{
     public function __construct(){
 		parent::__construct();
-		$this->load->model('calendarioModel');
+		$this->load->model('CalendarioModel');
 		$this->load->model('GeneralModel');
 		$this->load->model('UsuariosModel');
 		$this->load->model('EspecialistasModel');

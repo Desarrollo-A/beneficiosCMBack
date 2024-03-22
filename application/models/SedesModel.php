@@ -3,6 +3,8 @@
 class SedesModel extends CI_Model {
     public function __construct(){
         parent::__construct();
+        $this->schema_cm = $this->config->item('schema_cm');
+		$this->schema_ch = $this->config->item('schema_ch');
     }
 
     public function getPresencialXEspecialista($idEspecialista){
@@ -18,8 +20,8 @@ class SedesModel extends CI_Model {
         $query = "SELECT
         ate.idSede as value,
         sd.nsede as label
-        FROM PRUEBA_beneficiosCM.atencionxsede ate
-        LEFT JOIN PRUEBA_CH.beneficioscm_vista_sedes AS sd ON sd.idsede = ate.idSede
+        FROM ". $this->schema_cm .".atencionxsede ate
+        LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_sedes AS sd ON sd.idsede = ate.idSede
         WHERE
         ate.idEspecialista=$idEspecialista AND
         ate.tipoCita=1";
@@ -50,12 +52,12 @@ class SedesModel extends CI_Model {
                 END
         END"; */
 
-        $query = "INSERT IGNORE INTO PRUEBA_beneficiosCM.presencialxsede (presencialDate, idSede, idEspecialista)
+        $query = "INSERT IGNORE INTO ". $this->schema_cm .".presencialxsede (presencialDate, idSede, idEspecialista)
         SELECT '$presencialDate', '$idSede', '$idEspecialista'
         FROM dual
         WHERE NOT EXISTS (
             SELECT * 
-            FROM PRUEBA_beneficiosCM.presencialxsede 
+            FROM ". $this->schema_cm .".presencialxsede 
             WHERE presencialDate = '$presencialDate' AND idEspecialista = '$idEspecialista'
         );";
 
@@ -68,7 +70,7 @@ class SedesModel extends CI_Model {
                 presencialDate = '$presencialDate'
             AND idEspecialista = '$idEspecialista'"; */
 
-        $query = "DELETE FROM PRUEBA_beneficiosCM.presencialxsede
+        $query = "DELETE FROM ". $this->schema_cm .".presencialxsede
         WHERE presencialDate = '$presencialDate' AND idEspecialista = '$idEspecialista'";
 
         return $this->ch->query($query);
@@ -98,9 +100,9 @@ class SedesModel extends CI_Model {
         sd.nsede AS title,
         'background' AS display,
         ds.colorBack AS backgroundColor
-        FROM PRUEBA_beneficiosCM.presencialxsede pxs
-        LEFT JOIN PRUEBA_CH.beneficioscm_vista_sedes AS sd ON sd.idsede = pxs.idSede
-        LEFT JOIN PRUEBA_beneficiosCM.datosede AS ds ON ds.idSede = sd.idsede
+        FROM ". $this->schema_cm .".presencialxsede pxs
+        LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_sedes AS sd ON sd.idsede = pxs.idSede
+        LEFT JOIN ". $this->schema_cm .".datosede AS ds ON ds.idSede = sd.idsede
         WHERE pxs.idEspecialista='$idEspecialista'";
 
         $horaios = $this->ch->query($query)->result_array();
@@ -114,7 +116,7 @@ class SedesModel extends CI_Model {
                 idEspecialista='$idEspecialista'
             AND idSede='$idSede'"; */
 
-        $query = "SELECT * FROM PRUEBA_beneficiosCM.presencialxsede
+        $query = "SELECT * FROM ". $this->schema_cm .".presencialxsede
         WHERE idEspecialista='$idEspecialista' AND idSede='$idSede'";
 
         $dias = $this->ch->query($query)->result_array();
