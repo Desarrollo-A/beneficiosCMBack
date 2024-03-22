@@ -350,7 +350,7 @@ class DashModel extends CI_Model
         /* $query = $this->db-> query("SELECT idUsuario, nombre 
 		FROM usuarios WHERE idRol = 3 AND idPuesto = $dt"); */
 
-		$query = $this->ch-> query("SELECT idUsuario, CONCAT(us2.nombre_persona,' ',us2.pri_apellido,' ',us2.sec_apellido) AS nombre
+		$query = $this->ch-> query("SELECT idUsuario, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre
 		FROM ". $this->schema_cm .".usuarios us
 		INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
 		WHERE idRol = 3 AND us2.idpuesto = $dt");

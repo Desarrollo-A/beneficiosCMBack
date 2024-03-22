@@ -435,8 +435,8 @@ class GeneralModel extends CI_Model {
 		ct.fechaInicio, ct.fechaFinal
 		ORDER BY ct.fechaInicio, ct.fechaFinal DESC "); */
 
-        $query = $this->ch->query("SELECT CONCAT(us3.nombre_persona, us3.pri_apellido, us3.sec_apellido) AS nombre, 
-        CONCAT(us2.nombre_persona,' ',us2.pri_apellido,' ',us2.sec_apellido) AS especialista, ct.idPaciente, ct.titulo, 
+        $query = $this->ch->query("SELECT CONCAT(IFNULL(us3.nombre_persona, ''), ' ', IFNULL(us3.pri_apellido, ''), ' ', IFNULL(us3.sec_apellido, '')) AS nombre, 
+        CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista, ct.idPaciente, ct.titulo,
         oc.nombre AS estatus, ct.estatusCita, ct.idDetalle AS pago, ct.tipoCita,
         CONCAT(DATE_FORMAT(ct.fechaInicio, '%Y-%m-%d'), ' ', DATE_FORMAT(ct.fechaInicio, '%H:%i'), ' - ', DATE_FORMAT(ct.fechaFinal, '%H:%i')) AS horario,
         IFNULL(GROUP_CONCAT(ops.nombre SEPARATOR ', '), 'Sin motivos de cita') AS motivoCita
@@ -489,8 +489,8 @@ class GeneralModel extends CI_Model {
             ct.fechaInicio, ct.fechaFinal
             ORDER BY ct.fechaInicio, ct.fechaFinal DESC "); */
     
-            $query = $this->ch->query("SELECT CONCAT(us3.nombre_persona, us3.pri_apellido, us3.sec_apellido) AS nombre, 
-            CONCAT(us2.nombre_persona,' ',us2.pri_apellido,' ',us2.sec_apellido) AS especialista, ct.idPaciente, ct.titulo, 
+            $query = $this->ch->query("SELECT CONCAT(IFNULL(us3.nombre_persona, ''), ' ', IFNULL(us3.pri_apellido, ''), ' ', IFNULL(us3.sec_apellido, '')) AS nombre, 
+            CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista, ct.idPaciente, ct.titulo, 
             oc.nombre AS estatus, ct.estatusCita, ct.idDetalle AS pago, ct.tipoCita,
             CONCAT(DATE_FORMAT(ct.fechaInicio, '%Y-%m-%d'), ' ', DATE_FORMAT(ct.fechaInicio, '%H:%i'), ' - ', DATE_FORMAT(ct.fechaFinal, '%H:%i')) AS horario,
             IFNULL(GROUP_CONCAT(ops.nombre SEPARATOR ', '), 'Sin motivos de cita') AS motivoCita
@@ -546,7 +546,7 @@ class GeneralModel extends CI_Model {
         INNER JOIN opcionesPorCatalogo op ON op.idCatalogo = ct.idCatalogo AND op.idOpcion = axs.tipoCita"); */
         
         $query = $this->ch->query("SELECT axs.idAtencionXSede AS id,axs.idSede, sd.nsede AS sede, axs.idArea, axs.idEspecialista, axs.tipoCita, 
-        o.idoficina AS idOficina, o.noficina AS oficina, o.direccion AS ubicación, CONCAT(us2.nombre_persona,' ',us2.pri_apellido,' ',us2.sec_apellido) AS nombre,
+        o.idoficina AS idOficina, o.noficina AS oficina, o.direccion AS ubicación, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre,
         ps.idpuesto AS idPuesto, ps.nom_puesto AS puesto, op.nombre AS modalidad, axs.estatus,
         CASE
         WHEN axs.idArea IS NULL THEN 'SIN ÁREA'
@@ -678,7 +678,7 @@ class GeneralModel extends CI_Model {
 			  dep.depto,
 			  axs.tipoCita"); */
 
-        $query = $this->ch-> query("SELECT ct.idCita AS id, CONCAT (us2.nombre_persona,' ',us2.pri_apellido,' ',us2.sec_apellido) AS especialista, us2.idpuesto AS beneficio, sd.nsede AS sede, op.nombre AS estatus, 
+        $query = $this->ch-> query("SELECT ct.idCita AS id, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista, us2.idpuesto AS beneficio, sd.nsede AS sede, op.nombre AS estatus, 
 		CONCAT(DATE_FORMAT(ct.fechaInicio, '%Y-%m-%d'), ' ', DATE_FORMAT(ct.fechaInicio, '%H:%i'), ' - ', DATE_FORMAT(ct.fechaFinal, '%H:%i')) AS horario,
 		ofi.noficina AS oficina, oxc.nombre AS metodoPago, ct.estatusCita,
 		IFNULL(GROUP_CONCAT(ops.nombre SEPARATOR ', '), 'Sin motivos de cita') AS motivoCita,
