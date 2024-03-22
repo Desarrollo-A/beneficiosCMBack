@@ -5,6 +5,9 @@
 class EspecialistasModel extends CI_Model {
 	public function __construct()
 	{
+		$this->schema_cm = $this->config->item('schema_cm');
+        $this->schema_ch = $this->config->item('schema_ch');
+		$this->ch = $this->load->database('ch', TRUE);
 		parent::__construct();
 	}
 
@@ -27,9 +30,9 @@ class EspecialistasModel extends CI_Model {
 			$query = "SELECT
 			CASE
 				WHEN mpe.metaCitas IS NULL THEN ab.metaCitas ELSE mpe.metaCitas END AS meta
-			FROM PRUEBA_beneficiosCM.usuarios us
-			LEFT JOIN PRUEBA_beneficiosCM.areasbeneficios ab ON ab.idAreaBeneficio = us.idAreaBeneficio
-			LEFT JOIN PRUEBA_beneficiosCM.metasporespecialista mpe ON mpe.idEspecialista = us.idUsuario
+			FROM ". $this->schema_ch .".usuarios us
+			LEFT JOIN ". $this->schema_ch .".areasbeneficios ab ON ab.idAreaBeneficio = us.idAreaBeneficio
+			LEFT JOIN ". $this->schema_ch .".metasporespecialista mpe ON mpe.idEspecialista = us.idUsuario
 			WHERE us.idUsuario = $idEspecialista";
 
         return $this->ch->query($query)->row();
@@ -43,7 +46,7 @@ class EspecialistasModel extends CI_Model {
         	AND estatusCita = 4
 			AND MONTH(fechaFinal) = $mes"; */
 
-			$query = "SELECT * FROM PRUEBA_beneficiosCM.citas
+			$query = "SELECT * FROM ". $this->schema_ch .".citas
         	WHERE
         		idEspecialista = $idEspecialista
         	AND estatusCita = 4
@@ -61,8 +64,8 @@ class EspecialistasModel extends CI_Model {
     		AND idRol = 3"; */
 
 			$query = "SELECT CONCAT(us2.nombre_persona,' ',us2.pri_apellido,' ',us2.sec_apellido) AS nombre, us.idUsuario
-    		FROM PRUEBA_beneficiosCM.usuarios us
-    		INNER JOIN PRUEBA_CH.beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
+    		FROM ". $this->schema_ch .".usuarios us
+    		INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
     		WHERE
     			(us.idAreaBeneficio=$idAreaBeneficio
 			OR us2.idpuesto = $idAreaBeneficio)
@@ -74,7 +77,7 @@ class EspecialistasModel extends CI_Model {
 	public function checkModalitie($idEspecialista, $presencialDate){
 		/* $query = $this->db->query("SELECT idSede from presencialXSede where idEspecialista = ? AND presencialDate = ? ", array($idEspecialista, $presencialDate)); */
 		
-		$query = $this->ch->query("SELECT idSede from PRUEBA_beneficiosCM.presencialxsede where idEspecialista = ? AND presencialDate = ? ", array($idEspecialista, $presencialDate));
+		$query = $this->ch->query("SELECT idSede from ". $this->schema_ch .".presencialxsede where idEspecialista = ? AND presencialDate = ? ", array($idEspecialista, $presencialDate));
 
 		return $query;
 	}

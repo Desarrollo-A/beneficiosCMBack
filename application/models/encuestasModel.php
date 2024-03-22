@@ -5,6 +5,9 @@
 class EncuestasModel extends CI_Model {
 	public function __construct()
 	{
+        $this->schema_cm = $this->config->item('schema_cm');
+        $this->schema_ch = $this->config->item('schema_ch');
+        $this->ch = $this->load->database('ch', TRUE);
 		parent::__construct();
 	}
 
@@ -37,7 +40,7 @@ class EncuestasModel extends CI_Model {
     {
         /* $query = $this->db-> query("SELECT idOpcion, nombre FROM opcionesPorCatalogo WHERE idCatalogo = 4"); */
 
-        $query = $this->ch-> query("SELECT idOpcion, nombre FROM PRUEBA_beneficiosCM.opcionesporcatalogo WHERE idCatalogo = 4");
+        $query = $this->ch-> query("SELECT idOpcion, nombre FROM ". $this->schema_cm .".opcionesporcatalogo WHERE idCatalogo = 4");
 		return $query;
     }
 
@@ -45,7 +48,7 @@ class EncuestasModel extends CI_Model {
     {
         /* $query = $this->db-> query("SELECT COALESCE(MAX(idEncuesta), 0) AS minIdEncuesta FROM encuestasCreadas;"); */
 		
-        $query = $this->ch->query("SELECT COALESCE(MAX(idEncuesta), 0) AS minIdEncuesta FROM PRUEBA_beneficiosCM.encuestascreadas;");
+        $query = $this->ch->query("SELECT COALESCE(MAX(idEncuesta), 0) AS minIdEncuesta FROM ". $this->schema_cm .".encuestascreadas;");
         return $query;
     }
 
@@ -55,8 +58,8 @@ class EncuestasModel extends CI_Model {
 		INNER JOIN preguntasGeneradas pg ON pg.idPregunta = ec.idPregunta
 		WHERE ec.idEncuesta = $dt AND pg.idEncuesta = $dt"); */
 
-        $query = $this->ch->query("SELECT DISTINCT ec.idPregunta, pg.pregunta, ec.respuestas, ec.idArea FROM PRUEBA_beneficiosCM.encuestascreadas ec
-        INNER JOIN PRUEBA_beneficiosCM.preguntasgeneradas pg ON pg.idPregunta = ec.idPregunta
+        $query = $this->ch->query("SELECT DISTINCT ec.idPregunta, pg.pregunta, ec.respuestas, ec.idArea FROM ". $this->schema_cm .".encuestascreadas ec
+        INNER JOIN ". $this->schema_cm .".preguntasgeneradas pg ON pg.idPregunta = ec.idPregunta
         WHERE ec.idEncuesta = $dt AND pg.idEncuesta = $dt");
 		return $query;
     }
@@ -68,9 +71,9 @@ class EncuestasModel extends CI_Model {
         INNER JOIN respuestasGenerales rp ON rp.grupo = op.idOpcion
         WHERE idOpcion = 1"); */
 
-        $query = $this->ch-> query("SELECT  rp.idRespuestaGeneral AS value, rp.respuesta AS label, rp.tipo  FROM PRUEBA_beneficiosCM.catalogos ca 
-        INNER JOIN PRUEBA_beneficiosCM.opcionesporcatalogo op ON op.idCatalogo = ca.idCatalogo AND ca.idCatalogo = 4
-        INNER JOIN PRUEBA_beneficiosCM.respuestasgenerales rp ON rp.grupo = op.idOpcion
+        $query = $this->ch-> query("SELECT  rp.idRespuestaGeneral AS value, rp.respuesta AS label, rp.tipo  FROM ". $this->schema_cm .".catalogos ca 
+        INNER JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = ca.idCatalogo AND ca.idCatalogo = 4
+        INNER JOIN ". $this->schema_cm .".respuestasgenerales rp ON rp.grupo = op.idOpcion
         WHERE idOpcion = 1"); 
 		return $query;
     }
@@ -82,9 +85,9 @@ class EncuestasModel extends CI_Model {
         INNER JOIN respuestasGenerales rp ON rp.grupo = op.idOpcion
         WHERE idOpcion = 2"); */
 
-        $query = $this->ch-> query("SELECT  rp.idRespuestaGeneral AS value, rp.respuesta AS label, rp.tipo  FROM PRUEBA_beneficiosCM.catalogos ca 
-        INNER JOIN PRUEBA_beneficiosCM.opcionesporcatalogo op ON op.idCatalogo = ca.idCatalogo AND ca.idCatalogo = 4
-        INNER JOIN PRUEBA_beneficiosCM.respuestasgenerales rp ON rp.grupo = op.idOpcion
+        $query = $this->ch-> query("SELECT  rp.idRespuestaGeneral AS value, rp.respuesta AS label, rp.tipo  FROM ". $this->schema_cm .".catalogos ca 
+        INNER JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = ca.idCatalogo AND ca.idCatalogo = 4
+        INNER JOIN ". $this->schema_cm .".respuestasgenerales rp ON rp.grupo = op.idOpcion
         WHERE idOpcion = 2");
 		return $query;
     }
@@ -96,9 +99,9 @@ class EncuestasModel extends CI_Model {
         INNER JOIN respuestasGenerales rp ON rp.grupo = op.idOpcion
         WHERE idOpcion = 3"); */
 
-        $query = $this->ch-> query("SELECT  rp.idRespuestaGeneral AS value, rp.respuesta AS label, rp.tipo  FROM PRUEBA_beneficiosCM.catalogos ca 
-        INNER JOIN PRUEBA_beneficiosCM.opcionesporcatalogo op ON op.idCatalogo = ca.idCatalogo AND ca.idCatalogo = 4
-        INNER JOIN PRUEBA_beneficiosCM.respuestasgenerales rp ON rp.grupo = op.idOpcion
+        $query = $this->ch-> query("SELECT  rp.idRespuestaGeneral AS value, rp.respuesta AS label, rp.tipo  FROM ". $this->schema_cm .".catalogos ca 
+        INNER JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = ca.idCatalogo AND ca.idCatalogo = 4
+        INNER JOIN ". $this->schema_cm .".respuestasgenerales rp ON rp.grupo = op.idOpcion
         WHERE idOpcion = 3");
 		return $query;
     }
@@ -110,9 +113,9 @@ class EncuestasModel extends CI_Model {
         INNER JOIN respuestasGenerales rp ON rp.grupo = op.idOpcion
         WHERE idOpcion = 4"); */
 
-        $query = $this->ch-> query("SELECT  rp.idRespuestaGeneral AS value, rp.respuesta AS label, rp.tipo  FROM PRUEBA_beneficiosCM.catalogos ca 
-        INNER JOIN PRUEBA_beneficiosCM.opcionesporcatalogo op ON op.idCatalogo = ca.idCatalogo AND ca.idCatalogo = 4
-        INNER JOIN PRUEBA_beneficiosCM.respuestasgenerales rp ON rp.grupo = op.idOpcion
+        $query = $this->ch-> query("SELECT  rp.idRespuestaGeneral AS value, rp.respuesta AS label, rp.tipo  FROM ". $this->schema_cm .".catalogos ca 
+        INNER JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = ca.idCatalogo AND ca.idCatalogo = 4
+        INNER JOIN ". $this->schema_cm .".respuestasgenerales rp ON rp.grupo = op.idOpcion
         WHERE idOpcion = 4");
 		return $query;
     }
@@ -291,9 +294,9 @@ class EncuestasModel extends CI_Model {
                     ORDER BY fechaMasReciente DESC"); */
 
                     $query_idEspecialista = $this->ch->query("SELECT ct.idEspecialista, MAX(ct.fechaFinal) AS fechaMasReciente
-					FROM PRUEBA_CH.beneficioscm_vista_usuarios us2
-					INNER JOIN PRUEBA_beneficiosCM.usuarios us ON us.idContrato = us2.idcontrato
-					INNER JOIN PRUEBA_beneficiosCM.citas ct ON ct.idEspecialista = us.idUsuario
+					FROM ". $this->schema_ch .".beneficioscm_vista_usuarios us2
+					INNER JOIN ". $this->schema_cm .".usuarios us ON us.idContrato = us2.idcontrato
+					INNER JOIN ". $this->schema_cm .".citas ct ON ct.idEspecialista = us.idUsuario
 					WHERE us2.idcontrato = $idArea AND ct.idPaciente = $idUsuario
 					GROUP BY ct.idEspecialista
 					ORDER BY fechaMasReciente DESC
@@ -308,7 +311,7 @@ class EncuestasModel extends CI_Model {
 					VALUES (?, ?, ?, ?, ?, GETDATE(), ?)", 
 					array($idPregunta, $resp, $idEspecialista, $idArea, $idEncuesta, $idUsuario, $idUsuario, $idUsuario )); */
 
-                    $this->ch->query("INSERT INTO PRUEBA_beneficiosCM.encuestascontestadas (idPregunta, idRespuesta, idEspecialista, idArea, idEncuesta, fechaCreacion, idUsuario, creadoPor, modificadoPor ) 
+                    $this->ch->query("INSERT INTO ". $this->schema_cm .".encuestascontestadas (idPregunta, idRespuesta, idEspecialista, idArea, idEncuesta, fechaCreacion, idUsuario, creadoPor, modificadoPor ) 
 					VALUES (?, ?, ?, ?, ?, NOW(), ?, ?, ?)", 
 					array($idPregunta, $resp, $idEspecialista, $idArea, $idEncuesta, $idUsuario, $idUsuario, $idUsuario ));
 					
@@ -362,7 +365,7 @@ class EncuestasModel extends CI_Model {
 
                     /* $query_idEncuesta = $this->db->query("SELECT * FROM encuestasCreadas WHERE idArea = $area AND estatus = 1"); */
 
-                    $query_idEncuesta = $this->ch->query("SELECT * FROM PRUEBA_beneficiosCM.encuestascreadas WHERE idArea = $area AND estatus = 1");
+                    $query_idEncuesta = $this->ch->query("SELECT * FROM ". $this->schema_cm .".encuestascreadas WHERE idArea = $area AND estatus = 1");
 
                     $idEnc = 0;
                     foreach ($query_idEncuesta->result() as $row) {
@@ -375,7 +378,7 @@ class EncuestasModel extends CI_Model {
 
                     /* $this->GeneralModel->updateRecord('encuestasCreadas', $data_1, 'idEncuesta', $idEnc); */
 
-                    $this->GeneralModel->updateRecord('PRUEBA_beneficiosCM.encuestascreadas', $data_1, 'idEncuesta', $idEnc);
+                    $this->GeneralModel->updateRecord('". $this->schema_cm .".encuestascreadas', $data_1, 'idEncuesta', $idEnc);
 
                 }
 
@@ -397,11 +400,11 @@ class EncuestasModel extends CI_Model {
 					VALUES (?, ?, 1, ?, ?, ?)", 
 					array($idPregunta, $pregunta, $abierta, $area, $idEncuesta )); */
 
-                    $this->ch->query("INSERT INTO PRUEBA_beneficiosCM.preguntasgeneradas (idPregunta, pregunta, estatus, abierta, idArea, idEncuesta) 
+                    $this->ch->query("INSERT INTO ". $this->schema_cm .".preguntasgeneradas (idPregunta, pregunta, estatus, abierta, idArea, idEncuesta) 
 					VALUES (?, ?, 1, ?, ?, ?)", 
 					array($idPregunta, $pregunta, $abierta, $area, $idEncuesta ));
 
-                    $this->ch->query("INSERT INTO PRUEBA_beneficiosCM.encuestascreadas (idPregunta, respuestas, idArea, estatus, fechaCreacion, idEncuesta) 
+                    $this->ch->query("INSERT INTO ". $this->schema_cm .".encuestascreadas (idPregunta, respuestas, idArea, estatus, fechaCreacion, idEncuesta) 
                     VALUES (?, ?, ?, ?, NOW(), ?)", 
                     array($idPregunta, $respuesta, $area, $estatus, $idEncuesta));
 
@@ -435,7 +438,7 @@ class EncuestasModel extends CI_Model {
             CASE WHEN @prev_idEncuesta = idEncuesta THEN @row_number := @row_number + 1
                 ELSE @row_number := 1 AND @prev_idEncuesta := idEncuesta END AS rn
                 FROM (SELECT @row_number := 0, @prev_idEncuesta := NULL) AS vars,
-                     PRUEBA_beneficiosCM.encuestascreadas
+                     ". $this->schema_cm .".encuestascreadas
                 WHERE idArea = $dt
                 ORDER BY idEncuesta, fechaCreacion DESC
             ) AS subquery
@@ -463,7 +466,7 @@ class EncuestasModel extends CI_Model {
                         ELSE @row_number := 1 AND @prev_idEncuesta := idEncuesta END AS rn
             FROM (
                 SELECT estatus, idEncuesta, fechaCreacion
-                FROM PRUEBA_beneficiosCM.encuestascreadas
+                FROM ". $this->schema_cm .".encuestascreadas
                 WHERE idArea = $dt
                 ORDER BY idEncuesta, fechaCreacion DESC
             ) AS subquery,

@@ -5,6 +5,9 @@
 class GeneralModel extends CI_Model {
 	public function __construct()
 	{
+        $this->schema_cm = $this->config->item('schema_cm');
+        $this->schema_ch = $this->config->item('schema_ch');
+        $this->ch = $this->load->database('ch', TRUE);
 		parent::__construct();
 	}
 
@@ -17,7 +20,7 @@ class GeneralModel extends CI_Model {
     public function usuarioExiste($idContrato){
         /* $query = $this->db-> query("SELECT * FROM usuarios WHERE idContrato = ?", $idContrato); */
 
-        $query = $this->ch-> query("SELECT * FROM PRUEBA_beneficiosCM.usuarios WHERE idContrato = ?", $idContrato);
+        $query = $this->ch-> query("SELECT * FROM ". $this->schema_cm .".usuarios WHERE idContrato = ?", $idContrato);
 		return $query;
     }
 
@@ -26,8 +29,8 @@ class GeneralModel extends CI_Model {
 
         $query = $this->ch-> query("SELECT ps.idpuesto AS idPuesto, ps.nom_puesto AS puesto, ps.tipo_puesto AS tipoPuesto,  
         ps.idarea AS idArea, ps.estatus_puesto AS estatus, dp.canRegister 
-        FROM PRUEBA_CH.beneficioscm_vista_usuarios AS us
-        INNER JOIN PRUEBA_CH.beneficioscm_vista_puestos ps ON ps.idpuesto = us.idpuesto
+        FROM ". $this->schema_ch .".beneficioscm_vista_usuarios AS us
+        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_puestos ps ON ps.idpuesto = us.idpuesto
         LEFT JOIN datopuesto dp ON dp.idPuesto = ps.idpuesto 
         WHERE us.idcontrato = ?", $contrato);
         return $query;
@@ -48,7 +51,7 @@ class GeneralModel extends CI_Model {
     public function especialistas()
 	{
 		/* $query = $this->db-> query("SELECT idPuesto, puesto AS nombre FROM puestos WHERE idPuesto = 537 OR idPuesto = 686 OR idPuesto = 158 OR idPuesto = 585"); */
-		$query = $this->ch-> query("SELECT idpuesto AS idPuesto, nom_puesto AS nombre FROM PRUEBA_CH.beneficioscm_vista_puestos WHERE idpuesto = 537 OR idpuesto = 686 OR idpuesto = 158 OR idpuesto = 585");
+		$query = $this->ch-> query("SELECT idpuesto AS idPuesto, nom_puesto AS nombre FROM ". $this->schema_ch .".beneficioscm_vista_puestos WHERE idpuesto = 537 OR idpuesto = 686 OR idpuesto = 158 OR idpuesto = 585");
         return $query->result();
 	}
 
@@ -124,9 +127,9 @@ class GeneralModel extends CI_Model {
                 WHERE us.idPuesto = $idData AND ct.estatusCita = 4 AND 
 				(ct.fechaModificacion >= '$fhI' AND ct.fechaModificacion <= '$fhF')"); */
 
-                $query = $this->ch->query("SELECT COUNT(DISTINCT ct.idPaciente) AS `pacientes` FROM PRUEBA_beneficiosCM.usuarios us
-                INNER JOIN PRUEBA_beneficiosCM.citas ct ON ct.idEspecialista = us.idUsuario
-                INNER JOIN PRUEBA_CH.beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
+                $query = $this->ch->query("SELECT COUNT(DISTINCT ct.idPaciente) AS `pacientes` FROM ". $this->schema_cm .".usuarios us
+                INNER JOIN ". $this->schema_cm .".citas ct ON ct.idEspecialista = us.idUsuario
+                INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
                 WHERE us2.idpuesto = $idData AND ct.estatusCita = 4 AND 
 				(ct.fechaModificacion >= '$fhI' AND ct.fechaModificacion <= '$fhF')");
 
@@ -140,7 +143,7 @@ class GeneralModel extends CI_Model {
 
                 $query = $this->ch-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS `pacientes` FROM usuarios us
                 INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
-                INNER JOIN PRUEBA_CH.beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
+                INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
                 WHERE us2.idpuesto = 158 AND ct.estatusCita = 4 AND ct.idEspecialista = $slEs AND 
 				(ct.fechaModificacion >= '$fhI' AND ct.fechaModificacion <= '$fhF')");
             }
@@ -435,23 +438,23 @@ class GeneralModel extends CI_Model {
         oc.nombre AS estatus, ct.estatusCita, ct.idDetalle AS pago, ct.tipoCita,
         CONCAT(DATE_FORMAT(ct.fechaInicio, '%Y-%m-%d'), ' ', DATE_FORMAT(ct.fechaInicio, '%H:%i'), ' - ', DATE_FORMAT(ct.fechaFinal, '%H:%i')) AS horario,
         IFNULL(GROUP_CONCAT(ops.nombre SEPARATOR ', '), 'Sin motivos de cita') AS motivoCita
-        FROM PRUEBA_beneficiosCM.citas ct 
-        INNER JOIN PRUEBA_beneficiosCM.catalogos ca ON ca.idCatalogo = 2
-        INNER JOIN PRUEBA_beneficiosCM.opcionesporcatalogo oc ON oc.idCatalogo = ca.idCatalogo AND oc.idOpcion = ct.estatusCita
-        INNER JOIN PRUEBA_beneficiosCM.usuarios us ON us.idUsuario = ct.idPaciente
-        INNER JOIN PRUEBA_CH.beneficioscm_vista_usuarios us3 ON us3.idcontrato = us.idContrato
-        INNER JOIN PRUEBA_beneficiosCM.usuarios es ON es.idUsuario = ct.idEspecialista
-        INNER JOIN PRUEBA_CH.beneficioscm_vista_usuarios us2 ON us2.idcontrato = es.idContrato
-        LEFT JOIN PRUEBA_beneficiosCM.detallepagos dp ON dp.idDetalle = ct.idDetalle
-        LEFT JOIN PRUEBA_beneficiosCM.opcionesporcatalogo oxc ON oxc.idOpcion = dp.metodoPago AND oxc.idCatalogo = 11
-        LEFT JOIN PRUEBA_beneficiosCM.motivosporcita mpc ON mpc.idCita = ct.idCita
+        FROM ". $this->schema_cm .".citas ct 
+        INNER JOIN ". $this->schema_cm .".catalogos ca ON ca.idCatalogo = 2
+        INNER JOIN ". $this->schema_cm .".opcionesporcatalogo oc ON oc.idCatalogo = ca.idCatalogo AND oc.idOpcion = ct.estatusCita
+        INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idPaciente
+        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us3 ON us3.idcontrato = us.idContrato
+        INNER JOIN ". $this->schema_cm .".usuarios es ON es.idUsuario = ct.idEspecialista
+        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = es.idContrato
+        LEFT JOIN ". $this->schema_cm .".detallepagos dp ON dp.idDetalle = ct.idDetalle
+        LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo oxc ON oxc.idOpcion = dp.metodoPago AND oxc.idCatalogo = 11
+        LEFT JOIN ". $this->schema_cm .".motivosporcita mpc ON mpc.idCita = ct.idCita
         LEFT JOIN catalogos cat ON cat.idCatalogo = CASE 
             WHEN us2.idpuesto = 537 THEN 8
             WHEN us2.idpuesto = 585 THEN 7
             WHEN us2.idpuesto = 686 THEN 9
             WHEN us2.idpuesto = 158 THEN 6
             ELSE us2.idpuesto END 
-          LEFT JOIN PRUEBA_beneficiosCM.opcionesporcatalogo ops ON ops.idOpcion = mpc.idMotivo AND ops.idCatalogo = cat.idCatalogo
+          LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo ops ON ops.idOpcion = mpc.idMotivo AND ops.idCatalogo = cat.idCatalogo
         WHERE ct.idPaciente = $idUsuario AND oc.idCatalogo = 2 AND us2.idpuesto = $espe
         GROUP BY us2.nombre_persona, us2.pri_apellido,us2.sec_apellido,us3.nombre_persona, us3.pri_apellido,    
           us3.sec_apellido, ct.idPaciente, ct.titulo, oc.nombre, ct.estatusCita, ct.idDetalle, ct.tipoCita, ct.fechaInicio, ct.fechaFinal
@@ -489,23 +492,23 @@ class GeneralModel extends CI_Model {
             oc.nombre AS estatus, ct.estatusCita, ct.idDetalle AS pago, ct.tipoCita,
             CONCAT(DATE_FORMAT(ct.fechaInicio, '%Y-%m-%d'), ' ', DATE_FORMAT(ct.fechaInicio, '%H:%i'), ' - ', DATE_FORMAT(ct.fechaFinal, '%H:%i')) AS horario,
             IFNULL(GROUP_CONCAT(ops.nombre SEPARATOR ', '), 'Sin motivos de cita') AS motivoCita
-            FROM PRUEBA_beneficiosCM.citas ct 
-            INNER JOIN PRUEBA_beneficiosCM.catalogos ca ON ca.idCatalogo = 2
-            INNER JOIN PRUEBA_beneficiosCM.opcionesporcatalogo oc ON oc.idCatalogo = ca.idCatalogo AND oc.idOpcion = ct.estatusCita
-            INNER JOIN PRUEBA_beneficiosCM.usuarios us ON us.idUsuario = ct.idPaciente
-            INNER JOIN PRUEBA_CH.beneficioscm_vista_usuarios us3 ON us3.idcontrato = us.idContrato
-            INNER JOIN PRUEBA_beneficiosCM.usuarios es ON es.idUsuario = ct.idEspecialista
-            INNER JOIN PRUEBA_CH.beneficioscm_vista_usuarios us2 ON us2.idcontrato = es.idContrato
-            LEFT JOIN PRUEBA_beneficiosCM.detallepagos dp ON dp.idDetalle = ct.idDetalle
-            LEFT JOIN PRUEBA_beneficiosCM.opcionesporcatalogo oxc ON oxc.idOpcion = dp.metodoPago AND oxc.idCatalogo = 11
-            LEFT JOIN PRUEBA_beneficiosCM.motivosporcita mpc ON mpc.idCita = ct.idCita
+            FROM ". $this->schema_cm .".citas ct 
+            INNER JOIN ". $this->schema_cm .".catalogos ca ON ca.idCatalogo = 2
+            INNER JOIN ". $this->schema_cm .".opcionesporcatalogo oc ON oc.idCatalogo = ca.idCatalogo AND oc.idOpcion = ct.estatusCita
+            INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idPaciente
+            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us3 ON us3.idcontrato = us.idContrato
+            INNER JOIN ". $this->schema_cm .".usuarios es ON es.idUsuario = ct.idEspecialista
+            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = es.idContrato
+            LEFT JOIN ". $this->schema_cm .".detallepagos dp ON dp.idDetalle = ct.idDetalle
+            LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo oxc ON oxc.idOpcion = dp.metodoPago AND oxc.idCatalogo = 11
+            LEFT JOIN ". $this->schema_cm .".motivosporcita mpc ON mpc.idCita = ct.idCita
             LEFT JOIN catalogos cat ON cat.idCatalogo = CASE 
                 WHEN us2.idpuesto = 537 THEN 8
                 WHEN us2.idpuesto = 585 THEN 7
                 WHEN us2.idpuesto = 686 THEN 9
                 WHEN us2.idpuesto = 158 THEN 6
                 ELSE us2.idpuesto END 
-              LEFT JOIN PRUEBA_beneficiosCM.opcionesporcatalogo ops ON ops.idOpcion = mpc.idMotivo AND ops.idCatalogo = cat.idCatalogo
+              LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo ops ON ops.idOpcion = mpc.idMotivo AND ops.idCatalogo = cat.idCatalogo
             WHERE ct.idPaciente = $idUsuario AND oc.idCatalogo = 2 AND us2.idpuesto = $espe AND es.idUsuario = $idEspe
             GROUP BY us2.nombre_persona, us2.pri_apellido,us2.sec_apellido,us3.nombre_persona, us3.pri_apellido,    
               us3.sec_apellido, ct.idPaciente, ct.titulo, oc.nombre, ct.estatusCita, ct.idDetalle, ct.tipoCita, ct.fechaInicio, ct.fechaFinal
@@ -518,7 +521,7 @@ class GeneralModel extends CI_Model {
 
     public function getEstatusPaciente(){
         
-        $query = $this->ch->query("SELECT idOpcion, nombre FROM PRUEBA_beneficiosCM.opcionesporcatalogo WHERE idCatalogo = 13");
+        $query = $this->ch->query("SELECT idOpcion, nombre FROM ". $this->schema_cm .".opcionesporcatalogo WHERE idCatalogo = 13");
         return $query;
 
     }
@@ -547,15 +550,15 @@ class GeneralModel extends CI_Model {
         WHEN axs.idArea IS NULL THEN 'SIN ÁREA'
         WHEN axs.idArea IS NOT NULL THEN CONCAT(ar.narea, ' ', '(', dt.ndepto, ')')
         END AS nombreArea
-        FROM PRUEBA_beneficiosCM.atencionxsede axs
-        INNER JOIN PRUEBA_CH.beneficioscm_vista_sedes sd ON sd.idsede = axs.idSede
-        INNER JOIN PRUEBA_CH.beneficioscm_vista_oficinas o ON o.idoficina = axs.idOficina
+        FROM ". $this->schema_cm .".atencionxsede axs
+        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_sedes sd ON sd.idsede = axs.idSede
+        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_oficinas o ON o.idoficina = axs.idOficina
         INNER JOIN usuarios us ON us.idUsuario = axs.idEspecialista
-        INNER JOIN PRUEBA_CH.beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
-        INNER JOIN PRUEBA_CH.beneficioscm_vista_puestos ps ON ps.idpuesto = us2.idpuesto 
+        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
+        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_puestos ps ON ps.idpuesto = us2.idpuesto 
         INNER JOIN catalogos ct ON ct.idCatalogo = 5
-        LEFT JOIN PRUEBA_CH.beneficioscm_vista_area ar ON ar.idsubarea = axs.idArea
-        LEFT JOIN PRUEBA_CH.beneficioscm_vista_departamento dt ON dt.iddepto = ar.iddepto  
+        LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_area ar ON ar.idsubarea = axs.idArea
+        LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_departamento dt ON dt.iddepto = ar.iddepto  
         INNER JOIN opcionesporcatalogo op ON op.idCatalogo = ct.idCatalogo AND op.idOpcion = axs.tipoCita");
         return $query;
 
@@ -566,7 +569,7 @@ class GeneralModel extends CI_Model {
         /* $query = $this->db->query("SELECT * FROM sedes"); */
 
         $query = $this->ch->query("SELECT idsede AS idSede, nsede AS sede 
-        FROM PRUEBA_CH.beneficioscm_vista_sedes");
+        FROM ". $this->schema_ch .".beneficioscm_vista_sedes");
         return $query;
 
     }
@@ -576,7 +579,7 @@ class GeneralModel extends CI_Model {
         /* $query = $this->db->query("SELECT * FROM oficinas"); */
 
         $query = $this->ch->query("SELECT idoficina AS idOficina, noficina AS oficina, direccion AS ubicación 
-        FROM PRUEBA_CH.beneficioscm_vista_oficinas");
+        FROM ". $this->schema_ch .".beneficioscm_vista_oficinas");
         return $query;
 
     }
@@ -584,7 +587,7 @@ class GeneralModel extends CI_Model {
     public function getModalidades(){
         
         /* $query = $this->db->query("SELECT idOpcion, nombre AS modalidad FROM opcionesPorCatalogo WHERE idCatalogo = 5"); */
-        $query = $this->ch->query("SELECT idOpcion, nombre AS modalidad FROM PRUEBA_beneficiosCM.opcionesporcatalogo WHERE idCatalogo = 5");
+        $query = $this->ch->query("SELECT idOpcion, nombre AS modalidad FROM ". $this->schema_cm .".opcionesporcatalogo WHERE idCatalogo = 5");
         return $query;
 
     }
@@ -598,8 +601,8 @@ class GeneralModel extends CI_Model {
         "); */
 
         $query = $this->ch->query("SELECT sd.idsede AS idSede, sd.nsede AS sede
-        FROM PRUEBA_CH.beneficioscm_vista_sedes sd
-        LEFT JOIN PRUEBA_beneficiosCM.atencionxsede ON sd.idsede = atencionxsede.idSede
+        FROM ". $this->schema_ch .".beneficioscm_vista_sedes sd
+        LEFT JOIN ". $this->schema_cm .".atencionxsede ON sd.idsede = atencionxsede.idSede
         WHERE atencionxsede.idSede IS NULL");
 
         if ($query->num_rows() > 0) {
@@ -692,25 +695,25 @@ class GeneralModel extends CI_Model {
 		WHEN ct.estatusCita IN (2, 7, 8) THEN 'Cancelado'
 		ELSE 'Exitoso'
 		END AS pagoGenerado
-		FROM PRUEBA_beneficiosCM.citas ct
-		LEFT JOIN PRUEBA_beneficiosCM.usuarios us ON us.idUsuario = ct.idEspecialista
-		LEFT JOIN PRUEBA_CH.beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
-		LEFT JOIN PRUEBA_beneficiosCM.usuarios pa ON pa.idUsuario = ct.idPaciente
-		LEFT JOIN PRUEBA_CH.beneficioscm_vista_usuarios us3 ON us3.idcontrato = pa.idContrato
-		LEFT JOIN PRUEBA_beneficiosCM.opcionesporcatalogo op ON op.idOpcion = ct.estatusCita
-		LEFT JOIN PRUEBA_beneficiosCM.atencionxsede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
-		LEFT JOIN PRUEBA_CH.beneficioscm_vista_sedes sd ON sd.idsede = axs.idSede
-		LEFT JOIN PRUEBA_CH.beneficioscm_vista_oficinas ofi ON ofi.idoficina = axs.idOficina
-		LEFT JOIN PRUEBA_beneficiosCM.catalogos cat ON cat.idCatalogo = CASE 
+		FROM ". $this->schema_cm .".citas ct
+		LEFT JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idEspecialista
+		LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
+		LEFT JOIN ". $this->schema_cm .".usuarios pa ON pa.idUsuario = ct.idPaciente
+		LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us3 ON us3.idcontrato = pa.idContrato
+		LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idOpcion = ct.estatusCita
+		LEFT JOIN ". $this->schema_cm .".atencionxsede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
+		LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_sedes sd ON sd.idsede = axs.idSede
+		LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_oficinas ofi ON ofi.idoficina = axs.idOficina
+		LEFT JOIN ". $this->schema_cm .".catalogos cat ON cat.idCatalogo = CASE 
 		WHEN us2.idpuesto = 537 THEN 8
 		WHEN us2.idpuesto = 585 THEN 7
 		WHEN us2.idpuesto = 686 THEN 9
 		WHEN us2.idpuesto = 158 THEN 6
 		ELSE us2.idpuesto END 
-		LEFT JOIN PRUEBA_beneficiosCM.detallepagos dp ON dp.idDetalle = ct.idDetalle
-		LEFT JOIN PRUEBA_beneficiosCM.opcionesporcatalogo oxc ON oxc.idOpcion = dp.metodoPago AND oxc.idCatalogo = 11
-		LEFT JOIN PRUEBA_beneficiosCM.motivosporcita mpc ON mpc.idCita = ct.idCita
-		LEFT JOIN PRUEBA_beneficiosCM.opcionesporcatalogo ops ON ops.idCatalogo = cat.idCatalogo AND ops.idOpcion = mpc.idMotivo	
+		LEFT JOIN ". $this->schema_cm .".detallepagos dp ON dp.idDetalle = ct.idDetalle
+		LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo oxc ON oxc.idOpcion = dp.metodoPago AND oxc.idCatalogo = 11
+		LEFT JOIN ". $this->schema_cm .".motivosporcita mpc ON mpc.idCita = ct.idCita
+		LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo ops ON ops.idCatalogo = cat.idCatalogo AND ops.idOpcion = mpc.idMotivo	
 		WHERE op.idCatalogo = 2 AND ct.idPaciente = $dt
 		GROUP BY 
 			  ct.idCita, 
@@ -752,7 +755,7 @@ class GeneralModel extends CI_Model {
         WHEN idOpcion = 5 THEN '#ff4d67'
         WHEN idOpcion = 6 THEN '#00ffff'
         END
-        FROM PRUEBA_beneficiosCM.opcionesporcatalogo WHERE idCatalogo = 2 AND idOpcion NOT IN (7, 8, 9);");
+        FROM ". $this->schema_cm .".opcionesporcatalogo WHERE idCatalogo = 2 AND idOpcion NOT IN (7, 8, 9);");
         return $query;
 
     }
@@ -791,8 +794,8 @@ class GeneralModel extends CI_Model {
             COUNT(CASE WHEN ct.estatusCita = 5 THEN ct.idPaciente END) AS justificada,
             COUNT(CASE WHEN ct.estatusCita = 6 THEN ct.idPaciente END) AS pendiente,
             COUNT(ct.idCita) AS citas
-            FROM PRUEBA_beneficiosCM.usuarios us
-            INNER JOIN PRUEBA_CH.beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
+            FROM ". $this->schema_cm .".usuarios us
+            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
             INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
             WHERE us2.idpuesto = $area AND
             (ct.fechaFinal >= '$fhI' AND ct.fechaFinal <= '$fhF')");
@@ -821,8 +824,8 @@ class GeneralModel extends CI_Model {
             COUNT(CASE WHEN ct.estatusCita = 5 THEN ct.idPaciente END) AS justificada,
             COUNT(CASE WHEN ct.estatusCita = 6 THEN ct.idPaciente END) AS pendiente,
             COUNT(ct.idCita) AS citas
-            FROM PRUEBA_beneficiosCM.usuarios us
-            INNER JOIN PRUEBA_CH.beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
+            FROM ". $this->schema_cm .".usuarios us
+            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
             INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
             WHERE us2.idpuesto = $area AND
             (ct.fechaFinal >= '$fhI' AND ct.fechaFinal <= '$fhF')
@@ -860,11 +863,11 @@ class GeneralModel extends CI_Model {
             $query = $this->ch->query("SELECT 
 			COUNT(CASE WHEN axs.tipoCita = 2 THEN ct.idPaciente END) AS `virtual`,
 			COUNT(CASE WHEN axs.tipoCita = 1 THEN ct.idPaciente END) AS presencial
-			FROM PRUEBA_beneficiosCM.usuarios us
-			INNER JOIN PRUEBA_CH.beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
-            INNER JOIN PRUEBA_beneficiosCM.citas ct ON ct.idEspecialista = us.idUsuario
-			INNER JOIN PRUEBA_beneficiosCM.atencionxsede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
-			INNER JOIN PRUEBA_beneficiosCM.opcionesporcatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
+			FROM ". $this->schema_cm .".usuarios us
+			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
+            INNER JOIN ". $this->schema_cm .".citas ct ON ct.idEspecialista = us.idUsuario
+			INNER JOIN ". $this->schema_cm .".atencionxsede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
+			INNER JOIN ". $this->schema_cm .".opcionesporcatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
             WHERE us2.idpuesto = $area AND
 		    (ct.fechaFinal >= '$fhI' AND ct.fechaFinal <= '$fhF')");
 
@@ -884,11 +887,11 @@ class GeneralModel extends CI_Model {
             $query = $this->ch->query("SELECT 
 			COUNT(CASE WHEN axs.tipoCita = 2 THEN ct.idPaciente END) AS `virtual`,
 			COUNT(CASE WHEN axs.tipoCita = 1 THEN ct.idPaciente END) AS presencial
-			FROM PRUEBA_beneficiosCM.usuarios us
-			INNER JOIN PRUEBA_CH.beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
-            INNER JOIN PRUEBA_beneficiosCM.citas ct ON ct.idEspecialista = us.idUsuario
-			INNER JOIN PRUEBA_beneficiosCM.atencionxsede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
-			INNER JOIN PRUEBA_beneficiosCM.opcionesporcatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
+			FROM ". $this->schema_cm .".usuarios us
+			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
+            INNER JOIN ". $this->schema_cm .".citas ct ON ct.idEspecialista = us.idUsuario
+			INNER JOIN ". $this->schema_cm .".atencionxsede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
+			INNER JOIN ". $this->schema_cm .".opcionesporcatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
             WHERE us2.idpuesto = $area AND
 		    (ct.fechaFinal >= '$fhI' AND ct.fechaFinal <= '$fhF')
             AND us.idUsuario = $especialidad");
@@ -939,8 +942,8 @@ class GeneralModel extends CI_Model {
             COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 11 THEN ct.idPaciente END) AS noviembre,
             COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 12 THEN ct.idPaciente END) AS diciembre,
             COUNT(DISTINCT ct.idPaciente) AS total
-            FROM PRUEBA_beneficiosCM.usuarios us
-            INNER JOIN PRUEBA_beneficiosCM.citas ct ON ct.idEspecialista = us.idUsuario
+            FROM ". $this->schema_cm .".usuarios us
+            INNER JOIN ". $this->schema_cm .".citas ct ON ct.idEspecialista = us.idUsuario
             WHERE ct.estatusCita = 4
             AND YEAR(ct.fechaFinal) =  YEAR(CURDATE());");
 
@@ -980,8 +983,8 @@ class GeneralModel extends CI_Model {
             COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 11 THEN ct.idPaciente END) AS noviembre,
             COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 12 THEN ct.idPaciente END) AS diciembre,
             COUNT(DISTINCT ct.idPaciente) AS total
-            FROM PRUEBA_beneficiosCM.usuarios us
-            INNER JOIN PRUEBA_beneficiosCM.citas ct ON ct.idEspecialista = us.idUsuario
+            FROM ". $this->schema_cm .".usuarios us
+            INNER JOIN ". $this->schema_cm .".citas ct ON ct.idEspecialista = us.idUsuario
             WHERE ct.estatusCita = 4
             AND YEAR(ct.fechaFinal) =  YEAR(CURDATE())
             AND us.idUsuario = $especialidad");

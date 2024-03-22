@@ -5,14 +5,14 @@ require_once(APPPATH . "/controllers/BaseController.php");
 
 class CalendarioController extends BaseController{
     public function __construct(){
-		parent::__construct();
-		$this->load->model('calendarioModel');
+		$this->load->model('CalendarioModel');
 		$this->load->model('GeneralModel');
 		$this->load->model('UsuariosModel');
 		$this->load->model('EspecialistasModel');
 		$this->load->library("email");
 		$this->load->library('GoogleApi');
 		$this->ch = $this->load->database('ch', TRUE);
+		parent::__construct();
 	}
 
 	public function getAllEvents()
@@ -30,8 +30,8 @@ class CalendarioController extends BaseController{
             "year2" => $year2 =  intval($month) === 12 ? $year + 1 : $year
         ];
 
-        $occupied = $this->calendarioModel->getOccupied($month, $idUsuario, $dates);
-        $appointment = $this->calendarioModel->getAppointment($month, $idUsuario, $dates);
+        $occupied = $this->CalendarioModel->getOccupied($month, $idUsuario, $dates);
+        $appointment = $this->CalendarioModel->getAppointment($month, $idUsuario, $dates);
 
         if ($occupied->num_rows() > 0 || $appointment->num_rows() > 0)
             $response["events"] = array_merge($occupied->result(), $appointment->result());
@@ -51,8 +51,8 @@ class CalendarioController extends BaseController{
 
 		$response['result'] = isset($especialista, $usuario, $fechaInicio, $fechaFin);
 		if ($response['result']) {
-			$occupied = $this->calendarioModel->getOccupiedRange($fechaInicio, $fechaFin, $especialista);
-			$appointment = $this->calendarioModel->getAppointmentRange($fechaInicio, $fechaFin, $especialista, $usuario);
+			$occupied = $this->CalendarioModel->getOccupiedRange($fechaInicio, $fechaFin, $especialista);
+			$appointment = $this->CalendarioModel->getAppointmentRange($fechaInicio, $fechaFin, $especialista, $usuario);
 
 			$response['result'] = $occupied->num_rows() > 0 || $appointment->num_rows() > 0;
 			if ($response['result']) {
@@ -73,7 +73,7 @@ class CalendarioController extends BaseController{
 	{
 		$beneficio = $this->input->post('dataValue[beneficio]');
 
-		$rs = $this->calendarioModel->getHorarioBeneficio($beneficio)->result();
+		$rs = $this->CalendarioModel->getHorarioBeneficio($beneficio)->result();
 		$response['result'] = count($rs) > 0;
 		if ($response['result']) {
 			$response['msg'] = '¡Horario cargado exitosamente!';
@@ -109,8 +109,8 @@ class CalendarioController extends BaseController{
 			$pass = true;
 
 		try {
-			$checkOccupied = $this->calendarioModel->checkOccupied($dataValue, $fechaInicioSuma, $fechaFinalResta);
-			$checkAppointment = $this->calendarioModel->checkAppointmentNormal($dataValue, $fechaInicioSuma, $fechaFinalResta);
+			$checkOccupied = $this->CalendarioModel->checkOccupied($dataValue, $fechaInicioSuma, $fechaFinalResta);
+			$checkAppointment = $this->CalendarioModel->checkAppointmentNormal($dataValue, $fechaInicioSuma, $fechaFinalResta);
 
 			if ($checkOccupied->num_rows() < 1 && $checkAppointment->num_rows() < 1 && isset($pass)) {
 				$addRecord = $this->GeneralModel->addRecord("horariosocupados", $values);
@@ -173,8 +173,8 @@ class CalendarioController extends BaseController{
 				"modificadoPor" => $dataValue["modificadoPor"]
 			];
 
-			$checkOccupiedId = $this->calendarioModel->checkOccupiedId($dataValue, $fechaInicioSuma, $fechaFinalResta);
-			$checkAppointment = $this->calendarioModel->checkAppointmentNormal($dataValue, $fechaInicioSuma, $fechaFinalResta);
+			$checkOccupiedId = $this->CalendarioModel->checkOccupiedId($dataValue, $fechaInicioSuma, $fechaFinalResta);
+			$checkAppointment = $this->CalendarioModel->checkAppointmentNormal($dataValue, $fechaInicioSuma, $fechaFinalResta);
 
 			if ($checkOccupiedId->num_rows() > 0 || $checkAppointment->num_rows() > 0) {
 				$response["result"] = false;
@@ -261,7 +261,7 @@ public function createAppointmentByColaborator()
             // Validación para ver que tenga dias disponibles en su sede de manera presencial, que el especialista
             // brinde la atención en su sede, y si la brinde que sea la unica y en caso que no que tenga dias asignados a esa sede. 
             if ($modalidad === "1") { 
-                $sedesatencion = $this->calendarioModel->getSedesDeAtencionEspecialista($idEspecialista);
+                $sedesatencion = $this->CalendarioModel->getSedesDeAtencionEspecialista($idEspecialista);
                 $response['result'] = $sedesatencion->num_rows() > 0;
                 if ($response['result']) {
                     $response['result'] = $sedesatencion->num_rows() > 1;
@@ -274,7 +274,7 @@ public function createAppointmentByColaborator()
                             }
                         }
                         if ($response['result']) {
-                            $checkPresencial = $this->calendarioModel->checkPresencial($idSede, $idEspecialista, $fechaInicio);
+                            $checkPresencial = $this->CalendarioModel->checkPresencial($idSede, $idEspecialista, $fechaInicio);
                             $response['result'] = $checkPresencial->num_rows() > 0;
                             if (!$response['result']) {
                                 $response['msg'] = "¡El especialista cambió los dias de atención!"; 
@@ -297,8 +297,8 @@ public function createAppointmentByColaborator()
                 $dataValue = ["idPaciente" => $idPaciente, "idUsuario" => $idEspecialista];
                 $fechaFinalResta = date('Y/m/d H:i:s', strtotime($fechaFinal . '-1 minute'));
                 $fechaInicioSuma = date('Y/m/d H:i:s', strtotime($fechaInicio . '+1 minute'));
-                $checkAppointment = $this->calendarioModel->checkAppointment($dataValue, $fechaInicioSuma, $fechaFinalResta);
-                $checkOccupied = $this->calendarioModel->checkOccupied($dataValue, $fechaInicioSuma, $fechaFinalResta);
+                $checkAppointment = $this->CalendarioModel->checkAppointment($dataValue, $fechaInicioSuma, $fechaFinalResta);
+                $checkOccupied = $this->CalendarioModel->checkOccupied($dataValue, $fechaInicioSuma, $fechaFinalResta);
                 $response['result'] = $checkAppointment->num_rows() === 0 && $checkOccupied->num_rows() === 0;
                 if ($response['result']) { // Validamos que no tenga registros con horarios repetidos
                     // Obtén la fecha actual
@@ -393,8 +393,8 @@ public function createAppointmentByColaborator()
 
 			$checkModalitie = $this->EspecialistasModel->checkModalitie($dataValue["idUsuario"], $fechaCheck);
 			$checkUser = $this->UsuariosModel->checkUser($dataValue["idPaciente"], $year, $month);
-			$checkAppointment = $this->calendarioModel->checkAppointment($dataValue, $fechaInicioSuma, $fechaFinalResta);
-			$checkOccupied = $this->calendarioModel->checkOccupied($dataValue, $fechaInicioSuma, $fechaFinalResta);
+			$checkAppointment = $this->CalendarioModel->checkAppointment($dataValue, $fechaInicioSuma, $fechaFinalResta);
+			$checkOccupied = $this->CalendarioModel->checkOccupied($dataValue, $fechaInicioSuma, $fechaFinalResta);
 			
 			if ($checkAppointment->num_rows() > 0) {
 				$response["result"] = false;
@@ -461,8 +461,8 @@ public function createAppointmentByColaborator()
 				"titulo" => $dataValue["titulo"]
 			];
 
-			$checkOccupied = $this->calendarioModel->checkOccupied($dataValue, $fechaInicioSuma, $fechaFinalResta);
-			$checkAppointmentId = $this->calendarioModel->checkAppointmentId($dataValue, $fechaInicioSuma, $fechaFinalResta);
+			$checkOccupied = $this->CalendarioModel->checkOccupied($dataValue, $fechaInicioSuma, $fechaFinalResta);
+			$checkAppointmentId = $this->CalendarioModel->checkAppointmentId($dataValue, $fechaInicioSuma, $fechaFinalResta);
 
 			if ($checkOccupied->num_rows() > 0 || $checkAppointmentId->num_rows() > 0) {
 				$response["result"] = false;
@@ -561,8 +561,8 @@ public function createAppointmentByColaborator()
 				"modificadoPor" => $dataValue["idUsuario"]
 			];
 
-			$checkOccupied = $this->calendarioModel->checkOccupied($dataValue, $fechaInicioSuma, $fechaFinalResta);
-			$checkAppointment = $this->calendarioModel->checkAppointment($dataValue, $fechaInicioSuma, $fechaFinalResta);
+			$checkOccupied = $this->CalendarioModel->checkOccupied($dataValue, $fechaInicioSuma, $fechaFinalResta);
+			$checkAppointment = $this->CalendarioModel->checkAppointment($dataValue, $fechaInicioSuma, $fechaFinalResta);
 
 			if ($checkOccupied->num_rows() > 0 || $checkAppointment->num_rows() > 0) {
 				$response["result"] = false;
@@ -621,8 +621,8 @@ public function createAppointmentByColaborator()
 				"fechaModificacion" => $now
 			];
 
-			$checkOccupied = $this->calendarioModel->checkOccupiedId($dataValue, $fechaInicioSuma, $fechaFinalResta);
-			$checkAppointment = $this->calendarioModel->checkAppointmentNormal($dataValue, $fechaInicioSuma, $fechaFinalResta);
+			$checkOccupied = $this->CalendarioModel->checkOccupiedId($dataValue, $fechaInicioSuma, $fechaFinalResta);
+			$checkAppointment = $this->CalendarioModel->checkAppointmentNormal($dataValue, $fechaInicioSuma, $fechaFinalResta);
 
 			if ($checkOccupied->num_rows() > 0 || $checkAppointment->num_rows() > 0) {
 				$response["result"] = false;
@@ -699,7 +699,7 @@ public function createAppointmentByColaborator()
 
 		$response['result'] = isset($sede);
 		if ($response['result']) {
-			$rs = $this->calendarioModel->getBeneficiosPorSede($sede, $area)->result();
+			$rs = $this->CalendarioModel->getBeneficiosPorSede($sede, $area)->result();
 			$response['result'] = count($rs) > 0;
 			if ($response['result']) {
 				$response['msg'] = '¡Listado de beneficios cargado exitosamente!';
@@ -723,7 +723,7 @@ public function createAppointmentByColaborator()
 
 		$response['result'] = isset($area, $sede, $beneficio);
 		if ($response['result']) {
-			$rs = $this->calendarioModel->getEspecialistaPorBeneficioYSede($sede, $area, $beneficio)->result();
+			$rs = $this->CalendarioModel->getEspecialistaPorBeneficioYSede($sede, $area, $beneficio)->result();
 			$response['result'] = count($rs) > 0;
 			if ($response['result']) {
 				$response['msg'] = '¡Listado de especialistas cargado exitosamente!';
@@ -747,7 +747,7 @@ public function createAppointmentByColaborator()
 		
 		$response['result'] = isset($sede, $especialista);
 		if ($response['result']) {
-			$rs = $this->calendarioModel->getModalidadesEspecialista($sede, $especialista, $area)->result();
+			$rs = $this->CalendarioModel->getModalidadesEspecialista($sede, $especialista, $area)->result();
 			$response['result'] = count($rs) > 0;
 			if ($response['result']) {
 				$response['msg'] = '¡Listado de modalidades cargado exitosamente!';
@@ -771,7 +771,7 @@ public function createAppointmentByColaborator()
 
 		$response['result'] = isset($year, $month, $idUsuario);
 		if ($response['result']) {
-			$rs = $this->calendarioModel->getAppointmentsByUser($year, $month, $idUsuario)->result();
+			$rs = $this->CalendarioModel->getAppointmentsByUser($year, $month, $idUsuario)->result();
 			$response['result'] = count($rs) > 0;
 			if ($response['result']) {
 				$response['msg'] = '¡Listado de citas cargadas exitosamente!';
@@ -806,7 +806,7 @@ public function createAppointmentByColaborator()
 				break;
 		}
 
-		$get = $this->calendarioModel->getReasons($tipo);
+		$get = $this->CalendarioModel->getReasons($tipo);
 
 		$this->output->set_content_type('application/json');
 		$this->output->set_output(json_encode($get, JSON_NUMERIC_CHECK));
@@ -819,7 +819,7 @@ public function createAppointmentByColaborator()
         $especialista = $this->input->post('dataValue[especialista]');
         $modalidad = $this->input->post('dataValue[modalidad]');
 
-        $rs = $this->calendarioModel->getOficinaByAtencion($sede, $especialista, $modalidad)->result();
+        $rs = $this->CalendarioModel->getOficinaByAtencion($sede, $especialista, $modalidad)->result();
         $response['result'] = count($rs) > 0;
         if ($response['result']) {
             $response['msg'] = '¡Datos de oficina cargados exitosamente!';
@@ -838,7 +838,7 @@ public function createAppointmentByColaborator()
 
 		$response['result'] = isset($usuario, $especialista);
 		if ($response['result']) {
-			$rs = $this->calendarioModel->isPrimeraCita($usuario, $especialista)->result();
+			$rs = $this->CalendarioModel->isPrimeraCita($usuario, $especialista)->result();
 			$response['result'] = count($rs) === 0;
 			if ($response['result']) {
 				$response['msg'] = '¡Usuario con registros de citas!';
@@ -860,7 +860,7 @@ public function createAppointmentByColaborator()
 
 		$response['result'] = isset($usuario, $beneficio);
 		if ($response['result']) {
-			$rs = $this->calendarioModel->getCitasSinFinalizarUsuario($usuario, $beneficio)->result();
+			$rs = $this->CalendarioModel->getCitasSinFinalizarUsuario($usuario, $beneficio)->result();
 			$response['result'] = count($rs) > 0;
 			if ($response['result']) {
 				$response['msg'] = '¡Usuario con citas sin finalizar!';
@@ -881,7 +881,7 @@ public function createAppointmentByColaborator()
 
 		$response['result'] = isset($usuario);
 		if ($response['result']) {
-			$rs = $this->calendarioModel->getCitasSinEvaluarUsuario($usuario)->result();
+			$rs = $this->CalendarioModel->getCitasSinEvaluarUsuario($usuario)->result();
 			$response['result'] = count($rs) > 0;
 			if ($response['result']) {
 				$response['msg'] = '¡Usuario con citas sin evaluar!';
@@ -902,7 +902,7 @@ public function createAppointmentByColaborator()
 
 		$response['result'] = isset($usuario);
 		if ($response['result']) {
-			$rs = $this->calendarioModel->getCitasSinPagarUsuario($usuario)->result();
+			$rs = $this->CalendarioModel->getCitasSinPagarUsuario($usuario)->result();
 			$response['result'] = count($rs) > 0;
 			if ($response['result']) {
 				$response['msg'] = '¡Usuario con citas sin pagar!';
@@ -925,7 +925,7 @@ public function createAppointmentByColaborator()
 
 		$response['result'] = isset($usuario, $mes, $año);
 		if ($response['result']) {
-			$rs = $this->calendarioModel->getCitasFinalizadasUsuario($usuario, $mes, $año)->result();
+			$rs = $this->CalendarioModel->getCitasFinalizadasUsuario($usuario, $mes, $año)->result();
 			$response['result'] = count($rs) > 0;
 			if ($response['result']) {
 				$response['msg'] = '¡Usuario con citas finalizadas!';
@@ -949,7 +949,7 @@ public function createAppointmentByColaborator()
 
 		$response['result'] = isset($especialista, $sede, $modalidad);
 		if ($response['result']) {
-			$rs = $this->calendarioModel->getAtencionPorSede($especialista, $sede, $area, $modalidad)->result();
+			$rs = $this->CalendarioModel->getAtencionPorSede($especialista, $sede, $area, $modalidad)->result();
 			$response['result'] = count($rs) > 0;
 			if ($response['result']) {
 				$response['msg'] = '¡Datos de atencion por sede consultados!';
@@ -968,7 +968,7 @@ public function createAppointmentByColaborator()
 	{
 		$idUsuario = $this->input->post('dataValue', true);
 
-		$get = $this->calendarioModel->getPending($idUsuario)->result();
+		$get = $this->CalendarioModel->getPending($idUsuario)->result();
 
 		$this->output->set_content_type('application/json');
 		$this->output->set_output(json_encode($get, JSON_NUMERIC_CHECK));
@@ -979,8 +979,8 @@ public function createAppointmentByColaborator()
 		
 		$response['result'] = isset($usuario);
 		if ($response['result']) {
-			$rs = $this->calendarioModel->getPendientesPago($usuario)->result();
-			$rs2 = $this->calendarioModel->getPendientesEvaluacion($usuario)->result();
+			$rs = $this->CalendarioModel->getPendientesPago($usuario)->result();
+			$rs2 = $this->CalendarioModel->getPendientesEvaluacion($usuario)->result();
 			$response['result'] = count($rs) > 0 || count($rs2) > 0;
 			if ($response['result']) {
 				$response['data']['pago'] = $rs;
@@ -1002,7 +1002,7 @@ public function createAppointmentByColaborator()
 		
 		$response['result'] = isset($usuario);
 		if ($response['result']) {
-			$rs = $this->calendarioModel->getUnrated($usuario)->result();
+			$rs = $this->CalendarioModel->getUnrated($usuario)->result();
 			$response['result'] = count($rs) > 0;
 			if ($response['result']) {
 				$response['data'] = $rs;
@@ -1021,7 +1021,7 @@ public function createAppointmentByColaborator()
 	public function getEventReasons(){
 		$idCita = $this->input->post('dataValue', true);
 
-		$response = $this->calendarioModel->getEventReasons($idCita)->result();
+		$response = $this->CalendarioModel->getEventReasons($idCita)->result();
 		$this->output->set_content_type('application/json');
 		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
@@ -1050,7 +1050,7 @@ public function createAppointmentByColaborator()
 			$response["result"] = $this->GeneralModel->addRecord("detallepagos", $values);
 			if ($response["result"]) {
 				$response["msg"] = "¡Se ha generado el detalle de pago con éxito!";
-				$rs = $this->calendarioModel->getDetallePago($folio)->result();
+				$rs = $this->CalendarioModel->getDetallePago($folio)->result();
 				if (!empty($rs) && isset($rs[0]->idDetalle)) {
 					$response["data"] = $rs[0]->idDetalle;
 				} else {
@@ -1074,7 +1074,7 @@ public function createAppointmentByColaborator()
 
 		$response['result'] = isset($usuario, $beneficio);
 		if ($response['result']) {
-			$rs = $this->calendarioModel->getLastAppointment($usuario, $beneficio)->result();
+			$rs = $this->CalendarioModel->getLastAppointment($usuario, $beneficio)->result();
 			$response['result'] = count($rs) > 0;
 			if ($response['result']) {
 				$response['data'] = $rs;
@@ -1097,7 +1097,7 @@ public function createAppointmentByColaborator()
         $response['result'] = isset($id);
         
         if ($response['result']) {
-            $response['result'] = $this->calendarioModel->checkInvoice($id)->num_rows() === 0;
+            $response['result'] = $this->CalendarioModel->checkInvoice($id)->num_rows() === 0;
             if ($response['result']) {
                 $response['msg'] = 'Se puede utilizar el folio';
             } else {
@@ -1174,7 +1174,7 @@ public function createAppointmentByColaborator()
 				case 686:  $column = 'estatusGE' ; break;
 				default: $column = 'estatus';
 			}
-			$rs = $this->calendarioModel->checkDetailPacient($user, $column)->result();
+			$rs = $this->CalendarioModel->checkDetailPacient($user, $column)->result();
 			$response['result'] = count($rs) > 0;
 			if ($response['result']) {
 				if ($rs !== 1) {
@@ -1241,7 +1241,7 @@ public function createAppointmentByColaborator()
 
 		$response['result'] = isset($idCita);
 		if ($response['result']) {
-			$rs = $this->calendarioModel->getCitaById($idCita)->result();
+			$rs = $this->CalendarioModel->getCitaById($idCita)->result();
 			$response['result'] = count($rs) > 0;
 			if ($response["result"]) {
 				$response["data"] = $rs;
@@ -1407,7 +1407,7 @@ public function createAppointmentByColaborator()
 
 		$response['result'] = isset($idUsuario);
 		if ($response['result']) {
-			$rs = $this->calendarioModel->getSedesDeAtencionEspecialista($idUsuario)->result();
+			$rs = $this->CalendarioModel->getSedesDeAtencionEspecialista($idUsuario)->result();
 			$response['result'] = count($rs) > 0;
 			if ($response['result']) {
 				$response['data'] = $rs;
@@ -1429,7 +1429,7 @@ public function createAppointmentByColaborator()
 
 		$response['result'] = isset($idUsuario, $idSede);
 		if ($response['result']) {
-			$rs = $this->calendarioModel->getDiasDisponiblesAtencionEspecialista($idUsuario, $idSede);
+			$rs = $this->CalendarioModel->getDiasDisponiblesAtencionEspecialista($idUsuario, $idSede);
 			$response['result'] = count($rs->result()) > 0;
 			if ($response['result']) {
 				$dias = [];

@@ -6,25 +6,24 @@ class AvisosPrivacidadController extends BaseController
 {
 	public function __construct()
 	{
-		parent::__construct();
 		$this->ch = $this->load->database('ch', TRUE);
-		$this->load->model('calendarioModel');
-		$this->load->model('avisosPrivacidadModel');
-		$this->load->model('generalModel');
-		$this->load->model('usuariosModel');
-
+		$this->load->model('CalendarioModel');
+		$this->load->model('AvisosPrivacidadModel');
+		$this->load->model('GeneralModel');
+		$this->load->model('UsuariosModel');
+		
 		date_default_timezone_set('America/Mexico_City');
+		parent::__construct();
 	}
 
-
 	function getEspecialidades(){
-		$data['data'] = $this->avisosPrivacidadModel->getEspecialidades();
+		$data['data'] = $this->AvisosPrivacidadModel->getEspecialidades();
 		$this->output->set_content_type('application/json');
 		$this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
 	}
 
 	function getAvisoPrivacidad($idEspecialidad){
-		$data = $this->avisosPrivacidadModel->getAvisoPrivacidadByEsp($idEspecialidad);
+		$data = $this->AvisosPrivacidadModel->getAvisoPrivacidadByEsp($idEspecialidad);
 		$this->output->set_content_type('application/json');
 		$this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
 	}
@@ -51,7 +50,7 @@ class AvisosPrivacidadController extends BaseController
 						//acciónEditar
 						if ($accion == 2) {
 							$idDocumento = $this->input->post('idDocumento');
-							$validacionRama = $this->avisosPrivacidadModel->revisaRamaActiva($idDocumento);
+							$validacionRama = $this->AvisosPrivacidadModel->revisaRamaActiva($idDocumento);
 
 							if (count($validacionRama) > 0) {
 								$updateDocumentData = array(
@@ -59,7 +58,7 @@ class AvisosPrivacidadController extends BaseController
 									"fechaModificacion" => date_format($dataExpedienteGenerado['date'], "Y-m-d H:i:s"),
 									"modificadoPor" => $this->session->userdata('id_usuario')
 								);
-								$result = $this->generalModel->updateRecord("PRUEBA_beneficiosCM.historialdocumento", $updateDocumentData, "idDocumento", $idDocumento);
+								$result = $this->GeneralModel->updateRecord("PRUEBA_beneficiosCM.historialdocumento", $updateDocumentData, "idDocumento", $idDocumento);
 								$archivoAnterior = $validacionRama[0]['expediente'];
 								$rutaArchivo = 'dist/documentos/avisos-privacidad/';
 								$rutaEliminarArchivo =  $rutaArchivo.$archivoAnterior;
@@ -82,7 +81,7 @@ class AvisosPrivacidadController extends BaseController
 								"modificadoPor" => $id_usuario_actual
 							);
 
-							$result = $this->generalModel->addRecord('PRUEBA_beneficiosCM.historialdocumento', $insertDocumentData);
+							$result = $this->GeneralModel->addRecord('PRUEBA_beneficiosCM.historialdocumento', $insertDocumentData);
 						}
 						return ($result)
 							? print_r(json_encode(array('code' => 200, 'message'=>'Se ha editado correctamente')))
