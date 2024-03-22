@@ -1123,7 +1123,8 @@ class calendarioModel extends CI_Model
     public function getPending($idUsuario){
         $query = $this->ch->query(
             "SELECT ct.idCita as id, ct.titulo, ct.fechaInicio as 'start', ct.fechaFinal as 'end', 
-            CONCAT(usEsp2.nombre_persona, usEsp2.pri_apellido, usEsp2.sec_apellido) AS especialista, us2.mail_emp as correo, sed.nsede as sede, ofi.noficina AS oficina,
+            CONCAT(IFNULL(usEsp2.nombre_persona, ''), ' ', IFNULL(usEsp2.pri_apellido, ''), ' ', IFNULL(usEsp2.sec_apellido, '')) AS especialista,
+            us2.mail_emp as correo, sed.nsede as sede, ofi.noficina AS oficina,
             CASE 
             WHEN usEsp2.idpuesto = 537 THEN 'nutrición'
             WHEN usEsp2.idpuesto = 585 THEN 'psicología'
