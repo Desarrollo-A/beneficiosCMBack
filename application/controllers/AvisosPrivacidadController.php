@@ -8,10 +8,10 @@ class AvisosPrivacidadController extends BaseController
 	{
 		parent::__construct();
 		$this->ch = $this->load->database('ch', TRUE);
-		$this->load->model('calendarioModel');
-		$this->load->model('avisosPrivacidadModel');
-		$this->load->model('generalModel');
-		$this->load->model('usuariosModel');
+		$this->load->model('CalendarioModel');
+		$this->load->model('AvisosPrivacidadModel');
+		$this->load->model('GeneralModel');
+		$this->load->model('UsuariosModel');
 
 		date_default_timezone_set('America/Mexico_City');
 	}

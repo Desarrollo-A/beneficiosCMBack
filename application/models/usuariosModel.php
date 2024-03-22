@@ -6,11 +6,13 @@ class UsuariosModel extends CI_Model {
 	public function __construct()
 	{
 		$this->ch = $this->load->database('ch', TRUE);
+		$this->schema_cm = $this->config->item('schema_cm');
+		$this->schema_ch = $this->config->item('schema_ch');
 	}
 
     public function usuarios()
 	{
-		$query = $this->ch-> query("SELECT * FROM PRUEBA_beneficiosCM.usuarios");
+		$query = $this->ch-> query("SELECT * FROM ". $this->schema_cm .".usuarios");
 		return $query->result();
 	}
 
@@ -24,7 +26,7 @@ class UsuariosModel extends CI_Model {
 	{
 		/* $query = $this->db->query("SELECT *FROM usuarios WHERE externo = 1"); */ 
 
-		$query = $this->ch->query("SELECT *FROM PRUEBA_beneficiosCM.usuarios WHERE externo = 1");
+		$query = $this->ch->query("SELECT *FROM ". $this->schema_cm .".usuarios WHERE externo = 1");
 		return $query;
 	}
 
@@ -38,8 +40,8 @@ class UsuariosModel extends CI_Model {
         us2.idsede AS 'idSede', us2.nsede AS 'sede', us2.idpuesto AS 'idPuesto', us2.npuesto AS 'puesto', us2.idarea AS 'idArea', 
         us2.narea as 'area', us2.iddepto AS 'idDepto', us2.ndepto as 'departamento', us.idAreaBeneficio, 
         us.estatus, us.creadoPor, us.fechaCreacion, us.modificadoPor, us.fechaModificacion  
-        FROM PRUEBA_beneficiosCM.usuarios AS us 
-        INNER JOIN PRUEBA_CH.beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
+        FROM ". $this->schema_cm .".usuarios AS us 
+        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
         WHERE us2.num_empleado = ? AND us.password = ?;", array( $numEmpleado, $password ));
         return $query;
     }
@@ -48,8 +50,8 @@ class UsuariosModel extends CI_Model {
 	{
 		/* $query = $this->db->query("SELECT *from usuarios"); */
 
-		$query = $this->ch->query("SELECT * FROM PRUEBA_beneficiosCM.usuarios AS us
-		LEFT JOIN PRUEBA_CH.beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato");
+		$query = $this->ch->query("SELECT * FROM ". $this->schema_cm .".usuarios AS us
+		LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato");
 
         return $query;
 	}
@@ -69,15 +71,15 @@ class UsuariosModel extends CI_Model {
 			 SELECT US2.*, NULL AS idArea, CONCAT('(Lamat)', ' ', US2.nombre) AS nombreCompleto, 'nombrePuesto' = 'na', 'tipoPuesto' = 'na' FROM usuarios US2 where externo = 1",
 			 array( 2, 1, $idEspecialista )
 		); */
-		$schema_cm = $this->config->item('schema_cm');
+		
 
 		$query = $this->ch->query(
 			"SELECT US.*, SE.idsede AS idSede, PS.idArea, us2.tipo_puesto AS tipoPuesto, us2.fingreso AS fechaIngreso, CONCAT(CONCAT (us2.nombre_persona,' ',us2.pri_apellido,' ',us2.sec_apellido), ' ', '(', SE.nsede, ')') AS nombreCompleto, 
 			 PS.nom_puesto as nombrePuesto, PS.tipo_puesto
-			 FROM ". $schema_cm .".usuarios US
-			 INNER JOIN PRUEBA_CH.beneficioscm_vista_usuarios us2 ON us2.idcontrato = US.idContrato
-			 INNER JOIN PRUEBA_CH.beneficioscm_vista_puestos PS ON us2.idpuesto = PS.idpuesto 
-			 INNER JOIN PRUEBA_CH.beneficioscm_vista_sedes SE ON SE.idsede = us2.idsede 
+			 FROM ". $this->schema_cm .".usuarios US
+			 INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = US.idContrato
+			 INNER JOIN ". $this->schema_ch .".beneficioscm_vista_puestos PS ON us2.idpuesto = PS.idpuesto 
+			 INNER JOIN ". $this->schema_ch .".beneficioscm_vista_sedes SE ON SE.idsede = us2.idsede 
 			 WHERE US.idRol = ?
 			 AND US.estatus = ?
 			 AND us2.idsede
@@ -85,7 +87,7 @@ class UsuariosModel extends CI_Model {
 			 UNION
 			 SELECT US2.*, NULL AS idSede, NULL AS idArea, NULL AS tipoPuesto, us3.fingreso, CONCAT('(Lamat)', ' ', CONCAT (us3.nombre_persona,' ',us3.pri_apellido,' ',us3.sec_apellido)) AS nombreCompleto, 'nombrePuesto' = 'na', 'tipoPuesto' = 'na' 
 			 FROM usuarios US2 
-			 INNER JOIN PRUEBA_CH.beneficioscm_vista_usuarios us3 ON us3.idcontrato = US2.idContrato
+			 INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us3 ON us3.idcontrato = US2.idContrato
 			 WHERE externo = 1",
 			 array( 2, 1, $idEspecialista )
 		);
@@ -100,7 +102,7 @@ class UsuariosModel extends CI_Model {
 			array( $year, $month, 4, $idPaciente, 3, 1 )); // version de query por mes */
 		
 		$query = $this->ch->query(
-			"SELECT idPaciente FROM (SELECT * FROM PRUEBA_beneficiosCM.citas ct WHERE YEAR(fechaInicio) = ? AND MONTH(fechaInicio) = ?) AS citas 
+			"SELECT idPaciente FROM (SELECT * FROM ". $this->schema_cm .".citas ct WHERE YEAR(fechaInicio) = ? AND MONTH(fechaInicio) = ?) AS citas 
 			WHERE estatusCita IN(?) AND idPaciente = ? AND tipoCita != ? GROUP BY idPaciente HAVING COUNT(idPaciente) > ?",
 			array( $year, $month, 4, $idPaciente, 3, 1 ));
 
@@ -112,9 +114,9 @@ class UsuariosModel extends CI_Model {
 		if(!empty($dt))
 		{
 			$query = $this->ch-> query("SELECT password 
-			FROM PRUEBA_CH.beneficioscm_vista_usuarios us2 
-			INNER JOIN PRUEBA_beneficiosCM.usuarios us ON us.idContrato = us2.idcontrato
-			WHERE us2.num_empleado = ?", $dt);
+			FROM ". $this->schema_cm .".usuarios us
+			WHERE us.idUsuario = ?", $dt);
+
 
 			$pass = '';
 			foreach ($query->result() as $row) {
@@ -131,7 +133,7 @@ class UsuariosModel extends CI_Model {
 	}
 
 	public function updateRefreshToken($idUsuario, $refresh_token){
-		$query = "UPDATE PRUEBA_beneficiosCM.usuarios SET refreshToken=$refresh_token WHERE idUsuario=$idUsuario";
+		$query = "UPDATE ". $this->schema_cm .".usuarios SET refreshToken=$refresh_token WHERE idUsuario=$idUsuario";
 
 		return $this->ch->query($query);
 	}
@@ -144,7 +146,7 @@ class UsuariosModel extends CI_Model {
 
 		$query = $this->ch->query(
 			"SELECT idContrato 
-			FROM PRUEBA_beneficiosCM.usuarios
+			FROM ". $this->schema_cm .".usuarios
 			WHERE idContrato=?", $idContrato);
 
 		return $query;
@@ -157,7 +159,7 @@ class UsuariosModel extends CI_Model {
 		$correo = $dt_array["correo"];
         $token = $dt_array["token"]["codigo"];
 
-        $query = $this->ch->query("SELECT * FROM PRUEBA_beneficiosCM.tokenregistro WHERE correo = ? AND token = ?", array("\"$correo\"", $token));
+        $query = $this->ch->query("SELECT * FROM ". $this->schema_cm .".tokenregistro WHERE correo = ? AND token = ?", array("\"$correo\"", $token));
 
 		if ($query->num_rows() > 0) {
 			echo json_encode(array("estatus" => true, "msj" => "Código correcto" ), JSON_NUMERIC_CHECK); 
@@ -169,7 +171,7 @@ class UsuariosModel extends CI_Model {
 	public function getUserByNumEmp($numEmpleado)
     {
         $query = $this->ch->query(
-        "SELECT *FROM PRUEBA_CH.beneficioscm_vista_usuarios AS us
+        "SELECT *FROM ". $this->schema_ch .".beneficioscm_vista_usuarios AS us
         WHERE us.num_empleado = ?;", array( $numEmpleado ));
         return $query;
     }
