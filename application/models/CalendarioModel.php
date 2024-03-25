@@ -1061,7 +1061,7 @@ class CalendarioModel extends CI_Model
         $query = $this->ch->query(
             "SELECT TRIM(CAST(ct.idCita AS CHAR(36))) AS id,  ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end',
             ct.fechaInicio AS occupied, 'date' AS 'type', ct.estatusCita AS estatus, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre, ct.idPaciente, us2.telefono_personal AS telPersonal, us2.mail_emp AS correo,
-            se.nsede AS sede, ofi.noficina as oficina, ct.idDetalle, ct.idAtencionXSede, us.externo, CONCAT(usEspCH.nombre_persona, usEspCH.pri_apellido, usEspCH.sec_apellido) as especialista, ct.fechaCreacion, usEspCH.tipo_puesto AS tipoPuesto,
+            se.nsede AS sede, ofi.noficina as oficina, ct.idDetalle, ct.idAtencionXSede, us.externo, CONCAT(IFNULL(usEspCH.nombre_persona, ''), ' ', IFNULL(usEspCH.pri_apellido, ''), ' ', IFNULL(usEspCH.sec_apellido, '')) AS especialista, ct.fechaCreacion, usEspCH.tipo_puesto AS tipoPuesto,
             tf.fechasFolio, idEventoGoogle, ct.tipoCita, aps.tipoCita as modalidad, aps.idSede,
             CASE
                 WHEN ct.estatusCita = 0 THEN '#ff0000'
@@ -1146,12 +1146,12 @@ class CalendarioModel extends CI_Model
 
         return $query;
     }
-
+    
     public function getPendientesPago($idUsuario){
-        $query = $this->ch->query("        SELECT TRIM(CAST(ct.idCita AS CHAR(36))) AS id, ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
-        ct.fechaInicio AS occupied, ct.estatusCita AS estatus, CONCAT(us2.nombre_persona, us2.pri_apellido, us2.sec_apellido) AS nombre, ct.idPaciente, us2.telefono_personal, CASE WHEN ofi.noficina IS NULL THEN 'VIRTUAL' ELSE ofi.noficina END as 'oficina',
+        $query = $this->ch->query("SELECT TRIM(CAST(ct.idCita AS CHAR(36))) AS id, ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
+        ct.fechaInicio AS occupied, ct.estatusCita AS estatus, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre, ct.idPaciente, us2.telefono_personal, CASE WHEN ofi.noficina IS NULL THEN 'VIRTUAL' ELSE ofi.noficina END as 'oficina',
         CASE WHEN ofi.direccion IS NULL THEN 'VIRTUAL' ELSE ofi.direccion END as 'ubicación', sed.nsede AS sede, atc.idOficina, us2.mail_emp as correo, usEspe2.mail_emp as correoEspecialista, 
-        CONCAT(usEspe2.nombre_persona, usEspe2.pri_apellido, usEspe2.sec_apellido) AS especialista, ct.idDetalle, usEspe2.telefono_personal as telefonoEspecialista,
+        CONCAT(IFNULL(usEspe2.nombre_persona, ''), ' ', IFNULL(usEspe2.pri_apellido, ''), ' ', IFNULL(usEspe2.sec_apellido, '')) AS especialista, ct.idDetalle, usEspe2.telefono_personal as telefonoEspecialista,
         usEspe2.sexo as sexoEspecialista, tf.fechasFolio, ct.idEventoGoogle, ct.evaluacion,
         CASE WHEN usEspe2.idpuesto = 537 THEN 'Nutrición'
         WHEN usEspe2.idpuesto = 585 THEN 'Psicología'
@@ -1174,9 +1174,9 @@ class CalendarioModel extends CI_Model
 
     public function getPendientesEvaluacion($idUsuario){
         $query = $this->ch->query("SELECT TRIM(CAST(ct.idCita AS CHAR(36))) AS id, ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
-            ct.fechaInicio AS occupied, ct.estatusCita AS estatus, CONCAT(us2.nombre_persona, us2.pri_apellido, us2.sec_apellido) AS nombre, ct.idPaciente, us2.telefono_personal, CASE WHEN ofi.noficina IS NULL THEN 'VIRTUAL' ELSE ofi.noficina END as 'oficina',
+            ct.fechaInicio AS occupied, ct.estatusCita AS estatus, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre, ct.idPaciente, us2.telefono_personal, CASE WHEN ofi.noficina IS NULL THEN 'VIRTUAL' ELSE ofi.noficina END as 'oficina',
             CASE WHEN ofi.direccion IS NULL THEN 'VIRTUAL' ELSE ofi.direccion END as 'ubicación', sed.nsede AS sede, atc.idOficina, us2.mail_emp as correo, usEspe2.mail_emp as correoEspecialista, 
-            CONCAT(usEspe2.nombre_persona, usEspe2.pri_apellido, usEspe2.sec_apellido) AS especialista, ct.idDetalle, usEspe2.telefono_personal as telefonoEspecialista,
+            CONCAT(IFNULL(usEspe2.nombre_persona, ''), ' ', IFNULL(usEspe2.pri_apellido, ''), ' ', IFNULL(usEspe2.sec_apellido, '')) AS especialista, ct.idDetalle, usEspe2.telefono_personal as telefonoEspecialista,
             usEspe2.sexo as sexoEspecialista, tf.fechasFolio, ct.idEventoGoogle, ct.evaluacion,
             CASE 
             WHEN usEspe2.idPuesto = 537 THEN 'Nutrición'

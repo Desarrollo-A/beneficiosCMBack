@@ -82,7 +82,7 @@ class ReportesModel extends CI_Model {
 				axs.tipoCita
 			"); */
 
-			$query = $this->ch->query("SELECT ct.idCita, pa.idUsuario AS idColab, CONCAT (us2.nombre_persona,' ',us2.pri_apellido,' ',us2.sec_apellido) AS especialista, 
+			$query = $this->ch->query("SELECT ct.idCita, pa.idUsuario AS idColab, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista, 
 			CONCAT (us3.nombre_persona,' ',us3.pri_apellido,' ',us3.sec_apellido) AS paciente, ps.nom_puesto AS area, sd.nsede AS sede,ct.titulo, op.nombre AS estatus, 
 			CONCAT(DATE_FORMAT(ct.fechaInicio, '%Y-%m-%d'), ' ', DATE_FORMAT(ct.fechaInicio, '%H:%i'), ' - ', DATE_FORMAT(ct.fechaFinal, '%H:%i')) AS horario, observaciones, us2.sexo, 
 			ofi.noficina AS oficina, ct.estatusCita, ct.fechaInicio, dep.ndepto AS depto, op2.nombre AS modalidad,
@@ -221,7 +221,7 @@ class ReportesModel extends CI_Model {
 				axs.tipoCita
 			"); */
 
-			$query = $this->ch->query("SELECT ct.idCita, pa.idUsuario AS idColab, CONCAT (us2.nombre_persona,' ',us2.pri_apellido,' ',us2.sec_apellido) AS especialista, 
+			$query = $this->ch->query("SELECT ct.idCita, pa.idUsuario AS idColab, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista, 
 			CONCAT (us3.nombre_persona,' ',us3.pri_apellido,' ',us3.sec_apellido) AS paciente, ps.nom_puesto AS area, sd.nsede AS sede,ct.titulo, op.nombre AS estatus, 
 			CONCAT(DATE_FORMAT(ct.fechaInicio, '%Y-%m-%d'), ' ', DATE_FORMAT(ct.fechaInicio, '%H:%i'), ' - ', DATE_FORMAT(ct.fechaFinal, '%H:%i')) AS horario, observaciones, us2.sexo, 
 			ofi.noficina AS oficina, oxc.nombre AS metodoPago, ct.estatusCita, ct.fechaInicio, dep.ndepto AS depto, op2.nombre AS modalidad,
@@ -358,7 +358,7 @@ class ReportesModel extends CI_Model {
 				axs.tipoCita
 			"); */
 
-			$query = $this->ch->query("SELECT ct.idCita, pa.idUsuario AS idColab, CONCAT (us2.nombre_persona,' ',us2.pri_apellido,' ',us2.sec_apellido) AS especialista, 
+			$query = $this->ch->query("SELECT ct.idCita, pa.idUsuario AS idColab, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista, 
 			CONCAT (us3.nombre_persona,' ',us3.pri_apellido,' ',us3.sec_apellido) AS paciente, ps.nom_puesto AS area, sd.nsede AS sede,ct.titulo, op.nombre AS estatus, 
 			CONCAT(DATE_FORMAT(ct.fechaInicio, '%Y-%m-%d'), ' ', DATE_FORMAT(ct.fechaInicio, '%H:%i'), ' - ', DATE_FORMAT(ct.fechaFinal, '%H:%i')) AS horario, observaciones, us2.sexo, 
 			ofi.noficina AS oficina, oxc.nombre AS metodoPago, ct.estatusCita, ct.fechaInicio, dep.ndepto AS depto, op2.nombre AS modalidad,
@@ -465,7 +465,7 @@ class ReportesModel extends CI_Model {
 
 				$query = $this->ch-> query("SELECT DISTINCT dp.idDetallePaciente AS id, 
                 us.idUsuario, 
-                CONCAT(us2.nombre_persona,' ',us2.pri_apellido,' ',us2.sec_apellido) AS nombre, 
+                CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre, 
                 us2.ndepto AS depto,
                 us2.nsede AS sede,
                 us2.npuesto AS puesto,
@@ -506,7 +506,7 @@ class ReportesModel extends CI_Model {
 
 				$query = $this->ch-> query("SELECT DISTINCT dp.idDetallePaciente AS id, 
                 us.idUsuario, 
-                CONCAT(us2.nombre_persona,' ',us2.pri_apellido,' ',us2.sec_apellido) AS nombre, 
+                CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre, 
                 us2.ndepto AS depto,
                 us2.nsede AS sede,
                 us2.npuesto AS puesto,
@@ -547,7 +547,7 @@ class ReportesModel extends CI_Model {
 
 				$query = $this->ch-> query("SELECT DISTINCT dp.idDetallePaciente AS id, 
                 us.idUsuario, 
-                CONCAT(us2.nombre_persona,' ',us2.pri_apellido,' ',us2.sec_apellido) AS nombre, 
+                CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre, 
                 us2.ndepto AS depto,
                 us2.nsede AS sede,
                 us2.npuesto AS puesto,
@@ -587,7 +587,7 @@ class ReportesModel extends CI_Model {
 
 				$query = $this->ch-> query("SELECT DISTINCT dp.idDetallePaciente AS id, 
                 us.idUsuario, 
-                CONCAT(us2.nombre_persona,' ',us2.pri_apellido,' ',us2.sec_apellido) AS nombre, 
+                CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre, 
                 us2.ndepto AS depto,
                 us2.nsede AS sede,
                 us2.npuesto AS puesto,
@@ -620,7 +620,7 @@ class ReportesModel extends CI_Model {
 				LEFT JOIN opcionesPorCatalogo op ON op.idCatalogo = cat.idCatalogo AND  op.idOpcion = dtp.estatusNut
 				WHERE ct.idEspecialista = $idUs AND estatusNut IS NOT null AND ci.estatusCita = 4"); */
 
-				$query = $this->ch-> query("SELECT DISTINCT us.idUsuario, CONCAT(us2.nombre_persona,' ',us2.pri_apellido,' ',us2.sec_apellido) AS nombre,   
+				$query = $this->ch-> query("SELECT DISTINCT us.idUsuario, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre,   
 				us2.ndepto AS depto, us2.nsede AS sede, us2.npuesto AS puesto, op.nombre AS estNut 
 				FROM ". $this->schema_cm .".citas ct 
 				INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idPaciente
@@ -644,7 +644,7 @@ class ReportesModel extends CI_Model {
 				LEFT JOIN opcionesPorCatalogo op ON op.idCatalogo = cat.idCatalogo AND  op.idOpcion = dtp.estatusPsi
 				WHERE ct.idEspecialista = $idUs AND estatusPsi IS NOT null AND ci.estatusCita = 4"); */
 
-				$query = $this->ch-> query("SELECT DISTINCT us.idUsuario, CONCAT(us2.nombre_persona,' ',us2.pri_apellido,' ',us2.sec_apellido) AS nombre,   
+				$query = $this->ch-> query("SELECT DISTINCT us.idUsuario, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre,   
 				us2.ndepto AS depto, us2.nsede AS sede, us2.npuesto AS puesto, op.nombre AS estPsi
 				FROM ". $this->schema_cm .".citas ct 
 				INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idPaciente
@@ -668,7 +668,7 @@ class ReportesModel extends CI_Model {
 				LEFT JOIN opcionesPorCatalogo op ON op.idCatalogo = cat.idCatalogo AND  op.idOpcion = dtp.estatusQB
 				WHERE ct.idEspecialista = $idUs AND estatusQB IS NOT null AND ci.estatusCita = 4"); */
 
-				$query = $this->ch-> query("SELECT DISTINCT us.idUsuario, CONCAT(us2.nombre_persona,' ',us2.pri_apellido,' ',us2.sec_apellido) AS nombre,   
+				$query = $this->ch-> query("SELECT DISTINCT us.idUsuario, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre,   
 				us2.ndepto AS depto, us2.nsede AS sede, us2.npuesto AS puesto, op.nombre AS estQB
 				FROM ". $this->schema_cm .".citas ct 
 				INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idPaciente
@@ -692,7 +692,7 @@ class ReportesModel extends CI_Model {
 				LEFT JOIN opcionesPorCatalogo op ON op.idCatalogo = cat.idCatalogo AND  op.idOpcion = dtp.estatusGE
 				WHERE ct.idEspecialista = $idUs AND estatusGE IS NOT null AND ci.estatusCita = 4"); */
 
-				$query = $this->ch-> query("SELECT DISTINCT us.idUsuario, CONCAT(us2.nombre_persona,' ',us2.pri_apellido,' ',us2.sec_apellido) AS nombre,   
+				$query = $this->ch-> query("SELECT DISTINCT us.idUsuario, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre,   
 				us2.ndepto AS depto, us2.nsede AS sede, us2.npuesto AS puesto, op.nombre AS estQB
 				FROM ". $this->schema_cm .".citas ct 
 				INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idPaciente
@@ -1745,7 +1745,7 @@ class ReportesModel extends CI_Model {
 			INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
 			WHERE us.idRol =  3 AND ps.puesto IN ('$area1', '$area2', '$area3', '$area4')"); */
 			
-			$query = $this->ch-> query("SELECT CONCAT(us.nombre_persona,' ', us.pri_apellido,' ', us.sec_apellido) AS nombre, us2.idUsuario 
+			$query = $this->ch-> query("SELECT CONCAT(IFNULL(us.nombre_persona, ''), ' ', IFNULL(us.pri_apellido, ''), ' ', IFNULL(us.sec_apellido, '')) AS nombre, us2.idUsuario 
 			FROM ". $this->schema_ch .".beneficioscm_vista_usuarios AS us
 			INNER JOIN ". $this->schema_cm .".usuarios AS us2 ON us2.idContrato = us.idcontrato 
 			WHERE us2.idRol =  3 AND us.npuesto IN ('$area1', '$area2', '$area3', '$area4')");
