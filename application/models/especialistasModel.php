@@ -14,22 +14,14 @@ class EspecialistasModel extends CI_Model {
 	}
 
     public function especialistas(){
-		/* $query = $this->db-> query("SELECT * FROM opcionesporcatalogo WHERE idCatalogo = 1"); */
-
+		
 		$query = $this->ch-> query("SELECT * FROM opcionesporcatalogo WHERE idCatalogo = 1");
 		return $query;
 	}
 
 	public function getMeta($idEspecialista){
-/*     	$query = "SELECT
-			CASE
-				WHEN mpe.metaCitas IS NULL THEN ab.metaCitas ELSE mpe.metaCitas END AS meta
-			FROM usuarios us
-			LEFT JOIN areasBeneficios ab ON ab.idAreaBeneficio = us.idAreaBeneficio
-			LEFT JOIN metasPorEspecialista mpe ON mpe.idEspecialista = us.idUsuario
-			WHERE us.idUsuario = $idEspecialista"; */
-
-			$query = "SELECT
+		
+		$query = "SELECT
 			CASE
 				WHEN mpe.metaCitas IS NULL THEN ab.metaCitas ELSE mpe.metaCitas END AS meta
 			FROM ". $this->schema_cm .".usuarios us
@@ -42,29 +34,20 @@ class EspecialistasModel extends CI_Model {
 
     public function getTotal($idEspecialista, $mes)
     {
-        /* $query = "SELECT * FROM citas
-        	WHERE
-        		idEspecialista = $idEspecialista
-        	AND estatusCita = 4
-			AND MONTH(fechaFinal) = $mes"; */
-			$query = "SELECT * FROM ". $this->schema_cm .".citas
+        
+		$query = "SELECT * FROM ". $this->schema_cm .".citas
         	WHERE
         		idEspecialista = $idEspecialista
         	AND estatusCita = 4
 			AND MONTH(fechaFinal) = $mes";
 
         return $this->ch->query($query)->num_rows();
+
     }
 
     public function getEspecialistasPorArea($idAreaBeneficio){
-    	/* $query = "SELECT *
-    		FROM usuarios
-    		WHERE
-    			(idAreaBeneficio=$idAreaBeneficio
-			OR idPuesto = $idAreaBeneficio)
-    		AND idRol = 3"; */
-
-			$query = "SELECT CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre, us.idUsuario
+    	
+		$query = "SELECT CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre, us.idUsuario
     		FROM ". $this->schema_cm .".usuarios us
     		INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
     		WHERE
@@ -76,9 +59,10 @@ class EspecialistasModel extends CI_Model {
     }
 
 	public function checkModalitie($idEspecialista, $presencialDate){
-		/* $query = $this->db->query("SELECT idSede from presencialXSede where idEspecialista = ? AND presencialDate = ? ", array($idEspecialista, $presencialDate)); */
+		
 		$query = $this->ch->query("SELECT idSede from ". $this->schema_cm .".presencialxsede where idEspecialista = ? AND presencialDate = ? ", array($idEspecialista, $presencialDate));
 		return $query;
+		
 	}
 
 }

@@ -98,8 +98,6 @@ class EncuestasController extends BaseController {
 		$estatus= $this->input->post('dataValue[estatus]');
 		$area= $this->input->post('dataValue[area]');
 
-		/* $query_idEncuesta = $this->db->query("SELECT * FROM encuestasCreadas WHERE idArea = $area AND estatus = 1"); */
-
 		$query_idEncuesta = $this->ch->query("SELECT * 
 		FROM PRUEBA_beneficiosCM.encuestascreadas WHERE idArea = $area AND estatus = 1");
 

@@ -68,20 +68,11 @@ class GestorController extends BaseController {
 			'fechaModificacion'  => date('Y-m-d h:i:s')
 		];
 
-		/* $query = $this->ch-> query("SELECT *
-		FROM PRUEBA_beneficiosCM.atencionxsede
-		WHERE idEspecialista = AND idSede = ");
-
-		if ($query->num_rows() > 0) {
-			$response["result"] = false;
-			$response["msg"] = 'La atención por sede ya ha sido asignada anteriormente';
-		} */
-		/* else */ if($checkAxs->num_rows() > 0){
+		if($checkAxs->num_rows() > 0){
 			$response["result"] = false;
 			$response["msg"] = 'La atención por sede ya ha sido asignada anteriormente';
 		}
 		else{
-			/* $data = $this->GeneralModel->addRecord('atencionXSede', $data); */
 			$data = $this->GeneralModel->addRecord('atencionxsede', $data);
 
 			if($data){
@@ -127,8 +118,6 @@ class GestorController extends BaseController {
 				"tipoCita" => $modalidad
 			);
 
-			/* $updateRecord = $this->GeneralModel->updateRecord('atencionXSede', $data, 'idAtencionXSede', $idAts); */
-
 			$updateRecord = $this->GeneralModel->updateRecord('atencionxsede', $data, 'idAtencionXSede', $idAts);
 
 			if($updateRecord){
@@ -154,7 +143,7 @@ class GestorController extends BaseController {
 			"idEspecialista" => $idEspe,
 		);
 
-		$response=$this->GeneralModel->updateRecord('PRUEBA_beneficiosCM.atencionxsede', $data, 'idAtencionXSede', $id);
+		$this->GeneralModel->updateRecord('PRUEBA_beneficiosCM.atencionxsede', $data, 'idAtencionXSede', $id);
 		echo json_encode(array("estatus" => true, "msj" => "Estatus Actualizado!" ));
 				
 	}
@@ -176,7 +165,7 @@ class GestorController extends BaseController {
 			"modificadoPor" => $modificadoPor,
 		);
 
-		$response=$this->GeneralModel->updateRecord('oficinas', $data, 'idOficina', $idOficina);
+		$this->GeneralModel->updateRecord('oficinas', $data, 'idOficina', $idOficina);
 		echo json_encode(array("estatus" => true, "msj" => "Datos Actualizados!" ));
 				
 	}
@@ -196,7 +185,7 @@ class GestorController extends BaseController {
 			"modificadoPor" => $modificadoPor,
 		);
 
-		$response=$this->GeneralModel->updateRecord('sedes', $data, 'idSede', $idSede);
+		$this->GeneralModel->updateRecord('sedes', $data, 'idSede', $idSede);
 		echo json_encode(array("estatus" => true, "msj" => "Datos Actualizados!" ));
 				
 	}
@@ -302,8 +291,6 @@ class GestorController extends BaseController {
 				"idArea" => $idAreaInsert
 			);
 
-			/* $updateRecord = $this->GeneralModel->updateRecord('atencionXSede', $data, 'idAtencionXSede', $idAts); */
-
 			$updateRecord = $this->GeneralModel->updateRecord('PRUEBA_beneficiosCM.atencionxsede', $data, 'idAtencionXSede', $idAts);
 
 			if($updateRecord){
@@ -327,8 +314,6 @@ class GestorController extends BaseController {
 		$data = [
 			"estatus" => intval($dataValue["estatus"])
 		];
-
-		/* $updateRecord = $this->GeneralModel->updateRecord("atencionXSede", $data, "idAtencionXSede", $id); */
 
 		$updateRecord = $this->GeneralModel->updateRecord("PRUEBA_beneficiosCM.atencionxsede", $data, "idAtencionXSede", $id);
 

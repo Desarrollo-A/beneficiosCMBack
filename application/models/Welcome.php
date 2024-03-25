@@ -15,7 +15,6 @@ class Welcome extends CI_Controller {
 	}
 
 	public function citas(){
-		/* $data['data'] = $this->citasModel->citas(); */
 		echo json_encode('Servicio funcionando...'); 
 	}
 

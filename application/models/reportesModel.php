@@ -18,70 +18,6 @@ class ReportesModel extends CI_Model {
 
 		if($dt == '0'){
 
-			/* $query = $this->db-> query("SELECT ct.idCita, pa.idUsuario AS idColab, us.nombre especialista, pa.nombre paciente, ps.puesto AS area, sd.sede,ct.titulo, op.nombre AS estatus, 
-			CONCAT (CONVERT(DATE,ct.fechaInicio), ' ', FORMAT(ct.fechaInicio, 'HH:mm'), ' - ', FORMAT(ct.fechaFinal, 'HH:mm')) AS horario, observaciones, us.sexo, 
-			ofi.oficina, oxc.nombre AS metodoPago, ct.estatusCita, ct.fechaInicio, dep.depto, op2.nombre AS modalidad,
-			ISNULL(string_agg(ops.nombre, ', '), 'Sin motivos de cita') AS motivoCita, 
-			'color' = CASE
-	            WHEN ct.estatusCita = 0 THEN '#ff0000'
-	            WHEN ct.estatusCita = 1 AND axs.tipoCita = 1 THEN '#ffa500'
-	            WHEN ct.estatusCita = 2 THEN '#ff0000'
-	            WHEN ct.estatusCita = 3 THEN '#808080'
-	            WHEN ct.estatusCita = 4 THEN '#008000'
-                WHEN ct.estatusCita = 5 THEN '#ff4d67'
-                WHEN ct.estatusCita = 6 THEN '#00ffff'
-                WHEN ct.estatusCita = 7 THEN '#ff0000'
-                WHEN ct.estatusCita = 1 AND axs.tipoCita = 2 THEN '#0000ff'
-	        END,
-			CASE 
-			WHEN ct.estatusCita IN (2, 7, 8) THEN 'Cancelado'
-			ELSE 'Exitoso'
-			END AS pagoGenerado
-			FROM citas ct
-			LEFT JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-			LEFT JOIN usuarios pa ON pa.idUsuario = ct.idPaciente
-			LEFT JOIN puestos ps ON ps.idPuesto = us.idPuesto
-			LEFT JOIN opcionesPorCatalogo op ON op.idOpcion = ct.estatusCita
-			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
-			LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-			LEFT JOIN sedes sd ON sd.idSede = axs.idSede
-			LEFT JOIN oficinas ofi ON ofi.idOficina = axs.idOficina
-			LEFT JOIN puestos ps2 ON ps2.idPuesto = pa.idPuesto
-			LEFT JOIN areas ar ON ar.idArea = ps2.idArea
-			LEFT JOIN departamentos dep ON dep.idDepto = ar.idDepto
-			LEFT JOIN catalogos cat ON cat.idCatalogo = CASE 
-			WHEN ps.idPuesto = 537 THEN 8
-			WHEN ps.idPuesto = 585 THEN 7
-			WHEN ps.idPuesto = 686 THEN 9
-			WHEN ps.idPuesto = 158 THEN 6
-			ELSE ps.idPuesto END 
-			LEFT JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-			LEFT JOIN opcionesPorCatalogo oxc ON oxc.idOpcion = dp.metodoPago AND oxc.idCatalogo = 11
-			LEFT JOIN motivosPorCita mpc ON mpc.idCita = ct.idCita
-  			LEFT JOIN opcionesPorCatalogo ops ON ops.idCatalogo = cat.idCatalogo AND ops.idOpcion = mpc.idMotivo	
-			WHERE op.idCatalogo = 2 AND ct.estatusCita < 6
-			GROUP BY 
-  				ct.idCita, 
-  				pa.idUsuario, 
-  				us.nombre, 
-  				pa.nombre, 
-  				ps.puesto, 
-  				sd.sede, 
-  				ct.titulo, 
-  				op.nombre, 
-  				ct.fechaInicio, 
-  				ct.fechaFinal, 
-  				observaciones, 
-  				us.sexo, 
-  				ofi.oficina, 
-  				oxc.nombre, 
-  				ct.estatusCita, 
-  				ct.fechaModificacion,
-				dep.depto,
-				op2.nombre,
-				axs.tipoCita
-			"); */
-
 			$query = $this->ch->query("SELECT ct.idCita, pa.idUsuario AS idColab, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista, 
 			CONCAT (us3.nombre_persona,' ',us3.pri_apellido,' ',us3.sec_apellido) AS paciente, ps.nom_puesto AS area, sd.nsede AS sede,ct.titulo, op.nombre AS estatus, 
 			CONCAT(DATE_FORMAT(ct.fechaInicio, '%Y-%m-%d'), ' ', DATE_FORMAT(ct.fechaInicio, '%H:%i'), ' - ', DATE_FORMAT(ct.fechaFinal, '%H:%i')) AS horario, observaciones, us2.sexo, 
@@ -157,70 +93,6 @@ class ReportesModel extends CI_Model {
 
 		}else if($dt !== '0' || $dt !== '2'){
 
-			/* $query = $this->db-> query("SELECT ct.idCita, pa.idUsuario AS idColab, us.nombre especialista, pa.nombre paciente, ps.puesto AS area, sd.sede,ct.titulo, op.nombre AS estatus, 
-			CONCAT (CONVERT(DATE,ct.fechaInicio), ' ', FORMAT(ct.fechaInicio, 'HH:mm'), ' - ', FORMAT(ct.fechaFinal, 'HH:mm')) AS horario, observaciones, us.sexo, 
-			ofi.oficina, oxc.nombre AS metodoPago, ct.estatusCita, ct.fechaInicio, dep.depto, op2.nombre AS modalidad,
-			ISNULL(string_agg(ops.nombre, ', '), 'Sin motivos de cita') AS motivoCita,
-			'color' = CASE
-	            WHEN ct.estatusCita = 0 THEN '#ff0000'
-	            WHEN ct.estatusCita = 1 AND axs.tipoCita = 1 THEN '#ffa500'
-	            WHEN ct.estatusCita = 2 THEN '#ff0000'
-	            WHEN ct.estatusCita = 3 THEN '#808080'
-	            WHEN ct.estatusCita = 4 THEN '#008000'
-                WHEN ct.estatusCita = 5 THEN '#ff4d67'
-                WHEN ct.estatusCita = 6 THEN '#00ffff'
-                WHEN ct.estatusCita = 7 THEN '#ff0000'
-                WHEN ct.estatusCita = 1 AND axs.tipoCita = 2 THEN '#0000ff'
-	        END,
-			CASE 
-			WHEN ct.estatusCita IN (2, 7, 8) THEN 'Cancelado'
-			ELSE 'Exitoso'
-			END AS pagoGenerado
-			FROM citas ct
-			LEFT JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-			LEFT JOIN usuarios pa ON pa.idUsuario = ct.idPaciente
-			LEFT JOIN puestos ps ON ps.idPuesto = us.idPuesto
-			LEFT JOIN opcionesPorCatalogo op ON op.idOpcion = ct.estatusCita
-			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
-			LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-			LEFT JOIN sedes sd ON sd.idSede = axs.idSede
-			LEFT JOIN oficinas ofi ON ofi.idOficina = axs.idOficina
-			LEFT JOIN puestos ps2 ON ps2.idPuesto = pa.idPuesto
-			LEFT JOIN areas ar ON ar.idArea = ps2.idArea
-			LEFT JOIN departamentos dep ON dep.idDepto = ar.idDepto
-			LEFT JOIN catalogos cat ON cat.idCatalogo = CASE 
-			WHEN ps.idPuesto = 537 THEN 8
-			WHEN ps.idPuesto = 585 THEN 7
-			WHEN ps.idPuesto = 686 THEN 9
-			WHEN ps.idPuesto = 158 THEN 6
-			ELSE ps.idPuesto END 
-			LEFT JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-			LEFT JOIN opcionesPorCatalogo oxc ON oxc.idOpcion = dp.metodoPago AND oxc.idCatalogo = 11
-			LEFT JOIN motivosPorCita mpc ON mpc.idCita = ct.idCita
-  			LEFT JOIN opcionesPorCatalogo ops ON ops.idCatalogo = cat.idCatalogo AND ops.idOpcion = mpc.idMotivo	
-			WHERE op.idCatalogo = 2 AND ct.estatusCita = $dt
-			GROUP BY 
-  				ct.idCita, 
-  				pa.idUsuario, 
-  				us.nombre, 
-  				pa.nombre, 
-  				ps.puesto, 
-  				sd.sede, 
-  				ct.titulo, 
-  				op.nombre, 
-  				ct.fechaInicio, 
-  				ct.fechaFinal, 
-  				observaciones, 
-  				us.sexo, 
-  				ofi.oficina, 
-  				oxc.nombre, 
-  				ct.estatusCita, 
-  				ct.fechaModificacion,
-				dep.depto,
-				op2.nombre,
-				axs.tipoCita
-			"); */
-
 			$query = $this->ch->query("SELECT ct.idCita, pa.idUsuario AS idColab, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista, 
 			CONCAT (us3.nombre_persona,' ',us3.pri_apellido,' ',us3.sec_apellido) AS paciente, ps.nom_puesto AS area, sd.nsede AS sede,ct.titulo, op.nombre AS estatus, 
 			CONCAT(DATE_FORMAT(ct.fechaInicio, '%Y-%m-%d'), ' ', DATE_FORMAT(ct.fechaInicio, '%H:%i'), ' - ', DATE_FORMAT(ct.fechaFinal, '%H:%i')) AS horario, observaciones, us2.sexo, 
@@ -294,70 +166,6 @@ class ReportesModel extends CI_Model {
 			return $query;
 		}else if($dt == '2'){
 			
-			/* $query = $this->db-> query("SELECT ct.idCita, pa.idUsuario AS idColab, us.nombre especialista, pa.nombre paciente, ps.puesto AS area, sd.sede,ct.titulo, op.nombre AS estatus, 
-			CONCAT (CONVERT(DATE,ct.fechaInicio), ' ', FORMAT(ct.fechaInicio, 'HH:mm'), ' - ', FORMAT(ct.fechaFinal, 'HH:mm')) AS horario, observaciones, us.sexo, 
-			ofi.oficina, oxc.nombre AS metodoPago, ct.estatusCita, ct.fechaInicio, dep.depto, op2.nombre AS modalidad,
-			ISNULL(string_agg(ops.nombre, ', '), 'Sin motivos de cita') AS motivoCita,
-			'color' = CASE
-	            WHEN ct.estatusCita = 0 THEN '#ff0000'
-	            WHEN ct.estatusCita = 1 AND axs.tipoCita = 1 THEN '#ffa500'
-	            WHEN ct.estatusCita = 2 THEN '#ff0000'
-	            WHEN ct.estatusCita = 3 THEN '#808080'
-	            WHEN ct.estatusCita = 4 THEN '#008000'
-                WHEN ct.estatusCita = 5 THEN '#ff4d67'
-                WHEN ct.estatusCita = 6 THEN '#00ffff'
-                WHEN ct.estatusCita = 7 THEN '#ff0000'
-                WHEN ct.estatusCita = 1 AND axs.tipoCita = 2 THEN '#0000ff'
-	        END,
-			CASE 
-			WHEN ct.estatusCita IN (2, 7, 8) THEN 'Cancelado'
-			ELSE 'Exitoso'
-			END AS pagoGenerado
-			FROM citas ct
-			LEFT JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-			LEFT JOIN usuarios pa ON pa.idUsuario = ct.idPaciente
-			LEFT JOIN puestos ps ON ps.idPuesto = us.idPuesto
-			LEFT JOIN opcionesPorCatalogo op ON op.idOpcion = ct.estatusCita
-			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
-			LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-			LEFT JOIN sedes sd ON sd.idSede = axs.idSede
-			LEFT JOIN oficinas ofi ON ofi.idOficina = axs.idOficina
-			LEFT JOIN puestos ps2 ON ps2.idPuesto = pa.idPuesto
-			LEFT JOIN areas ar ON ar.idArea = ps2.idArea
-			LEFT JOIN departamentos dep ON dep.idDepto = ar.idDepto
-			LEFT JOIN catalogos cat ON cat.idCatalogo = CASE 
-			WHEN ps.idPuesto = 537 THEN 8
-			WHEN ps.idPuesto = 585 THEN 7
-			WHEN ps.idPuesto = 686 THEN 9
-			WHEN ps.idPuesto = 158 THEN 6
-			ELSE ps.idPuesto END 
-			LEFT JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-			LEFT JOIN opcionesPorCatalogo oxc ON oxc.idOpcion = dp.metodoPago AND oxc.idCatalogo = 11
-			LEFT JOIN motivosPorCita mpc ON mpc.idCita = ct.idCita
-  			LEFT JOIN opcionesPorCatalogo ops ON ops.idCatalogo = cat.idCatalogo AND ops.idOpcion = mpc.idMotivo	
-			WHERE op.idCatalogo = 2 AND ct.estatusCita = 2 AND ct.estatusCita = 7
-			GROUP BY 
-  				ct.idCita, 
-  				pa.idUsuario, 
-  				us.nombre, 
-  				pa.nombre, 
-  				ps.puesto, 
-  				sd.sede, 
-  				ct.titulo, 
-  				op.nombre, 
-  				ct.fechaInicio, 
-  				ct.fechaFinal, 
-  				observaciones, 
-  				us.sexo, 
-  				ofi.oficina, 
-  				oxc.nombre, 
-  				ct.estatusCita, 
-  				ct.fechaModificacion,
-				dep.depto,
-				op2.nombre,
-				axs.tipoCita
-			"); */
-
 			$query = $this->ch->query("SELECT ct.idCita, pa.idUsuario AS idColab, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista, 
 			CONCAT (us3.nombre_persona,' ',us3.pri_apellido,' ',us3.sec_apellido) AS paciente, ps.nom_puesto AS area, sd.nsede AS sede,ct.titulo, op.nombre AS estatus, 
 			CONCAT(DATE_FORMAT(ct.fechaInicio, '%Y-%m-%d'), ' ', DATE_FORMAT(ct.fechaInicio, '%H:%i'), ' - ', DATE_FORMAT(ct.fechaFinal, '%H:%i')) AS horario, observaciones, us2.sexo, 
@@ -442,27 +250,7 @@ class ReportesModel extends CI_Model {
 		
 		switch($area){
 			case 537:
-				/* $query = $this->db-> query("SELECT DISTINCT dp.idDetallePaciente AS id, 
-                us.idUsuario, 
-                us.nombre, 
-                dep.depto, 
-                sd.sede, 
-                pu.puesto,
-                us.correo, 
-                sd.sede,
-				op.nombre AS estNut
-				FROM detallePaciente dp 
-				INNER JOIN usuarios us ON us.idUsuario = dp.idUsuario
-				INNER JOIN areas ar ON ar.idArea = us.idArea
-				INNER JOIN departamentos dep ON dep.idDepto = ar.idDepto
-				INNER JOIN puestos pu ON pu.idPuesto = us.idPuesto
-				INNER JOIN sedes sd ON sd.idSede = us.idSede
-				INNER JOIN catalogos ct ON ct.idCatalogo = 13
-				INNER JOIN usuarios us2 ON us2.idRol = 3 AND us2.idPuesto = 537
-				INNER JOIN citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = us2.idUsuario
-				LEFT JOIN opcionesPorCatalogo op ON op.idCatalogo = ct.idCatalogo AND  op.idOpcion = dp.estatusNut
-				WHERE estatusNut IS NOT null AND ci.estatusCita = 4"); */
-
+				
 				$query = $this->ch-> query("SELECT DISTINCT dp.idDetallePaciente AS id, 
                 us.idUsuario, 
                 CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre, 
@@ -480,30 +268,10 @@ class ReportesModel extends CI_Model {
 				INNER JOIN ". $this->schema_cm .".citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = us3.idUsuario
 				LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = ct.idCatalogo AND  op.idOpcion = dp.estatusNut
 				WHERE estatusNut IS NOT null AND ci.estatusCita = 4");
-				
 				break;
-			case 585:
-				/* $query = $this->db-> query("SELECT DISTINCT dp.idDetallePaciente AS id, 
-                us.idUsuario, 
-                us.nombre, 
-                dep.depto, 
-                sd.sede, 
-                pu.puesto,
-                us.correo, 
-                sd.sede, 
-				op.nombre AS estPsi
-				FROM detallePaciente dp 
-				INNER JOIN usuarios us ON us.idUsuario = dp.idUsuario
-				INNER JOIN areas ar ON ar.idArea = us.idArea
-				INNER JOIN departamentos dep ON dep.idDepto = ar.idDepto
-				INNER JOIN puestos pu ON pu.idPuesto = us.idPuesto
-				INNER JOIN sedes sd ON sd.idSede = us.idSede
-				INNER JOIN catalogos ct ON ct.idCatalogo = 13
-				INNER JOIN usuarios us2 ON us2.idRol = 3 AND us2.idPuesto = 585
-				INNER JOIN citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = us2.idUsuario
-				LEFT JOIN opcionesPorCatalogo op ON op.idCatalogo = ct.idCatalogo AND  op.idOpcion = dp.estatusPsi
-				WHERE estatusPsi IS NOT null AND ci.estatusCita = 4"); */
 
+			case 585:
+				
 				$query = $this->ch-> query("SELECT DISTINCT dp.idDetallePaciente AS id, 
                 us.idUsuario, 
                 CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre, 
@@ -521,29 +289,9 @@ class ReportesModel extends CI_Model {
 				INNER JOIN ". $this->schema_cm .".citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = us3.idUsuario
 				LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = ct.idCatalogo AND  op.idOpcion = dp.estatusPsi
 				WHERE estatusPsi IS NOT null AND ci.estatusCita = 4");
-
 				break;
+				
 			case 158:
-				/* $query = $this->db-> query("SELECT DISTINCT dp.idDetallePaciente AS id, 
-                us.idUsuario, 
-                us.nombre, 
-                dep.depto, 
-                sd.sede, 
-                pu.puesto,
-                us.correo, 
-                sd.sede, 
-                op.nombre AS estQB
-				FROM detallePaciente dp 
-				INNER JOIN usuarios us ON us.idUsuario = dp.idUsuario
-				INNER JOIN areas ar ON ar.idArea = us.idArea
-				INNER JOIN departamentos dep ON dep.idDepto = ar.idDepto
-				INNER JOIN puestos pu ON pu.idPuesto = us.idPuesto
-				INNER JOIN sedes sd ON sd.idSede = us.idSede
-				INNER JOIN catalogos ct ON ct.idCatalogo = 13
-				INNER JOIN usuarios us2 ON us2.idRol = 3 AND us2.idPuesto = 158
-				INNER JOIN citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = us2.idUsuario
-				LEFT JOIN opcionesPorCatalogo op ON op.idCatalogo = ct.idCatalogo AND  op.idOpcion = dp.estatusQB
-				WHERE estatusQB IS NOT NULL AND ci.estatusCita = 4"); */
 
 				$query = $this->ch-> query("SELECT DISTINCT dp.idDetallePaciente AS id, 
                 us.idUsuario, 
@@ -563,27 +311,8 @@ class ReportesModel extends CI_Model {
 				LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = ct.idCatalogo AND  op.idOpcion = dp.estatusQB
 				WHERE estatusQB IS NOT null AND ci.estatusCita = 4");
 				break;
+
 			case 686:
-				/* $query = $this->db-> query("SELECT DISTINCT dp.idDetallePaciente AS id, 
-                us.idUsuario, 
-                us.nombre, 
-                dep.depto, 
-                sd.sede, 
-                pu.puesto,
-                us.correo, 
-                sd.sede,
-				op.nombre AS estGE
-				FROM detallePaciente dp 
-				INNER JOIN usuarios us ON us.idUsuario = dp.idUsuario
-				INNER JOIN areas ar ON ar.idArea = us.idArea
-				INNER JOIN departamentos dep ON dep.idDepto = ar.idDepto
-				INNER JOIN puestos pu ON pu.idPuesto = us.idPuesto
-				INNER JOIN sedes sd ON sd.idSede = us.idSede
-				INNER JOIN catalogos ct ON ct.idCatalogo = 13
-				INNER JOIN usuarios us2 ON us2.idRol = 3 AND us2.idPuesto = 686
-				INNER JOIN citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = us2.idUsuario
-				LEFT JOIN opcionesPorCatalogo op ON op.idCatalogo = ct.idCatalogo AND  op.idOpcion = dp.estatusGE
-				WHERE estatusGE IS NOT null AND ci.estatusCita = 4"); */
 
 				$query = $this->ch-> query("SELECT DISTINCT dp.idDetallePaciente AS id, 
                 us.idUsuario, 
@@ -608,17 +337,6 @@ class ReportesModel extends CI_Model {
 
 		switch($area){
 			case 537:
-				/* $query = $this->db-> query("SELECT DISTINCT us.idUsuario, us.nombre, dp.depto, sd.sede, ps.puesto, op.nombre AS estNut FROM citas ct 
-				INNER JOIN usuarios us ON us.idUsuario = ct.idPaciente
-				INNER JOIN areas ar ON ar.idArea = us.idArea
-				INNER JOIN departamentos dp ON  dp.idDepto = ar.idDepto
-				INNER JOIN sedes sd ON sd.idSede = us.idSede
-				INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
-				INNER JOIN detallePaciente dtp ON dtp.idUsuario = us.idUsuario
-				INNER JOIN catalogos cat ON cat.idCatalogo = 13
-				INNER JOIN citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = $idUs
-				LEFT JOIN opcionesPorCatalogo op ON op.idCatalogo = cat.idCatalogo AND  op.idOpcion = dtp.estatusNut
-				WHERE ct.idEspecialista = $idUs AND estatusNut IS NOT null AND ci.estatusCita = 4"); */
 
 				$query = $this->ch-> query("SELECT DISTINCT us.idUsuario, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre,   
 				us2.ndepto AS depto, us2.nsede AS sede, us2.npuesto AS puesto, op.nombre AS estNut 
@@ -631,18 +349,8 @@ class ReportesModel extends CI_Model {
 				LEFT JOIN opcionesporcatalogo op ON op.idCatalogo = cat.idCatalogo AND  op.idOpcion = dtp.estatusNut
 				WHERE ct.idEspecialista = $idUs AND estatusNut IS NOT null AND ci.estatusCita = 4");
 				break;
+
 			case 585:
-				/* $query = $this->db-> query("SELECT DISTINCT us.idUsuario, us.nombre, dp.depto, sd.sede, ps.puesto, op.nombre AS estPsi FROM citas ct 
-				INNER JOIN usuarios us ON us.idUsuario = ct.idPaciente
-				INNER JOIN areas ar ON ar.idArea = us.idArea
-				INNER JOIN departamentos dp ON  dp.idDepto = ar.idDepto
-				INNER JOIN sedes sd ON sd.idSede = us.idSede
-				INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
-				INNER JOIN detallePaciente dtp ON dtp.idUsuario = us.idUsuario
-				INNER JOIN catalogos cat ON cat.idCatalogo = 13
-				INNER JOIN citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = $idUs
-				LEFT JOIN opcionesPorCatalogo op ON op.idCatalogo = cat.idCatalogo AND  op.idOpcion = dtp.estatusPsi
-				WHERE ct.idEspecialista = $idUs AND estatusPsi IS NOT null AND ci.estatusCita = 4"); */
 
 				$query = $this->ch-> query("SELECT DISTINCT us.idUsuario, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre,   
 				us2.ndepto AS depto, us2.nsede AS sede, us2.npuesto AS puesto, op.nombre AS estPsi
@@ -655,18 +363,8 @@ class ReportesModel extends CI_Model {
 				LEFT JOIN opcionesporcatalogo op ON op.idCatalogo = cat.idCatalogo AND  op.idOpcion = dtp.estatusPsi
 				WHERE ct.idEspecialista = $idUs AND estatusPsi IS NOT null AND ci.estatusCita = 4");
 				break;
+
 			case 158:
-				/* $query = $this->db-> query("SELECT DISTINCT us.idUsuario, us.nombre, dp.depto, sd.sede, ps.puesto, op.nombre AS estQB FROM citas ct 
-				INNER JOIN usuarios us ON us.idUsuario = ct.idPaciente
-				INNER JOIN areas ar ON ar.idArea = us.idArea
-				INNER JOIN departamentos dp ON  dp.idDepto = ar.idDepto
-				INNER JOIN sedes sd ON sd.idSede = us.idSede
-				INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
-				INNER JOIN detallePaciente dtp ON dtp.idUsuario = us.idUsuario
-				INNER JOIN catalogos cat ON cat.idCatalogo = 13
-				INNER JOIN citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = $idUs
-				LEFT JOIN opcionesPorCatalogo op ON op.idCatalogo = cat.idCatalogo AND  op.idOpcion = dtp.estatusQB
-				WHERE ct.idEspecialista = $idUs AND estatusQB IS NOT null AND ci.estatusCita = 4"); */
 
 				$query = $this->ch-> query("SELECT DISTINCT us.idUsuario, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre,   
 				us2.ndepto AS depto, us2.nsede AS sede, us2.npuesto AS puesto, op.nombre AS estQB
@@ -679,18 +377,8 @@ class ReportesModel extends CI_Model {
 				LEFT JOIN opcionesporcatalogo op ON op.idCatalogo = cat.idCatalogo AND  op.idOpcion = dtp.estatusQB
 				WHERE ct.idEspecialista = $idUs AND estatusQB IS NOT null AND ci.estatusCita = 4");
 				break;
+
 			case 686:
-				/* $query = $this->db-> query("SELECT DISTINCT us.idUsuario, us.nombre, dp.depto, sd.sede, ps.puesto, op.nombre AS estGE FROM citas ct 
-				INNER JOIN usuarios us ON us.idUsuario = ct.idPaciente
-				INNER JOIN areas ar ON ar.idArea = us.idArea
-				INNER JOIN departamentos dp ON  dp.idDepto = ar.idDepto
-				INNER JOIN sedes sd ON sd.idSede = us.idSede
-				INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
-				INNER JOIN detallePaciente dtp ON dtp.idUsuario = us.idUsuario
-				INNER JOIN catalogos cat ON cat.idCatalogo = 13
-				INNER JOIN citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = $idUs
-				LEFT JOIN opcionesPorCatalogo op ON op.idCatalogo = cat.idCatalogo AND  op.idOpcion = dtp.estatusGE
-				WHERE ct.idEspecialista = $idUs AND estatusGE IS NOT null AND ci.estatusCita = 4"); */
 
 				$query = $this->ch-> query("SELECT DISTINCT us.idUsuario, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre,   
 				us2.ndepto AS depto, us2.nsede AS sede, us2.npuesto AS puesto, op.nombre AS estQB
@@ -710,76 +398,6 @@ class ReportesModel extends CI_Model {
 		return $query;
 	}
 
-	/* public function getResumenTerapias($dt){
-
-		if($dt === 'general'){
-
-			$query = $this->db-> query("SELECT ct.idCita, pa.idUsuario AS idColab, us.nombre especialista, pa.nombre paciente, ps.puesto AS area, sd.sede,ct.titulo, op.nombre AS estatus, 
-			CONCAT (CONVERT(DATE,ct.fechaInicio), ' ', FORMAT(ct.fechaInicio, 'HH:mm'), ' - ', FORMAT(ct.fechaFinal, 'HH:mm')) AS horario, observaciones, us.sexo, 
-			ct.motivoCita, ofi.oficina, ops.nombre AS motivoCita, oxc.nombre AS metodoPago, ct.estatusCita, ct.fechaModificacion,
-			CASE 
-			WHEN ct.estatusCita IN (2, 7, 8) THEN 'Cancelado'
-			ELSE 'Exitoso'
-			END AS pagoGenerado
-			FROM citas ct
-			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-			INNER JOIN usuarios pa ON pa.idUsuario = ct.idPaciente
-			INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
-			INNER JOIN opcionesPorCatalogo op ON op.idOpcion = ct.estatusCita
-			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
-			INNER JOIN sedes sd ON sd.idSede = axs.idSede
-			LEFT JOIN oficinas ofi ON ofi.idOficina = axs.idOficina
-			LEFT JOIN catalogos cat ON cat.idCatalogo = CASE 
-			WHEN ps.idPuesto = 537 THEN 8
-			WHEN ps.idPuesto = 585 THEN 7
-			WHEN ps.idPuesto = 686 THEN 9
-			WHEN ps.idPuesto = 158 THEN 6
-			ELSE ps.idPuesto END 
-			LEFT JOIN opcionesPorCatalogo ops ON ops.idCatalogo =  cat.idCatalogo AND ops.idOpcion = ct.motivoCita
-			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-			INNER JOIN opcionesPorCatalogo oxc ON oxc.idOpcion = dp.metodoPago AND oxc.idCatalogo = 11
-			WHERE op.idCatalogo = 2 AND us.idPuesto =  158");
-			return $query;
-	
-			}else if($dt === 'penalizacion'){
-	
-			$query = $this->db-> query("SELECT ct.idCita, pa.idUsuario AS idColab, us.nombre especialista, pa.nombre paciente, ps.puesto AS area, sd.sede,ct.titulo, op.nombre AS estatus, 
-			CONCAT (CONVERT(DATE,ct.fechaInicio), ' ', FORMAT(ct.fechaInicio, 'HH:mm'), ' - ', FORMAT(ct.fechaFinal, 'HH:mm')) AS horario, observaciones, us.sexo, 
-			ct.motivoCita, ofi.oficina, ops.nombre AS motivoCita, oxc.nombre AS metodoPago, ct.estatusCita, ct.fechaModificacion,
-			CASE 
-			WHEN ct.estatusCita IN (2, 7, 8) THEN 'Cancelado'
-			ELSE 'Exitoso'
-			END AS pagoGenerado
-			FROM citas ct
-			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-			INNER JOIN usuarios pa ON pa.idUsuario = ct.idPaciente
-			INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
-			INNER JOIN opcionesPorCatalogo op ON op.idOpcion = ct.estatusCita
-			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
-			INNER JOIN sedes sd ON sd.idSede = axs.idSede
-			LEFT JOIN oficinas ofi ON ofi.idOficina = axs.idOficina
-			LEFT JOIN catalogos cat ON cat.idCatalogo = CASE 
-			WHEN ps.idPuesto = 537 THEN 8
-			WHEN ps.idPuesto = 585 THEN 7
-			WHEN ps.idPuesto = 686 THEN 9
-			WHEN ps.idPuesto = 158 THEN 6
-			ELSE ps.idPuesto END 
-			LEFT JOIN opcionesPorCatalogo ops ON ops.idCatalogo =  cat.idCatalogo AND ops.idOpcion = ct.motivoCita
-			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-			INNER JOIN opcionesPorCatalogo oxc ON oxc.idOpcion = dp.metodoPago AND oxc.idCatalogo = 11
-			WHERE op.idCatalogo = 2 AND us.idPuesto =  158 AND ct.estatusCita = 3");
-			return $query;
-	
-			}
-	} */
-
-	/* public function getEspeQua(){
-
-		$query = $this->db-> query("SELECT * FROM usuarios WHERE idRol = 3 AND idPuesto = 158");
-		return $query;
-
-	} */
-
 	public function getCierrePacientes($dt){
 		
 		$idUsr = $dt["idUsr"];
@@ -796,10 +414,6 @@ class ReportesModel extends CI_Model {
 
 		if($area == "0" && $rol == 4 && $mod == "0"){
 
-			/* $query = $this->db-> query("SELECT COUNT(DISTINCT idPaciente) AS TotalPacientes
-			FROM citas
-			WHERE fechaModificacion >= '$fechaI' AND fechaModificacion < '$fechaF'"); */
-
 			$query = $this->ch-> query("SELECT COUNT(DISTINCT idPaciente) AS TotalPacientes
 			FROM ". $this->schema_cm .".citas
 			WHERE fechaModificacion >= '$fechaI' AND fechaModificacion < '$fechaF' AND estatusCita = 4");
@@ -808,13 +422,6 @@ class ReportesModel extends CI_Model {
 		}else if($area != "0" && $rol == 4 && $idEsp == "0" && $mod == "0"){
 
 			$ar = implode("','", $dt["esp"]);
-
-			/* $query = $this->db-> query("SELECT COUNT(DISTINCT idPaciente) AS TotalPacientes
-			FROM citas ct
-			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-			INNER JOIN puestos ps On ps.idPuesto = us.idPuesto
-			WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF') 
-			AND ps.puesto IN ('$ar') AND ct.estatusCita = 4"); */
 
 			$query = $this->ch-> query("SELECT COUNT(DISTINCT idPaciente) AS TotalPacientes
 			FROM ". $this->schema_cm .".citas ct
@@ -829,13 +436,6 @@ class ReportesModel extends CI_Model {
 			$ar = implode("','", $dt["esp"]);
 			$nombres = implode("','", $dt["idEsp"]);
 
-			/* $query = $this->db-> query("SELECT COUNT(DISTINCT idPaciente) AS TotalPacientes
-			FROM citas ct
-			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-			INNER JOIN puestos ps On ps.idPuesto = us.idPuesto
-			WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF') 
-			AND ps.puesto IN ('$ar') AND ct.estatusCita = 4 AND us.nombre IN ('$nombres')"); */
-
 			$query = $this->ch-> query("SELECT COUNT(DISTINCT idPaciente) AS TotalPacientes
 			FROM ". $this->schema_cm .".citas ct
 			INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idEspecialista
@@ -848,16 +448,6 @@ class ReportesModel extends CI_Model {
 		}else if($area == "0" && $rol == 4 && $idEsp == "0" && $mod != "0"){
 
 			$modalidad = implode("','", $dt["modalidad"]);
-
-			/* $query = $this->db-> query("SELECT COUNT(DISTINCT idPaciente) AS TotalPacientes
-			FROM citas ct
-			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-			INNER JOIN puestos ps On ps.idPuesto = us.idPuesto
-			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
-			LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-			WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF') 
-			AND op2.nombre IN ('$modalidad')
-			AND ct.estatusCita = 4"); */
 
 			$query = $this->ch-> query("SELECT COUNT(DISTINCT idPaciente) AS TotalPacientes
 			FROM ". $this->schema_cm .".citas ct
@@ -875,16 +465,6 @@ class ReportesModel extends CI_Model {
 			$modalidad = implode("','", $dt["modalidad"]);
 			$ar = implode("','", $dt["esp"]);
 
-			/* $query = $this->db-> query("SELECT COUNT(DISTINCT idPaciente) AS TotalPacientes
-			FROM citas ct
-			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-			INNER JOIN puestos ps On ps.idPuesto = us.idPuesto
-			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
-			LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-			WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF') 
-			AND op2.nombre IN ('$modalidad') AND ps.puesto IN ('$ar')
-			AND ct.estatusCita = 4"); */
-
 			$query = $this->ch-> query("SELECT COUNT(DISTINCT idPaciente) AS TotalPacientes
 			FROM ". $this->schema_cm .".citas ct
 			INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idEspecialista
@@ -901,16 +481,6 @@ class ReportesModel extends CI_Model {
 			$modalidad = implode("','", $dt["modalidad"]);
 			$nombres = implode("','", $dt["idEsp"]);
 
-			/* $query = $this->db->query("SELECT COUNT(DISTINCT idPaciente) AS TotalPacientes
-			FROM citas ct
-			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-			INNER JOIN puestos ps On ps.idPuesto = us.idPuesto
-			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
-			LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-			WHERE (ct.fechaModificacion >= '$fechaI' 
-			AND ct.fechaModificacion < '$fechaF') AND us.nombre IN ('$nombres')
-			AND ct.estatusCita = 4 AND op2.nombre IN ('$modalidad')"); */
-
 			$query = $this->ch->query("SELECT COUNT(DISTINCT idPaciente) AS TotalPacientes
 			FROM ". $this->schema_cm .".citas ct
 			INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idEspecialista
@@ -924,13 +494,6 @@ class ReportesModel extends CI_Model {
 
 		}else if($rol == 3 && $mod == "0"){
 
-			/* $query = $this->db-> query("SELECT COUNT(DISTINCT idPaciente) AS TotalPacientes
-			FROM citas ct
-			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-			INNER JOIN puestos ps On ps.idPuesto = us.idPuesto
-			WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-			AND us.idUsuario = $idUsr AND ct.estatusCita = 4"); */
-
 			$query = $this->ch-> query("SELECT COUNT(DISTINCT idPaciente) AS TotalPacientes
 			FROM ". $this->schema_cm .".citas ct
 			INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idEspecialista
@@ -943,15 +506,6 @@ class ReportesModel extends CI_Model {
 		}else if($rol == 3 && $mod != "0"){
 
 			$modalidad = implode("','", $dt["modalidad"]);
-
-			/* $query = $this->db-> query("SELECT COUNT(DISTINCT idPaciente) AS TotalPacientes
-			FROM citas ct
-			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-			INNER JOIN puestos ps On ps.idPuesto = us.idPuesto
-			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
-			LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-			WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-			AND us.idUsuario = $idUsr AND ct.estatusCita = 4 AND op2.nombre IN ('$modalidad')"); */
 
 			$query = $this->ch-> query("SELECT COUNT(DISTINCT idPaciente) AS TotalPacientes
 			FROM ". $this->schema_cm .".citas ct
@@ -1018,17 +572,6 @@ class ReportesModel extends CI_Model {
 
 			$nombres = implode("','", $dt["idEsp"]);
 			$ar = implode("','", $dt["esp"]);
-	
-			/* $query = $this->db->query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
-			FROM (
-				SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
-			FROM citas ct
-			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-			INNER JOIN puestos ps On ps.idPuesto = us.idPuesto
-			WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-			AND ps.puesto IN ('$ar') AND us.nombre IN ('$nombres')
-			) AS sub"); */
 
 			$query = $this->ch->query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
 			FROM (
@@ -1048,19 +591,6 @@ class ReportesModel extends CI_Model {
 
 			$modalidad = implode("','", $dt["modalidad"]);
 
-			/* $query = $this->db-> query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
-			FROM (
-				SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
-			FROM citas ct
-			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-			INNER JOIN puestos ps On ps.idPuesto = us.idPuesto
-			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
-			LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-			WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-			AND op2.nombre IN ('$modalidad')
-			) AS sub"); */
-
 			$query = $this->ch-> query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
 			FROM (
 				SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
@@ -1079,19 +609,6 @@ class ReportesModel extends CI_Model {
 
 			$modalidad = implode("','", $dt["modalidad"]);
 			$ar = implode("','", $dt["esp"]);
-
-			/* $query = $this->db-> query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
-			FROM (
-				SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
-			FROM citas ct
-			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-			INNER JOIN puestos ps On ps.idPuesto = us.idPuesto
-			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
-			LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-			WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-			AND op2.nombre IN ('$modalidad') AND ps.puesto IN ('$ar')
-			) AS sub"); */
 
 			$query = $this->ch-> query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
 			FROM (
@@ -1113,19 +630,6 @@ class ReportesModel extends CI_Model {
 			$nombres = implode("','", $dt["idEsp"]);
 			$modalidad = implode("','", $dt["modalidad"]);
 
-			/* $query = $this->db->query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
-			FROM (
-				SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
-			FROM citas ct
-			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-			INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
-			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
-			LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-			WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-			AND us.nombre IN ('$nombres') AND op2.nombre IN ('$modalidad')
-			) AS sub"); */
-
 			$query = $this->ch->query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
 			FROM (
 				SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
@@ -1143,20 +647,6 @@ class ReportesModel extends CI_Model {
 			return $query;
 
 		}else if($rol == 3 && $mod == "0"){
-
-			/* $query = $this->db-> query("SELECT COALESCE(SUM(TotalIngreso), 0) AS TotalIngreso
-			FROM (
-				SELECT SUM(distinct_ct.cantidad) AS TotalIngreso
-				FROM (
-					SELECT DISTINCT ct.idDetalle, dp.cantidad
-					FROM citas ct
-					INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-					INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-					INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
-					WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-					AND us.idUsuario = $idUsr
-				) AS distinct_ct
-			) AS subconsulta"); */
 
 			$query = $this->ch-> query("SELECT COALESCE(SUM(TotalIngreso), 0) AS TotalIngreso
 			FROM (
@@ -1176,22 +666,6 @@ class ReportesModel extends CI_Model {
 		}else if($rol == 3 && $mod != "0"){
 
 			$modalidad = implode("','", $dt["modalidad"]);
-
-			/* $query = $this->db-> query("SELECT COALESCE(SUM(TotalIngreso), 0) AS TotalIngreso
-			FROM (
-				SELECT SUM(distinct_ct.cantidad) AS TotalIngreso
-			FROM (
-				SELECT DISTINCT ct.idDetalle, dp.cantidad
-				FROM citas ct
-				INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-				INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-				INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
-				LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
-				LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-				WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-				AND us.idUsuario = $idUsr AND op2.nombre IN ('$modalidad')
-				) AS distinct_ct
-			) AS subconsulta;"); */
 
 			$query = $this->ch-> query("SELECT COALESCE(SUM(TotalIngreso), 0) AS TotalIngreso
 			FROM (SELECT SUM(distinct_ct.cantidad) AS TotalIngreso
@@ -1216,14 +690,6 @@ class ReportesModel extends CI_Model {
 
 		if($area == "0" && $mod == "0" && $rol == 4){
 
-			/* $query = $this->db-> query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
-			FROM (
-				SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
-			FROM citas ct
-			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-			WHERE ct.estatusCita = $reporte AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-			) AS sub"); */
-
 			$query = $this->ch-> query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
 			FROM (
 				SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
@@ -1237,17 +703,6 @@ class ReportesModel extends CI_Model {
 		}else if($area != "0" && $rol == 4 && $idEsp == "0" && $mod == "0"){
 
 			$ar = implode("','", $dt["esp"]);
-
-			/* $query = $this->db-> query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
-			FROM (
-				SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
-			FROM citas ct
-			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-			INNER JOIN puestos ps On ps.idPuesto = us.idPuesto
-			WHERE ct.estatusCita = $reporte AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-			AND ps.puesto IN ('$ar')
-			) AS sub"); */
 
 			$query = $this->ch->query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
 			FROM (SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
@@ -1265,17 +720,6 @@ class ReportesModel extends CI_Model {
 
 			$nombres = implode("','", $dt["idEsp"]);
 			$ar = implode("','", $dt["esp"]);
-	
-			/* $query = $this->db->query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
-			FROM (
-				SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
-			FROM citas ct
-			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-			INNER JOIN puestos ps On ps.idPuesto = us.idPuesto
-			WHERE ct.estatusCita = $reporte AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-			AND ps.puesto IN ('$ar') AND us.nombre IN ('$nombres')
-			) AS sub"); */
 
 			$query = $this->ch->query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
 			FROM (
@@ -1295,19 +739,6 @@ class ReportesModel extends CI_Model {
 
 			$modalidad = implode("','", $dt["modalidad"]);
 
-			/* $query = $this->db-> query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
-			FROM (
-				SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
-			FROM citas ct
-			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-			INNER JOIN puestos ps On ps.idPuesto = us.idPuesto
-			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
-			LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-			WHERE ct.estatusCita = $reporte AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-			AND op2.nombre IN ('$modalidad')
-			) AS sub"); */
-
 			$query = $this->ch-> query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
 			FROM (SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
 			FROM ". $this->schema_cm .".citas ct
@@ -1325,20 +756,6 @@ class ReportesModel extends CI_Model {
 
 			$nombres = implode("','", $dt["idEsp"]);
 			$modalidad = implode("','", $dt["modalidad"]);
-
-			/* $query = $this->db->query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
-			FROM (
-				SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
-			FROM citas ct
-			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-			INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
-			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
-			LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-			WHERE ct.estatusCita = $reporte
-			AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-			AND us.nombre IN ('$nombres') AND op2.nombre IN ('$modalidad')
-			) AS sub"); */
 
 			$query = $this->ch->query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
 			FROM (
@@ -1362,19 +779,6 @@ class ReportesModel extends CI_Model {
 			$modalidad = implode("','", $dt["modalidad"]);
 			$ar = implode("','", $dt["esp"]);
 
-			/* $query = $this->db-> query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
-			FROM (
-				SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
-			FROM citas ct
-			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-			INNER JOIN puestos ps On ps.idPuesto = us.idPuesto
-			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
-			LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-			WHERE ct.estatusCita = $reporte AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-			AND op2.nombre IN ('$modalidad') AND ps.puesto IN ('$ar')
-			) AS sub"); */
-
 			$query = $this->ch-> query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
 			FROM (
 				SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
@@ -1391,21 +795,6 @@ class ReportesModel extends CI_Model {
 			return $query;	
 
 		}else if($rol == 3 && $mod == "0"){
-
-			/* $query = $this->db-> query("SELECT COALESCE(SUM(TotalIngreso), 0) AS TotalIngreso
-			FROM (
-			SELECT SUM(distinct_ct.cantidad) AS TotalIngreso
-			FROM (
-				SELECT DISTINCT ct.idDetalle, dp.cantidad
-				FROM citas ct
-				INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-				INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-				INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
-				WHERE ct.estatusCita = $reporte
-				AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-				AND us.idUsuario = $idUsr
-				) AS distinct_ct
-			) AS subconsulta;"); */
 
 			$query = $this->ch->query("SELECT COALESCE(SUM(TotalIngreso), 0) AS TotalIngreso
 			FROM (
@@ -1426,23 +815,6 @@ class ReportesModel extends CI_Model {
 		}else if($rol == 3 && $mod != "0"){
 
 			$modalidad = implode("','", $dt["modalidad"]);
-
-			/* $query = $this->db-> query("SELECT COALESCE(SUM(TotalIngreso), 0) AS TotalIngreso
-			FROM (
-			SELECT SUM(distinct_ct.cantidad) AS TotalIngreso
-			FROM (
-				SELECT DISTINCT ct.idDetalle, dp.cantidad
-				FROM citas ct
-				INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-				INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-				INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
-				LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
-				LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-				WHERE ct.estatusCita = $reporte
-				AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-				AND us.idUsuario = $idUsr AND op2.nombre IN ('$modalidad')
-				) AS distinct_ct
-			) AS subconsulta;"); */
 
 			$query = $this->ch->query("SELECT COALESCE(SUM(TotalIngreso), 0) AS TotalIngreso
 			FROM (
@@ -1469,14 +841,6 @@ class ReportesModel extends CI_Model {
 
 		if($area == "0" && $mod == "0" && $rol == 4){
 
-			/* $query = $this->db-> query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
-			FROM (
-				SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
-			FROM citas ct
-			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-			WHERE ct.estatusCita = 2 AND ct.estatusCita = 7 AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-			) AS sub"); */
-
 			$query = $this->ch-> query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
 			FROM ( SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
 			FROM ". $this->schema_cm .".citas ct
@@ -1488,17 +852,6 @@ class ReportesModel extends CI_Model {
 		}else if($area != "0" && $rol == 4 && $idEsp == "0" && $mod == "0"){
 
 			$ar = implode("','", $dt["esp"]);
-
-			/* $query = $this->db-> query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
-			FROM (
-				SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
-			FROM citas ct
-			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-			INNER JOIN puestos ps On ps.idPuesto = us.idPuesto
-			WHERE ct.estatusCita = 2 AND ct.estatusCita = 7 AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-			AND ps.puesto IN ('$ar')
-			) AS sub"); */
 
 			$query = $this->ch-> query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
 			FROM (
@@ -1516,19 +869,6 @@ class ReportesModel extends CI_Model {
 		}else if($area == "0" && $rol == 4 && $idEsp == "0" && $mod != "0"){
 
 			$modalidad = implode("','", $dt["modalidad"]);
-
-			/* $query = $this->db-> query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
-			FROM (
-				SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
-			FROM citas ct
-			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-			INNER JOIN puestos ps On ps.idPuesto = us.idPuesto
-			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
-			LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-			WHERE ct.estatusCita = 2 AND ct.estatusCita = 7 AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-			AND op2.nombre IN ('$modalidad')
-			) AS sub"); */
 
 			$query = $this->ch-> query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
 			FROM (SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
@@ -1548,17 +888,6 @@ class ReportesModel extends CI_Model {
 			$nombres = implode("','", $dt["idEsp"]);
 			$ar = implode("','", $dt["esp"]);
 
-			/* $query = $this->db->query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
-			FROM (
-				SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
-			FROM citas ct
-			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-			INNER JOIN puestos ps On ps.idPuesto = us.idPuesto
-			WHERE ct.estatusCita = 2 AND ct.estatusCita = 7 AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-			AND ps.puesto IN ('$ar') AND us.nombre IN ('$nombres')
-			) AS sub"); */
-
 			$query = $this->ch->query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
 			FROM (SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
 			FROM ". $this->schema_cm .".citas ct
@@ -1576,21 +905,6 @@ class ReportesModel extends CI_Model {
 
 			$nombres = implode("','", $dt["idEsp"]);
 			$modalidad = implode("','", $dt["modalidad"]);
-
-			/* $query = $this->db->query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
-			FROM (
-				SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
-			FROM citas ct
-			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-			INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
-			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
-			LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-			WHERE ct.estatusCita = 2 AND ct.estatusCita = 7
-			AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-			AND us.nombre IN ('$nombres') AND op2.nombre IN ('$modalidad')
-			) AS sub");
-			return $query; */
 
 			$query = $this->ch->query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
 			FROM (SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
@@ -1613,20 +927,6 @@ class ReportesModel extends CI_Model {
 			$modalidad = implode("','", $dt["modalidad"]);
 			$ar = implode("','", $dt["esp"]);
 
-			/* $query = $this->db-> query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
-			FROM (
-				SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
-			FROM citas ct
-			INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-			INNER JOIN puestos ps On ps.idPuesto = us.idPuesto
-			LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
-			LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-			WHERE ct.estatusCita = 2 AND ct.estatusCita = 7 
-			AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-			AND op2.nombre IN ('$modalidad') AND ps.puesto IN ('$ar')
-			) AS sub"); */
-
 			$query = $this->ch-> query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
 			FROM (SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
 			FROM ". $this->schema_cm .".citas ct
@@ -1643,21 +943,6 @@ class ReportesModel extends CI_Model {
 			return $query;	
 
 		}else if($rol == 3 && $mod == "0"){
-
-			/* $query = $this->db-> query("SELECT COALESCE(SUM(TotalIngreso), 0) AS TotalIngreso
-			FROM (
-			SELECT SUM(distinct_ct.cantidad) AS TotalIngreso
-			FROM (
-				SELECT DISTINCT ct.idDetalle, dp.cantidad
-				FROM citas ct
-				INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-				INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-				INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
-				WHERE ct.estatusCita = 2 AND ct.estatusCita = 7
-				AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-				AND us.idUsuario = $idUsr
-				) AS distinct_ct
-			) AS subconsulta;"); */
 
 			$query = $this->ch-> query("SELECT COALESCE(SUM(TotalIngreso), 0) AS TotalIngreso
 			FROM (
@@ -1678,23 +963,6 @@ class ReportesModel extends CI_Model {
 		}else if($rol == 3 && $mod != "0"){
 
 			$modalidad = implode("','", $dt["modalidad"]);
-
-			/* $query = $this->db-> query("SELECT COALESCE(SUM(TotalIngreso), 0) AS TotalIngreso
-			FROM (
-			SELECT SUM(distinct_ct.cantidad) AS TotalIngreso
-			FROM (
-				SELECT DISTINCT ct.idDetalle, dp.cantidad
-				FROM citas ct
-				INNER JOIN detallePagos dp ON dp.idDetalle = ct.idDetalle
-				INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
-				INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
-				LEFT JOIN atencionXSede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
-				LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-				WHERE ct.estatusCita = 2 AND ct.estatusCita = 7
-				AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
-				AND us.idUsuario = $idUsr AND op2.nombre IN ('$modalidad')
-				) AS distinct_ct
-			) AS subconsulta;"); */
 
 			$query = $this->ch-> query("SELECT COALESCE(SUM(TotalIngreso), 0) AS TotalIngreso
 			FROM (
@@ -1725,10 +993,6 @@ class ReportesModel extends CI_Model {
 
 		if($area == "0"){
 
-		/* $query = $this->db-> query("SELECT * FROM usuarios us
-		INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
-		WHERE us.idRol =  3"); */
-
 		$query = $this->ch-> query("SELECT * FROM ". $this->schema_ch .".beneficioscm_vista_usuarios AS us
 		INNER JOIN ". $this->schema_cm .".usuarios AS us2 ON us2.idContrato = us.idcontrato 
 		WHERE us2.idRol =  3");
@@ -1740,10 +1004,6 @@ class ReportesModel extends CI_Model {
 			$area2 = isset($dt["esp"][1]) ? $dt["esp"][1] : '';
 			$area3 = isset($dt["esp"][2]) ? $dt["esp"][2] : '';
 			$area4 = isset($dt["esp"][3]) ? $dt["esp"][3] : '';
-
-			/* $query = $this->db-> query("SELECT * FROM usuarios us
-			INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
-			WHERE us.idRol =  3 AND ps.puesto IN ('$area1', '$area2', '$area3', '$area4')"); */
 			
 			$query = $this->ch-> query("SELECT CONCAT(IFNULL(us.nombre_persona, ''), ' ', IFNULL(us.pri_apellido, ''), ' ', IFNULL(us.sec_apellido, '')) AS nombre, us2.idUsuario 
 			FROM ". $this->schema_ch .".beneficioscm_vista_usuarios AS us
@@ -1757,11 +1017,6 @@ class ReportesModel extends CI_Model {
 
 	public function getEspeUser($dt){
 
-		/* $query = $this->db-> query("SELECT ps.idPuesto, ps.puesto
-		FROM usuarios us
-		INNER JOIN puestos ps ON ps.idPuesto = us.idPuesto
-		WHERE us.idUsuario = $dt;"); */
-
 		$query = $this->ch-> query("SELECT us.idpuesto AS idPuesto, us.npuesto AS puesto
 		FROM ". $this->schema_ch .".beneficioscm_vista_usuarios AS us
 		INNER JOIN ". $this->schema_cm .".usuarios AS us2 ON us2.idContrato = us.idcontrato 
@@ -1769,5 +1024,77 @@ class ReportesModel extends CI_Model {
 		return $query;
 
 	}
+
+	public function getAppointmentHistory($dt){
+
+        $idUsuario = $dt["idUser"];
+        $idRol = $dt["idRol"];
+        $idEspe = $dt["idEspe"];
+        $espe = $dt["espe"];
+
+        if($idRol == 1  || $idRol == 4){
+
+        $query = $this->ch->query("SELECT CONCAT(IFNULL(us3.nombre_persona, ''), ' ', IFNULL(us3.pri_apellido, ''), ' ', IFNULL(us3.sec_apellido, '')) AS nombre, 
+        CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista, ct.idPaciente, ct.titulo,
+        oc.nombre AS estatus, ct.estatusCita, ct.idDetalle AS pago, ct.tipoCita,
+        CONCAT(DATE_FORMAT(ct.fechaInicio, '%Y-%m-%d'), ' ', DATE_FORMAT(ct.fechaInicio, '%H:%i'), ' - ', DATE_FORMAT(ct.fechaFinal, '%H:%i')) AS horario,
+        IFNULL(GROUP_CONCAT(ops.nombre SEPARATOR ', '), 'Sin motivos de cita') AS motivoCita
+        FROM ". $this->schema_cm .".citas ct 
+        INNER JOIN ". $this->schema_cm .".catalogos ca ON ca.idCatalogo = 2
+        INNER JOIN ". $this->schema_cm .".opcionesporcatalogo oc ON oc.idCatalogo = ca.idCatalogo AND oc.idOpcion = ct.estatusCita
+        INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idPaciente
+        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us3 ON us3.idcontrato = us.idContrato
+        INNER JOIN ". $this->schema_cm .".usuarios es ON es.idUsuario = ct.idEspecialista
+        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = es.idContrato
+        LEFT JOIN ". $this->schema_cm .".detallepagos dp ON dp.idDetalle = ct.idDetalle
+        LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo oxc ON oxc.idOpcion = dp.metodoPago AND oxc.idCatalogo = 11
+        LEFT JOIN ". $this->schema_cm .".motivosporcita mpc ON mpc.idCita = ct.idCita
+        LEFT JOIN catalogos cat ON cat.idCatalogo = CASE 
+            WHEN us2.idpuesto = 537 THEN 8
+            WHEN us2.idpuesto = 585 THEN 7
+            WHEN us2.idpuesto = 686 THEN 9
+            WHEN us2.idpuesto = 158 THEN 6
+            ELSE us2.idpuesto END 
+          LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo ops ON ops.idOpcion = mpc.idMotivo AND ops.idCatalogo = cat.idCatalogo
+        WHERE ct.idPaciente = $idUsuario AND oc.idCatalogo = 2 AND us2.idpuesto = $espe
+        GROUP BY us2.nombre_persona, us2.pri_apellido,us2.sec_apellido,us3.nombre_persona, us3.pri_apellido,    
+          us3.sec_apellido, ct.idPaciente, ct.titulo, oc.nombre, ct.estatusCita, ct.idDetalle, ct.tipoCita, ct.fechaInicio, ct.fechaFinal
+        ORDER BY ct.fechaInicio, ct.fechaFinal DESC");
+
+        return $query;
+
+        }else if($idRol == 3){
+    
+            $query = $this->ch->query("SELECT CONCAT(IFNULL(us3.nombre_persona, ''), ' ', IFNULL(us3.pri_apellido, ''), ' ', IFNULL(us3.sec_apellido, '')) AS nombre, 
+            CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista, ct.idPaciente, ct.titulo, 
+            oc.nombre AS estatus, ct.estatusCita, ct.idDetalle AS pago, ct.tipoCita,
+            CONCAT(DATE_FORMAT(ct.fechaInicio, '%Y-%m-%d'), ' ', DATE_FORMAT(ct.fechaInicio, '%H:%i'), ' - ', DATE_FORMAT(ct.fechaFinal, '%H:%i')) AS horario,
+            IFNULL(GROUP_CONCAT(ops.nombre SEPARATOR ', '), 'Sin motivos de cita') AS motivoCita
+            FROM ". $this->schema_cm .".citas ct 
+            INNER JOIN ". $this->schema_cm .".catalogos ca ON ca.idCatalogo = 2
+            INNER JOIN ". $this->schema_cm .".opcionesporcatalogo oc ON oc.idCatalogo = ca.idCatalogo AND oc.idOpcion = ct.estatusCita
+            INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idPaciente
+            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us3 ON us3.idcontrato = us.idContrato
+            INNER JOIN ". $this->schema_cm .".usuarios es ON es.idUsuario = ct.idEspecialista
+            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = es.idContrato
+            LEFT JOIN ". $this->schema_cm .".detallepagos dp ON dp.idDetalle = ct.idDetalle
+            LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo oxc ON oxc.idOpcion = dp.metodoPago AND oxc.idCatalogo = 11
+            LEFT JOIN ". $this->schema_cm .".motivosporcita mpc ON mpc.idCita = ct.idCita
+            LEFT JOIN catalogos cat ON cat.idCatalogo = CASE 
+                WHEN us2.idpuesto = 537 THEN 8
+                WHEN us2.idpuesto = 585 THEN 7
+                WHEN us2.idpuesto = 686 THEN 9
+                WHEN us2.idpuesto = 158 THEN 6
+                ELSE us2.idpuesto END 
+              LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo ops ON ops.idOpcion = mpc.idMotivo AND ops.idCatalogo = cat.idCatalogo
+            WHERE ct.idPaciente = $idUsuario AND oc.idCatalogo = 2 AND us2.idpuesto = $espe AND es.idUsuario = $idEspe
+            GROUP BY us2.nombre_persona, us2.pri_apellido,us2.sec_apellido,us3.nombre_persona, us3.pri_apellido,    
+              us3.sec_apellido, ct.idPaciente, ct.titulo, oc.nombre, ct.estatusCita, ct.idDetalle, ct.tipoCita, ct.fechaInicio, ct.fechaFinal
+            ORDER BY ct.fechaInicio, ct.fechaFinal DESC");
+            return $query;
+
+        }
+
+    }
 
 }
