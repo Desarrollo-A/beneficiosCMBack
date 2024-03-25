@@ -126,8 +126,9 @@ class GestorModel extends CI_Model {
 		WHERE us.idPuesto = $dt"); */
         
         $query = $this->ch-> query("SELECT axs.idAtencionXSede AS id,axs.idSede, sd.nsede AS sede, o.noficina AS oficina, 
-        o.direccion AS ubicación, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre,
-        ps.idpuesto AS idPuesto, ps.nom_puesto As puesto, op.nombre AS modalidad, axs.estatus
+        o.direccion AS ubicación, CONCAT(us2.nombre_persona,' ',us2.pri_apellido,' ',us2.sec_apellido) AS nombre,
+        ps.idpuesto AS idPuesto, ps.nom_puesto As puesto, op.nombre AS modalidad, axs.estatus,
+        IFNULL(ar.narea, 'SIN ÁREA') AS nombreArea
         FROM ". $this->schema_cm .".atencionxsede axs
         INNER JOIN ". $this->schema_ch .".beneficioscm_vista_sedes sd ON sd.idsede = axs.idSede
         INNER JOIN ". $this->schema_ch .".beneficioscm_vista_oficinas o ON o.idoficina = axs.idOficina
@@ -136,6 +137,7 @@ class GestorModel extends CI_Model {
         INNER JOIN ". $this->schema_ch .".beneficioscm_vista_puestos ps ON ps.idpuesto = us2.idpuesto
         INNER JOIN ". $this->schema_cm .".catalogos ct ON ct.idCatalogo = 5
         INNER JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = ct.idCatalogo AND op.idOpcion = axs.tipoCita
+        LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_area ar ON ar.idsubarea = axs.idArea 
         WHERE us2.idpuesto = $dt");
         return $query->result();
         
