@@ -14,109 +14,8 @@ class DashModel extends CI_Model
         $this->schema_ch = $this->config->item('schema_ch');
 	}
 
-	/* public function citasCountStatus()
-	{
-		$query = $this->db->query("SELECT op.nombre as estatus, COUNT(op.nombre) AS total
-		FROM catalogos ca
-		INNER JOIN opcionesPorCatalogo op ON op.idCatalogo = ca.idCatalogo AND ca.idCatalogo = 2
-		INNER JOIN citas ct ON ct.estatusCita = op.idOpcion 
-		GROUP BY op.nombre
-		HAVING COUNT(op.nombre)>0");
-		return $query->result();
-	} */
-
-	/* public function totalStatusCitas()
-	{
-		$query = $this->db->query("SELECT COUNT(*) total
-		FROM opcionesPorCatalogo 
-		WHERE idCatalogo = 2");
-		return $query->result();
-	} */
-
-	/* public function estatusFechaAsistencia($year)
-	{
-		$query = $this->db->query("SELECT
-		DATEPART(MONTH, ct.fechaModificacion) AS mes,
-		COUNT(*) AS cantidad, op.nombre AS nombre
-		FROM catalogos ca
-		INNER JOIN opcionesPorCatalogo op ON op.idCatalogo = ca.idCatalogo AND ca.idCatalogo = 2
-		INNER JOIN citas ct ON ct.estatusCita = op.idOpcion 
-		WHERE
-		DATEPART(YEAR, fechaModificacion) = ? AND ct.estatusCita = 1
-		GROUP BY
-		DATEPART(MONTH, fechaModificacion), op.nombre
-		ORDER BY
-		Mes", $year);
-
-		return $query->result();
-	} */
-
-	/* public function estatusFechaCancelada($year)
-	{
-		$query = $this->db->query("SELECT
-		DATEPART(MONTH, ct.fechaModificacion) AS mes,
-		COUNT(*) AS cantidad, op.nombre AS nombre
-		FROM catalogos ca
-		INNER JOIN opcionesPorCatalogo op ON op.idCatalogo = ca.idCatalogo AND ca.idCatalogo = 2
-		INNER JOIN citas ct ON ct.estatusCita = op.idOpcion 
-		WHERE
-		DATEPART(YEAR, fechaModificacion) = ? AND ct.estatusCita = 2
-		GROUP BY
-		DATEPART(MONTH, fechaModificacion), op.nombre
-		ORDER BY Mes", $year);
-
-		return $query->result();
-	} */
-
-	/* public function estatusFechaPenalizada($year)
-	{
-		$query = $this->db->query("SELECT
-		DATEPART(MONTH, ct.fechaModificacion) AS mes,
-		COUNT(*) AS cantidad, op.nombre AS nombre
-		FROM catalogos ca
-		INNER JOIN opcionesPorCatalogo op ON op.idCatalogo = ca.idCatalogo AND ca.idCatalogo = 2
-		INNER JOIN citas ct ON ct.estatusCita = op.idOpcion 
-		WHERE
-		DATEPART(YEAR, fechaModificacion) = ? AND ct.estatusCita = 3
-		GROUP BY
-		DATEPART(MONTH, fechaModificacion), op.nombre
-		ORDER BY Mes", $year);
-
-		return $query->result();
-	} */
-
-	/* public function fechaMinima()
-	{
-		$query = $this->db->query("SELECT DATEPART(YEAR, MIN(fechaModificacion)) AS year FROM citas");
-
-		return $query->result();
-	} */
-
-	/* public function citasAnual($year)
-	{
-		$query = $this->db->query("SELECT
-		DATEPART(MONTH, fechaModificacion) AS mes,
-		COUNT(*) AS cantidad, op.nombre AS nombre
-		FROM catalogos ca
-		INNER JOIN opcionesPorCatalogo op ON op.idCatalogo = ca.idCatalogo AND ca.idCatalogo = 2
-		INNER JOIN citas ct ON ct.estatusCita = op.idOpcion
-		WHERE
-		DATEPART(YEAR, fechaModificacion) = ?
-		GROUP BY
-		DATEPART(MONTH, fechaModificacion), op.nombre
-		ORDER BY
-		Mes", $year);
-
-		return $query->result();
-	} */
-
 	public function getPregunta($dt)
 	{
-		/* $query = $this->db->query("SELECT DISTINCT ec.idPregunta, pg.pregunta, ec.respuestas, pg.idPregunta, ec.idEncuesta, ec.idEncuestaCreada, ec.idArea, ec.idPregunta
-		FROM encuestasCreadas ec
-		INNER JOIN preguntasGeneradas pg ON pg.idPregunta = ec.idPregunta AND pg.idEncuesta = ec.idEncuesta
-		WHERE ec.estatus = 1 AND (pg.abierta = 1 AND ec.idArea = $dt AND pg.idArea = $dt AND ec.respuestas <= 4)"); */
-
 		$query = $this->ch->query("SELECT DISTINCT ec.idPregunta, pg.pregunta, ec.respuestas, pg.idPregunta, ec.idEncuesta, ec.idEncuestaCreada, ec.idArea, ec.idPregunta
 		FROM ". $this->schema_cm .".encuestascreadas ec
 		INNER JOIN ". $this->schema_cm .".preguntasgeneradas pg ON pg.idPregunta = ec.idPregunta AND pg.idEncuesta = ec.idEncuesta
@@ -150,14 +49,6 @@ class DashModel extends CI_Model
 				($idEncuesta != 0)
 			) {
 
-				/* $query_pregunta = $this->db->query(
-					"SELECT DISTINCT pg.pregunta  
-					FROM encuestasCreadas ec
-					INNER JOIN preguntasGeneradas pg ON pg.idPregunta = ec.idPregunta
-					WHERE ec.estatus = 1 AND abierta = 1 AND pg.idArea = ? AND pg.idPregunta = ? AND ec.idPregunta = ?",
-					array($idEspecialidad, $idPregunta, $idPregunta)
-				); */
-
 				$query_pregunta = $this->ch->query(
 					"SELECT DISTINCT pg.pregunta  
 					FROM ". $this->schema_cm .".encuestascreadas ec
@@ -174,16 +65,6 @@ class DashModel extends CI_Model
 					}
 
 					$idPreguntasString = implode(",", $idPrg);
-
-					/* $query = $this->db->query(
-						"SELECT STRING_AGG(rg.respuesta, ', ') AS respuestas, rg.grupo  
-						FROM encuestasCreadas ec
-						INNER JOIN respuestasGenerales rg ON rg.grupo = ec.respuestas 
-						INNER JOIN preguntasGeneradas pg ON pg.idPregunta = ec.idPregunta
-						WHERE pg.pregunta IN ($idPreguntasString) AND ec.idEncuesta = $idEncuesta AND pg.idEncuesta = $idEncuesta
-						GROUP BY grupo",
-						array($idEncuesta)
-					); */
 
 					$query = $this->ch->query(
 						"SELECT GROUP_CONCAT(rg.respuesta SEPARATOR ', ') AS respuestas, rg.grupo  
@@ -233,14 +114,6 @@ class DashModel extends CI_Model
 
 				if($idEspecialista == 0){
 
-					/* $query = $this->db->query("SELECT rg.respuesta, COUNT(*) AS cantidad, (COUNT(*) * 100.0 / SUM(COUNT(*)) OVER ()) AS porcentaje, 
-					ec.idPregunta, ec.idArea, ec.idEncuesta
-					FROM encuestasContestadas ec
-					INNER JOIN respuestasGenerales rg ON rg.idRespuestaGeneral = ec.idRespuesta
-					WHERE ec.idEncuesta = $idEncuesta AND ec.idPregunta = $idPregunta AND ec.idArea = $area
-					AND (ec.fechaCreacion >= '$fhI' AND ec.fechaCreacion <= '$fhF')
-					GROUP BY rg.respuesta, ec.idPregunta, ec.idArea, ec.idEncuesta"); */
-
 					$query = $this->ch->query("SELECT 
 					rg.respuesta, 
 					COUNT(*) AS cantidad, 
@@ -257,14 +130,6 @@ class DashModel extends CI_Model
 					GROUP BY rg.respuesta, ec.idPregunta, ec.idArea, ec.idEncuesta;");
 
 				}else{
-
-					/* $query = $this->db->query("SELECT rg.respuesta, COUNT(*) AS cantidad, (COUNT(*) * 100.0 / SUM(COUNT(*)) OVER ()) AS porcentaje, 
-					ec.idPregunta, ec.idArea, ec.idEncuesta
-					FROM encuestasContestadas ec
-					INNER JOIN respuestasGenerales rg ON rg.idRespuestaGeneral = ec.idRespuesta
-					WHERE ec.idEncuesta = $idEncuesta AND ec.idPregunta = $idPregunta AND ec.idEspecialista = $idEspecialista
-					AND (ec.fechaCreacion >= '$fhI' AND ec.fechaCreacion <= '$fhF')
-					GROUP BY rg.respuesta, ec.idPregunta, ec.idArea, ec.idEncuesta"); */
 
 					$query = $this->ch->query("SELECT 
 					rg.respuesta, 
@@ -304,18 +169,6 @@ class DashModel extends CI_Model
 		$inicio = $dt["inicio"];
 		$fin = $dt["fin"];
 
-		/*
-        if($idRol == 1 || $idRol == 4){
-            $query = $this->db-> query("SELECT COUNT(*) AS [citas] FROM usuarios us
-            INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
-            WHERE us.idPuesto = $idData AND ct.estatusCita = 4 AND fechaFinal BETWEEN '$inicio' AND '$fin'");
-        }else{
-            $query = $this->db-> query("SELECT COUNT(*) AS [citas] FROM usuarios us
-            INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
-            WHERE us.idUsuario = $idData AND ct.estatusCita = 4 AND fechaFinal BETWEEN '$inicio' AND '$fin'");
-        }
-        */
-
 		$query = "SELECT COUNT(*) AS citas FROM citas
         	WHERE
         		idEspecialista = $idData";
@@ -323,32 +176,8 @@ class DashModel extends CI_Model
 		return $this->ch->query($query)->result();
 	}
 
-	/* public function getMetaAdmin($dt)
-	{
-
-		switch ($dt) {
-			case 537:
-				$query = $this->db->query("SELECT idAreaBeneficio FROM usuarios WHERE idUsuario = 74");
-				break;
-			case 585:
-				$query = $this->db->query("SELECT idAreaBeneficio FROM usuarios WHERE idUsuario = 73");
-				break;
-			case 158:
-				$query = $this->db->query("SELECT idAreaBeneficio FROM usuarios WHERE idUsuario = 72");
-				break;
-			case 686:
-				$query = $this->db->query("SELECT idAreaBeneficio FROM usuarios WHERE idUsuario = 75");
-				break;
-		}
-
-		return $this->db->query($query)->row()->result();
-	} */
-
 	public function getEsp($dt)
     {
-
-        /* $query = $this->db-> query("SELECT idUsuario, nombre 
-		FROM usuarios WHERE idRol = 3 AND idPuesto = $dt"); */
 
 		$query = $this->ch-> query("SELECT idUsuario, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre
 		FROM ". $this->schema_cm .".usuarios us
@@ -360,13 +189,6 @@ class DashModel extends CI_Model
 
 	public function getCtDisponibles($dt)
     {
-
-        /* $query = $this->db-> query("SELECT COUNT(idCita) AS total
-		FROM citas 
-		WHERE idPaciente = $dt
-		AND estatusCita = 4 
-		AND YEAR(fechaFinal) = YEAR(GETDATE())
-		AND MONTH(fechaFinal) = MONTH(GETDATE())"); */
 
 		$query = $this->ch-> query("SELECT COUNT(idCita) AS total
 		FROM ". $this->schema_cm .".citas 
@@ -380,9 +202,7 @@ class DashModel extends CI_Model
 
 	public function getCtAsistidas($dt)
     {
-        /* $query = $this->db-> query("SELECT COUNT(*) AS [asistencia] FROM citas WHERE idPaciente = $dt AND estatusCita = 4"); */
-
-		$query = $this->ch-> query("SELECT COUNT(*) AS `asistencia` 
+        $query = $this->ch-> query("SELECT COUNT(*) AS `asistencia` 
 		FROM ". $this->schema_cm .".citas 
 		WHERE idPaciente = $dt AND estatusCita = 4;");
 
@@ -391,9 +211,7 @@ class DashModel extends CI_Model
 
     public function getCtCanceladas($dt)
     {
-        /* $query = $this->db-> query("SELECT COUNT(*) AS [cancelada] FROM citas WHERE idPaciente = $dt AND estatusCita = 2"); */
-		
-		$query = $this->ch-> query("SELECT COUNT(*) AS `cancelada` 
+        $query = $this->ch-> query("SELECT COUNT(*) AS `cancelada` 
 		FROM ". $this->schema_cm .".citas 
 		WHERE idPaciente = $dt AND estatusCita = 2;");
         return $query;
@@ -401,17 +219,210 @@ class DashModel extends CI_Model
 
     public function getCtPenalizadas($dt)
     {
-            /* $query = $this->db-> query("SELECT COUNT(*) AS [penalizada] FROM citas WHERE idPaciente = $dt AND estatusCita = 3"); */
-
-			$query = $this->ch-> query("SELECT COUNT(*) AS `penalizada` 
-			FROM ". $this->schema_cm .".citas 
-			WHERE idPaciente = $dt AND estatusCita = 3;");
-        	return $query;
+        $query = $this->ch-> query("SELECT COUNT(*) AS `penalizada` 
+		FROM ". $this->schema_cm .".citas 
+		WHERE idPaciente = $dt AND estatusCita = 3;");
+        return $query;
     }
 
 	public function getCarrusel()
     {
 		$query = $this->ch-> query("SELECT * FROM ". $this->schema_cm .".novedadesdashboard WHERE estatus = 1");
+        return $query;
+
+    }
+
+	public function getPacientes($dt)
+    {
+        $idData = $dt["idData"];
+        $idRol = $dt["idRol"];
+        $slEs = $dt["slEs"];
+        $idUser = $dt["idUser"];
+        $fhI = $dt["fhI"];
+        $fechaFn = $dt["fhF"];
+
+        $fecha = new DateTime($fechaFn);
+        $fecha->modify('+1 day');
+		$fhF = $fecha->format('Y-m-d');
+
+        if($idRol == 1 || $idRol == 4){
+            if( $slEs == 0){
+
+                $query = $this->ch->query("SELECT COUNT(DISTINCT ct.idPaciente) AS `pacientes` FROM ". $this->schema_cm .".usuarios us
+                INNER JOIN ". $this->schema_cm .".citas ct ON ct.idEspecialista = us.idUsuario
+                INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
+                WHERE us2.idpuesto = $idData AND ct.estatusCita = 4 AND 
+				(ct.fechaModificacion >= '$fhI' AND ct.fechaModificacion <= '$fhF')");
+
+
+            }else if( $slEs != 0 ){
+
+                $query = $this->ch-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS `pacientes` FROM usuarios us
+                INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
+                INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
+                WHERE us2.idpuesto = 158 AND ct.estatusCita = 4 AND ct.idEspecialista = $slEs AND 
+				(ct.fechaModificacion >= '$fhI' AND ct.fechaModificacion <= '$fhF')");
+            }
+
+        }else if($idRol == 2){
+
+            $query = $this->ch-> query("SELECT COUNT(*) AS `pacientes` FROM citas WHERE idPaciente = $idUser AND 
+            (fechaModificacion >= '$fhI' AND fechaModificacion <= '$fhF')");
+
+        }else if($idRol == 3){
+
+            $query = $this->ch-> query("SELECT COUNT(DISTINCT idPaciente) AS `pacientes` FROM citas WHERE idEspecialista = $idUser AND estatusCita = 4 AND 
+            (fechaModificacion >= '$fhI' AND fechaModificacion <= '$fhF')");
+
+        }
+        
+        return $query;
+    }
+
+	public function getCountModalidades($dt){
+
+        $area = $dt["area"];
+        $especialidad = $dt["espe"];
+        $fhI = $dt["fhI"];
+        $fechaFn = $dt["fhF"];
+
+        $fecha = new DateTime($fechaFn);
+        $fecha->modify('+1 day');
+		$fhF = $fecha->format('Y-m-d');
+
+        if($especialidad == 0){
+
+            $query = $this->ch->query("SELECT 
+			COUNT(CASE WHEN axs.tipoCita = 2 THEN ct.idPaciente END) AS `virtual`,
+			COUNT(CASE WHEN axs.tipoCita = 1 THEN ct.idPaciente END) AS presencial
+			FROM ". $this->schema_cm .".usuarios us
+			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
+            INNER JOIN ". $this->schema_cm .".citas ct ON ct.idEspecialista = us.idUsuario
+			INNER JOIN ". $this->schema_cm .".atencionxsede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
+			INNER JOIN ". $this->schema_cm .".opcionesporcatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
+            WHERE us2.idpuesto = $area AND
+		    (ct.fechaFinal >= '$fhI' AND ct.fechaFinal <= '$fhF')");
+
+        }else{
+
+            $query = $this->ch->query("SELECT 
+			COUNT(CASE WHEN axs.tipoCita = 2 THEN ct.idPaciente END) AS `virtual`,
+			COUNT(CASE WHEN axs.tipoCita = 1 THEN ct.idPaciente END) AS presencial
+			FROM ". $this->schema_cm .".usuarios us
+			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
+            INNER JOIN ". $this->schema_cm .".citas ct ON ct.idEspecialista = us.idUsuario
+			INNER JOIN ". $this->schema_cm .".atencionxsede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
+			INNER JOIN ". $this->schema_cm .".opcionesporcatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
+            WHERE us2.idpuesto = $area AND
+		    (ct.fechaFinal >= '$fhI' AND ct.fechaFinal <= '$fhF')
+            AND us.idUsuario = $especialidad");
+
+        }
+        
+        return $query;
+
+    }
+
+	public function getCountEstatusCitas($dt){
+
+        $area = $dt["area"];
+        $especialidad = $dt["espe"];
+        $fhI = $dt["fhI"];
+        $fechaFn = $dt["fhF"];
+
+        $fecha = new DateTime($fechaFn);
+        $fecha->modify('+1 day');
+		$fhF = $fecha->format('Y-m-d');
+
+        if($especialidad == 0){
+
+            $query = $this->ch->query("SELECT 
+            COUNT(CASE WHEN ct.estatusCita = 1 THEN ct.idPaciente END) AS asistir,
+            COUNT(CASE WHEN ct.estatusCita = 2 OR ct.estatusCita = 7 THEN ct.idPaciente END) AS cancelada,
+            COUNT(CASE WHEN ct.estatusCita = 3 THEN ct.idPaciente END) AS penalizada,
+            COUNT(CASE WHEN ct.estatusCita = 4 THEN ct.idPaciente END) AS asistencia,
+            COUNT(CASE WHEN ct.estatusCita = 5 THEN ct.idPaciente END) AS justificada,
+            COUNT(CASE WHEN ct.estatusCita = 6 THEN ct.idPaciente END) AS pendiente,
+            COUNT(ct.idCita) AS citas
+            FROM ". $this->schema_cm .".usuarios us
+            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
+            INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
+            WHERE us2.idpuesto = $area AND
+            (ct.fechaFinal >= '$fhI' AND ct.fechaFinal <= '$fhF')");
+
+        }else{
+
+            $query = $this->ch->query("SELECT 
+            COUNT(CASE WHEN ct.estatusCita = 1 THEN ct.idPaciente END) AS asistir,
+            COUNT(CASE WHEN ct.estatusCita = 2 OR ct.estatusCita = 7 THEN ct.idPaciente END) AS cancelada,
+            COUNT(CASE WHEN ct.estatusCita = 3 THEN ct.idPaciente END) AS penalizada,
+            COUNT(CASE WHEN ct.estatusCita = 4 THEN ct.idPaciente END) AS asistencia,
+            COUNT(CASE WHEN ct.estatusCita = 5 THEN ct.idPaciente END) AS justificada,
+            COUNT(CASE WHEN ct.estatusCita = 6 THEN ct.idPaciente END) AS pendiente,
+            COUNT(ct.idCita) AS citas
+            FROM ". $this->schema_cm .".usuarios us
+            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
+            INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
+            WHERE us2.idpuesto = $area AND
+            (ct.fechaFinal >= '$fhI' AND ct.fechaFinal <= '$fhF')
+            AND us.idUsuario = $especialidad");
+
+        }
+        
+        return $query;
+
+    }
+
+	public function getCountPacientes($dt){
+
+        $especialidad = $dt["espe"];
+        $rol = $dt["idRol"];
+
+        if($rol == 4){
+
+            $query = $this->ch->query("SELECT
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 1 THEN ct.idPaciente END) AS enero,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 2 THEN ct.idPaciente END) AS febrero,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 3 THEN ct.idPaciente END) AS marzo,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 4 THEN ct.idPaciente END) AS abril,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 5 THEN ct.idPaciente END) AS mayo,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 6 THEN ct.idPaciente END) AS junio,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 7 THEN ct.idPaciente END) AS julio,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 8 THEN ct.idPaciente END) AS agosto,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 9 THEN ct.idPaciente END) AS septiembre,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 10 THEN ct.idPaciente END) AS octubre,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 11 THEN ct.idPaciente END) AS noviembre,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 12 THEN ct.idPaciente END) AS diciembre,
+            COUNT(DISTINCT ct.idPaciente) AS total
+            FROM ". $this->schema_cm .".usuarios us
+            INNER JOIN ". $this->schema_cm .".citas ct ON ct.idEspecialista = us.idUsuario
+            WHERE ct.estatusCita = 4
+            AND YEAR(ct.fechaFinal) =  YEAR(CURDATE());");
+
+        }else{
+
+            $query = $this->ch->query("SELECT
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 1 THEN ct.idPaciente END) AS enero,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 2 THEN ct.idPaciente END) AS febrero,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 3 THEN ct.idPaciente END) AS marzo,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 4 THEN ct.idPaciente END) AS abril,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 5 THEN ct.idPaciente END) AS mayo,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 6 THEN ct.idPaciente END) AS junio,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 7 THEN ct.idPaciente END) AS julio,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 8 THEN ct.idPaciente END) AS agosto,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 9 THEN ct.idPaciente END) AS septiembre,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 10 THEN ct.idPaciente END) AS octubre,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 11 THEN ct.idPaciente END) AS noviembre,
+            COUNT(DISTINCT CASE WHEN MONTH(ct.fechaFinal) = 12 THEN ct.idPaciente END) AS diciembre,
+            COUNT(DISTINCT ct.idPaciente) AS total
+            FROM ". $this->schema_cm .".usuarios us
+            INNER JOIN ". $this->schema_cm .".citas ct ON ct.idEspecialista = us.idUsuario
+            WHERE ct.estatusCita = 4
+            AND YEAR(ct.fechaFinal) =  YEAR(CURDATE())
+            AND us.idUsuario = $especialidad");
+
+        }
+        
         return $query;
 
     }

@@ -25,7 +25,6 @@ class UsuariosModel extends CI_Model {
 
 	public function getUsersExternos()
 	{
-		/* $query = $this->db->query("SELECT *FROM usuarios WHERE externo = 1"); */ 
 
 		$query = $this->ch->query("SELECT *FROM ". $this->schema_cm .".usuarios WHERE externo = 1");
 		return $query;
@@ -49,7 +48,6 @@ class UsuariosModel extends CI_Model {
 
 	public function getAreas()
 	{
-		/* $query = $this->db->query("SELECT *from usuarios"); */
 
 		$query = $this->ch->query("SELECT * FROM ". $this->schema_cm .".usuarios AS us
 		LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato");
@@ -59,21 +57,6 @@ class UsuariosModel extends CI_Model {
 
 	public function getNameUser($idEspecialista)
 	{
-		/* $query = $this->db->query(
-			"SELECT US.*, PS.idArea, CONCAT(US.nombre, ' ', '(', SE.sede, ')') AS nombreCompleto, PS.puesto as nombrePuesto, PS.tipoPuesto FROM usuarios US
-			 INNER JOIN puestos PS ON
-			 US.idPuesto = PS.idPuesto
-			 INNER JOIN sedes SE ON SE.idSede = US.idSede
-			 WHERE US.idRol = ?
-			 AND US.estatus = ?
-			 AND US.idSede
-			 IN ( select distinct idSede from atencionXSede where idEspecialista = ? )
-			 UNION
-			 SELECT US2.*, NULL AS idArea, CONCAT('(Lamat)', ' ', US2.nombre) AS nombreCompleto, 'nombrePuesto' = 'na', 'tipoPuesto' = 'na' FROM usuarios US2 where externo = 1",
-			 array( 2, 1, $idEspecialista )
-		); */
-																																
-
 		$query = $this->ch->query(
 			"SELECT US.*, SE.idsede AS idSede, PS.idArea, us2.tipo_puesto AS tipoPuesto, us2.fingreso AS fechaIngreso, CONCAT(CONCAT (us2.nombre_persona,' ',us2.pri_apellido,' ',us2.sec_apellido), ' ', '(', SE.nsede, ')') AS nombreCompleto, 
 			 PS.nom_puesto as nombrePuesto, PS.tipo_puesto
@@ -97,10 +80,6 @@ class UsuariosModel extends CI_Model {
 	}
 
 	public function checkUser($idPaciente, $year, $month){ // función para checar si el beneficiario lleva 2 beneficios usados, sin importar mes
-		/* $query = $this->db->query(
-			"SELECT idPaciente from (select *from citas ct where YEAR(fechaInicio) = ? AND MONTH(fechaInicio) = ?) as citas 
-			WHERE estatusCita IN(?) AND idPaciente = ? AND tipoCita != ? GROUP BY idPaciente HAVING COUNT(idPaciente) > ?",
-			array( $year, $month, 4, $idPaciente, 3, 1 )); // version de query por mes */
 		
 		$query = $this->ch->query(
 			"SELECT idPaciente FROM (SELECT * FROM ". $this->schema_cm .".citas ct WHERE YEAR(fechaInicio) = ? AND MONTH(fechaInicio) = ?) AS citas 
@@ -140,10 +119,6 @@ class UsuariosModel extends CI_Model {
 	}
 
 	public function getUserByNumEmpleado($idContrato){
-		/* $query = $this->db->query(
-			"SELECT idContrato 
-			FROM usuarios
-			WHERE idContrato=?", $idContrato); */
 
 		$query = $this->ch->query(
 			"SELECT idContrato 

@@ -11,11 +11,6 @@ class CitasModel extends CI_Model{
     }
 
     public function cancelFromUser($idUsuario){
-        /* $query = "UPDATE citas
-            SET
-                estatusCita=2
-            WHERE
-                idPaciente=$idUsuario"; */
 
         $query = "UPDATE ". $this->schema_cm .".citas
         SET estatusCita=2
@@ -25,14 +20,6 @@ class CitasModel extends CI_Model{
     }
 
     public function getCitasPendientes($idEspecialista, $idSede, $fechaInicio, $fechaFinal){
-        /* $query = "SELECT *
-            FROM citas
-            LEFT JOIN atencionXSede ON citas.idAtencionXSede = atencionXSede.idAtencionXSede
-            WHERE
-                citas.idEspecialista='$idEspecialista'
-            AND citas.estatusCita IN (1)
-            AND NOT atencionXSede.idSede = '$idSede'
-            AND citas.fechaInicio BETWEEN '$fechaInicio' AND '$fechaFinal'"; */
 
             $query = "SELECT *
             FROM ". $this->schema_cm .".citas as ct

@@ -92,4 +92,14 @@ class ReportesController extends BaseController {
 		$data['data'] = $this->ReportesModel->getEspeUser($dt)->result();
 		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
+
+	
+	public function getAppointmentHistory(){
+
+        $dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->ReportesModel->getAppointmentHistory($dt)->result();
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+
+    }
 }

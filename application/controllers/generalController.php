@@ -49,13 +49,6 @@ class GeneralController extends BaseController {
         $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
 	}
 
-	public function getPacientes(){
-		$dt = $this->input->post('dataValue', true);
-		$data['data'] = $this->GeneralModel->getPacientes($dt)->result();
-		$this->output->set_content_type('application/json');
-        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
-	}
-
 	public function getCtAsistidas(){
 		$dt = $this->input->post('dataValue', true);
 		$data['data'] = $this->GeneralModel->getCtAsistidas($dt)->result();
@@ -94,15 +87,6 @@ class GeneralController extends BaseController {
 		$this->output->set_content_type('application/json');
         $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
 	}
-
-	public function getAppointmentHistory(){
-
-        $dt = $this->input->post('dataValue', true);
-		$data['data'] = $this->GeneralModel->getAppointmentHistory($dt)->result();
-		$this->output->set_content_type('application/json');
-        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
-
-    }
 
 	public function getEstatusPaciente(){
         $data['data'] = $this->GeneralModel->getEstatusPaciente()->result();
@@ -224,30 +208,6 @@ class GeneralController extends BaseController {
 
 	public function getEstatusCitas(){
 		$data['data'] = $this->GeneralModel->getEstatusCitas()->result();
-		
-		$this->output->set_content_type("application/json");
-		$this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
-	}
-
-	public function getCountEstatusCitas(){
-		$dt = $this->input->post('dataValue', true);
-		$data['data'] = $this->GeneralModel->getCountEstatusCitas($dt)->result();
-		
-		$this->output->set_content_type("application/json");
-		$this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
-	}
-
-	public function getCountModalidades(){
-		$dt = $this->input->post('dataValue', true);
-		$data['data'] = $this->GeneralModel->getCountModalidades($dt)->result();
-		
-		$this->output->set_content_type("application/json");
-		$this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
-	}
-
-	public function getCountPacientes(){
-		$dt = $this->input->post('dataValue', true);
-		$data['data'] = $this->GeneralModel->getCountPacientes($dt)->result();
 		
 		$this->output->set_content_type("application/json");
 		$this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
