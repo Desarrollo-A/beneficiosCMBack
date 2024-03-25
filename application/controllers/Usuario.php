@@ -356,7 +356,7 @@ class Usuario extends BaseController {
 			$this->json($result, JSON_NUMERIC_CHECK);
 		}
 
-		$empleado = $this->UsuariosModel->getUserByNumEmpleado($idContrato)->row();
+		$empleado = $this->UsuariosModel->getUserByIdContrato($idContrato)->row();
 
 		if(!isset($empleado)){
 			$result->msg = 'No existe el empleado en la base de datos';
@@ -458,7 +458,7 @@ class Usuario extends BaseController {
 			$this->json($result, JSON_NUMERIC_CHECK);
 		}
 
-		$empleado = $this->UsuariosModel->getUserByNumEmpleado($idContrato)->row();
+		$empleado = $this->UsuariosModel->getUserByIdContrato($idContrato)->row();
 
 		if(!isset($empleado)){
 			$result->msg = 'No existe el empleado en la base de datos';
