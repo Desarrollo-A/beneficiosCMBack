@@ -3,7 +3,7 @@
 abstract class BaseController extends CI_Controller{
     public function __construct(){
         parent::__construct();
-
+        $this->load->model('UsuariosModel');
         date_default_timezone_set('America/Mexico_City');
 
         header('Access-Control-Allow-Origin: *');
@@ -15,11 +15,24 @@ abstract class BaseController extends CI_Controller{
         
         // Lineas para la verificación de 
         $allowed_routes = ['LoginController/login', 'Usuario/getUserByNumEmp', 'Usuario/sendMail', 'Usuario/GetToken', 'LoginController/addRegistroEmpleado'];
+        
         if (!isset($this->input->request_headers()['token']) AND !in_array($this->uri->uri_string(), $allowed_routes)) {
-            $response['result'] = false;
-            echo $response;
-            exit;
-        }        
+            $token = $this->headers('token');
+            $datosToken = json_decode(base64_decode(explode(".", $token)[1]));
+            $numEmpleado = $datosToken->numEmpleado;
+            
+            $data = $this->UsuariosModel->getUserByNumEmpleado($numEmpleado);
+            
+            $response['result'] = $data->num_rows() > 0;
+
+            if ($response['result']) {
+                $response['msg'] = '¡Token invalido!';
+                $this->output->set_content_type('application/json');
+
+                echo json_encode($response);
+                exit;
+            }
+        }
 
         if(isset($this->input->request_headers()['origin']))
             $origin = $this->input->request_headers()['origin'];

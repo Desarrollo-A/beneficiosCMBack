@@ -139,16 +139,20 @@ class UsuariosModel extends CI_Model {
 		return $this->ch->query($query);
 	}
 
-	public function getUserByNumEmpleado($idContrato){
-		/* $query = $this->db->query(
-			"SELECT idContrato 
-			FROM usuarios
-			WHERE idContrato=?", $idContrato); */
-
+	public function getUserByIdContrato($idContrato){
 		$query = $this->ch->query(
 			"SELECT idContrato 
 			FROM PRUEBA_beneficiosCM.usuarios
 			WHERE idContrato=?", $idContrato);
+
+		return $query;
+	}
+
+	public function getUserByNumEmpleado($numEmpleado){
+		$query = $this->ch->query(
+			"SELECT *FROM PRUEBA_beneficiosCM.usuarios AS us
+			INNER JOIN PRUEBA_CH.beneficioscm_vista_usuarios AS usCH ON usCH.idcontrato = us.idContrato
+			WHERE usCH.num_empleado = ?;", $numEmpleado);
 
 		return $query;
 	}
