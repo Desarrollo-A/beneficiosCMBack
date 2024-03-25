@@ -3,7 +3,7 @@
 abstract class BaseController extends CI_Controller{
     public function __construct(){
         parent::__construct();
-
+        $this->load->model('UsuariosModel');
         date_default_timezone_set('America/Mexico_City');
 
         header('Access-Control-Allow-Origin: *');
@@ -12,6 +12,27 @@ abstract class BaseController extends CI_Controller{
 
     
         $urls = array('192.168.30.128/auth/jwt/login','localhost','http://localhost','http://localhost:3030','http://192.168.30.128/auth/jwt/login','192.168.30.128','http://192.168.30.128:3030','127.0.0.1','https://rh.gphsis.com','rh.gphsis.com', 'https://prueba.gphsis.com/beneficiosmaderas', 'prueba.gphsis.com/beneficiosmaderas', 'https://prueba.gphsis.com', 'prueba.gphsis.com', 'https://beneficiosmaderasapi.gphsis.com', 'beneficiosmaderasapi.gphsis.com');
+        
+        // Lineas para la verificación de 
+        $allowed_routes = ['LoginController/login', 'Usuario/getUserByNumEmp', 'Usuario/sendMail', 'Usuario/GetToken', 'LoginController/addRegistroEmpleado'];
+        
+        if (!isset($this->input->request_headers()['token']) AND !in_array($this->uri->uri_string(), $allowed_routes)) {
+            $token = $this->headers('token');
+            $datosToken = json_decode(base64_decode(explode(".", $token)[1]));
+            $numEmpleado = $datosToken->numEmpleado;
+            
+            $data = $this->UsuariosModel->getUserByNumEmpleado($numEmpleado);
+            
+            $response['result'] = $data->num_rows() > 0;
+
+            if ($response['result']) {
+                $response['msg'] = '¡Token invalido!';
+                $this->output->set_content_type('application/json');
+
+                echo json_encode($response);
+                exit;
+            }
+        }
 
         if(isset($this->input->request_headers()['origin']))
             $origin = $this->input->request_headers()['origin'];
