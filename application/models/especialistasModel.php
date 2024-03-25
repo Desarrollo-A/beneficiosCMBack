@@ -47,7 +47,7 @@ class EspecialistasModel extends CI_Model {
         		idEspecialista = $idEspecialista
         	AND estatusCita = 4
 			AND MONTH(fechaFinal) = $mes"; */
-			$query = "SELECT * FROM ". $this->schema_ch .".citas
+			$query = "SELECT * FROM ". $this->schema_cm .".citas
         	WHERE
         		idEspecialista = $idEspecialista
         	AND estatusCita = 4
@@ -64,7 +64,7 @@ class EspecialistasModel extends CI_Model {
 			OR idPuesto = $idAreaBeneficio)
     		AND idRol = 3"; */
 
-			$query = "SELECT CONCAT(us2.nombre_persona,' ',us2.pri_apellido,' ',us2.sec_apellido) AS nombre, us.idUsuario
+			$query = "SELECT CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre, us.idUsuario
     		FROM ". $this->schema_cm .".usuarios us
     		INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
     		WHERE
