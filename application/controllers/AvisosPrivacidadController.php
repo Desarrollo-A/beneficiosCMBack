@@ -12,7 +12,6 @@ class AvisosPrivacidadController extends BaseController
 		$this->load->model('AvisosPrivacidadModel');
 		$this->load->model('GeneralModel');
 		$this->load->model('UsuariosModel');
-		
 		date_default_timezone_set('America/Mexico_City');
 	}
 
