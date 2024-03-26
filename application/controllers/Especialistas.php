@@ -21,14 +21,14 @@ class Especialistas extends BaseController{
     }
 
     public function horario(){
-        $data = $this->post();
+        $data = $this->input->post('dataValue[data]');
 
-        $sede = $data->sede;
-        $especialista = $data->especialista;
+        $sede = $data['sede'];
+        $especialista = $data['especialista'];
 
-        $start = new DateTime($data->start);
+        $start = new DateTime($data['start']);
         $interval = new DateInterval('P1D');
-        $end = new DateTime($data->end);
+        $end = new DateTime($data['end']);
         $end->modify('+1 day'); //Esto para incluir el ultimo dia, en PHP 8 se usa DatePeriod::INCLUDE_END_DATE
 
         $period = new DatePeriod(
