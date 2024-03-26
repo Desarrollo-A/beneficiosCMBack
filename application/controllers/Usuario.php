@@ -141,23 +141,15 @@ class Usuario extends BaseController {
         $response['result'] = isset($table, $data); // && !empty($data);
         if ($response['result']) {
             $fecha = date('Y-m-d H:i:s');
-            $complemento = date('YmdHis');
             $rows = array();
             foreach ($data as $user) {
-                $iniciales = getIniciales($user['nombre']); // 
                 $row = array(
-                    'idContrato' => $complemento,
-                    'numEmpleado' => $iniciales.$complemento,
                     'nombre' => $user['nombre'],
-                    'telPersonal' => isset($user['telPersonal']) ? $user['telPersonal'] : null,
-                    'idArea' => null,
-					'idPuesto' => null,
-                    'idSede' => null,
-					'sexo' => $user['sexo'],
-					'externo' => 1,
-					'idRol' => 2,
                     'correo' => isset($user['correo']) ? $user['correo'] : null,
-                    'password' => encriptar('Tempo01@'),
+                    'telPersonal' => isset($user['telPersonal']) ? $user['telPersonal'] : null,
+					'sexo' => $user['sexo'],
+					'idRol' => 2,
+					'externo' => 1,
                     'estatus' => 1,
 					'creadoPor' => $user['creadoPor'],
                     'fechaCreacion' => $fecha,
@@ -200,6 +192,40 @@ class Usuario extends BaseController {
 			$data['fechaModificacion'] = $fecha;
 			$data['modificadoPor'] = $user;
 			$response['result'] = $this->GeneralModel->updateRecord('usuarios', $data, 'idUsuario', $user);
+	
+			if ($response['result']) {
+				$response['msg'] = "¡Usuario actualizado exitosamente!";
+			} else {
+				$response['msg'] = "¡Error al intentar actualizar datos de usuario!";
+			}
+		} else {
+			$response['msg'] = "¡Parametros invalidos!";
+		}
+	
+		$this->output->set_content_type("application/json");
+		$this->output->set_output(json_encode($response));
+	}
+
+	// Actualizar usuarios externos como personal beneficiaria lamat.
+	public function updateExternalUser() {
+		$fecha = date('Y-m-d H:i:s');
+		$user = $this->input->post('dataValue[idUsuarioExt]');
+		
+		$data = array();
+	
+		// Recorre $_POST y agrega los campos con valores (incluido 0) al array $data
+		foreach ($this->input->post('dataValue') as $key => $value) {
+			if (($value !== null || $value !== '') && $key != 'idUsuarioExt') {
+				$data[$key] = $value;
+			}
+		}
+
+		$response['result'] = isset($user, $data) && !empty($user);
+		
+		if ($response['result']) {  
+			$data['fechaModificacion'] = $fecha;
+			$data['modificadoPor'] = $user;
+			$response['result'] = $this->GeneralModel->updateRecord('usuariosexternos', $data, 'idUsuarioExt', $user);
 	
 			if ($response['result']) {
 				$response['msg'] = "¡Usuario actualizado exitosamente!";
