@@ -26,7 +26,7 @@ class UsuariosModel extends CI_Model {
 	public function getUsersExternos()
 	{
 
-		$query = $this->ch->query("SELECT *FROM ". $this->schema_cm .".usuarios WHERE externo = 1");
+		$query = $this->ch->query("SELECT *FROM ". $this->schema_cm .".usuariosexternos WHERE externo = 1");
 		return $query;
 	}
 
