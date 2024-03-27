@@ -16,7 +16,7 @@ abstract class BaseController extends CI_Controller{
         // Lineas para la verificación de 
         $allowed_routes = ['LoginController/login', 'Usuario/getUserByNumEmp', 'Usuario/sendMail', 'Usuario/GetToken', 'LoginController/addRegistroEmpleado'];
         
-        if (!isset($this->input->request_headers()['token']) AND !in_array($this->uri->uri_string(), $allowed_routes)) {
+        /* if (!isset($this->input->request_headers()['token']) AND !in_array($this->uri->uri_string(), $allowed_routes)) {
             $token = $this->headers('token');
             $datosToken = json_decode(base64_decode(explode(".", $token)[1]));
             $numEmpleado = $datosToken->numEmpleado;
@@ -32,7 +32,7 @@ abstract class BaseController extends CI_Controller{
                 echo json_encode($response);
                 exit;
             }
-        }
+        } */
 
         if(isset($this->input->request_headers()['origin']))
             $origin = $this->input->request_headers()['origin'];

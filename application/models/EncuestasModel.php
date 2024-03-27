@@ -154,7 +154,7 @@ class EncuestasModel extends CI_Model {
 				}
 			}
 		} else {
-			echo json_encode(array("estatus" => false, "msj" => "Error Faltan Datos" ));
+			echo json_encode(array("estatus" => false, "msj" => "Error faltan Datos" ));
 		}
     }
 
@@ -169,7 +169,7 @@ class EncuestasModel extends CI_Model {
 			$items = $dataArray->items;
 
 			if (empty($area)) {
-				echo json_encode(array("estatus" => false, "msj" => "Error Hay Campos Vacios" ));
+				echo json_encode(array("estatus" => false, "msj" => "Error hay Campos Vacios" ));
 				$datosValidos = false;
 			}
 
@@ -177,7 +177,7 @@ class EncuestasModel extends CI_Model {
 
 				if (!isset($item->pregunta, $item->respuesta) || empty($item->pregunta) 
 				|| is_null($item->respuesta) || empty($item->respuesta) || is_null($item->pregunta)) {
-					echo json_encode(array("estatus" => false, "msj" => "Error Hay campos vacios!" ));
+					echo json_encode(array("estatus" => false, "msj" => "Error hay campos vacios!" ));
 					$datosValidos = false;
 					break; 
 				}
@@ -198,7 +198,7 @@ class EncuestasModel extends CI_Model {
                         "estatus" => 0,
                     );
 
-                    $this->GeneralModel->updateRecord('". $this->schema_cm .".encuestascreadas', $data_1, 'idEncuesta', $idEnc);
+                    $this->GeneralModel->updateRecord('encuestascreadas', $data_1, 'idEncuesta', $idEnc);
 
                 }
 
