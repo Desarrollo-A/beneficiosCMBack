@@ -21,7 +21,9 @@ class AvisosPrivacidadController extends BaseController
 		$this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
 	}
 
-	function getAvisoPrivacidad($idEspecialidad){
+	function getAvisoPrivacidad(){
+		$idEspecialidad = $this->input->post('dataValue[idEspecialidad]');
+
 		$data = $this->AvisosPrivacidadModel->getAvisoPrivacidadByEsp($idEspecialidad);
 		$this->output->set_content_type('application/json');
 		$this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
