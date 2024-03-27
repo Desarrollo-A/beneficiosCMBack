@@ -94,9 +94,9 @@ class UsuariosModel extends CI_Model {
 		if(!empty($dt))
 		{
 			$query = $this->ch-> query("SELECT password 
-			FROM ". $this->schema_cm .".usuarios us
-			WHERE us.idUsuario = ?", $dt);
-
+			FROM ". $this->schema_ch .".beneficioscm_vista_usuarios us2 
+			INNER JOIN ". $this->schema_cm .".usuarios us ON us.idContrato = us2.idcontrato
+			WHERE us2.num_empleado = ?", $dt);
 
 			$pass = '';
 			foreach ($query->result() as $row) {
@@ -129,8 +129,8 @@ class UsuariosModel extends CI_Model {
 
 	public function getUserByNumEmpleado($numEmpleado){
 		$query = $this->ch->query(
-			"SELECT *FROM PRUEBA_beneficiosCM.usuarios AS us
-			INNER JOIN PRUEBA_CH.beneficioscm_vista_usuarios AS usCH ON usCH.idcontrato = us.idContrato
+			"SELECT * FROM ". $this->schema_cm .".usuarios AS us
+			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS usCH ON usCH.idcontrato = us.idContrato
 			WHERE usCH.num_empleado = ?;", $numEmpleado);
 
 		return $query;
