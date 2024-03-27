@@ -40,7 +40,7 @@ class Especialistas extends BaseController{
 
         if(!iterator_count($period)){
             $data["result"] = false;
-            $data["msg"] = 'Rango de fechas erroneo';
+            $data["msg"] = 'Rango de fechas erróneo';
         
         }
 
@@ -50,7 +50,7 @@ class Especialistas extends BaseController{
             if($date < $today){
 
                 $data["result"] = false;
-                $data["msg"] = 'No puedes cambiar un horario de un dia que ya paso.';
+                $data["msg"] = 'No puedes cambiar un horario de un día que ya paso.';
             }
 
             $start_day = $date->format("Y-m-d 00:00:00");
