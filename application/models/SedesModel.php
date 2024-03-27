@@ -40,6 +40,13 @@ class SedesModel extends CI_Model {
         return $this->ch->query($query);
     }
 
+    public function checkExist($presencialDate, $idSede, $idEspecialista){
+        $query = $this->ch->query("SELECT *FROM ". $this->schema_cm .".presencialxsede 
+            WHERE presencialDate = '$presencialDate' AND idEspecialista = '$idEspecialista'");
+
+        return $query;
+    }
+
     public function deleteHorarioPresencial($presencialDate, $idSede, $idEspecialista){
 
         $query = "DELETE FROM ". $this->schema_cm .".presencialxsede

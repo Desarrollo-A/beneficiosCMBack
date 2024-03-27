@@ -10,6 +10,7 @@ class Especialistas extends BaseController{
         $this->load->model('SedesModel');
         $this->load->model('EspecialistasModel');
         $this->load->model('CitasModel');
+        $this->load->model('GeneralModel');
     }
 
     public function sedes(){
@@ -21,7 +22,7 @@ class Especialistas extends BaseController{
     }
 
     public function horario(){
-        $data = $this->input->post('dataValue[data]');
+        $data = $this->input->post('dataValue', true);
 
         $sede = $data['sede'];
         $especialista = $data['especialista'];
@@ -38,23 +39,18 @@ class Especialistas extends BaseController{
         );
 
         if(!iterator_count($period)){
-            $response = [
-                'status' => 'error',
-                'message' => 'Rango de fechas erroneo.',
-            ];
-
-            $this->json($response);
+            $data["result"] = false;
+            $data["msg"] = 'Rango de fechas erroneo';
+        
         }
 
         foreach ($period as $date) {
             $today = new DateTime();
-            if($date < $today){
-                $response = [
-                    'status' => 'error',
-                    'message' => "No puedes cambiar un horario de un dia que ya paso.",
-                ];
 
-                $this->json($response);
+            if($date < $today){
+
+                $data["result"] = false;
+                $data["msg"] = 'No puedes cambiar un horario de un dia que ya paso.';
             }
 
             $start_day = $date->format("Y-m-d 00:00:00");
@@ -64,30 +60,37 @@ class Especialistas extends BaseController{
             
             if($has_citas){
                 $day = $date->format("Y-m-d");
-
-                $response = [
-                    'status' => 'error',
-                    'message' => "No puedes cambiar el horario el $day, por que tienes citas pendientes.",
-                ];
-
-                $this->json($response);
+                $data["result"] = false;
+                $data["msg"] = 'No puedes cambiar el horario el'. $day .', por que tienes citas pendientes.';
             }
 
             if($sede != 0){
-                $is_ok = $this->SedesModel->addHorarioPresencial($date->format("Y-m-d"), $sede, $especialista);
+                $check_exist = $this->SedesModel->checkExist($date->format("Y-m-d"), $sede, $especialista);
+                if($check_exist->num_rows() > 0){
+                    $id = $check_exist->result();
+
+                   
+                    $values = [
+                        "idSede" => $sede
+                    ];
+
+                    $is_ok = $this->GeneralModel->updateRecord('presencialxsede', $values, 'idEvento', $id[0]->idEvento);
+                }
+                else{
+                    $is_ok = $this->SedesModel->addHorarioPresencial($date->format("Y-m-d"), $sede, $especialista);
+                }
             }else{
                 $is_ok = $this->SedesModel->deleteHorarioPresencial($date->format("Y-m-d"), $sede, $especialista);
             }
         }
 
         if($is_ok){
-            $response = [
-                'status' => 'ok',
-                'message' => 'Horario establecido',
-            ];
-
-            $this->json($response);
+            $data["result"] = true;
+            $data["msg"] = 'Horario establecido';
         }
+
+        $this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data));
     }
 
     public function horarios(){
