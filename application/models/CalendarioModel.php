@@ -579,7 +579,7 @@ class CalendarioModel extends CI_Model
             ct.fechaInicio AS occupied, ct.estatusCita AS estatus, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre, ct.idPaciente, us2.telefono_personal, CASE WHEN ofi.noficina IS NULL THEN 'VIRTUAL' ELSE ofi.noficina END as 'oficina',
             CASE WHEN ofi.direccion IS NULL THEN 'VIRTUAL' ELSE ofi.direccion END as 'ubicación', sed.nsede AS sede, atc.idOficina, us2.mail_emp as correo, usEspe2.mail_emp as correoEspecialista, 
             CONCAT(IFNULL(usEspe2.nombre_persona, ''), ' ', IFNULL(usEspe2.pri_apellido, ''), ' ', IFNULL(usEspe2.sec_apellido, '')) AS especialista, ct.idDetalle, usEspe2.telefono_personal as telefonoEspecialista,
-            usEspe2.sexo as sexoEspecialista, tf.fechasFolio, ct.idEventoGoogle, ct.evaluacion,
+            usEspe2.sexo as sexoEspecialista, tf.fechasFolio, ct.idEventoGoogle, ct.evaluacion, ct.idEspecialista AS idEspecialista, ec.idEncuesta,
             CASE 
             WHEN usEspe2.idPuesto = 537 THEN 'Nutrición'
             WHEN usEspe2.idPuesto = 585 THEN 'Psicología'
@@ -595,7 +595,8 @@ class CalendarioModel extends CI_Model
             LEFT join ". $this->schema_ch .".beneficioscm_vista_oficinas AS ofi ON ofi.idoficina = atc.idOficina
             INNER join ". $this->schema_ch .".beneficioscm_vista_sedes AS sed ON sed.idSede = atc.idSede
 		    LEFT JOIN (SELECT idDetalle, GROUP_CONCAT(DATE_FORMAT(fechaInicio, '%d / %m / %Y A las %H:%i horas.'), '') AS fechasFolio FROM ". $this->schema_cm .".citas WHERE estatusCita IN(8) GROUP BY idDetalle) tf ON tf.idDetalle = ct.idDetalle 
-            WHERE ct.estatusCita IN(?) AND ct.evaluacion is NULL AND ct.idPaciente = ?", array(4, $idUsuario));
+            INNER JOIN ". $this->schema_cm .".encuestascreadas AS ec ON ec.idArea = usEspe2.idPuesto
+            WHERE ct.estatusCita IN(?) AND ct.evaluacion is NULL AND ct.idPaciente = ? AND (ec.idPregunta = 1 AND ec.estatus = 1)", array(4, $idUsuario));
 
         return $query;
     }

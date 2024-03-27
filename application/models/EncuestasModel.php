@@ -122,10 +122,11 @@ class EncuestasModel extends CI_Model {
 					$idUsuario = $item->idUsuario;
 					$idEncuesta = $item->idEnc;
 					$idArea = $item->idArea;
+                    $idEsp = $item->idEsp;
 
 					$abierta = is_numeric($resp) ? 1 : 0;
 
-                    $query_idEspecialista = $this->ch->query("SELECT ct.idEspecialista, MAX(ct.fechaFinal) AS fechaMasReciente
+                    /* $query_idEspecialista = $this->ch->query("SELECT ct.idEspecialista, MAX(ct.fechaFinal) AS fechaMasReciente
 					FROM ". $this->schema_ch .".beneficioscm_vista_usuarios us2
 					INNER JOIN ". $this->schema_cm .".usuarios us ON us.idContrato = us2.idcontrato
 					INNER JOIN ". $this->schema_cm .".citas ct ON ct.idEspecialista = us.idUsuario
@@ -137,11 +138,11 @@ class EncuestasModel extends CI_Model {
                     $idEspecialista = [];
                     foreach ($query_idEspecialista->result() as $row) {
                         $idEspecialista[] = $row->idEspecialista;
-                    }
+                    } */
                     
                     $this->ch->query("INSERT INTO ". $this->schema_cm .".encuestascontestadas (idPregunta, idRespuesta, idEspecialista, idArea, idEncuesta, fechaCreacion, idUsuario, creadoPor, modificadoPor ) 
 					VALUES (?, ?, ?, ?, ?, NOW(), ?, ?, ?)", 
-					array($idPregunta, $resp, $idEspecialista, $idArea, $idEncuesta, $idUsuario, $idUsuario, $idUsuario ));
+					array($idPregunta, $resp, $idEsp, $idArea, $idEncuesta, $idUsuario, $idUsuario, $idUsuario ));
 				
 				}
 				

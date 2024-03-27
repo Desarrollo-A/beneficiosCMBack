@@ -104,14 +104,15 @@ class GeneralModel extends CI_Model {
     public function getSedes(){
 
         $query = $this->ch->query("SELECT idsede AS idSede, nsede AS sede 
-        FROM ". $this->schema_ch .".beneficioscm_vista_sedes");
+        FROM ". $this->schema_ch .".beneficioscm_vista_sedes WHERE idsede NOT IN(7)");
         return $query;
 
     }
 
     public function getOficinas(){
 
-        $query = $this->ch->query("SELECT idoficina AS idOficina, noficina AS oficina, direccion AS ubicación 
+        $query = $this->ch->query("SELECT idoficina AS idOficina, noficina AS oficina, direccion AS ubicación, 
+        CONCAT(noficina,' (', IFNULL(direccion, 'Sin dirección'),') ') AS lugar
         FROM ". $this->schema_ch .".beneficioscm_vista_oficinas");
         return $query;
 
