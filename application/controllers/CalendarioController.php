@@ -401,7 +401,7 @@ class CalendarioController extends BaseController{
 			} else if ($checkOccupied->num_rows() > 0) {
 				$response["result"] = false;
 				$response["msg"] = "Horario no disponible";
-			}  else if ($checkUser->num_rows() === 0 && $reagenda == 0) {
+			}  else if ($checkUser->num_rows() < 0 && $reagenda < 0) {
 				$response["result"] = false;
 				$response["msg"] = " El paciente debe finalizar sus beneficios mensuales";
 			} else if($checkUser->num_rows() === 0 && $reagenda == 1 && $month != date('m') || $checkUser->num_rows() === 0 && $reagenda == 1 && $year != date('Y')){
