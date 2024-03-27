@@ -228,7 +228,7 @@ class CalendarioController extends BaseController{
 		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
-public function createAppointmentByColaborator()
+	public function createAppointmentByColaborator()
     {
         $titulo = $this->input->post('dataValue[titulo]');
         $idEspecialista = $this->input->post('dataValue[idEspecialista]');
@@ -307,7 +307,7 @@ public function createAppointmentByColaborator()
                     $fechaActual = $fechaActual->format('Y-m-d H:i:s');
                     $response['result'] = $fechaInicio > $fechaActual; //Si la fecha de la cita es despues de la actual
 
-                    if ($response['result']) {
+					if ($response['result']) {
                         $values = [
                             "titulo" => $titulo, "idEspecialista" => $idEspecialista,
                             "idPaciente" => $idPaciente, "observaciones" => $observaciones,
@@ -319,10 +319,9 @@ public function createAppointmentByColaborator()
 							"modificadoPor" => $idPaciente, "idDetalle" => $detalle,
                             "idEventoGoogle" => $idGoogleEvent
                         ];
-                        $rs = $this->GeneralModel->addRecord("citas", $values);
-                        $last_id = $this->ch->insert_id();
-                        $response["result"] = $rs;
-                        $response["data"] = $last_id;
+                        $rs = $this->GeneralModel->addRecordReturnId("citas", $values);
+                        $response["result"] = $rs > 0;
+                        $response["data"] = $rs;
                         if ($response["result"]) {
                             $response["msg"] = "¡Se ha agendado la cita con éxito!";
                         } else {
@@ -415,13 +414,12 @@ public function createAppointmentByColaborator()
 				$response["result"] = false;
 				$response["msg"] = "La sede presencial es distinta al del paciente seleccionado";
 			} else {
-				$addRecord = $this->GeneralModel->addRecord("citas", $values);
-
-				$last_id = $this->ch->insert_id();
+				$rs = $this->GeneralModel->addRecordReturnId("citas", $values);
+				$addRecord = $rs > 0; 
 				
 				if ($addRecord) {
 					$response["result"] = true;
-					$response["data"] = $last_id;
+					$response["data"] = $rs;
 					$response["msg"] = "Se ha agendado la cita";
 				} else {
 					$response["result"] = false;

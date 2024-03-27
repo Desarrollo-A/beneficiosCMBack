@@ -77,6 +77,7 @@ class LoginController extends BaseController {
                 if($usuarioExiste->num_rows() === 0){
                     $resultado = $this->GeneralModel->addRecord('usuarios',$insertData);
                     $last_id = $this->ch->insert_id();
+                    var_dump($last_id);
                     
                     $insertData = array(
                         "idUsuario" => $last_id,

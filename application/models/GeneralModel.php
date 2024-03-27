@@ -9,8 +9,6 @@ class GeneralModel extends CI_Model {
         $this->schema_ch = $this->config->item('schema_ch');
         $this->ch = $this->load->database('ch', TRUE);
 		parent::__construct();
-        $this->schema_cm = $this->config->item('schema_cm');
-        $this->schema_ch = $this->config->item('schema_ch');
 	}
 
     public function usuarioExiste($idContrato){
@@ -38,8 +36,12 @@ class GeneralModel extends CI_Model {
 
     // MJ: AGREGA UN REGISTRO A UNA TABLA EN PARTICULAR, RECIBE 2 PARÁMETROS. LA TABLA Y LA DATA A INSERTAR
     public function addRecord($table, $data) { 
-
         return $this->ch->insert($table, $data);
+    }
+
+    public function addRecordReturnId($table, $data) { 
+        $this->ch->insert($table, $data);
+        return $this->ch->insert_id();
     }
 
     // MJ: ACTUALIZA LA INFORMACIÓN DE UN REGISTRO EN PARTICULAR, RECIBE 4 PARÁMETROS. TABLA, DATA A ACTUALIZAR, LLAVE (WHERE) Y EL VALOR DE LA LLAVE
