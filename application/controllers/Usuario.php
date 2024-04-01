@@ -60,33 +60,42 @@ class Usuario extends BaseController {
 
         //print_r($headers);
         //exit();
-
-        $data = explode('.', $headers->token);
-        $user = json_decode(base64_decode($data[2]));
-
-        //print_r($user);
-        //exit();
-
-        $path = substr($this->input->get('path'), 1);
-
-        //print_r($path);
-        //exit();
-
-        $id_user = intval($user->idUsuario);
-        $id_rol = intval($user->idRol);
-
-        $auth = $this->MenuModel->checkAuth($path, $id_user, $id_rol);
-
-        //print_r($auth);
-        //exit();
-
-        $result = [
-            "idRol" => $id_rol,
-            "idUsuario" => $id_user,
-            "authorized" => $auth,
-        ];
-
-        echo json_encode($result);
+		if (property_exists($headers, 'token')) {
+			$data = explode('.', $headers->token);
+			$user = json_decode(base64_decode($data[2]));
+	
+			//print_r($user);
+			//exit();
+	
+			$path = substr($this->input->get('path'), 1);
+	
+			//print_r($path);
+			//exit();
+	
+			$id_user = intval($user->idUsuario);
+			$id_rol = intval($user->idRol);
+	
+			$auth = $this->MenuModel->checkAuth($path, $id_user, $id_rol);
+	
+			//print_r($auth);
+			//exit();
+	
+			$result = [
+				"idRol" => $id_rol,
+				"idUsuario" => $id_user,
+				"authorized" => $auth,
+			];
+	
+			echo json_encode($result);
+		}else {
+			$result = [
+				"idRol" => null,
+				"idUsuario" => null,
+				"authorized" => false,
+			];
+	
+			echo json_encode($result);
+		}
     }
 
 	public function usuarios(){

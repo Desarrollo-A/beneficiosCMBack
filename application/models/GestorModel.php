@@ -17,7 +17,8 @@ class GestorModel extends CI_Model {
     public function getOficinasVal($dt)
     {
 
-        $query = $this->ch-> query("SELECT idoficina AS idOficina, noficina AS oficina 
+        $query = $this->ch-> query("SELECT idoficina AS idOficina, noficina AS oficina,
+        CONCAT(noficina,' (', IFNULL(direccion, 'SIN DIRECCIÓN'),') ') AS lugar
         FROM  ". $this->schema_ch .".beneficioscm_vista_oficinas WHERE idsede =  $dt OR idsede =  0");
         
         if($query->num_rows() > 0){

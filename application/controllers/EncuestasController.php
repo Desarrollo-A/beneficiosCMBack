@@ -117,12 +117,12 @@ class EncuestasController extends BaseController {
 		);
 
 		$this->GeneralModel->updateRecord('PRUEBA_beneficiosCM.encuestascreadas', $data_2, 'idEncuesta', $idEncuesta);
-		$this->db->trans_complete();
+		$this->ch->trans_complete();
 				
-		if ($this->db->trans_status() === FALSE) {
+		if ($this->ch->trans_status() === FALSE) {
 			echo json_encode(array("estatus" => false, "msj" => "Error en actualizar el estatus"), JSON_NUMERIC_CHECK);
 		} else {
-			echo json_encode(array("estatus" => true, "msj" => "Estatus Actualizado!"), JSON_NUMERIC_CHECK);
+			echo json_encode(array("estatus" => true, "msj" => "Estatus actualizado!"), JSON_NUMERIC_CHECK);
 		}
 	}
 
