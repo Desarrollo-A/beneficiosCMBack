@@ -25,8 +25,17 @@ class AvisosPrivacidadController extends BaseController
 		$idEspecialidad = $this->input->post('dataValue[idEspecialidad]');
 
 		$data = $this->AvisosPrivacidadModel->getAvisoPrivacidadByEsp($idEspecialidad);
+
+		$fileName = $data['base_url'] = base_url() . '/dist/documentos/avisos-privacidad/' . $data[0]['expediente'];
+
 		$this->output->set_content_type('application/json');
-		$this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+
+		$content = @file_get_contents($fileName);
+		if ($content !== false) {
+			$this->output->set_output(json_encode($this->AvisosPrivacidadModel->getAvisoPrivacidadByEsp($idEspecialidad), JSON_NUMERIC_CHECK));
+		} else {
+			$this->output->set_output(json_encode(false, JSON_NUMERIC_CHECK));
+		}
 	}
 
 	function actualizarArchivoPrivacidad(){
