@@ -166,12 +166,12 @@ class CalendarioModel extends CI_Model
         return $query;
     }
     
-    public function isPrimeraCita($usuario, $especialista)
-    {
-        $query = $this->ch->query(
-            "SELECT *FROM ". $this->schema_cm .".citas
-            WHERE idPaciente = ? AND idEspecialista = ?;",
-            array($usuario, $especialista)
+    public function isPrimeraCita($usuario, $beneficio) {
+        $query = $this->db->query(
+            "SELECT *FROM CITAS as ct
+            INNER JOIN usuarios as us ON us.idUsuario = ct.idEspecialista
+            WHERE ct.idPaciente = ? AND us.idPuesto = ?;",
+            array($usuario, $beneficio)
         );
 
         return $query;

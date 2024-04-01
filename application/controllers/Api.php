@@ -44,63 +44,60 @@ class Api extends BaseController{
 		$fechaPago = $this->input->post('dt_fechaPago');
 		$hash = $this->input->post('hash');
 
-        // $cadena = $folio.'|'.$concepto.'|'.$referencia.'|'.$cantidad.'|'.$fechaPago.'|'.$metodoPago.'|'.$estatusPago.'|';
-		// $key = APPPATH . '..'.DIRECTORY_SEPARATOR.'dist'.DIRECTORY_SEPARATOR.'keys'.DIRECTORY_SEPARATOR.'public_key_BB.pem';
+        $cadena = $folio.'|'.$concepto.'|'.$referencia.'|'.$cantidad.'|'.$fechaPago.'|'.$metodoPago.'|'.$estatusPago.'|';
+		$key = APPPATH . '..'.DIRECTORY_SEPARATOR.'dist'.DIRECTORY_SEPARATOR.'keys'.DIRECTORY_SEPARATOR.'public_key_BB.pem';
 		// $response['result'] = VerifyData($hash, $cadena, $key);
-		$response['result'] = true;
-		// if ($response['result']) {
-		// 	$values = [
-		// 		"folio" => $folio,
-		// 		"idConcepto" => $concepto,
-		// 		"referencia" => $referencia,
-		// 		"cantidad" => $cantidad,
-		// 		"metodoPago" => $metodoPago,
-		// 		"estatusPago" => $estatusPago,
-		// 		"fechaPago" => $fechaPago,
-		// 		"estatus" => 1,
-		// 		"creadoPor" => $usuario,
-		// 		"fechaCreacion" => $fecha,
-		// 		"modificadoPor" => $usuario,
-		// 		"fechaModificacion" => $fecha
-		// 	];
-		// 	$rs = $this->GeneralModel->addRecord("detallepagos", $values);
-		// 	$last_id = $this->ch->insert_id();
-		// 	$response["result"] = $rs;
-		// 	if ($response["result"]) {
-		// 		if (isset($last_id)) {					
-		// 			$partes = explode('-', $referencia); // Sacamos el ultimo dato de la referencia
-		// 			$idCita = substr(end($partes), 1); //Cortamos la inicial del dato que es una letra para extraer solo el numero del id
-		// 			if ($concepto == 1) { // Actualizamos el id de cita
-		// 				$upd = [
-		// 					"idDetalle" => $last_id,
-		// 					"modificadoPor" => $usuario,
-		// 					"fechaModificacion" => $fecha,
-		// 				];
-		// 				$response["result"] = $this->GeneralModel->updateRecord("citas", $upd, 'idCita', $idCita);
-		// 				if ($response["result"]) {
-		// 					$response["msg"] = "estatus_notificacion=0";
-		// 				}else {
-		// 					$response["msg"] = "¡Surgió un error al enlazar la cita con el pago!";
-		// 				}
-		// 			}else {
-		// 				$response["msg"] = "¡Se ha generado el detalle de pago con éxito!";
-		// 			}
-		// 		} else {
-		// 			$response["msg"] = 'No se encontró la información del detalle de pago';
-		// 		}
-		// 	} 
-		// 	else {
-		// 		$response["msg"] = "¡Surgió un error al intentar registrar el detalle de pago!";
-		// 	}
-		// } else{
-		// 	$response['msg'] = "¡Parámetros inválidos!";
-		// }
+		$response['result'] = isset($fecha, $usuario, $folio, $referencia, $concepto, $cantidad, $metodoPago, $estatusPago, $fechaPago, $hash) AND $cadena == $hash;
+		if ($response['result']) {
+			$values = [
+				"folio" => $folio,
+				"idConcepto" => $concepto,
+				"referencia" => $referencia,
+				"cantidad" => $cantidad,
+				"metodoPago" => $metodoPago,
+				"estatusPago" => $estatusPago,
+				"fechaPago" => $fechaPago,
+				"estatus" => 1,
+				"creadoPor" => $usuario,
+				"fechaCreacion" => $fecha,
+				"modificadoPor" => $usuario,
+				"fechaModificacion" => $fecha
+			];
+			$rs = $this->GeneralModel->addRecordReturnId("detallepagos", $values);
+			$response["result"] = $rs > 0;
+			if ($response["result"]) {
+				if (isset($rs)) {					
+					$partes = explode('-', $referencia); // Sacamos el ultimo dato de la referencia
+					$idCita = substr(end($partes), 1); //Cortamos la inicial del dato que es una letra para extraer solo el numero del id
+					if ($concepto == 1) { // Actualizamos el id de cita
+						$upd = [
+							"idDetalle" => $rs,
+							"estatusCita" => $estatusPago == 2 ? 6 : 1,
+							"modificadoPor" => $usuario,
+							"fechaModificacion" => $fecha,
+						];
+						$response["result"] = $this->GeneralModel->updateRecord("citas", $upd, 'idCita', $idCita);
+						if ($response["result"]) {
+							$response["msg"] = "estatus_notificacion=0";
+						}else {
+							$response["msg"] = "¡Surgió un error al enlazar la cita con el pago!";
+						}
+					}else {
+						$response["msg"] = "¡Se ha generado el detalle de pago con éxito!";
+					}
+				} else {
+					$response["msg"] = 'No se encontró la información del detalle de pago';
+				}
+			} 
+			else {
+				$response["msg"] = "¡Surgió un error al intentar registrar el detalle de pago!";
+			}
+		} else{
+			$response['msg'] = "¡Parámetros inválidos!";
+		}
 
-		// 'estatus_notificacion=0' 
-		// $response
-		
-		echo 'estatus_notificacion=0';
-		// $this->output->set_content_type('application/json');
-		// $this->output->set_output(json_encode(echo 'estatus_notificacion=0', JSON_NUMERIC_CHECK));
+		// echo 'estatus_notificacion=0';
+		$this->output->set_content_type('application/json');
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
     }
 }

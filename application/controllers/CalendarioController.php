@@ -829,18 +829,16 @@ class CalendarioController extends BaseController{
         $this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
     }
 
-	public function isPrimeraCita()
-	{
+	public function isPrimeraCita() {
 		$usuario = $this->input->post('dataValue[usuario]');
-		$especialista = $this->input->post('dataValue[especialista]');
+		$beneficio = $this->input->post('dataValue[beneficio]');
 
-		$response['result'] = isset($usuario, $especialista);
+		$response['result'] = isset($usuario, $beneficio);
 		if ($response['result']) {
-			$rs = $this->CalendarioModel->isPrimeraCita($usuario, $especialista)->result();
-			$response['result'] = count($rs) === 0;
+			$rs = $this->CalendarioModel->isPrimeraCita($usuario, $beneficio)->result();
+			$response['result'] = count($rs) == 0;
 			if ($response['result']) {
 				$response['msg'] = '¡Usuario con registros de citas!';
-				// $response['data'] = $rs;
 			} else {
 				$response['msg'] = '¡No existen registros!';
 			}
