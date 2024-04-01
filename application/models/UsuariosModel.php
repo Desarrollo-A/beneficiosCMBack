@@ -68,10 +68,9 @@ class UsuariosModel extends CI_Model {
 			 AND us2.idsede
 			 IN ( SELECT DISTINCT idSede FROM atencionxsede WHERE idEspecialista = ? )
 			 UNION
-			 SELECT US2.*, NULL AS idSede, NULL AS idArea, NULL AS tipoPuesto, us3.fingreso, CONCAT('(Lamat)', ' ', CONCAT(IFNULL(us3.nombre_persona, ''), ' ', IFNULL(us3.pri_apellido, ''), ' ', IFNULL(us3.sec_apellido, ''))) AS nombreCompleto, 'nombrePuesto' = 'na', 'tipoPuesto' = 'na' 
-			 FROM usuarios US2 
-			 INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us3 ON us3.idcontrato = US2.idContrato
-			 WHERE externo = 1",
+			 SELECT  us2.idUsuarioExt AS idUsuario, 0 AS idContrato, 0 AS 'password', us2.idRol, us2.externo, 0 AS idAreaBeneficio, us2.estatus, us2.creadoPor, us2.fechaCreacion, us2.modificadoPor, us2.fechaModificacion, 0 AS idSede,  0 AS idarea, 0 tipoPuesto, 0 AS fechaIngreso, 
+			 CONCAT('(Lamat)', ' ', CONCAT(IFNULL(us2.nombre, ''))) AS nombreCompleto, 0 AS nombrePuesto, 0 AS tipo_puesto 
+			 FROM ". $this->schema_cm .".usuariosexternos AS us2",
 			 array( 2, 1, $idEspecialista )
 		);
 		
