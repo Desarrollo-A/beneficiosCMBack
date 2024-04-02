@@ -35,7 +35,7 @@ class AvisosPrivacidadModel extends CI_Model
 		LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo opc ON opc.idOpcion = hd.tipoDocumento AND opc.idCatalogo = 11
 		LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo opc2 ON opc2.idOpcion = hd.tipoEspecialidad AND opc2.idCatalogo = 1
 		 WHERE hd.estatus=1 AND
-		 hd.tipoDocumento = 1 AND hd.tipoEspecialidad = $idEspecialidad");
+		 hd.tipoDocumento = 1 AND hd.tipoEspecialidad = $idEspecialidad order by fechaModificacion desc");
 		return $query->result_array();
 	}
 
