@@ -46,8 +46,8 @@ class Api extends BaseController{
 
         $cadena = $folio.'|'.$concepto.'|'.$referencia.'|'.$cantidad.'|'.$fechaPago.'|'.$metodoPago.'|'.$estatusPago.'|';
 		$key = APPPATH . '..'.DIRECTORY_SEPARATOR.'dist'.DIRECTORY_SEPARATOR.'keys'.DIRECTORY_SEPARATOR.'public_key_BB.pem';
-		// $response['result'] = VerifyData($hash, $cadena, $key);
-		$response['result'] = isset($fecha, $usuario, $folio, $referencia, $concepto, $cantidad, $metodoPago, $estatusPago, $fechaPago, $hash) AND $cadena == $hash;
+		$response['result'] = VerifyData($hash, $cadena, $key);
+		// $response['result'] =  $cadena == $hash;
 		if ($response['result']) {
 			$values = [
 				"folio" => $folio,
@@ -96,8 +96,8 @@ class Api extends BaseController{
 			$response['msg'] = "¡Parámetros inválidos!";
 		}
 
-		// echo 'estatus_notificacion=0';
-		$this->output->set_content_type('application/json');
-		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
+		echo 'estatus_notificacion=0';
+		// $this->output->set_content_type('application/json');
+		// $this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
     }
 }

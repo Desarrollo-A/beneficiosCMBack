@@ -550,9 +550,9 @@ class CalendarioModel extends CI_Model
     }
     
     public function getPendientesPago($idUsuario){
-        $query = $this->ch->query("SELECT TRIM(CAST(ct.idCita AS CHAR(36))) AS id, ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
+        $query = $this->ch->query("SELECT TRIM(CAST(ct.idCita AS CHAR(36))) AS id, ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', usEspe2.idpuesto AS idPuesto,
         ct.fechaInicio AS occupied, ct.estatusCita AS estatus, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre, ct.idPaciente, us2.telefono_personal, CASE WHEN ofi.noficina IS NULL THEN 'VIRTUAL' ELSE ofi.noficina END as 'oficina',
-        CASE WHEN ofi.direccion IS NULL THEN 'VIRTUAL' ELSE ofi.direccion END as 'ubicación', sed.nsede AS sede, atc.idOficina, us2.mail_emp as correo, usEspe2.mail_emp as correoEspecialista, 
+        CASE WHEN ofi.direccion IS NULL THEN 'VIRTUAL' ELSE ofi.direccion END as 'ubicación', sed.nsede AS sede, atc.idOficina, us2.mail_emp as correo, usEspe2.mail_emp as correoEspecialista,  ct.idEspecialista, 
         CONCAT(IFNULL(usEspe2.nombre_persona, ''), ' ', IFNULL(usEspe2.pri_apellido, ''), ' ', IFNULL(usEspe2.sec_apellido, '')) AS especialista, ct.idDetalle, usEspe2.telefono_personal as telefonoEspecialista,
         usEspe2.sexo as sexoEspecialista, tf.fechasFolio, ct.idEventoGoogle, ct.evaluacion,
         CASE WHEN usEspe2.idpuesto = 537 THEN 'Nutrición'
@@ -575,9 +575,9 @@ class CalendarioModel extends CI_Model
     }
 
     public function getPendientesEvaluacion($idUsuario){
-        $query = $this->ch->query("SELECT TRIM(CAST(ct.idCita AS CHAR(36))) AS id, ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', 
+        $query = $this->ch->query("SELECT TRIM(CAST(ct.idCita AS CHAR(36))) AS id, ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', usEspe2.idpuesto as idPuesto,
             ct.fechaInicio AS occupied, ct.estatusCita AS estatus, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre, ct.idPaciente, us2.telefono_personal, CASE WHEN ofi.noficina IS NULL THEN 'VIRTUAL' ELSE ofi.noficina END as 'oficina',
-            CASE WHEN ofi.direccion IS NULL THEN 'VIRTUAL' ELSE ofi.direccion END as 'ubicación', sed.nsede AS sede, atc.idOficina, us2.mail_emp as correo, usEspe2.mail_emp as correoEspecialista, 
+            CASE WHEN ofi.direccion IS NULL THEN 'VIRTUAL' ELSE ofi.direccion END as 'ubicación', sed.nsede AS sede, atc.idOficina, us2.mail_emp as correo, usEspe2.mail_emp as correoEspecialista,  ct.idEspecialista,
             CONCAT(IFNULL(usEspe2.nombre_persona, ''), ' ', IFNULL(usEspe2.pri_apellido, ''), ' ', IFNULL(usEspe2.sec_apellido, '')) AS especialista, ct.idDetalle, usEspe2.telefono_personal as telefonoEspecialista,
             usEspe2.sexo as sexoEspecialista, tf.fechasFolio, ct.idEventoGoogle, ct.evaluacion,
             CASE 
