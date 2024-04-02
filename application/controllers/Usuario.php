@@ -304,7 +304,7 @@ class Usuario extends BaseController {
 		];
 
 		if(!isset($auth)){
-			$result->msg = 'Falta header de autorizacion';
+			$result->msg = 'Falta header de autorización';
 			$this->json($result, JSON_NUMERIC_CHECK);
 		}
 
@@ -316,7 +316,7 @@ class Usuario extends BaseController {
 	    }
 
 	    if(!isset($token)){
-			$result->msg = 'Falta token de autorizacion';
+			$result->msg = 'Falta token de autorización';
 			$this->json($result, JSON_NUMERIC_CHECK);
 		}
 
@@ -324,7 +324,7 @@ class Usuario extends BaseController {
 
 		list($numEmpleado, $password) = explode(":", $decoded);
 
-		$usuario = $this->UsuariosModel->login($numEmpleado, encriptar($password))->row();
+		$usuario = $this->UsuariosModel->login($numEmpleado, encriptar(trim($password)))->row();
 
 		if(!isset($usuario)){
 			$result->msg = 'No existe el usuario';
@@ -355,7 +355,7 @@ class Usuario extends BaseController {
 		];
 
 		if(!isset($auth)){
-			$result->msg = 'Falta header de autorizacion';
+			$result->msg = 'Falta header de autorización';
 			$this->json($result, JSON_NUMERIC_CHECK);
 		}
 
@@ -482,7 +482,7 @@ class Usuario extends BaseController {
 
 		$usuario = $decoded->data;
 
-		if($usuario->idRol != 1){
+		if($usuario->idRol != 4){
 			$result->msg = 'No tiene permisos para esta acción';
 			$this->json($result, JSON_NUMERIC_CHECK);
 		}
