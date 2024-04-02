@@ -1058,7 +1058,7 @@ class ReportesModel extends CI_Model {
           LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo ops ON ops.idOpcion = mpc.idMotivo AND ops.idCatalogo = cat.idCatalogo
         WHERE ct.idPaciente = $idUsuario AND oc.idCatalogo = 2 AND us2.idpuesto = $espe
         GROUP BY us2.nombre_persona, us2.pri_apellido,us2.sec_apellido,us3.nombre_persona, us3.pri_apellido,    
-          us3.sec_apellido, ct.idPaciente, ct.titulo, oc.nombre, ct.estatusCita, ct.idDetalle, ct.tipoCita, ct.fechaInicio, ct.fechaFinal
+          us3.sec_apellido, ct.idPaciente, ct.titulo, oc.nombre, ct.estatusCita, ct.idDetalle, ct.tipoCita, ct.fechaInicio, ct.fechaFinal, ops.nombre
         ORDER BY ct.fechaInicio, ct.fechaFinal DESC");
 
         return $query;
@@ -1089,7 +1089,7 @@ class ReportesModel extends CI_Model {
               LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo ops ON ops.idOpcion = mpc.idMotivo AND ops.idCatalogo = cat.idCatalogo
             WHERE ct.idPaciente = $idUsuario AND oc.idCatalogo = 2 AND us2.idpuesto = $espe AND es.idUsuario = $idEspe
             GROUP BY us2.nombre_persona, us2.pri_apellido,us2.sec_apellido,us3.nombre_persona, us3.pri_apellido,    
-              us3.sec_apellido, ct.idPaciente, ct.titulo, oc.nombre, ct.estatusCita, ct.idDetalle, ct.tipoCita, ct.fechaInicio, ct.fechaFinal
+              us3.sec_apellido, ct.idPaciente, ct.titulo, oc.nombre, ct.estatusCita, ct.idDetalle, ct.tipoCita, ct.fechaInicio, ct.fechaFinal, ops.nombre
             ORDER BY ct.fechaInicio, ct.fechaFinal DESC");
             return $query;
 
