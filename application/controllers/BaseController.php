@@ -10,12 +10,9 @@ abstract class BaseController extends CI_Controller{
         header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
         header('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Token, Authorization');
 
-    
-        $urls = array('192.168.30.128/auth/jwt/login','localhost','http://localhost','http://localhost:3030','http://192.168.30.128/auth/jwt/login','192.168.30.128','http://192.168.30.128:3030','127.0.0.1','https://rh.gphsis.com','rh.gphsis.com', 'https://prueba.gphsis.com/beneficiosmaderas', 'prueba.gphsis.com/beneficiosmaderas', 'https://prueba.gphsis.com', 'prueba.gphsis.com', 'https://beneficiosmaderasapi.gphsis.com', 'beneficiosmaderasapi.gphsis.com');
-        
-        // Lineas para la verificación de 
+        // Lineas para la verificación de token
         $allowed_routes = ['LoginController/login', 'Usuario/getUserByNumEmp', 'Usuario/sendMail', 'Usuario/GetToken', 'LoginController/addRegistroEmpleado',
-                            "Usuario/authorized"];
+                            "Usuario/authorized", "Api/confirmarPago", "Api/encodedHash", "Usuario/loginCH", "Usuario/updateCH", "Usuario/bajaCH"];
                             
         /* if (!isset($this->input->request_headers()['token']) AND !in_array($this->uri->uri_string(), $allowed_routes)) {
 
@@ -34,24 +31,10 @@ abstract class BaseController extends CI_Controller{
                 echo json_encode($response);
                 exit;
             }
-        } */
-
-        if(isset($this->input->request_headers()['origin']))
-            $origin = $this->input->request_headers()['origin'];
-        else if(array_key_exists('HTTP_ORIGIN',$_SERVER))
-            $origin = $_SERVER['HTTP_ORIGIN'];
-        else if(array_key_exists('HTTP_PREFERER',$_SERVER))
-            $origin = $_SERVER['HTTP_PREFERER'];
-        else
-            $origin = $_SERVER['HTTP_HOST'];
-        
+        }
 
         $this->load->database('default');
-        
-        //$this->load->helper(array('form','funciones'));
-
         $this->load->library('Token');
-        //$this->load->library('GoogleApi');
     }
 
     public function headers($key = null){

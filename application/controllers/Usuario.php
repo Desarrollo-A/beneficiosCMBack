@@ -557,13 +557,6 @@ class Usuario extends BaseController {
 		$data['data'] = $this->UsuariosModel->getToken($dt);
 	}
 
-	public function prueba(){
-
-		$data['data'] = $this->UsuariosModel->prueba()->result();
-		$this->output->set_content_type('application/json');
-		$this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
-	}
-
 	public function getUserByNumEmp(){
         $user = $this->input->post('dataValue[num_empleado]');
         $response['result'] = isset($user);
