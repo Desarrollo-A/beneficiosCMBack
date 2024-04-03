@@ -145,6 +145,7 @@ class UsuariosModel extends CI_Model {
 
 		if ($query->num_rows() > 0) {
 			echo json_encode(array("estatus" => true, "msj" => "Código correcto" ), JSON_NUMERIC_CHECK); 
+			$this->ch->query("DELETE FROM ". $this->schema_cm .".tokenregistro WHERE correo = ?", array("\"$correo\""));
 		}else{
 			echo json_encode(array("estatus" => false, "msj" => "El código insertado no es correcto"), JSON_NUMERIC_CHECK);
 		}
