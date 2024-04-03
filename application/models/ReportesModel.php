@@ -22,7 +22,7 @@ class ReportesModel extends CI_Model {
 			CONCAT (us3.nombre_persona,' ',us3.pri_apellido,' ',us3.sec_apellido) AS paciente, ps.nom_puesto AS area, sd.nsede AS sede,ct.titulo, op.nombre AS estatus, 
 			CONCAT(DATE_FORMAT(ct.fechaInicio, '%Y-%m-%d'), ' ', DATE_FORMAT(ct.fechaInicio, '%H:%i'), ' - ', DATE_FORMAT(ct.fechaFinal, '%H:%i')) AS horario, observaciones, us2.sexo, 
 			ofi.noficina AS oficina, ct.estatusCita, ct.fechaInicio, dep.ndepto AS depto, op2.nombre AS modalidad,
-			IFNULL(GROUP_CONCAT(ops.nombre SEPARATOR ', '), 'Sin motivos de cita') AS motivoCita, IFNULL(GROUP_CONCAT(oxc.nombre SEPARATOR ', '), 'Pendiente de pago') AS metodoPago,
+			IFNULL(GROUP_CONCAT(ops.nombre SEPARATOR ', '), 'SIN MOTIVOS DE CITA') AS motivoCita, IFNULL(oxc.nombre, 'Pendiente de pago') AS metodoPago,
 			CASE 
 		        WHEN ct.estatusCita = 0 THEN '#ff0000'
 		        WHEN ct.estatusCita = 1 AND axs.tipoCita = 1 THEN '#ffa500'
@@ -96,8 +96,8 @@ class ReportesModel extends CI_Model {
 			$query = $this->ch->query("SELECT ct.idCita, pa.idUsuario AS idColab, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista, 
 			CONCAT (us3.nombre_persona,' ',us3.pri_apellido,' ',us3.sec_apellido) AS paciente, ps.nom_puesto AS area, sd.nsede AS sede,ct.titulo, op.nombre AS estatus, 
 			CONCAT(DATE_FORMAT(ct.fechaInicio, '%Y-%m-%d'), ' ', DATE_FORMAT(ct.fechaInicio, '%H:%i'), ' - ', DATE_FORMAT(ct.fechaFinal, '%H:%i')) AS horario, observaciones, us2.sexo, 
-			ofi.noficina AS oficina, oxc.nombre AS metodoPago, ct.estatusCita, ct.fechaInicio, dep.ndepto AS depto, op2.nombre AS modalidad,
-			IFNULL(GROUP_CONCAT(ops.nombre SEPARATOR ', '), 'Sin motivos de cita') AS motivoCita,
+			ofi.noficina AS oficina, IFNULL(oxc.nombre, 'Pendiente de pago') AS metodoPago, ct.estatusCita, ct.fechaInicio, dep.ndepto AS depto, op2.nombre AS modalidad,
+			IFNULL(GROUP_CONCAT(ops.nombre SEPARATOR ', '), 'SIN MOTIVOS DE CITA') AS motivoCita,
 			CASE 
 		        WHEN ct.estatusCita = 0 THEN '#ff0000'
 		        WHEN ct.estatusCita = 1 AND axs.tipoCita = 1 THEN '#ffa500'
@@ -169,8 +169,8 @@ class ReportesModel extends CI_Model {
 			$query = $this->ch->query("SELECT ct.idCita, pa.idUsuario AS idColab, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista, 
 			CONCAT (us3.nombre_persona,' ',us3.pri_apellido,' ',us3.sec_apellido) AS paciente, ps.nom_puesto AS area, sd.nsede AS sede,ct.titulo, op.nombre AS estatus, 
 			CONCAT(DATE_FORMAT(ct.fechaInicio, '%Y-%m-%d'), ' ', DATE_FORMAT(ct.fechaInicio, '%H:%i'), ' - ', DATE_FORMAT(ct.fechaFinal, '%H:%i')) AS horario, observaciones, us2.sexo, 
-			ofi.noficina AS oficina, oxc.nombre AS metodoPago, ct.estatusCita, ct.fechaInicio, dep.ndepto AS depto, op2.nombre AS modalidad,
-			IFNULL(GROUP_CONCAT(ops.nombre SEPARATOR ', '), 'Sin motivos de cita') AS motivoCita,
+			ofi.noficina AS oficina, IFNULL(oxc.nombre, 'Pendiente de pago') AS metodoPago, ct.estatusCita, ct.fechaInicio, dep.ndepto AS depto, op2.nombre AS modalidad,
+			IFNULL(GROUP_CONCAT(ops.nombre SEPARATOR ', '), 'SIN MOTIVOS DE CITA') AS motivoCita,
 			CASE 
 		        WHEN ct.estatusCita = 0 THEN '#ff0000'
 		        WHEN ct.estatusCita = 1 AND axs.tipoCita = 1 THEN '#ffa500'
@@ -546,7 +546,7 @@ class ReportesModel extends CI_Model {
 				SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
 			FROM ". $this->schema_cm .".citas ct
 			INNER JOIN ". $this->schema_cm .".detallepagos dp ON dp.idDetalle = ct.idDetalle
-			WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+			WHERE (ct.fechaCreacion >= '$fechaI' AND ct.fechaCreacion < '$fechaF')
 			AND (dp.estatusPago = 1 OR dp.estatusPago = 3)
 			) AS sub");
 			return $query;
@@ -562,7 +562,7 @@ class ReportesModel extends CI_Model {
 			INNER JOIN ". $this->schema_cm .".detallepagos dp ON dp.idDetalle = ct.idDetalle
 			INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idEspecialista
 			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
-			WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+			WHERE (ct.fechaCreacion >= '$fechaI' AND ct.fechaCreacion < '$fechaF')
 			AND (dp.estatusPago = 1 OR dp.estatusPago = 3)
 			AND us2.npuesto IN ('$ar')
 			) AS sub");
@@ -580,7 +580,7 @@ class ReportesModel extends CI_Model {
 			INNER JOIN ". $this->schema_cm .".detallepagos dp ON dp.idDetalle = ct.idDetalle
 			INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idEspecialista
 			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
-			WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+			WHERE (ct.fechaCreacion >= '$fechaI' AND ct.fechaCreacion < '$fechaF')
 			AND (dp.estatusPago = 1 OR dp.estatusPago = 3)
 			AND us2.npuesto IN ('$ar') 
 			AND CONCAT(us2.nombre_persona,' ',us2.pri_apellido,' ',us2.sec_apellido) IN ('$nombres')
@@ -599,7 +599,7 @@ class ReportesModel extends CI_Model {
 			INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idEspecialista
 			LEFT JOIN ". $this->schema_cm .".atencionxsede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
 			LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-			WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+			WHERE (ct.fechaCreacion >= '$fechaI' AND ct.fechaCreacion < '$fechaF')
 			AND (dp.estatusPago = 1 OR dp.estatusPago = 3)
 			AND op2.nombre IN ('$modalidad')
 			) AS sub");
@@ -619,7 +619,7 @@ class ReportesModel extends CI_Model {
 			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
 			LEFT JOIN ". $this->schema_cm .".atencionxsede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
 			LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-			WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+			WHERE (ct.fechaCreacion >= '$fechaI' AND ct.fechaCreacion < '$fechaF')
 			AND (dp.estatusPago = 1 OR dp.estatusPago = 3)
 			AND op2.nombre IN ('$modalidad') AND us2.npuesto IN ('$ar')
 			) AS sub");
@@ -639,7 +639,7 @@ class ReportesModel extends CI_Model {
 			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
 			LEFT JOIN ". $this->schema_cm .".atencionxsede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
 			LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-			WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+			WHERE (ct.fechaCreacion >= '$fechaI' AND ct.fechaCreacion < '$fechaF')
 			AND (dp.estatusPago = 1 OR dp.estatusPago = 3)
 			AND CONCAT(us2.nombre_persona,' ',us2.pri_apellido,' ',us2.sec_apellido) IN ('$nombres') 
 			AND op2.nombre IN ('$modalidad')
@@ -656,7 +656,7 @@ class ReportesModel extends CI_Model {
 					FROM ". $this->schema_cm .".citas ct
 					INNER JOIN ". $this->schema_cm .".detallepagos dp ON dp.idDetalle = ct.idDetalle
 					INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idEspecialista
-					WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+					WHERE (ct.fechaCreacion >= '$fechaI' AND ct.fechaCreacion < '$fechaF')
 					AND (dp.estatusPago = 1 OR dp.estatusPago = 3)
 					AND us.idUsuario = $idUsr
 				) AS distinct_ct
@@ -676,7 +676,7 @@ class ReportesModel extends CI_Model {
 				INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idEspecialista
 				LEFT JOIN ". $this->schema_cm .".atencionxsede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
 				LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-				WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+				WHERE (ct.fechaCreacion >= '$fechaI' AND ct.fechaCreacion < '$fechaF')
 				AND (dp.estatusPago = 1 OR dp.estatusPago = 3)
 				AND us.idUsuario = $idUsr AND op2.nombre IN ('$modalidad')
 				) AS distinct_ct
@@ -695,7 +695,7 @@ class ReportesModel extends CI_Model {
 				SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
 			FROM ". $this->schema_cm .".citas ct
 			INNER JOIN ". $this->schema_cm .".detallepagos dp ON dp.idDetalle = ct.idDetalle
-			WHERE ct.estatusCita = $reporte AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+			WHERE ct.estatusCita = $reporte AND (ct.fechaCreacion >= '$fechaI' AND ct.fechaCreacion < '$fechaF')
 			AND (dp.estatusPago = 1 OR dp.estatusPago = 3)
 			) AS sub");
 			return $query;
@@ -710,7 +710,7 @@ class ReportesModel extends CI_Model {
 			INNER JOIN ". $this->schema_cm .".detallepagos dp ON dp.idDetalle = ct.idDetalle
 			INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idEspecialista
 			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
-			WHERE ct.estatusCita = $reporte AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+			WHERE ct.estatusCita = $reporte AND (ct.fechaCreacion >= '$fechaI' AND ct.fechaCreacion < '$fechaF')
 			AND (dp.estatusPago = 1 OR dp.estatusPago = 3)
 			AND us2.npuesto IN ('$ar')
 			) AS sub");
@@ -728,7 +728,7 @@ class ReportesModel extends CI_Model {
 			INNER JOIN ". $this->schema_cm .".detallepagos dp ON dp.idDetalle = ct.idDetalle
 			INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idEspecialista
 			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
-			WHERE ct.estatusCita = $reporte AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+			WHERE ct.estatusCita = $reporte AND (ct.fechaCreacion >= '$fechaI' AND ct.fechaCreacion < '$fechaF')
 			AND (dp.estatusPago = 1 OR dp.estatusPago = 3)
 			AND us2.npuesto IN ('$ar')
 			AND CONCAT(us2.nombre_persona,' ',us2.pri_apellido,' ',us2.sec_apellido) IN ('$nombres') 
@@ -746,7 +746,7 @@ class ReportesModel extends CI_Model {
 			INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idEspecialista
 			LEFT JOIN ". $this->schema_cm .".atencionxsede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
 			LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-			WHERE ct.estatusCita = $reporte AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+			WHERE ct.estatusCita = $reporte AND (ct.fechaCreacion >= '$fechaI' AND ct.fechaCreacion < '$fechaF')
 			AND (dp.estatusPago = 1 OR dp.estatusPago = 3)
 			AND op2.nombre IN ('$modalidad')
 			) AS sub");
@@ -767,7 +767,7 @@ class ReportesModel extends CI_Model {
 			LEFT JOIN ". $this->schema_cm .".atencionxsede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
 			LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
 			WHERE ct.estatusCita = $reporte
-			AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+			AND (ct.fechaCreacion >= '$fechaI' AND ct.fechaCreacion < '$fechaF')
 			AND (dp.estatusPago = 1 OR dp.estatusPago = 3)
 			AND CONCAT(us2.nombre_persona,' ',us2.pri_apellido,' ',us2.sec_apellido) IN ('$nombres') 
 			AND op2.nombre IN ('$modalidad')
@@ -788,7 +788,7 @@ class ReportesModel extends CI_Model {
 			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
 			LEFT JOIN  ". $this->schema_cm .".atencionxsede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
 			LEFT JOIN  ". $this->schema_cm .".opcionesporcatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-			WHERE ct.estatusCita = $reporte AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+			WHERE ct.estatusCita = $reporte AND (ct.fechaCreacion >= '$fechaI' AND ct.fechaCreacion < '$fechaF')
 			AND (dp.estatusPago = 1 OR dp.estatusPago = 3)
 			AND op2.nombre IN ('$modalidad') AND us2.npuesto IN ('$ar')
 			) AS sub");
@@ -805,7 +805,7 @@ class ReportesModel extends CI_Model {
 				INNER JOIN ". $this->schema_cm .".detallepagos dp ON dp.idDetalle = ct.idDetalle
 				INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idEspecialista
 				WHERE ct.estatusCita = $reporte
-				AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+				AND (ct.fechaCreacion >= '$fechaI' AND ct.fechaCreacion < '$fechaF')
 				AND (dp.estatusPago = 1 OR dp.estatusPago = 3)
 				AND us.idUsuario = $idUsr
 				) AS distinct_ct
@@ -827,7 +827,7 @@ class ReportesModel extends CI_Model {
 				LEFT JOIN ". $this->schema_cm .".atencionxsede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
 				LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
 				WHERE ct.estatusCita = $reporte
-				AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+				AND (ct.fechaCreacion >= '$fechaI' AND ct.fechaCreacion < '$fechaF')
 				AND (dp.estatusPago = 1 OR dp.estatusPago = 3)
 				AND us.idUsuario = $idUsr AND op2.nombre IN ('$modalidad')
 				) AS distinct_ct
@@ -845,7 +845,7 @@ class ReportesModel extends CI_Model {
 			FROM ( SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
 			FROM ". $this->schema_cm .".citas ct
 			INNER JOIN ". $this->schema_cm .".detallepagos dp ON dp.idDetalle = ct.idDetalle
-			WHERE (ct.estatusCita = 2 OR ct.estatusCita = 7) AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+			WHERE (ct.estatusCita = 2 OR ct.estatusCita = 7) AND (ct.fechaCreacion >= '$fechaI' AND ct.fechaCreacion < '$fechaF')
 			) AS sub");
 			return $query;
 
@@ -860,7 +860,7 @@ class ReportesModel extends CI_Model {
 			INNER JOIN ". $this->schema_cm .".detallepagos dp ON dp.idDetalle = ct.idDetalle
 			INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idEspecialista
 			WHERE (ct.estatusCita = 2 OR ct.estatusCita = 7) 
-			AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+			AND (ct.fechaCreacion >= '$fechaI' AND ct.fechaCreacion < '$fechaF')
 			AND (dp.estatusPago = 1 OR dp.estatusPago = 3)
 			AND ps.puesto IN ('$ar')
 			) AS sub");
@@ -877,7 +877,7 @@ class ReportesModel extends CI_Model {
 			INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idEspecialista
 			LEFT JOIN ". $this->schema_cm .".atencionxsede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
 			LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-			WHERE (ct.estatusCita = 2 OR ct.estatusCita = 7) AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+			WHERE (ct.estatusCita = 2 OR ct.estatusCita = 7) AND (ct.fechaCreacion >= '$fechaI' AND ct.fechaCreacion < '$fechaF')
 			AND (dp.estatusPago = 1 OR dp.estatusPago = 3)
 			AND op2.nombre IN ('$modalidad')
 			) AS sub");
@@ -894,7 +894,7 @@ class ReportesModel extends CI_Model {
 			INNER JOIN ". $this->schema_cm .".detallepagos dp ON dp.idDetalle = ct.idDetalle
 			INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idEspecialista
 			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
-			WHERE (ct.estatusCita = 2 OR ct.estatusCita = 7) AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+			WHERE (ct.estatusCita = 2 OR ct.estatusCita = 7) AND (ct.fechaCreacion >= '$fechaI' AND ct.fechaCreacion < '$fechaF')
 			AND (dp.estatusPago = 1 OR dp.estatusPago = 3)
 			AND us2.npuesto IN ('$ar') 
 			AND CONCAT(us2.nombre_persona,' ',us2.pri_apellido,' ',us2.sec_apellido) IN ('$nombres') 
@@ -915,7 +915,7 @@ class ReportesModel extends CI_Model {
 			LEFT JOIN ". $this->schema_cm .".atencionxsede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
 			LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
 			WHERE (ct.estatusCita = 2 OR ct.estatusCita = 7)
-			AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+			AND (ct.fechaCreacion >= '$fechaI' AND ct.fechaCreacion < '$fechaF')
 			AND (dp.estatusPago = 1 OR dp.estatusPago = 3)
 			AND CONCAT(us2.nombre_persona,' ',us2.pri_apellido,' ',us2.sec_apellido) IN ('$nombres')  
 			AND op2.nombre IN ('$modalidad')
@@ -936,7 +936,7 @@ class ReportesModel extends CI_Model {
 			LEFT JOIN ". $this->schema_cm .".atencionxsede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
 			LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
 			WHERE (ct.estatusCita = 2 OR ct.estatusCita = 7) 
-			AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+			AND (ct.fechaCreacion >= '$fechaI' AND ct.fechaCreacion < '$fechaF')
 			AND (dp.estatusPago = 1 OR dp.estatusPago = 3)
 			AND op2.nombre IN ('$modalidad') AND us2.npuesto IN ('$ar')
 			) AS sub");
@@ -953,7 +953,7 @@ class ReportesModel extends CI_Model {
 				INNER JOIN ". $this->schema_cm .".detallepagos dp ON dp.idDetalle = ct.idDetalle
 				INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idEspecialista
 				WHERE (ct.estatusCita = 2 OR ct.estatusCita = 7)
-				AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+				AND (ct.fechaCreacion >= '$fechaI' AND ct.fechaCreacion < '$fechaF')
 				AND (dp.estatusPago = 1 OR dp.estatusPago = 3)
 				AND us.idUsuario = $idUsr
 				) AS distinct_ct
@@ -975,7 +975,7 @@ class ReportesModel extends CI_Model {
 				LEFT JOIN ". $this->schema_cm .".atencionxsede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
 				LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
 				WHERE (ct.estatusCita = 2 OR ct.estatusCita = 7)
-				AND (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
+				AND (ct.fechaCreacion >= '$fechaI' AND ct.fechaCreacion < '$fechaF')
 				AND (dp.estatusPago = 1 OR dp.estatusPago = 3)
 				AND us.idUsuario = $idUsr AND op2.nombre IN ('$modalidad')
 				) AS distinct_ct
@@ -1038,7 +1038,7 @@ class ReportesModel extends CI_Model {
         CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista, ct.idPaciente, ct.titulo,
         oc.nombre AS estatus, ct.estatusCita, ct.idDetalle AS pago, ct.tipoCita,
         CONCAT(DATE_FORMAT(ct.fechaInicio, '%Y-%m-%d'), ' ', DATE_FORMAT(ct.fechaInicio, '%H:%i'), ' - ', DATE_FORMAT(ct.fechaFinal, '%H:%i')) AS horario,
-        IFNULL(GROUP_CONCAT(ops.nombre SEPARATOR ', '), 'Sin motivos de cita') AS motivoCita
+        IFNULL(GROUP_CONCAT(ops.nombre SEPARATOR ', '), 'SIN MOTIVOS DE CITA') AS motivoCita
         FROM ". $this->schema_cm .".citas ct 
         INNER JOIN ". $this->schema_cm .".catalogos ca ON ca.idCatalogo = 2
         INNER JOIN ". $this->schema_cm .".opcionesporcatalogo oc ON oc.idCatalogo = ca.idCatalogo AND oc.idOpcion = ct.estatusCita
@@ -1069,7 +1069,7 @@ class ReportesModel extends CI_Model {
             CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista, ct.idPaciente, ct.titulo, 
             oc.nombre AS estatus, ct.estatusCita, ct.idDetalle AS pago, ct.tipoCita,
             CONCAT(DATE_FORMAT(ct.fechaInicio, '%Y-%m-%d'), ' ', DATE_FORMAT(ct.fechaInicio, '%H:%i'), ' - ', DATE_FORMAT(ct.fechaFinal, '%H:%i')) AS horario,
-            IFNULL(GROUP_CONCAT(ops.nombre SEPARATOR ', '), 'Sin motivos de cita') AS motivoCita
+            IFNULL(GROUP_CONCAT(ops.nombre SEPARATOR ', '), 'SIN MOTIVOS DE CITA') AS motivoCita
             FROM ". $this->schema_cm .".citas ct 
             INNER JOIN ". $this->schema_cm .".catalogos ca ON ca.idCatalogo = 2
             INNER JOIN ". $this->schema_cm .".opcionesporcatalogo oc ON oc.idCatalogo = ca.idCatalogo AND oc.idOpcion = ct.estatusCita
