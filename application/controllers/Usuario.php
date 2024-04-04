@@ -37,9 +37,9 @@ class Usuario extends BaseController {
 
 	public function menu()
 	{
-		$headers = (object) $this->input->request_headers();
+		$token = $this->headers('Token');
 
-		$data = explode('.', $headers->token);
+		$data = explode('.', $token);
 		$user = json_decode(base64_decode($data[2]));
 
 		$id_user = intval($user->idUsuario);

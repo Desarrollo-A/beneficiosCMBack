@@ -116,8 +116,8 @@ class LoginController extends BaseController {
 	}
 
 	public function check(){
-		$headers = (object) $this->input->request_headers();
-		$data = explode('.', $headers->token);
+		$token = $this->headers('Token');
+		$data = explode('.', $token);
 		$user = json_decode(base64_decode($data[2]));
 
 		echo json_encode(array('user' => $user, 'result' => 1), JSON_NUMERIC_CHECK);
