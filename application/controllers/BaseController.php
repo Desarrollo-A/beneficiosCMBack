@@ -17,8 +17,6 @@ abstract class BaseController extends CI_Controller{
         header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
         header('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Token, Authorization');
 
-        $urls = array('192.168.30.128/auth/jwt/login','localhost','http://localhost','http://localhost:3030','http://192.168.30.128/auth/jwt/login','192.168.30.128','http://192.168.30.128:3030','127.0.0.1','https://rh.gphsis.com','rh.gphsis.com', 'https://prueba.gphsis.com/beneficiosmaderas', 'prueba.gphsis.com/beneficiosmaderas', 'https://prueba.gphsis.com', 'prueba.gphsis.com', 'https://beneficiosmaderasapi.gphsis.com', 'beneficiosmaderasapi.gphsis.com');
-        
         // Lineas para la verificación de 
         $allowed_routes = ['LoginController/login', 'Usuario/getUserByNumEmp', 'Usuario/sendMail', 'Usuario/GetToken', 'LoginController/addRegistroEmpleado',
                             "Usuario/authorized", "Api/confirmarPago", "Api/encodedHash", "Usuario/loginCH", "Usuario/updateCH", "Usuario/bajaCH"];
@@ -28,7 +26,6 @@ abstract class BaseController extends CI_Controller{
         if(!in_array($uri, $allowed_routes)){
             $response['status'] = 'error';
 
-            /* if ($_SERVER['REQUEST_METHOD'] !== 'OPTIONS') { */
                 $token = $this->headers('Token');
 
                 if($token){
@@ -46,7 +43,6 @@ abstract class BaseController extends CI_Controller{
                     $response['msg'] = 'Falta token';
                     $this->json($response);
                 }
-            /* } */
         }
     }
 
