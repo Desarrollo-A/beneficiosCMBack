@@ -401,7 +401,7 @@ class CalendarioController extends BaseController{
 			} else if ($checkOccupied->num_rows() > 0) {
 				$response["result"] = false;
 				$response["msg"] = "Horario no disponible";
-			}  else if ($checkUser->num_rows() < 0 && $reagenda < 0) {
+			}  else if ($checkUser->num_rows() == 0 && $reagenda == 0) {
 				$response["result"] = false;
 				$response["msg"] = " El paciente debe finalizar sus beneficios mensuales";
 			} else if($checkUser->num_rows() === 0 && $reagenda == 1 && $month != date('m') || $checkUser->num_rows() === 0 && $reagenda == 1 && $year != date('Y')){
@@ -1031,7 +1031,7 @@ class CalendarioController extends BaseController{
 		$cantidad = $this->input->post('dataValue[cantidad]');
 		$metodoPago = $this->input->post('dataValue[metodoPago]');
 		$estatusPago = $this->input->post('dataValue[estatusPago]');
-		$fechaPago = $metodoPago === 11 ? $fecha : $this->input->post('dataValue[fechaPago]');
+		$fechaPago = $metodoPago == 7 ? $fecha : $this->input->post('dataValue[fechaPago]');
 		
 		$response['result'] = isset($usuario, $folio, $referencia, $concepto, $cantidad, $metodoPago, $estatusPago, $fechaPago);
 		if ($response['result']) {
@@ -1049,10 +1049,9 @@ class CalendarioController extends BaseController{
 				"modificadoPor" => $usuario,
 				"fechaModificacion" => $fecha
 			];
-			$response["result"] = $this->GeneralModel->addRecord("detallePagos", $values);
+			$response["result"] = $this->GeneralModel->addRecord("detallepagos", $values);
 			if ($response["result"]) {
-				$rs = $this->calendarioModel->getDetallePago($folio)->result();
-
+				$rs = $this->CalendarioModel->getDetallePago($folio)->result();
 				if (!empty($rs) && isset($rs[0]->idDetalle)) {
 					$response["data"] = $rs[0]->idDetalle;
 					$partes = explode('-', $referencia);

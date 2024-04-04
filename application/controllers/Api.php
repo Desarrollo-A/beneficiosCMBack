@@ -7,6 +7,7 @@ class Api extends BaseController{
     public function __construct(){
 		parent::__construct();
 		$this->load->model('GeneralModel');
+		$this->load->model('CalendarioModel');
 		$this->load->helper(array('form','funciones'));
 		$this->ch = $this->load->database('ch', TRUE);
 	}
@@ -72,7 +73,7 @@ class Api extends BaseController{
 					if ($concepto == 1) { // Actualizamos el id de cita
 						$upd = [
 							"idDetalle" => $rs,
-							"estatusCita" => $estatusPago == 2 ? 6 : 1,
+							"estatusCita" => $estatusPago == 2 ? null : 1,
 							"modificadoPor" => $usuario,
 							"fechaModificacion" => $fecha,
 						];
@@ -100,4 +101,10 @@ class Api extends BaseController{
 		// $this->output->set_content_type('application/json');
 		// $this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
     }
+
+	public function tareaCancelaCitasSinPago()
+	{
+		$citasEnProcesoPago = $this->CalendarioModel->tareaCancelaCitasSinPago();
+		echo $citasEnProcesoPago;
+	}
 }

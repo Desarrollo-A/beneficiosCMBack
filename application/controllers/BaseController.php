@@ -12,9 +12,9 @@ abstract class BaseController extends CI_Controller{
 
         // Lineas para la verificación de token
         $allowed_routes = ['LoginController/login', 'Usuario/getUserByNumEmp', 'Usuario/sendMail', 'Usuario/GetToken', 'LoginController/addRegistroEmpleado',
-                            "Usuario/authorized", "Api/confirmarPago", "Api/encodedHash", "Usuario/loginCH", "Usuario/updateCH", "Usuario/bajaCH"];
+                            "Usuario/authorized", "Api/confirmarPago", "Api/encodedHash", "Usuario/loginCH", "Usuario/updateCH", "Usuario/bajaCH", "Api/tareaCancelaCitasSinPago"];
                             
-        /* if (!isset($this->input->request_headers()['token']) AND !in_array($this->uri->uri_string(), $allowed_routes)) {
+        if (!isset($this->input->request_headers()['token']) AND !in_array($this->uri->uri_string(), $allowed_routes)) {
 
             $token = $this->headers('token');
             $datosToken = json_decode(base64_decode(explode(".", $token)[1]));

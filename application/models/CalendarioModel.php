@@ -592,11 +592,31 @@ class CalendarioModel extends CI_Model
             INNER JOIN ". $this->schema_cm .".usuarios AS usEspe ON usEspe.idUsuario = ct.idEspecialista
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS usEspe2 ON usEspe2.idcontrato = usEspe.idContrato
             INNER JOIN ". $this->schema_cm .".atencionxsede AS atc ON atc.idAtencionXSede = ct.idAtencionXSede  
-            LEFT join ". $this->schema_ch .".beneficioscm_vista_oficinas AS ofi ON ofi.idoficina = atc.idOficina
-            INNER join ". $this->schema_ch .".beneficioscm_vista_sedes AS sed ON sed.idSede = atc.idSede
+            LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_oficinas AS ofi ON ofi.idoficina = atc.idOficina
+            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_sedes AS sed ON sed.idSede = atc.idSede
 		    LEFT JOIN (SELECT idDetalle, GROUP_CONCAT(DATE_FORMAT(fechaInicio, '%d / %m / %Y A las %H:%i horas.'), '') AS fechasFolio FROM ". $this->schema_cm .".citas WHERE estatusCita IN(8) GROUP BY idDetalle) tf ON tf.idDetalle = ct.idDetalle 
             INNER JOIN ". $this->schema_cm .".encuestascreadas AS ec ON ec.idArea = usEspe2.idPuesto
             WHERE ct.estatusCita IN(?) AND ct.evaluacion is NULL AND ct.idPaciente = ? AND (ec.idPregunta = 1 AND ec.estatus = 1)", array(4, $idUsuario));
+
+        return $query;
+    }
+
+    // Actualiza cita de usuarios y cancela dependiendo el origen, las agendadas por especialista cancela a las 24 horas y si no es a los 10 min
+    public function tareaCancelaCitasSinPago(){
+        $query = $this->ch->query(
+            "UPDATE ". $this->schema_cm .".citas
+            SET estatusCita = 2, modificadoPor = 1, fechaModificacion = CURRENT_TIMESTAMP()
+            WHERE idCita IN (
+              SELECT id FROM (
+                SELECT idCita as id FROM ". $this->schema_cm .".citas 
+                WHERE estatus = 1 AND 
+                ((estatusCita = 9 AND fechaIntentoPago IS NOT NULL
+                AND tipoCita IN (1, 2) AND NOW() >= fechaIntentoPago + INTERVAL 10 MINUTE ) 
+                OR 
+                (estatusCita = 6 AND fechaCreacion IS NOT NULL
+                AND tipoCita IN (3) AND NOW() >= fechaCreacion + INTERVAL 24 HOUR ))
+              ) AS tmp
+            );");
 
         return $query;
     }

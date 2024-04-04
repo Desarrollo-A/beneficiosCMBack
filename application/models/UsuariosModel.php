@@ -154,7 +154,7 @@ class UsuariosModel extends CI_Model {
     {
         $query = $this->ch->query(
         "SELECT *FROM ". $this->schema_ch .".beneficioscm_vista_usuarios AS us
-        WHERE us.num_empleado = ?;", array( $numEmpleado ));
+        WHERE us.num_empleado = ? ;", array( $numEmpleado ));
         return $query;
     }
 }
