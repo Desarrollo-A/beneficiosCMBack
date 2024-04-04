@@ -8,7 +8,6 @@ class GeneralController extends BaseController {
 	public function __construct()
 	{
 		parent::__construct();
-		$this->load->database('default');
 		$this->load->model('GeneralModel');
 	}
 
@@ -46,13 +45,6 @@ class GeneralController extends BaseController {
 	public function getSede(){
 		$dt = $this->input->post('dataValue', true);
 		$data['data'] = $this->GeneralModel->getSede($dt)->result();
-		$this->output->set_content_type('application/json');
-        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
-	}
-
-	public function getPacientes(){
-		$dt = $this->input->post('dataValue', true);
-		$data['data'] = $this->GeneralModel->getPacientes($dt)->result();
 		$this->output->set_content_type('application/json');
         $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
 	}
@@ -96,15 +88,6 @@ class GeneralController extends BaseController {
         $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
 	}
 
-	public function getAppointmentHistory(){
-
-        $dt = $this->input->post('dataValue', true);
-		$data['data'] = $this->GeneralModel->getAppointmentHistory($dt)->result();
-		$this->output->set_content_type('application/json');
-        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
-
-    }
-
 	public function getEstatusPaciente(){
         $data['data'] = $this->GeneralModel->getEstatusPaciente()->result();
 		$this->output->set_content_type('application/json');
@@ -125,7 +108,7 @@ class GeneralController extends BaseController {
 						"estatusNut" => $estatus,
 					);
 							
-					$response=$this->GeneralModel->updateRecord('detallePaciente', $data, 'idDetallePaciente', $id);
+					$response=$this->GeneralModel->updateRecord('PRUEBA_beneficiosCM.detallepaciente', $data, 'idDetallePaciente', $id);
 					echo json_encode(array("estatus" => true, "msj" => "Estatus actualizado!" ), JSON_NUMERIC_CHECK);
 								
 				}else{
@@ -141,7 +124,7 @@ class GeneralController extends BaseController {
 						"estatusPsi" => $estatus,
 					);
 							
-					$response=$this->GeneralModel->updateRecord('detallePaciente', $data, 'idDetallePaciente', $id);
+					$response=$this->GeneralModel->updateRecord('PRUEBA_beneficiosCM.detallepaciente', $data, 'idDetallePaciente', $id);
 					echo json_encode(array("estatus" => true, "msj" => "Estatus actualizado!" ), JSON_NUMERIC_CHECK);
 								
 				}else{
@@ -157,7 +140,7 @@ class GeneralController extends BaseController {
 						"estatusQB" => $estatus,
 					);
 							
-					$response=$this->GeneralModel->updateRecord('detallePaciente', $data, 'idDetallePaciente', $id);
+					$response=$this->GeneralModel->updateRecord('PRUEBA_beneficiosCM.detallepaciente', $data, 'idDetallePaciente', $id);
 					echo json_encode(array("estatus" => true, "msj" => "Estatus actualizado!" ), JSON_NUMERIC_CHECK);
 								
 				}else{
@@ -173,7 +156,7 @@ class GeneralController extends BaseController {
 						"estatusGE" => $estatus,
 					);
 							
-					$response=$this->GeneralModel->updateRecord('detallePaciente', $data, 'idDetallePaciente', $id);
+					$response=$this->GeneralModel->updateRecord('PRUEBA_beneficiosCM.detallepaciente', $data, 'idDetallePaciente', $id);
 					echo json_encode(array("estatus" => true, "msj" => "Estatus actualizado!" ), JSON_NUMERIC_CHECK);
 								
 				}else{
@@ -218,6 +201,13 @@ class GeneralController extends BaseController {
 	public function getCitas(){
 		$dt = $this->input->post('dataValue', true);
 		$data['data'] = $this->GeneralModel->getCitas($dt)->result();
+		
+		$this->output->set_content_type("application/json");
+		$this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
+
+	public function getEstatusCitas(){
+		$data['data'] = $this->GeneralModel->getEstatusCitas()->result();
 		
 		$this->output->set_content_type("application/json");
 		$this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));

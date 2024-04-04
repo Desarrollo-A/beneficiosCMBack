@@ -12,6 +12,7 @@ class GestorController extends BaseController {
 		$this->load->database('default');
 		$this->load->model('GestorModel');
 		$this->load->model('GeneralModel');
+		$this->ch = $this->load->database('ch', TRUE);
 
 	}
 
@@ -72,7 +73,7 @@ class GestorController extends BaseController {
 			$response["msg"] = 'La atención por sede ya ha sido asignada anteriormente';
 		}
 		else{
-			$data = $this->GeneralModel->addRecord('atencionXSede', $data);
+			$data = $this->GeneralModel->addRecord('atencionxsede', $data);
 
 			if($data){
 				$response["result"] = true;
@@ -117,7 +118,7 @@ class GestorController extends BaseController {
 				"tipoCita" => $modalidad
 			);
 
-			$updateRecord = $this->GeneralModel->updateRecord('atencionXSede', $data, 'idAtencionXSede', $idAts);
+			$updateRecord = $this->GeneralModel->updateRecord('atencionxsede', $data, 'idAtencionXSede', $idAts);
 
 			if($updateRecord){
 				$response["result"] = true;
@@ -142,7 +143,7 @@ class GestorController extends BaseController {
 			"idEspecialista" => $idEspe,
 		);
 
-		$response=$this->GeneralModel->updateRecord('atencionXSede', $data, 'idAtencionXSede', $id);
+		$this->GeneralModel->updateRecord('PRUEBA_beneficiosCM.atencionxsede', $data, 'idAtencionXSede', $id);
 		echo json_encode(array("estatus" => true, "msj" => "Estatus Actualizado!" ));
 				
 	}
@@ -164,7 +165,7 @@ class GestorController extends BaseController {
 			"modificadoPor" => $modificadoPor,
 		);
 
-		$response=$this->GeneralModel->updateRecord('oficinas', $data, 'idOficina', $idOficina);
+		$this->GeneralModel->updateRecord('oficinas', $data, 'idOficina', $idOficina);
 		echo json_encode(array("estatus" => true, "msj" => "Datos Actualizados!" ));
 				
 	}
@@ -184,18 +185,15 @@ class GestorController extends BaseController {
 			"modificadoPor" => $modificadoPor,
 		);
 
-		$response=$this->GeneralModel->updateRecord('sedes', $data, 'idSede', $idSede);
+		$this->GeneralModel->updateRecord('sedes', $data, 'idSede', $idSede);
 		echo json_encode(array("estatus" => true, "msj" => "Datos Actualizados!" ));
 				
 	}
 
 	public function getEsp(){
-		$areas = $this->input->get('areas');
-		$data = $this->GestorModel->getEsp($areas);
-		// $this->output->set_content_type('application/json');
-        // $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
-
-		$this->json($data);
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->GestorModel->getEsp($dt);
+		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
 	public function getAtencionXsedeEsp(){
@@ -211,7 +209,7 @@ class GestorController extends BaseController {
 		$this->output->set_content_type('application/json');
         $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
 	}
-
+ 
 	public function insertOficinas(){
 		$dt = $this->input->post('dataValue', true);
 		$data['data'] = $this->GestorModel->insertOficinas($dt);
@@ -240,7 +238,7 @@ class GestorController extends BaseController {
 		}
 
 		$this->output->set_content_type('application/json');
-		$this->output->set_output(json_encode($response));
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
 	public function getAreas(){
@@ -258,7 +256,7 @@ class GestorController extends BaseController {
 		}
 
 		$this->output->set_content_type('application/json');
-		$this->output->set_output(json_encode($response));
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
 	public function updateArea(){
@@ -276,21 +274,24 @@ class GestorController extends BaseController {
 			"modalidad"    => $getAxs->result()[0]->tipoCita
 		];
 
-		if($idArea == 0)
-			$checkAxs = $this->GestorModel->checkAxsNull($checkData);
-		else
-			$checkAxs = $this->GestorModel->checkAxs($checkData, $checkData["idArea"]);
+		$checkAxs = $this->GestorModel->checkAxsId($checkData, $checkData["idArea"], $idAts);
+
+		$checkAxsArea = $this->GestorModel->checkAxsArea($checkData, $idAts);
 
 		if($checkAxs->num_rows() > 0){
 			$response["result"] = false;
 			$response["msg"] = 'La atención por sede ya ha sido asignada anteriormente';
+		}
+		else if($idArea == '0' && $checkAxsArea->num_rows() > 0 ){
+			$response["result"] = false;
+			$response["msg"] = 'No puede haber más atenciónes con esa área';
 		}
 		else{
 			$data = array(
 				"idArea" => $idAreaInsert
 			);
 
-			$updateRecord = $this->GeneralModel->updateRecord('atencionXSede', $data, 'idAtencionXSede', $idAts);
+			$updateRecord = $this->GeneralModel->updateRecord('PRUEBA_beneficiosCM.atencionxsede', $data, 'idAtencionXSede', $idAts);
 
 			if($updateRecord){
 				$response["result"] = true;
@@ -306,4 +307,26 @@ class GestorController extends BaseController {
 		$this->output->set_output(json_encode($response));
 	}
 
+	public function updateEstatus(){
+		$dataValue = $this->input->post("dataValue", true);
+		$id = $dataValue["idDetallePnt"];
+
+		$data = [
+			"estatus" => intval($dataValue["estatus"])
+		];
+
+		$updateRecord = $this->GeneralModel->updateRecord("PRUEBA_beneficiosCM.atencionxsede", $data, "idAtencionXSede", $id);
+
+		if($updateRecord){
+			$response["result"] = true;
+			$response["msg"] = "Se ha actualizado el estatus";
+		}
+		else{
+			$response["result"] = false;
+			$response["msg"] = "Ha ocurrido un error al actualizar";
+		}
+
+		$this->output->set_content_type('application/json');
+		$this->output->set_output(json_encode($response));
+	}
 }

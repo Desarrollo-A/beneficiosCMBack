@@ -7,26 +7,35 @@ class AvisosPrivacidadController extends BaseController
 	public function __construct()
 	{
 		parent::__construct();
-
-		$this->load->model('calendarioModel');
-		$this->load->model('avisosPrivacidadModel');
-		$this->load->model('generalModel');
-		$this->load->model('usuariosModel');
-
+		$this->ch = $this->load->database('ch', TRUE);
+		$this->load->model('CalendarioModel');
+		$this->load->model('AvisosPrivacidadModel');
+		$this->load->model('GeneralModel');
+		$this->load->model('UsuariosModel');
 		date_default_timezone_set('America/Mexico_City');
 	}
 
-
 	function getEspecialidades(){
-		$data['data'] = $this->avisosPrivacidadModel->getEspecialidades();
+		$data['data'] = $this->AvisosPrivacidadModel->getEspecialidades();
 		$this->output->set_content_type('application/json');
 		$this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
 	}
 
-	function getAvisoPrivacidad($idEspecialidad){
-		$data = $this->avisosPrivacidadModel->getAvisoPrivacidadByEsp($idEspecialidad);
+	function getAvisoPrivacidad(){
+		$idEspecialidad = $this->input->post('dataValue[idEspecialidad]');
+
+		$data = $this->AvisosPrivacidadModel->getAvisoPrivacidadByEsp($idEspecialidad);
+
+		$fileName = $data['base_url'] = base_url() . '/dist/documentos/avisos-privacidad/' . $data[0]['expediente'];
+
 		$this->output->set_content_type('application/json');
-		$this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+
+		$content = @file_get_contents($fileName);
+		if ($content !== false) {
+			$this->output->set_output(json_encode($this->AvisosPrivacidadModel->getAvisoPrivacidadByEsp($idEspecialidad), JSON_NUMERIC_CHECK));
+		} else {
+			$this->output->set_output(json_encode(false, JSON_NUMERIC_CHECK));
+		}
 	}
 
 	function actualizarArchivoPrivacidad(){
@@ -51,7 +60,7 @@ class AvisosPrivacidadController extends BaseController
 						//acciónEditar
 						if ($accion == 2) {
 							$idDocumento = $this->input->post('idDocumento');
-							$validacionRama = $this->avisosPrivacidadModel->revisaRamaActiva($idDocumento);
+							$validacionRama = $this->AvisosPrivacidadModel->revisaRamaActiva($idDocumento);
 
 							if (count($validacionRama) > 0) {
 								$updateDocumentData = array(
@@ -59,7 +68,7 @@ class AvisosPrivacidadController extends BaseController
 									"fechaModificacion" => date_format($dataExpedienteGenerado['date'], "Y-m-d H:i:s"),
 									"modificadoPor" => $this->session->userdata('id_usuario')
 								);
-								$result = $this->generalModel->updateRecord("historialDocumento", $updateDocumentData, "idDocumento", $idDocumento);
+								$result = $this->GeneralModel->updateRecord("PRUEBA_beneficiosCM.historialdocumento", $updateDocumentData, "idDocumento", $idDocumento);
 								$archivoAnterior = $validacionRama[0]['expediente'];
 								$rutaArchivo = 'dist/documentos/avisos-privacidad/';
 								$rutaEliminarArchivo =  $rutaArchivo.$archivoAnterior;
@@ -73,7 +82,7 @@ class AvisosPrivacidadController extends BaseController
 							$insertDocumentData = array(
 								"movimiento" => 'Se sube un nuevo archivo por usuario',
 								"expediente" => $dataExpedienteGenerado['expediente'],
-								"status" => 1,
+								"estatus" => 1,
 								"tipoDocumento" => 1,
 								"tipoEspecialidad" => $idEspecialidad,
 								"creadoPor" => $id_usuario_actual,
@@ -82,7 +91,7 @@ class AvisosPrivacidadController extends BaseController
 								"modificadoPor" => $id_usuario_actual
 							);
 
-							$result = $this->generalModel->addRecord('historialDocumento', $insertDocumentData);
+							$result = $this->GeneralModel->addRecord('PRUEBA_beneficiosCM.historialdocumento', $insertDocumentData);
 						}
 						return ($result)
 							? print_r(json_encode(array('code' => 200, 'message'=>'Se ha editado correctamente')))

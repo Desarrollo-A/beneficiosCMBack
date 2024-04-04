@@ -6,10 +6,11 @@ require_once(APPPATH . "/controllers/BaseController.php");
 class Especialistas extends BaseController{
     public function __construct(){
         parent::__construct();
-
+        $this->ch = $this->load->database('ch', TRUE);
         $this->load->model('SedesModel');
         $this->load->model('EspecialistasModel');
         $this->load->model('CitasModel');
+        $this->load->model('GeneralModel');
     }
 
     public function sedes(){
@@ -21,14 +22,14 @@ class Especialistas extends BaseController{
     }
 
     public function horario(){
-        $data = $this->post();
+        $data = $this->input->post('dataValue', true);
 
-        $sede = $data->sede;
-        $especialista = $data->especialista;
+        $sede = $data['sede'];
+        $especialista = $data['especialista'];
 
-        $start = new DateTime($data->start);
+        $start = new DateTime($data['start']);
         $interval = new DateInterval('P1D');
-        $end = new DateTime($data->end);
+        $end = new DateTime($data['end']);
         $end->modify('+1 day'); //Esto para incluir el ultimo dia, en PHP 8 se usa DatePeriod::INCLUDE_END_DATE
 
         $period = new DatePeriod(
@@ -38,23 +39,18 @@ class Especialistas extends BaseController{
         );
 
         if(!iterator_count($period)){
-            $response = [
-                'status' => 'error',
-                'message' => 'Rango de fechas erroneo.',
-            ];
-
-            $this->json($response);
+            $data["result"] = false;
+            $data["msg"] = 'Rango de fechas erróneo';
+        
         }
 
         foreach ($period as $date) {
             $today = new DateTime();
-            if($date < $today){
-                $response = [
-                    'status' => 'error',
-                    'message' => "No puedes cambiar un horario de un dia que ya paso.",
-                ];
 
-                $this->json($response);
+            if($date < $today){
+
+                $data["result"] = false;
+                $data["msg"] = 'No puedes cambiar un horario de un día que ya paso.';
             }
 
             $start_day = $date->format("Y-m-d 00:00:00");
@@ -64,30 +60,37 @@ class Especialistas extends BaseController{
             
             if($has_citas){
                 $day = $date->format("Y-m-d");
-
-                $response = [
-                    'status' => 'error',
-                    'message' => "No puedes cambiar el horario el $day, por que tienes citas pendientes.",
-                ];
-
-                $this->json($response);
+                $data["result"] = false;
+                $data["msg"] = 'No puedes cambiar el horario el'. $day .', por que tienes citas pendientes.';
             }
 
             if($sede != 0){
-                $is_ok = $this->SedesModel->addHorarioPresencial($date->format("Y-m-d"), $sede, $especialista);
+                $check_exist = $this->SedesModel->checkExist($date->format("Y-m-d"), $sede, $especialista);
+                if($check_exist->num_rows() > 0){
+                    $id = $check_exist->result();
+
+                   
+                    $values = [
+                        "idSede" => $sede
+                    ];
+
+                    $is_ok = $this->GeneralModel->updateRecord('presencialxsede', $values, 'idEvento', $id[0]->idEvento);
+                }
+                else{
+                    $is_ok = $this->SedesModel->addHorarioPresencial($date->format("Y-m-d"), $sede, $especialista);
+                }
             }else{
                 $is_ok = $this->SedesModel->deleteHorarioPresencial($date->format("Y-m-d"), $sede, $especialista);
             }
         }
 
         if($is_ok){
-            $response = [
-                'status' => 'ok',
-                'message' => 'Horario establecido',
-            ];
-
-            $this->json($response);
+            $data["result"] = true;
+            $data["msg"] = 'Horario establecido';
         }
+
+        $this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data));
     }
 
     public function horarios(){
@@ -116,12 +119,11 @@ class Especialistas extends BaseController{
 
     public function meta(){
         $especialista = $this->input->get('especialista');
-        $inicio = date('Y-m-01');
-        $fin = date('Y-m-t');
+        $mes = $this->input->get('mes');
 
         $result = [
             'meta' => $this->EspecialistasModel->getMeta($especialista)->meta,
-            'total' => $this->EspecialistasModel->getTotal($especialista, $inicio, $fin),
+            'total' => $this->EspecialistasModel->getTotal($especialista, $mes),
         ];
 
         $this->json($result);

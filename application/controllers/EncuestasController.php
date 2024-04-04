@@ -8,6 +8,9 @@ class EncuestasController extends BaseController {
 	public function __construct()
 	{
 		parent::__construct();
+		$this->schema_cm = $this->config->item('schema_cm');
+        $this->schema_ch = $this->config->item('schema_ch');
+        $this->ch = $this->load->database('ch', TRUE);
 		$this->load->database('default');
 		$this->load->model('EncuestasModel');
 		$this->load->model('GeneralModel');
@@ -97,7 +100,8 @@ class EncuestasController extends BaseController {
 		$estatus= $this->input->post('dataValue[estatus]');
 		$area= $this->input->post('dataValue[area]');
 
-		$query_idEncuesta = $this->db->query("SELECT * FROM encuestasCreadas WHERE idArea = $area AND estatus = 1");
+		$query_idEncuesta = $this->ch->query("SELECT * 
+		FROM ". $this->schema_cm .".encuestascreadas WHERE idArea = $area AND estatus = 1");
 
         $idEnc = 0;
         foreach ($query_idEncuesta->result() as $row) {
@@ -108,15 +112,20 @@ class EncuestasController extends BaseController {
 			"estatus" => 0,
 		);
 
-		$this->GeneralModel->updateRecord('encuestasCreadas', $data_1, 'idEncuesta', $idEnc);
+		$this->GeneralModel->updateRecord('encuestascreadas', $data_1, 'idEncuesta', $idEnc);
 
 		$data_2 = array(
 			"estatus" => $estatus
 		);
 
-		$this->GeneralModel->updateRecord('encuestasCreadas', $data_2, 'idEncuesta', $idEncuesta);
-		echo json_encode(array("estatus" => true, "msj" => "Estatus Actualizado!" ), JSON_NUMERIC_CHECK);
+		$this->GeneralModel->updateRecord('encuestascreadas', $data_2, 'idEncuesta', $idEncuesta);
+		$this->ch->trans_complete();
 				
+		if ($this->ch->trans_status() === FALSE) {
+			echo json_encode(array("estatus" => false, "msj" => "Error en actualizar el estatus"), JSON_NUMERIC_CHECK);
+		} else {
+			echo json_encode(array("estatus" => true, "msj" => "Estatus actualizado!"), JSON_NUMERIC_CHECK);
+		}
 	}
 
 	public function updateVigencia(){
@@ -128,7 +137,7 @@ class EncuestasController extends BaseController {
 			"diasVigencia" => $vigencia
 		);
 
-		$response=$this->GeneralModel->updateRecord('encuestasCreadas', $data, 'idEncuesta', $idEncuesta);
+		$this->GeneralModel->updateRecord('encuestasCreadas', $data, 'idEncuesta', $idEncuesta);
 		echo json_encode(array("estatus" => true, "msj" => "Dato Actualizado!" ), JSON_NUMERIC_CHECK);
 				
 	}

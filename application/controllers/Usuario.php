@@ -9,9 +9,11 @@ class Usuario extends BaseController {
 	{
 		parent::__construct();
 		$this->load->database('default');
+		$this->ch = $this->load->database('ch', TRUE);
 		$this->load->model('UsuariosModel');
 		$this->load->model('GeneralModel');
 		$this->load->model('MenuModel');
+		$this->load->library("email");
 
 		$this->load->helper(array('form','funciones'));
 	}
@@ -58,33 +60,42 @@ class Usuario extends BaseController {
 
         //print_r($headers);
         //exit();
-
-        $data = explode('.', $headers->token);
-        $user = json_decode(base64_decode($data[2]));
-
-        //print_r($user);
-        //exit();
-
-        $path = substr($this->input->get('path'), 1);
-
-        //print_r($path);
-        //exit();
-
-        $id_user = intval($user->idUsuario);
-        $id_rol = intval($user->idRol);
-
-        $auth = $this->MenuModel->checkAuth($path, $id_user, $id_rol);
-
-        //print_r($auth);
-        //exit();
-
-        $result = [
-            "idRol" => $id_rol,
-            "idUsuario" => $id_user,
-            "authorized" => $auth,
-        ];
-
-        echo json_encode($result);
+		if (property_exists($headers, 'token')) {
+			$data = explode('.', $headers->token);
+			$user = json_decode(base64_decode($data[2]));
+	
+			//print_r($user);
+			//exit();
+	
+			$path = substr($this->input->get('path'), 1);
+	
+			//print_r($path);
+			//exit();
+	
+			$id_user = intval($user->idUsuario);
+			$id_rol = intval($user->idRol);
+	
+			$auth = $this->MenuModel->checkAuth($path, $id_user, $id_rol);
+	
+			//print_r($auth);
+			//exit();
+	
+			$result = [
+				"idRol" => $id_rol,
+				"idUsuario" => $id_user,
+				"authorized" => $auth,
+			];
+	
+			echo json_encode($result);
+		}else {
+			$result = [
+				"idRol" => null,
+				"idUsuario" => null,
+				"authorized" => false,
+			];
+	
+			echo json_encode($result);
+		}
     }
 
 	public function usuarios(){
@@ -139,23 +150,15 @@ class Usuario extends BaseController {
         $response['result'] = isset($table, $data); // && !empty($data);
         if ($response['result']) {
             $fecha = date('Y-m-d H:i:s');
-            $complemento = date('YmdHis');
             $rows = array();
             foreach ($data as $user) {
-                $iniciales = getIniciales($user['nombre']); // 
                 $row = array(
-                    'idContrato' => $complemento,
-                    'numEmpleado' => $iniciales.$complemento,
                     'nombre' => $user['nombre'],
-                    'telPersonal' => isset($user['telPersonal']) ? $user['telPersonal'] : null,
-                    'idArea' => null,
-					'idPuesto' => null,
-                    'idSede' => null,
-					'sexo' => $user['sexo'],
-					'externo' => 1,
-					'idRol' => 2,
                     'correo' => isset($user['correo']) ? $user['correo'] : null,
-                    'password' => encriptar('Tempo01@'),
+                    'telPersonal' => isset($user['telPersonal']) ? $user['telPersonal'] : null,
+					'sexo' => $user['sexo'],
+					'idRol' => 2,
+					'externo' => 1,
                     'estatus' => 1,
 					'creadoPor' => $user['creadoPor'],
                     'fechaCreacion' => $fecha,
@@ -212,6 +215,40 @@ class Usuario extends BaseController {
 		$this->output->set_output(json_encode($response));
 	}
 
+	// Actualizar usuarios externos como personal beneficiaria lamat.
+	public function updateExternalUser() {
+		$fecha = date('Y-m-d H:i:s');
+		$user = $this->input->post('dataValue[idUsuarioExt]');
+		
+		$data = array();
+	
+		// Recorre $_POST y agrega los campos con valores (incluido 0) al array $data
+		foreach ($this->input->post('dataValue') as $key => $value) {
+			if (($value !== null || $value !== '') && $key != 'idUsuarioExt') {
+				$data[$key] = $value;
+			}
+		}
+
+		$response['result'] = isset($user, $data) && !empty($user);
+		
+		if ($response['result']) {  
+			$data['fechaModificacion'] = $fecha;
+			$data['modificadoPor'] = $user;
+			$response['result'] = $this->GeneralModel->updateRecord('usuariosexternos', $data, 'idUsuarioExt', $user);
+	
+			if ($response['result']) {
+				$response['msg'] = "¡Usuario actualizado exitosamente!";
+			} else {
+				$response['msg'] = "¡Error al intentar actualizar datos de usuario!";
+			}
+		} else {
+			$response['msg'] = "¡Parametros invalidos!";
+		}
+	
+		$this->output->set_content_type("application/json");
+		$this->output->set_output(json_encode($response));
+	}
+
 	public function getNameUser(){
 		$idEspecialista = $this->input->post("dataValue", true);
 
@@ -228,9 +265,14 @@ class Usuario extends BaseController {
 	}
 
 	public function decodePass(){
-		$dt = $this->input->post('dataValue', true);
+		$token = $this->headers('Token');
+
+		$array = json_decode(base64_decode(explode(".", $token)[1]));
+		$dt = $array->numEmpleado;
+
 		$data['data'] = $this->UsuariosModel->decodePass($dt);
-		echo json_encode($data);
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
 	}
 
 	public function updatePass(){
@@ -262,7 +304,7 @@ class Usuario extends BaseController {
 		];
 
 		if(!isset($auth)){
-			$result->msg = 'Falta header de autorizacion';
+			$result->msg = 'Falta header de autorización';
 			$this->json($result, JSON_NUMERIC_CHECK);
 		}
 
@@ -274,7 +316,7 @@ class Usuario extends BaseController {
 	    }
 
 	    if(!isset($token)){
-			$result->msg = 'Falta token de autorizacion';
+			$result->msg = 'Falta token de autorización';
 			$this->json($result, JSON_NUMERIC_CHECK);
 		}
 
@@ -282,7 +324,7 @@ class Usuario extends BaseController {
 
 		list($numEmpleado, $password) = explode(":", $decoded);
 
-		$usuario = $this->UsuariosModel->login($numEmpleado, encriptar($password))->row();
+		$usuario = $this->UsuariosModel->login($numEmpleado, encriptar(trim($password)))->row();
 
 		if(!isset($usuario)){
 			$result->msg = 'No existe el usuario';
@@ -313,7 +355,7 @@ class Usuario extends BaseController {
 		];
 
 		if(!isset($auth)){
-			$result->msg = 'Falta header de autorizacion';
+			$result->msg = 'Falta header de autorización';
 			$this->json($result, JSON_NUMERIC_CHECK);
 		}
 
@@ -348,7 +390,7 @@ class Usuario extends BaseController {
 			$this->json($result, JSON_NUMERIC_CHECK);
 		}
 
-		$empleado = $this->UsuariosModel->getUserByNumEmpleado($idContrato)->row();
+		$empleado = $this->UsuariosModel->getUserByIdContrato($idContrato)->row();
 
 		if(!isset($empleado)){
 			$result->msg = 'No existe el empleado en la base de datos';
@@ -440,7 +482,7 @@ class Usuario extends BaseController {
 
 		$usuario = $decoded->data;
 
-		if($usuario->idRol != 1){
+		if($usuario->idRol != 4){
 			$result->msg = 'No tiene permisos para esta acción';
 			$this->json($result, JSON_NUMERIC_CHECK);
 		}
@@ -450,7 +492,7 @@ class Usuario extends BaseController {
 			$this->json($result, JSON_NUMERIC_CHECK);
 		}
 
-		$empleado = $this->UsuariosModel->getUserByNumEmpleado($idContrato)->row();
+		$empleado = $this->UsuariosModel->getUserByIdContrato($idContrato)->row();
 
 		if(!isset($empleado)){
 			$result->msg = 'No existe el empleado en la base de datos';
@@ -472,4 +514,66 @@ class Usuario extends BaseController {
 
 		$this->json($result, JSON_NUMERIC_CHECK);
 	}
+
+	public function sendMail() {
+
+			$correo = $this->input->post('dataValue', true);
+
+			$config['protocol']  = 'smtp';
+			$config['smtp_host'] = 'smtp.gmail.com';
+			$config['smtp_user'] = 'no-reply@ciudadmaderas.com';
+			$config['smtp_pass'] = 'JDe64%8q5D';
+			$config['smtp_port'] = 465;
+			$config['charset']   = 'utf-8';
+			$config['mailtype']  = 'html';
+			$config['newline']   = "\r\n"; 
+			$config['smtp_crypto']   = 'ssl';
+
+			$data["data"] = substr(md5(time()), 0, 6);
+			
+			$html_message = $this->load->view("email-verificacion", $data, true);
+					
+			$this->load->library("email");
+			$this->email->initialize($config);
+			$this->email->from("no-reply@ciudadmaderas.com");
+			$this->email->to($correo);
+			$this->email->message($html_message);
+			$this->email->subject("Código de verificación Beneficios CDM");
+
+			$this->ch->query("DELETE FROM PRUEBA_beneficiosCM.tokenregistro WHERE correo = '?'", $correo);
+
+			if ($this->email->send()) {
+				echo json_encode(array("estatus" => true, "msj" => "Envio exitoso" ), JSON_NUMERIC_CHECK); 
+				$this->ch->query("INSERT INTO PRUEBA_beneficiosCM.tokenregistro (correo, token, fechaCreacion) 
+					VALUES (?,?, NOW())", 
+					array($correo, $data));
+			} else {
+				echo json_encode(array("estatus" => false, "msj" => "A ocurrido un error"), JSON_NUMERIC_CHECK);
+			}
+	}
+
+	public function getToken(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->UsuariosModel->getToken($dt);
+	}
+
+	public function getUserByNumEmp(){
+        $user = $this->input->post('dataValue[num_empleado]');
+        $response['result'] = isset($user);
+        if ($response['result']) {
+            $rs = $this->UsuariosModel->getUserByNumEmp($user)->result();
+            $response['result'] = count($rs) > 0;
+            if ($response['result']) {
+                $response['msg'] = '¡Colaborador consultado exitosamente!';
+                $response['data'] = $rs;
+            } else {
+                $response['msg'] = '¡No existen el colaborador!';
+            }
+        }else {
+            $response['msg'] = "¡Parámetros inválidos!";
+        }
+
+        $this->output->set_content_type("application/json");
+        $this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
+    }
 }

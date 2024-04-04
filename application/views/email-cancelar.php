@@ -366,7 +366,7 @@
 					</td>
 				</tr><!-- end tr -->
 				<tr>
-					<td valign="middle" class="hero bg_white">
+					<td valign="middle" class="hero bg_white" style="text-align: center; padding: 3em 2.5em 0 2.5em;">
 						<img src="<?= base_url() ?>dist/img/<?= $data["imagen"]?>" alt="" style="width: 300px; max-width: 600px; height: auto; margin: auto; display: block;">
 					</td>
 				</tr><!-- end tr -->
