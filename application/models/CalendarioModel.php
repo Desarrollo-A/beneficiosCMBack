@@ -167,7 +167,7 @@ class CalendarioModel extends CI_Model
     }
     
     public function isPrimeraCita($usuario, $beneficio) {
-        $query = $this->db->query(
+        $query = $this->ch->query(
             "SELECT *FROM CITAS as ct
             INNER JOIN usuarios as us ON us.idUsuario = ct.idEspecialista
             WHERE ct.idPaciente = ? AND us.idPuesto = ?;",
