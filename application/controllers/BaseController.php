@@ -28,7 +28,7 @@ abstract class BaseController extends CI_Controller{
         if(!in_array($uri, $allowed_routes)){
             $response['status'] = 'error';
 
-            if ($_SERVER['REQUEST_METHOD'] !== 'OPTIONS') {
+            /* if ($_SERVER['REQUEST_METHOD'] !== 'OPTIONS') { */
                 $token = $this->headers('Token');
 
                 if($token){
@@ -46,7 +46,7 @@ abstract class BaseController extends CI_Controller{
                     $response['msg'] = 'Falta token';
                     $this->json($response);
                 }
-            }
+            /* } */
         }
     }
 
