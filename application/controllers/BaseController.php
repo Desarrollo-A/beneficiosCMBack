@@ -51,21 +51,25 @@ abstract class BaseController extends CI_Controller{
     }
 
     public function headers($key = null){
-        $data = (object) $this->input->request_headers();
+        $key = strtolower($key);
+
+        $data = $this->input->request_headers();
 
         if(!isset($data)){
             return;
         }
 
         if(isset($key)){
-            if(isset($data->$key)){
-                return $data->$key;
+            if(isset($data[$key])){
+                return $data[$key];
+            }elseif (isset($data[ucfirst($key)])) {
+                return $data[ucfirst($key)];
             }else{
                 return null;
             }
         }
 
-        return $data;
+        return (object) $data;
     }
 
     public function post($key = null){
