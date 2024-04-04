@@ -23,7 +23,7 @@ class CalendarioModel extends CI_Model
             usEspe2.sexo as sexoEspecialista, tf.fechasFolio, ct.idEventoGoogle, ct.evaluacion,
             CASE WHEN ofi.noficina IS NULL THEN 'VIRTUAL' ELSE ofi.noficina END as 'oficina',
             CASE WHEN ofi.direccion IS NULL THEN 'VIRTUAL' ELSE ofi.direccion END as 'ubicación', 
-            CASE WHEN ct.estatusCita = 1 AND atc.tipoCita = 1 THEN '#ffa500' WHEN ct.estatusCita = 2 THEN '#ff0000' WHEN ct.estatusCita = 3 THEN '#808080' WHEN ct.estatusCita = 4 THEN '#008000' WHEN ct.estatusCita = 5 THEN '#ff4d67' WHEN ct.estatusCita = 6 THEN '#00ffff' WHEN ct.estatusCita = 7 THEN '#ff0000' WHEN ct.estatusCita = 1 AND atc.tipoCita = 2 THEN '#0000ff' END AS 'color', 
+            CASE WHEN ct.estatusCita = 1 AND atc.tipoCita = 1 THEN '#ffa500' WHEN ct.estatusCita = 2 THEN '#ff0000' WHEN ct.estatusCita = 3 THEN '#808080' WHEN ct.estatusCita = 4 THEN '#008000' WHEN ct.estatusCita = 5 THEN '#ff4d67' WHEN ct.estatusCita = 6 THEN '#00ffff' WHEN ct.estatusCita = 7 THEN '#ff0000' WHEN ct.estatusCita = 10 THEN '#33105D' WHEN ct.estatusCita = 1 AND atc.tipoCita = 2 THEN '#0000ff' END AS 'color', 
             CASE WHEN usEspe2.idpuesto = 537 THEN 'nutrición' WHEN usEspe2.idpuesto = 585 THEN 'psicología' WHEN usEspe2.idpuesto = 686 THEN 'guía espiritual' WHEN usEspe2.idpuesto = 158 THEN 'quantum balance' END AS 'beneficio'
             FROM ". $this->schema_cm .".citas AS ct 
             INNER JOIN ". $this->schema_cm .".usuarios AS us ON us.idUsuario = ct.idPaciente 
@@ -34,8 +34,8 @@ class CalendarioModel extends CI_Model
             LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_oficinas AS ofi ON ofi.idoficina = atc.idOficina 
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_sedes AS sed ON sed.idsede = atc.idSede 
             LEFT JOIN (SELECT idDetalle, GROUP_CONCAT(DATE_FORMAT(fechaInicio, '%d / %m / %Y A las %H:%i horas.'), '') AS fechasFolio FROM ". $this->schema_cm .".citas WHERE estatusCita IN(8) GROUP BY idDetalle) tf ON tf.idDetalle = ct.idDetalle 
-            WHERE YEAR(fechaInicio) = ? AND MONTH(fechaInicio) = ? AND ct.idPaciente = ? AND ct.estatusCita IN(?, ?, ?, ?, ?, ?, ?);",
-            array( $year, $month, $idUsuario, 1, 2, 3, 4, 5, 6, 7)
+            WHERE YEAR(fechaInicio) = ? AND MONTH(fechaInicio) = ? AND ct.idPaciente = ? AND ct.estatusCita IN(?, ?, ?, ?, ?, ?, ?, ?);",
+            array( $year, $month, $idUsuario, 1, 2, 3, 4, 5, 6, 7, 10)
         );
 
         return $query;
@@ -145,11 +145,11 @@ class CalendarioModel extends CI_Model
             FROM ". $this->schema_cm .".citas ct
             LEFT JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idPaciente
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
-            WHERE (ct.idEspecialista = ? OR ct.idPaciente = ?) AND ct.estatusCita IN (?, ?)
+            WHERE (ct.idEspecialista = ? OR ct.idPaciente = ?) AND ct.estatusCita IN (?, ?, ?)
             AND ((fechaInicio BETWEEN ? AND ? ) OR 
             (fechaFinal BETWEEN ? AND ?) OR 
             (fechaInicio >= ? AND fechaFinal <= ?))",
-            array( $especialista, $usuario, 1, 6, $fechaInicio, $fechaFin, $fechaInicio, $fechaFin, $fechaInicio, $fechaFin)
+            array( $especialista, $usuario, 1, 6, 10,  $fechaInicio, $fechaFin, $fechaInicio, $fechaFin, $fechaInicio, $fechaFin)
         );
 
         return $query;
@@ -167,7 +167,7 @@ class CalendarioModel extends CI_Model
     }
     
     public function isPrimeraCita($usuario, $beneficio) {
-        $query = $this->db->query(
+        $query = $this->ch->query(
             "SELECT *FROM CITAS as ct
             INNER JOIN usuarios as us ON us.idUsuario = ct.idEspecialista
             WHERE ct.idPaciente = ? AND us.idPuesto = ?;",
@@ -205,16 +205,16 @@ class CalendarioModel extends CI_Model
             OR (? BETWEEN fechaInicio AND fechaFinal)
             OR (? BETWEEN fechaInicio AND fechaFinal))
             AND ((idPaciente = ?
-            AND estatusCita IN (?, ?))
-            OR (idEspecialista = ? and estatusCita IN (?, ?)))",
+            AND estatusCita IN (?, ?, ?))
+            OR (idEspecialista = ? and estatusCita IN (?, ?, ?)))",
             array(
                 $fechaInicioSuma, $fechaFinalResta,
                 $fechaInicioSuma, $fechaFinalResta,
                 $fechaInicioSuma, $fechaFinalResta,
                 $dataValue["idPaciente"],
-                1, 6,
+                1, 6, 10,
                 $dataValue["idUsuario"],
-                1, 6
+                1, 6, 10
             )
         );
         
@@ -282,8 +282,8 @@ class CalendarioModel extends CI_Model
             OR (? BETWEEN fechaInicio AND fechaFinal))
             AND idCita != ?
             AND ((idPaciente = ?
-            AND estatusCita = ?)
-            OR (idEspecialista = ? AND estatusCita IN(?, ?)))",
+            AND estatusCita IN(?, ?, ?))
+            OR (idEspecialista = ? AND estatusCita IN(?, ?, ?)))",
             array(
                 $fecha_inicio_suma, $fecha_final_resta,
                 $fecha_inicio_suma, $fecha_final_resta,
@@ -292,9 +292,12 @@ class CalendarioModel extends CI_Model
                 $dataValue["id"],
                 $dataValue["idPaciente"],
                 1,
+                6,
+                10,
                 $dataValue["idUsuario"],
                 1,
-                6
+                6,
+                10
             )
         );
 
@@ -316,6 +319,7 @@ class CalendarioModel extends CI_Model
         WHEN ct.estatusCita = 5 THEN '#ff4d67'
         WHEN ct.estatusCita = 6 THEN '#00ffff'
         WHEN ct.estatusCita = 7 THEN '#ff0000'
+        WHEN ct.estatusCita = 10 THEN '#33105D'
         WHEN ct.estatusCita = 1 AND atc.tipoCita = 2 THEN '#0000ff'
         END AS 'color',
         CASE 
@@ -421,7 +425,7 @@ class CalendarioModel extends CI_Model
         $query = $this->ch->query(
             "SELECT *FROM ". $this->schema_cm .".citas
             WHERE idPaciente = ? AND MONTH(fechaInicio) = ?
-            AND YEAR(fechaInicio) = ? AND estatusCita IN (4, 1) AND tipoCita IN (1, 2);", array($usuario, $mes, $año)
+            AND YEAR(fechaInicio) = ? AND estatusCita IN (4, 1, 6, 10) AND tipoCita IN (1, 2);", array($usuario, $mes, $año)
         );
 
         return $query;
@@ -431,7 +435,7 @@ class CalendarioModel extends CI_Model
     {
         $query = $this->ch->query(
             "SELECT ct.idCita FROM ". $this->schema_cm .".citas AS ct
-            WHERE ct.idPaciente = ? AND ct.idDetalle is NULL AND ct.estatusCita IN (?);",array($usuario, 6)
+            WHERE ct.idPaciente = ? AND ct.idDetalle is NULL AND ct.estatusCita IN (?, ?);",array($usuario, 6, 10)
         );
 
         return $query;
@@ -453,7 +457,7 @@ class CalendarioModel extends CI_Model
             "SELECT ct.idCita FROM ". $this->schema_cm .".citas AS ct
             INNER JOIN ". $this->schema_cm .".usuarios as us ON ct.idEspecialista = us.idUsuario
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato 
-            WHERE ct.idPaciente = ? AND us2.idpuesto = ? AND ct.estatusCita IN (1, 6);",array($usuario, $beneficio)
+            WHERE ct.idPaciente = ? AND us2.idpuesto = ? AND ct.estatusCita IN (1, 6, 10);",array($usuario, $beneficio)
         );
 
         return $query;
@@ -474,6 +478,7 @@ class CalendarioModel extends CI_Model
                 WHEN ct.estatusCita = 5 THEN '#ff4d67'
                 WHEN ct.estatusCita = 6 THEN '#00ffff'
                 WHEN ct.estatusCita = 7 THEN '#ff0000'
+                WHEN ct.estatusCita = 10 THEN '#33105D'
                 WHEN ct.estatusCita = 1 AND aps.tipoCita = 2 THEN '#0000ff'
             END AS color,
             CASE
@@ -496,8 +501,8 @@ class CalendarioModel extends CI_Model
             WHERE YEAR(fechaInicio) IN (?, ?)
             AND MONTH(fechaInicio) IN (?, ?, ?)
             AND ct.idEspecialista = ?
-            AND ct.estatusCita IN(?, ?, ?, ?, ?, ?, ?)",
-            array( 8, $dates["year1"], $dates["year2"], $dates["month1"], $month, $dates["month2"], $idUsuario, 1, 2, 3, 4, 5, 6, 7 )
+            AND ct.estatusCita IN(?, ?, ?, ?, ?, ?, ?, ?)",
+            array( 8, $dates["year1"], $dates["year2"], $dates["month1"], $month, $dates["month2"], $idUsuario, 1, 2, 3, 4, 5, 6, 7, 10 )
         );
 
         return $query;
@@ -510,7 +515,7 @@ class CalendarioModel extends CI_Model
             OR (ct.fechaFinal BETWEEN ? AND ?)
             OR (? BETWEEN ct.fechaInicio AND ct.fechaFinal)
             OR (? BETWEEN ct.fechaInicio AND ct.fechaFinal))
-            AND ct.idEspecialista = ? AND ct.estatusCita IN(?, ?)",
+            AND ct.idEspecialista = ? AND ct.estatusCita IN(?, ?, ?)",
             array(
                 $fechaInicioSuma, $fechaFinalResta,
                 $fechaInicioSuma, $fechaFinalResta,
@@ -518,7 +523,8 @@ class CalendarioModel extends CI_Model
                 $fechaFinalResta,
                 $dataValue["idUsuario"],
                 1,
-                6
+                6,
+                10
             )
         );
         
@@ -605,12 +611,12 @@ class CalendarioModel extends CI_Model
     public function tareaCancelaCitasSinPago(){
         $query = $this->ch->query(
             "UPDATE ". $this->schema_cm .".citas
-            SET estatusCita = 2, modificadoPor = 1, fechaModificacion = CURRENT_TIMESTAMP()
+            SET estatusCita = 9, modificadoPor = 1, fechaModificacion = CURRENT_TIMESTAMP()
             WHERE idCita IN (
               SELECT id FROM (
                 SELECT idCita as id FROM ". $this->schema_cm .".citas 
                 WHERE estatus = 1 AND 
-                ((estatusCita = 9 AND fechaIntentoPago IS NOT NULL
+                ((estatusCita = 10 AND fechaIntentoPago IS NOT NULL
                 AND tipoCita IN (1, 2) AND NOW() >= fechaIntentoPago + INTERVAL 10 MINUTE ) 
                 OR 
                 (estatusCita = 6 AND fechaCreacion IS NOT NULL
