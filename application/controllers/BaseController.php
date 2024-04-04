@@ -3,73 +3,73 @@
 abstract class BaseController extends CI_Controller{
     public function __construct(){
         parent::__construct();
+        $this->load->database('default');
+
         $this->load->model('UsuariosModel');
+
+        //$this->load->helper(array('form','funciones'));
+
+        //$this->load->library('Token');
+        //$this->load->library('GoogleApi');
         date_default_timezone_set('America/Mexico_City');
 
         header('Access-Control-Allow-Origin: *');
         header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
         header('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Token, Authorization');
 
-    
         $urls = array('192.168.30.128/auth/jwt/login','localhost','http://localhost','http://localhost:3030','http://192.168.30.128/auth/jwt/login','192.168.30.128','http://192.168.30.128:3030','127.0.0.1','https://rh.gphsis.com','rh.gphsis.com', 'https://prueba.gphsis.com/beneficiosmaderas', 'prueba.gphsis.com/beneficiosmaderas', 'https://prueba.gphsis.com', 'prueba.gphsis.com', 'https://beneficiosmaderasapi.gphsis.com', 'beneficiosmaderasapi.gphsis.com');
         
         // Lineas para la verificación de 
         $allowed_routes = ['LoginController/login', 'Usuario/getUserByNumEmp', 'Usuario/sendMail', 'Usuario/GetToken', 'LoginController/addRegistroEmpleado',
                             "Usuario/authorized", "Api/confirmarPago", "Api/encodedHash", "Usuario/loginCH", "Usuario/updateCH", "Usuario/bajaCH"];
-                            
-        if (!isset($this->input->request_headers()['token']) AND !in_array($this->uri->uri_string(), $allowed_routes)) {
 
-            $token = $this->headers('token');
-            $datosToken = json_decode(base64_decode(explode(".", $token)[1]));
-            $numEmpleado = $datosToken->numEmpleado;
-            
-             $data = $this->UsuariosModel->getUserByNumEmpleado($numEmpleado);
-            
-             $response['result'] = $data->num_rows() > 0;
+        $uri = $this->uri->uri_string();
 
-             if ($response['result']) {
-                 $response['msg'] = '¡Token invalido!';
-                 $this->output->set_content_type('application/json');
+        if(!in_array($uri, $allowed_routes)){
+            $response['status'] = 'error';
 
-                echo json_encode($response);
-                exit;
+            if ($_SERVER['REQUEST_METHOD'] !== 'OPTIONS') {
+                $token = $this->headers('Token');
+
+                if($token){
+                    $datosToken = json_decode(base64_decode(explode(".", $token)[1]));
+
+                    $numEmpleado = $datosToken->numEmpleado;
+
+                    $data = $this->UsuariosModel->getUserByNumEmpleado($numEmpleado)->row();
+
+                    if(!$data){
+                        $response['msg'] = 'Token invalido';
+                        $this->json($response);
+                    }
+                }else{
+                    $response['msg'] = 'Falta token';
+                    $this->json($response);
+                }
             }
-        } 
-
-        if(isset($this->input->request_headers()['origin']))
-            $origin = $this->input->request_headers()['origin'];
-        else if(array_key_exists('HTTP_ORIGIN',$_SERVER))
-            $origin = $_SERVER['HTTP_ORIGIN'];
-        else if(array_key_exists('HTTP_PREFERER',$_SERVER))
-            $origin = $_SERVER['HTTP_PREFERER'];
-        else
-            $origin = $_SERVER['HTTP_HOST'];
-        
-
-        $this->load->database('default');
-        
-        //$this->load->helper(array('form','funciones'));
-
-        $this->load->library('Token');
-        //$this->load->library('GoogleApi');
+        }
     }
 
     public function headers($key = null){
-        $data = (object) $this->input->request_headers();
+        $key = strtolower($key);
+
+        $data = $this->input->request_headers();
 
         if(!isset($data)){
             return;
         }
 
         if(isset($key)){
-            if(isset($data->$key)){
-                return $data->$key;
+            if(isset($data[$key])){
+                return $data[$key];
+            }elseif (isset($data[ucfirst($key)])) {
+                return $data[ucfirst($key)];
             }else{
                 return null;
             }
         }
 
-        return $data;
+        return (object) $data;
     }
 
     public function post($key = null){
