@@ -5,12 +5,10 @@
 class GestorModel extends CI_Model {
 	public function __construct()
 	{
-        $this->schema_cm = $this->config->item('schema_cm');
-        $this->schema_ch = $this->config->item('schema_ch');
-        $this->ch = $this->load->database('ch', TRUE);
 		parent::__construct();
         $this->schema_cm = $this->config->item('schema_cm');
         $this->schema_ch = $this->config->item('schema_ch');
+        $this->ch = $this->load->database('ch', TRUE);
 	}
 
 
@@ -187,6 +185,20 @@ class GestorModel extends CI_Model {
                 UNION ALL
                 SELECT 0 AS idsubarea, 'Sin área' AS area, NULL AS iddepto, 'SIN ÁREA' AS nombre
                 ORDER BY idArea");
+
+        return $query;
+    }
+
+    public function getHorariosEspecificos(){
+        
+        $query = $this->ch->query(
+                "SELECT idHorario, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista,
+                CONCAT(TIME_FORMAT(he.horaInicio, '%H:%i'), ' - ', TIME_FORMAT(he.horaFin, '%H:%i')) AS horario,
+                CONCAT(TIME_FORMAT(he.horaInicioSabado, '%H:%i'), ' - ', TIME_FORMAT(he.horaFinSabado, '%H:%i')) AS horarioSabado,
+                he.estatus, he.horaInicio, he.horaFin, he.sabados, he.horaInicioSabado, he.horaFinSabado
+                FROM ". $this->schema_cm .".horariosespecificos he
+                INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = he.idEspecialista
+                INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.num_empleado = us.idUsuario ");
 
         return $query;
     }

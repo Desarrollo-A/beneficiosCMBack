@@ -330,4 +330,12 @@ class GestorController extends BaseController {
 		$this->output->set_content_type('application/json');
 		$this->output->set_output(json_encode($response));
 	}
+
+	public function getHorariosEspecificos(){
+
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->GestorModel->getHorariosEspecificos($dt)->result();
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
 }
