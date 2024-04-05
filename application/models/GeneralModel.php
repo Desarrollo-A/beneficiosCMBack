@@ -90,13 +90,13 @@ class GeneralModel extends CI_Model {
         FROM ". $this->schema_cm .".atencionxsede axs
         INNER JOIN ". $this->schema_ch .".beneficioscm_vista_sedes sd ON sd.idsede = axs.idSede
         INNER JOIN ". $this->schema_ch .".beneficioscm_vista_oficinas o ON o.idoficina = axs.idOficina
-        INNER JOIN usuarios us ON us.idUsuario = axs.idEspecialista
+        INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = axs.idEspecialista
         INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
         INNER JOIN ". $this->schema_ch .".beneficioscm_vista_puestos ps ON ps.idpuesto = us2.idpuesto 
-        INNER JOIN catalogos ct ON ct.idCatalogo = 5
+        INNER JOIN ". $this->schema_cm .".catalogos ct ON ct.idCatalogo = 5
         LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_area ar ON ar.idsubarea = axs.idArea
         LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_departamento dt ON dt.iddepto = ar.iddepto  
-        INNER JOIN opcionesporcatalogo op ON op.idCatalogo = ct.idCatalogo AND op.idOpcion = axs.tipoCita");
+        INNER JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = ct.idCatalogo AND op.idOpcion = axs.tipoCita");
         return $query;
 
     }

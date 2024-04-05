@@ -9,8 +9,6 @@ class GestorModel extends CI_Model {
         $this->schema_ch = $this->config->item('schema_ch');
         $this->ch = $this->load->database('ch', TRUE);
 		parent::__construct();
-        $this->schema_cm = $this->config->item('schema_cm');
-        $this->schema_ch = $this->config->item('schema_ch');
 	}
 
 
@@ -36,7 +34,7 @@ class GestorModel extends CI_Model {
         $idPuesto = $dt["idPs"];
 
         $query = $this->ch-> query("SELECT us.idUsuario, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre
-        FROM usuarios us
+        FROM ". $this->schema_cm .".usuarios us
         INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
         WHERE idRol = 3 AND idPuesto = $idPuesto");
 

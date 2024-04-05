@@ -108,7 +108,7 @@ class GeneralController extends BaseController {
 						"estatusNut" => $estatus,
 					);
 							
-					$response=$this->GeneralModel->updateRecord('PRUEBA_beneficiosCM.detallepaciente', $data, 'idDetallePaciente', $id);
+					$response=$this->GeneralModel->updateRecord($this->schema_cm .'.PRUEBA_beneficiosCM.detallepaciente', $data, 'idDetallePaciente', $id);
 					echo json_encode(array("estatus" => true, "msj" => "Estatus actualizado!" ), JSON_NUMERIC_CHECK);
 								
 				}else{
@@ -124,7 +124,7 @@ class GeneralController extends BaseController {
 						"estatusPsi" => $estatus,
 					);
 							
-					$response=$this->GeneralModel->updateRecord('PRUEBA_beneficiosCM.detallepaciente', $data, 'idDetallePaciente', $id);
+					$response=$this->GeneralModel->updateRecord($this->schema_cm .'.PRUEBA_beneficiosCM.detallepaciente', $data, 'idDetallePaciente', $id);
 					echo json_encode(array("estatus" => true, "msj" => "Estatus actualizado!" ), JSON_NUMERIC_CHECK);
 								
 				}else{
@@ -140,7 +140,7 @@ class GeneralController extends BaseController {
 						"estatusQB" => $estatus,
 					);
 							
-					$response=$this->GeneralModel->updateRecord('PRUEBA_beneficiosCM.detallepaciente', $data, 'idDetallePaciente', $id);
+					$response=$this->GeneralModel->updateRecord($this->schema_cm .'.PRUEBA_beneficiosCM.detallepaciente', $data, 'idDetallePaciente', $id);
 					echo json_encode(array("estatus" => true, "msj" => "Estatus actualizado!" ), JSON_NUMERIC_CHECK);
 								
 				}else{
@@ -156,7 +156,7 @@ class GeneralController extends BaseController {
 						"estatusGE" => $estatus,
 					);
 							
-					$response=$this->GeneralModel->updateRecord('PRUEBA_beneficiosCM.detallepaciente', $data, 'idDetallePaciente', $id);
+					$response=$this->GeneralModel->updateRecord($this->schema_cm .'.PRUEBA_beneficiosCM.detallepaciente', $data, 'idDetallePaciente', $id);
 					echo json_encode(array("estatus" => true, "msj" => "Estatus actualizado!" ), JSON_NUMERIC_CHECK);
 								
 				}else{
