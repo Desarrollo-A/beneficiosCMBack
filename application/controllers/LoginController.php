@@ -12,7 +12,8 @@ class LoginController extends BaseController {
 		$this->load->model('GeneralModel');
 		$this->load->model('MenuModel');
         $this->ch = $this->load->database('ch', TRUE);
-
+        $this->schema_cm = $this->config->item('schema_cm');
+        $this->schema_ch = $this->config->item('schema_ch');
 		$this->load->helper(array('form','funciones'));
 	}
 
@@ -75,7 +76,7 @@ class LoginController extends BaseController {
                 $usuarioExiste = $this->GeneralModel->usuarioExiste($insertData["idContrato"]);
             
                 if($usuarioExiste->num_rows() === 0){
-                    $resultado = $this->GeneralModel->addRecordReturnId('usuarios', $insertData);
+                    $resultado = $this->GeneralModel->addRecord( $this->schema_cm.".usuarios", $insertData);
                     
                     $insertData = array(
                         "idUsuario" => $resultado,
@@ -86,7 +87,7 @@ class LoginController extends BaseController {
                         "fechaModificacion" => date('Y-m-d H:i:s')
                     );
     
-                    $resultado = $this->GeneralModel->addRecord('detallepaciente', $insertData);
+                    $resultado = $this->GeneralModel->addRecord( $this->schema_cm.".detallepaciente", $insertData);
     
                     if ($this->ch->trans_status() === FALSE){
                         $this->ch->trans_rollback();
