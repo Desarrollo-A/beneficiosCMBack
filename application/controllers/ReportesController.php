@@ -14,6 +14,8 @@ class ReportesController extends BaseController {
 		$this->load->model('ReportesModel');
 		$this->load->model('EspecialistasModel');
 		$this->load->model('GeneralModel');
+		$this->schema_cm = $this->config->item('schema_cm');
+        $this->schema_ch = $this->config->item('schema_ch');
 	}
 
 	public function usuarios(){
