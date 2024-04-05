@@ -5,15 +5,13 @@
 class DashModel extends CI_Model
 {
 	public function __construct()
-	{
-		$this->schema_cm = $this->config->item('schema_cm');
-        $this->schema_ch = $this->config->item('schema_ch');
-		$this->ch = $this->load->database('ch', TRUE);
-		parent::__construct();
-		$this->schema_cm = $this->config->item('schema_cm');
-        $this->schema_ch = $this->config->item('schema_ch');
-	}
-
+  {
+      $this->schema_cm = $this->config->item('schema_cm');
+      $this->schema_ch = $this->config->item('schema_ch');
+      $this->ch = $this->load->database('ch', TRUE);
+      parent::__construct();
+  }
+  
 	public function getPregunta($dt)
 	{
 		$query = $this->ch->query("SELECT DISTINCT ec.idPregunta, pg.pregunta, ec.respuestas, pg.idPregunta, ec.idEncuesta, ec.idEncuestaCreada, ec.idArea, ec.idPregunta
@@ -69,8 +67,8 @@ class DashModel extends CI_Model
 					$query = $this->ch->query(
 						"SELECT GROUP_CONCAT(rg.respuesta SEPARATOR ', ') AS respuestas, rg.grupo  
 						FROM ". $this->schema_cm .".encuestascreadas ec
-						INNER JOIN respuestasgenerales rg ON rg.grupo = ec.respuestas 
-						INNER JOIN preguntasgeneradas pg ON pg.idPregunta = ec.idPregunta
+						INNER JOIN ". $this->schema_cm .".respuestasgenerales rg ON rg.grupo = ec.respuestas 
+						INNER JOIN ". $this->schema_cm .".preguntasgeneradas pg ON pg.idPregunta = ec.idPregunta
 						WHERE pg.pregunta IN ($idPreguntasString) AND ec.idEncuesta = $idEncuesta AND pg.idEncuesta = $idEncuesta
 						GROUP BY rg.grupo;",
 						array($idEncuesta)
@@ -258,7 +256,7 @@ class DashModel extends CI_Model
             }else if( $slEs != 0 ){
 
                 $query = $this->ch-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS `pacientes` FROM usuarios us
-                INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
+                INNER JOIN ". $this->schema_cm .".citas ct ON ct.idEspecialista = us.idUsuario
                 INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
                 WHERE us2.idpuesto = 158 AND ct.estatusCita = 4 AND ct.idEspecialista = $slEs AND 
 				(ct.fechaModificacion >= '$fhI' AND ct.fechaModificacion <= '$fhF')");
@@ -266,12 +264,12 @@ class DashModel extends CI_Model
 
         }else if($idRol == 2){
 
-            $query = $this->ch-> query("SELECT COUNT(*) AS `pacientes` FROM citas WHERE idPaciente = $idUser AND 
+            $query = $this->ch-> query("SELECT COUNT(*) AS `pacientes` FROM ". $this->schema_cm .".citas WHERE idPaciente = $idUser AND 
             (fechaModificacion >= '$fhI' AND fechaModificacion <= '$fhF')");
 
         }else if($idRol == 3){
 
-            $query = $this->ch-> query("SELECT COUNT(DISTINCT idPaciente) AS `pacientes` FROM citas WHERE idEspecialista = $idUser AND estatusCita = 4 AND 
+            $query = $this->ch-> query("SELECT COUNT(DISTINCT idPaciente) AS `pacientes` FROM ". $this->schema_cm .".citas WHERE idEspecialista = $idUser AND estatusCita = 4 AND 
             (fechaModificacion >= '$fhI' AND fechaModificacion <= '$fhF')");
 
         }
@@ -347,7 +345,7 @@ class DashModel extends CI_Model
             COUNT(ct.idCita) AS citas
             FROM ". $this->schema_cm .".usuarios us
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
-            INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
+            INNER JOIN ". $this->schema_cm .".citas ct ON ct.idEspecialista = us.idUsuario
             WHERE us2.idpuesto = $area AND
             (ct.fechaFinal >= '$fhI' AND ct.fechaFinal <= '$fhF')");
 
@@ -364,7 +362,7 @@ class DashModel extends CI_Model
             COUNT(ct.idCita) AS citas
             FROM ". $this->schema_cm .".usuarios us
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
-            INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
+            INNER JOIN ". $this->schema_cm .".citas ct ON ct.idEspecialista = us.idUsuario
             WHERE us2.idpuesto = $area AND
             (ct.fechaFinal >= '$fhI' AND ct.fechaFinal <= '$fhF')
             AND us.idUsuario = $especialidad");

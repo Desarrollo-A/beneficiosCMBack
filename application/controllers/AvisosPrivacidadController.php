@@ -13,6 +13,8 @@ class AvisosPrivacidadController extends BaseController
 		$this->load->model('GeneralModel');
 		$this->load->model('UsuariosModel');
 		date_default_timezone_set('America/Mexico_City');
+		$this->schema_cm = $this->config->item('schema_cm');
+        $this->schema_ch = $this->config->item('schema_ch');
 	}
 
 	function getEspecialidades(){
@@ -68,7 +70,8 @@ class AvisosPrivacidadController extends BaseController
 									"fechaModificacion" => date_format($dataExpedienteGenerado['date'], "Y-m-d H:i:s"),
 									"modificadoPor" => $this->session->userdata('id_usuario')
 								);
-								$result = $this->GeneralModel->updateRecord("PRUEBA_beneficiosCM.historialdocumento", $updateDocumentData, "idDocumento", $idDocumento);
+								$result = $this->GeneralModel->updateRecord($this->schema_cm.".historialdocumento", $updateDocumentData, "idDocumento", $idDocumento);
+
 								$archivoAnterior = $validacionRama[0]['expediente'];
 								$rutaArchivo = 'dist/documentos/avisos-privacidad/';
 								$rutaEliminarArchivo =  $rutaArchivo.$archivoAnterior;
@@ -91,7 +94,7 @@ class AvisosPrivacidadController extends BaseController
 								"modificadoPor" => $id_usuario_actual
 							);
 
-							$result = $this->GeneralModel->addRecord('PRUEBA_beneficiosCM.historialdocumento', $insertDocumentData);
+							$result = $this->GeneralModel->addRecord( $this->schema_cm.".historialdocumento", $insertDocumentData);
 						}
 						return ($result)
 							? print_r(json_encode(array('code' => 200, 'message'=>'Se ha editado correctamente')))

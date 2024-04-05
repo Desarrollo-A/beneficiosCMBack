@@ -14,6 +14,8 @@ class ReportesController extends BaseController {
 		$this->load->model('ReportesModel');
 		$this->load->model('EspecialistasModel');
 		$this->load->model('GeneralModel');
+		$this->schema_cm = $this->config->item('schema_cm');
+        $this->schema_ch = $this->config->item('schema_ch');
 	}
 
 	public function usuarios(){
@@ -47,7 +49,7 @@ class ReportesController extends BaseController {
 				"modificadoPor" => $modificadoPor,
 			);
 			
-			$response=$this->GeneralModel->updateRecord('PRUEBA_beneficiosCM.citas', $data, 'idCita', $idCita);
+			$response=$this->GeneralModel->updateRecord($this->schema_cm.'.citas', $data, 'idCita', $idCita);
 			echo json_encode(array("estatus" => true, "msj" => "Observación Registrada!" ), JSON_NUMERIC_CHECK);
 				
 		}else{

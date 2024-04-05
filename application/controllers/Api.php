@@ -10,6 +10,8 @@ class Api extends BaseController{
 		$this->load->model('CalendarioModel');
 		$this->load->helper(array('form','funciones'));
 		$this->ch = $this->load->database('ch', TRUE);
+		$this->schema_cm = $this->config->item('schema_cm');
+        $this->schema_ch = $this->config->item('schema_ch');
 	}
 
     public function index()
@@ -33,17 +35,49 @@ class Api extends BaseController{
 	}
 
 	public function confirmarPago()
-	{
-		$fecha = date('Y-m-d H:i:s');
-		$usuario = 1; //Banco
-		$folio = $this->input->post('cl_folio');
-		$referencia = $this->input->post('cl_referencia');
-		$concepto = $this->input->post('t_concepto');
-		$cantidad = $this->input->post('dl_monto');
-		$metodoPago = $this->input->post('nl_tipoPago');
-		$estatusPago = $this->input->post('nl_estatus');
-		$fechaPago = $this->input->post('dt_fechaPago');
-		$hash = $this->input->post('hash');
+    {
+        $fecha = date('Y-m-d H:i:s');
+        $usuario = 1; //Banco
+        $folio = $this->input->post('cl_folio');
+        $referencia = $this->input->post('cl_referencia');
+        $concepto = $this->input->post('t_concepto');
+        $cantidad = $this->input->post('dl_monto');
+        $metodoPago = $this->input->post('nl_tipoPago');
+        $estatusPago = $this->input->post('nl_status');
+        $fechaPago = $this->input->post('dt_fechaPago');
+        $hash = $this->input->post('hash');
+
+        $values = [
+            "folio" => $folio,
+            "idConcepto" => $concepto,
+            "referencia" => $referencia,
+            "cantidad" => $cantidad,
+            "metodoPago" => $metodoPago,
+            "estatusPago" => $estatusPago,
+            "fechaPago" => $fechaPago,
+            "estatus" => 0,
+            "creadoPor" => 666,
+            "fechaCreacion" => $fecha,
+            "modificadoPor" => 666,
+            "fechaModificacion" => $fecha
+        ];
+        $rs = $this->GeneralModel->addRecord($this->schema_cm.".detallepagos", $values);
+
+		$values = [
+			"folio" => $folio,
+			"idConcepto" => $concepto,
+			"referencia" => $referencia,
+			"cantidad" => $cantidad,
+			"metodoPago" => $metodoPago,
+			"estatusPago" => $estatusPago,
+			"fechaPago" => $fechaPago,
+			"estatus" => 666,
+			"creadoPor" => 666,
+			"fechaCreacion" => $fecha,
+			"modificadoPor" => 666,
+			"fechaModificacion" => $fecha
+		];
+		$rs = $this->GeneralModel->addRecord($this->schema_cm.".detallepagos", $values);
 
         $cadena = $folio.'|'.$concepto.'|'.$referencia.'|'.$cantidad.'|'.$fechaPago.'|'.$metodoPago.'|'.$estatusPago.'|';
 		$key = APPPATH . '..'.DIRECTORY_SEPARATOR.'dist'.DIRECTORY_SEPARATOR.'keys'.DIRECTORY_SEPARATOR.'public_key_BB.pem';
@@ -97,9 +131,9 @@ class Api extends BaseController{
 			$response['msg'] = "¡Parámetros inválidos!";
 		}
 
-		echo 'estatus_notificacion=0';
-		// $this->output->set_content_type('application/json');
-		// $this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
+        echo 'estatus_notificacion=0';
+        // $this->output->set_content_type('application/json');
+        // $this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
     }
 
 	public function tareaCancelaCitasSinPago()

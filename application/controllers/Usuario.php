@@ -16,7 +16,6 @@ class Usuario extends BaseController {
 		$this->load->library("email");
 		$this->schema_cm = $this->config->item('schema_cm');
         $this->schema_ch = $this->config->item('schema_ch');
-
 		$this->load->helper(array('form','funciones'));
 	}
 	
@@ -39,9 +38,9 @@ class Usuario extends BaseController {
 
 	public function menu()
 	{
-		$headers = (object) $this->input->request_headers();
+		$token = $this->headers('Token');
 
-		$data = explode('.', $headers->token);
+		$data = explode('.', $token);
 		$user = json_decode(base64_decode($data[2]));
 
 		$id_user = intval($user->idUsuario);
@@ -202,7 +201,7 @@ class Usuario extends BaseController {
 		if ($response['result']) {  
 			$data['fechaModificacion'] = $fecha;
 			$data['modificadoPor'] = $user;
-			$response['result'] = $this->GeneralModel->updateRecord('usuarios', $data, 'idUsuario', $user);
+			$response['result'] = $this->GeneralModel->updateRecord($this->schema_cm .'.usuarios', $data, 'idUsuario', $user);
 	
 			if ($response['result']) {
 				$response['msg'] = "¡Usuario actualizado exitosamente!";
@@ -236,7 +235,7 @@ class Usuario extends BaseController {
 		if ($response['result']) {  
 			$data['fechaModificacion'] = $fecha;
 			$data['modificadoPor'] = $user;
-			$response['result'] = $this->GeneralModel->updateRecord('usuariosexternos', $data, 'idUsuarioExt', $user);
+			$response['result'] = $this->GeneralModel->updateRecord($this->schema_cm .'.usuariosexternos', $data, 'idUsuarioExt', $user);
 	
 			if ($response['result']) {
 				$response['msg'] = "¡Usuario actualizado exitosamente!";
@@ -288,7 +287,7 @@ class Usuario extends BaseController {
 					"password" => encriptar($newPass),
 				);
 				
-				$response=$this->GeneralModel->updateRecord('usuarios', $data, 'idUsuario', $idUsuario);
+				$response=$this->GeneralModel->updateRecord($this->schema_cm .'.usuarios', $data, 'idUsuario', $idUsuario);
 				echo json_encode(array("estatus" => true, "msj" => "Contraseña actualizada!" ));
 					
 			}else{
@@ -306,7 +305,7 @@ class Usuario extends BaseController {
 		];
 
 		if(!isset($auth)){
-			$result->msg = 'Falta header de autorizacion';
+			$result->msg = 'Falta header de autorización';
 			$this->json($result, JSON_NUMERIC_CHECK);
 		}
 
@@ -318,7 +317,7 @@ class Usuario extends BaseController {
 	    }
 
 	    if(!isset($token)){
-			$result->msg = 'Falta token de autorizacion';
+			$result->msg = 'Falta token de autorización';
 			$this->json($result, JSON_NUMERIC_CHECK);
 		}
 
@@ -326,7 +325,7 @@ class Usuario extends BaseController {
 
 		list($numEmpleado, $password) = explode(":", $decoded);
 
-		$usuario = $this->UsuariosModel->login($numEmpleado, encriptar($password))->row();
+		$usuario = $this->UsuariosModel->login($numEmpleado, encriptar(trim($password)))->row();
 
 		if(!isset($usuario)){
 			$result->msg = 'No existe el usuario';
@@ -357,7 +356,7 @@ class Usuario extends BaseController {
 		];
 
 		if(!isset($auth)){
-			$result->msg = 'Falta header de autorizacion';
+			$result->msg = 'Falta header de autorización';
 			$this->json($result, JSON_NUMERIC_CHECK);
 		}
 
@@ -434,7 +433,7 @@ class Usuario extends BaseController {
 		$data["fechaModificacion"] = $fecha;
 		$data["modificadoPor"] = 1;
 
-		$updated = $this->GeneralModel->updateRecord("usuarios", $data, "idContrato", $idContrato);
+		$updated = $this->GeneralModel->updateRecord($this->schema_cm .".usuarios", $data, "idContrato", $idContrato);
 
 		if($updated){
 			$result->result = true;
@@ -484,7 +483,7 @@ class Usuario extends BaseController {
 
 		$usuario = $decoded->data;
 
-		if($usuario->idRol != 1){
+		if($usuario->idRol != 4){
 			$result->msg = 'No tiene permisos para esta acción';
 			$this->json($result, JSON_NUMERIC_CHECK);
 		}
@@ -505,7 +504,7 @@ class Usuario extends BaseController {
 		$data["fechaModificacion"] = $fecha;
 		$data["modificadoPor"] = 1;
 
-		$updated = $this->GeneralModel->updateRecord("usuarios", $data, "idContrato", $idContrato);
+		$updated = $this->GeneralModel->updateRecord($this->schema_cm .".usuarios", $data, "idContrato", $idContrato);
 
 		if($updated){
 			$result->result = true;

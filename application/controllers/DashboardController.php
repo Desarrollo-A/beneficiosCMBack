@@ -8,13 +8,15 @@ class DashboardController extends BaseController {
 	public function __construct()
 	{
 		parent::__construct();
-		header('Access-Control-Allow-Origin: *');
-		$this->load->database('default');
-		$this->ch = $this->load->database('ch', TRUE);
+		//$this->load->database('default');
+		//$this->ch = $this->load->database('ch', TRUE);
+
 		$this->load->model('UsuariosModel');
 		$this->load->model('ReportesModel');
 		$this->load->model('EspecialistasModel');
 		$this->load->model('DashModel');
+		$this->schema_cm = $this->config->item('schema_cm');
+        $this->schema_ch = $this->config->item('schema_ch');
 	}
 	public function index()
 	{

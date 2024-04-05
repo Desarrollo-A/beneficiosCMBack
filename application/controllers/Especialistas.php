@@ -11,6 +11,8 @@ class Especialistas extends BaseController{
         $this->load->model('EspecialistasModel');
         $this->load->model('CitasModel');
         $this->load->model('GeneralModel');
+        $this->schema_cm = $this->config->item('schema_cm');
+        $this->schema_ch = $this->config->item('schema_ch');
     }
 
     public function sedes(){
@@ -74,7 +76,7 @@ class Especialistas extends BaseController{
                         "idSede" => $sede
                     ];
 
-                    $is_ok = $this->GeneralModel->updateRecord('presencialxsede', $values, 'idEvento', $id[0]->idEvento);
+                    $is_ok = $this->GeneralModel->updateRecord($this->schema_cm .'.presencialxsede', $values, 'idEvento', $id[0]->idEvento);
                 }
                 else{
                     $is_ok = $this->SedesModel->addHorarioPresencial($date->format("Y-m-d"), $sede, $especialista);
