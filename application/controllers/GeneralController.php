@@ -125,6 +125,7 @@ class GeneralController extends BaseController {
 					);
 							
 					$response=$this->GeneralModel->updateRecord($this->schema_cm.'.detallepaciente', $data, 'idDetallePaciente', $id);
+
 					echo json_encode(array("estatus" => true, "msj" => "Estatus actualizado!" ), JSON_NUMERIC_CHECK);
 								
 				}else{
@@ -141,6 +142,7 @@ class GeneralController extends BaseController {
 					);
 							
 					$response=$this->GeneralModel->updateRecord($this->schema_cm.'.detallepaciente', $data, 'idDetallePaciente', $id);
+
 					echo json_encode(array("estatus" => true, "msj" => "Estatus actualizado!" ), JSON_NUMERIC_CHECK);
 								
 				}else{

@@ -62,6 +62,22 @@ class Api extends BaseController{
         ];
         $rs = $this->GeneralModel->addRecord($this->schema_cm.".detallepagos", $values);
 
+		$values = [
+			"folio" => $folio,
+			"idConcepto" => $concepto,
+			"referencia" => $referencia,
+			"cantidad" => $cantidad,
+			"metodoPago" => $metodoPago,
+			"estatusPago" => $estatusPago,
+			"fechaPago" => $fechaPago,
+			"estatus" => 666,
+			"creadoPor" => 666,
+			"fechaCreacion" => $fecha,
+			"modificadoPor" => 666,
+			"fechaModificacion" => $fecha
+		];
+		$rs = $this->GeneralModel->addRecord($this->schema_cm.".detallepagos", $values);
+
         $cadena = $folio.'|'.$concepto.'|'.$referencia.'|'.$cantidad.'|'.$fechaPago.'|'.$metodoPago.'|'.$estatusPago.'|';
         $key = APPPATH . '..'.DIRECTORY_SEPARATOR.'dist'.DIRECTORY_SEPARATOR.'keys'.DIRECTORY_SEPARATOR.'public_key_BB.pem';
         $response['result'] = VerifyData($hash, $cadena, $key);
