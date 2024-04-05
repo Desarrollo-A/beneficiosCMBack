@@ -144,7 +144,7 @@ class GestorController extends BaseController {
 			"idEspecialista" => $idEspe,
 		);
 
-		$this->GeneralModel->updateRecord('PRUEBA_beneficiosCM.atencionxsede', $data, 'idAtencionXSede', $id);
+		$this->GeneralModel->updateRecord($this->schema_cm.'.atencionxsede', $data, 'idAtencionXSede', $id);
 		echo json_encode(array("estatus" => true, "msj" => "Estatus Actualizado!" ));
 				
 	}
@@ -292,7 +292,7 @@ class GestorController extends BaseController {
 				"idArea" => $idAreaInsert
 			);
 
-			$updateRecord = $this->GeneralModel->updateRecord('PRUEBA_beneficiosCM.atencionxsede', $data, 'idAtencionXSede', $idAts);
+			$updateRecord = $this->GeneralModel->updateRecord($this->schema_cm.'.atencionxsede', $data, 'idAtencionXSede', $idAts);
 
 			if($updateRecord){
 				$response["result"] = true;
@@ -316,7 +316,7 @@ class GestorController extends BaseController {
 			"estatus" => intval($dataValue["estatus"])
 		];
 
-		$updateRecord = $this->GeneralModel->updateRecord("PRUEBA_beneficiosCM.atencionxsede", $data, "idAtencionXSede", $id);
+		$updateRecord = $this->GeneralModel->updateRecord($this->schema_cm.".atencionxsede", $data, "idAtencionXSede", $id);
 
 		if($updateRecord){
 			$response["result"] = true;

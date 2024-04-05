@@ -541,11 +541,11 @@ class Usuario extends BaseController {
 			$this->email->message($html_message);
 			$this->email->subject("Código de verificación Beneficios CDM");
 
-			$this->ch->query("DELETE FROM PRUEBA_beneficiosCM.tokenregistro WHERE correo = '?'", $correo);
+			$this->ch->query("DELETE FROM ". $this->schema_cm .".tokenregistro WHERE correo = '?'", $correo);
 
 			if ($this->email->send()) {
 				echo json_encode(array("estatus" => true, "msj" => "Envio exitoso" ), JSON_NUMERIC_CHECK); 
-				$this->ch->query("INSERT INTO PRUEBA_beneficiosCM.tokenregistro (correo, token, fechaCreacion) 
+				$this->ch->query("INSERT INTO ". $this->schema_cm .".tokenregistro (correo, token, fechaCreacion) 
 					VALUES (?,?, NOW())", 
 					array($correo, $data));
 			} else {
