@@ -14,7 +14,8 @@ class Usuario extends BaseController {
 		$this->load->model('GeneralModel');
 		$this->load->model('MenuModel');
 		$this->load->library("email");
-
+		$this->schema_cm = $this->config->item('schema_cm');
+        $this->schema_ch = $this->config->item('schema_ch');
 		$this->load->helper(array('form','funciones'));
 	}
 	

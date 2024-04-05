@@ -9,6 +9,8 @@ class Api extends BaseController{
 		$this->load->model('GeneralModel');
 		$this->load->helper(array('form','funciones'));
 		$this->ch = $this->load->database('ch', TRUE);
+		$this->schema_cm = $this->config->item('schema_cm');
+        $this->schema_ch = $this->config->item('schema_ch');
 	}
 
     public function index()
@@ -63,7 +65,7 @@ class Api extends BaseController{
 				"modificadoPor" => $usuario,
 				"fechaModificacion" => $fecha
 			];
-			$rs = $this->GeneralModel->addRecordReturnId("detallepagos", $values);
+			$rs = $this->GeneralModel->addRecordReturnId($this->schema_cm.".detallepagos", $values);
 			$response["result"] = $rs > 0;
 			if ($response["result"]) {
 				if (isset($rs)) {					

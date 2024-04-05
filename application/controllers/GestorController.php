@@ -13,7 +13,8 @@ class GestorController extends BaseController {
 		$this->load->model('GestorModel');
 		$this->load->model('GeneralModel');
 		$this->ch = $this->load->database('ch', TRUE);
-
+		$this->schema_cm = $this->config->item('schema_cm');
+        $this->schema_ch = $this->config->item('schema_ch');
 	}
 
     public function getOficinasVal(){
@@ -73,7 +74,7 @@ class GestorController extends BaseController {
 			$response["msg"] = 'La atención por sede ya ha sido asignada anteriormente';
 		}
 		else{
-			$data = $this->GeneralModel->addRecord('atencionxsede', $data);
+			$data = $this->GeneralModel->addRecord( $this->schema_cm.".atencionxsede", $data);
 
 			if($data){
 				$response["result"] = true;

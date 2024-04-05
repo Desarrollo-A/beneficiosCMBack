@@ -13,6 +13,8 @@ class CalendarioController extends BaseController{
 		$this->load->library("email");
 		$this->load->library('GoogleApi');
 		$this->ch = $this->load->database('ch', TRUE);
+		$this->schema_cm = $this->config->item('schema_cm');
+        $this->schema_ch = $this->config->item('schema_ch');
 	}
 
 	public function getAllEvents()
@@ -113,7 +115,7 @@ class CalendarioController extends BaseController{
 			$checkAppointment = $this->CalendarioModel->checkAppointmentNormal($dataValue, $fechaInicioSuma, $fechaFinalResta);
 
 			if ($checkOccupied->num_rows() < 1 && $checkAppointment->num_rows() < 1 && isset($pass)) {
-				$addRecord = $this->GeneralModel->addRecord("horariosocupados", $values);
+				$addRecord = $this->GeneralModel->addRecord( $this->schema_cm.".horariosocupados", $values);
 
 				if ($addRecord) {
 					$response["result"] = true;
@@ -257,6 +259,7 @@ class CalendarioController extends BaseController{
             $idAtencionXSede,
             $estatusCita
         );
+		
         if ($response['result']) { // Validamos que vengan todos los valores de post
             // Validación para ver que tenga dias disponibles en su sede de manera presencial, que el especialista
             // brinde la atención en su sede, y si la brinde que sea la unica y en caso que no que tenga dias asignados a esa sede. 
@@ -319,7 +322,7 @@ class CalendarioController extends BaseController{
 							"modificadoPor" => $idPaciente, "idDetalle" => $detalle,
                             "idEventoGoogle" => $idGoogleEvent
                         ];
-                        $rs = $this->GeneralModel->addRecordReturnId("citas", $values);
+                        $rs = $this->GeneralModel->addRecordReturnId( $this->schema_cm.".citas", $values);
                         $response["result"] = $rs > 0;
                         $response["data"] = $rs;
                         if ($response["result"]) {
@@ -414,7 +417,7 @@ class CalendarioController extends BaseController{
 				$response["result"] = false;
 				$response["msg"] = "La sede presencial es distinta al del paciente seleccionado";
 			} else {
-				$rs = $this->GeneralModel->addRecordReturnId("citas", $values);
+				$rs = $this->GeneralModel->addRecordReturnId( $this->schema_cm.".citas", $values);
 				$addRecord = $rs > 0; 
 				
 				if ($addRecord) {
@@ -1049,7 +1052,7 @@ class CalendarioController extends BaseController{
 				"modificadoPor" => $usuario,
 				"fechaModificacion" => $fecha
 			];
-			$response["result"] = $this->GeneralModel->addRecord("detallePagos", $values);
+			$response["result"] = $this->GeneralModel->addRecord( $this->schema_cm.".detallePagos", $values);
 			if ($response["result"]) {
 				$rs = $this->calendarioModel->getDetallePago($folio)->result();
 
@@ -1178,7 +1181,7 @@ class CalendarioController extends BaseController{
 		$logData['modificadoPor'] = $data["idUsuario"];
 		$logData['fechaModificacion'] = $fecha;
 
-		$this->GeneralModel->addRecord("emaillogs", $logData);
+		$this->GeneralModel->addRecord( $this->schema_cm.".emaillogs", $logData);
 		$this->output->set_content_type('application/json');
 		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
