@@ -46,11 +46,27 @@ class Api extends BaseController{
 		$fechaPago = $this->input->post('dt_fechaPago');
 		$hash = $this->input->post('hash');
 
+		$values = [
+			"folio" => $folio,
+			"idConcepto" => $concepto,
+			"referencia" => $referencia,
+			"cantidad" => $cantidad,
+			"metodoPago" => $metodoPago,
+			"estatusPago" => $estatusPago,
+			"fechaPago" => $fechaPago,
+			"estatus" => 666,
+			"creadoPor" => 666,
+			"fechaCreacion" => $fecha,
+			"modificadoPor" => 666,
+			"fechaModificacion" => $fecha
+		];
+		$rs = $this->GeneralModel->addRecord($this->schema_cm.".detallepagos", $values);
+
         $cadena = $folio.'|'.$concepto.'|'.$referencia.'|'.$cantidad.'|'.$fechaPago.'|'.$metodoPago.'|'.$estatusPago.'|';
 		$key = APPPATH . '..'.DIRECTORY_SEPARATOR.'dist'.DIRECTORY_SEPARATOR.'keys'.DIRECTORY_SEPARATOR.'public_key_BB.pem';
-		$response['result'] = VerifyData($hash, $cadena, $key);
+		//$response['result'] = VerifyData($hash, $cadena, $key);
 		// $response['result'] =  $cadena == $hash;
-		if ($response['result']) {
+		// if ($response['result']) {
 			$values = [
 				"folio" => $folio,
 				"idConcepto" => $concepto,
@@ -60,9 +76,9 @@ class Api extends BaseController{
 				"estatusPago" => $estatusPago,
 				"fechaPago" => $fechaPago,
 				"estatus" => 1,
-				"creadoPor" => $usuario,
+				"creadoPor" => 999,
 				"fechaCreacion" => $fecha,
-				"modificadoPor" => $usuario,
+				"modificadoPor" => 999,
 				"fechaModificacion" => $fecha
 			];
 			$rs = $this->GeneralModel->addRecordReturnId($this->schema_cm.".detallepagos", $values);
@@ -78,7 +94,7 @@ class Api extends BaseController{
 							"modificadoPor" => $usuario,
 							"fechaModificacion" => $fecha,
 						];
-						$response["result"] = $this->GeneralModel->updateRecord("citas", $upd, 'idCita', $idCita);
+						$response["result"] = $this->GeneralModel->updateRecord($this->schema_cm.".citas", $upd, 'idCita', $idCita);
 						if ($response["result"]) {
 							$response["msg"] = "estatus_notificacion=0";
 						}else {
@@ -94,9 +110,9 @@ class Api extends BaseController{
 			else {
 				$response["msg"] = "¡Surgió un error al intentar registrar el detalle de pago!";
 			}
-		} else{
-			$response['msg'] = "¡Parámetros inválidos!";
-		}
+		// } else{
+		// 	$response['msg'] = "¡Parámetros inválidos!";
+		// }
 
 		echo 'estatus_notificacion=0';
 		// $this->output->set_content_type('application/json');

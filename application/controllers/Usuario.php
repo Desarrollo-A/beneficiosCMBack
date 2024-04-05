@@ -433,7 +433,7 @@ class Usuario extends BaseController {
 		$data["fechaModificacion"] = $fecha;
 		$data["modificadoPor"] = 1;
 
-		$updated = $this->GeneralModel->updateRecord("usuarios", $data, "idContrato", $idContrato);
+		$updated = $this->GeneralModel->updateRecord($this->schema_cm .".usuarios", $data, "idContrato", $idContrato);
 
 		if($updated){
 			$result->result = true;
@@ -504,7 +504,7 @@ class Usuario extends BaseController {
 		$data["fechaModificacion"] = $fecha;
 		$data["modificadoPor"] = 1;
 
-		$updated = $this->GeneralModel->updateRecord("usuarios", $data, "idContrato", $idContrato);
+		$updated = $this->GeneralModel->updateRecord($this->schema_cm .".usuarios", $data, "idContrato", $idContrato);
 
 		if($updated){
 			$result->result = true;
