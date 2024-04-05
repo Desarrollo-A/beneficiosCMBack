@@ -345,7 +345,7 @@ class DashModel extends CI_Model
             COUNT(ct.idCita) AS citas
             FROM ". $this->schema_cm .".usuarios us
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
-            INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
+            INNER JOIN ". $this->schema_cm .".citas ct ON ct.idEspecialista = us.idUsuario
             WHERE us2.idpuesto = $area AND
             (ct.fechaFinal >= '$fhI' AND ct.fechaFinal <= '$fhF')");
 
@@ -361,7 +361,7 @@ class DashModel extends CI_Model
             COUNT(ct.idCita) AS citas
             FROM ". $this->schema_cm .".usuarios us
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
-            INNER JOIN citas ct ON ct.idEspecialista = us.idUsuario
+            INNER JOIN ". $this->schema_cm .".citas ct ON ct.idEspecialista = us.idUsuario
             WHERE us2.idpuesto = $area AND
             (ct.fechaFinal >= '$fhI' AND ct.fechaFinal <= '$fhF')
             AND us.idUsuario = $especialidad");
