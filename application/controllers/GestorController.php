@@ -119,7 +119,7 @@ class GestorController extends BaseController {
 				"tipoCita" => $modalidad
 			);
 
-			$updateRecord = $this->GeneralModel->updateRecord('atencionxsede', $data, 'idAtencionXSede', $idAts);
+			$updateRecord = $this->GeneralModel->updateRecord($this->schema_cm .'.atencionxsede', $data, 'idAtencionXSede', $idAts);
 
 			if($updateRecord){
 				$response["result"] = true;
@@ -166,7 +166,7 @@ class GestorController extends BaseController {
 			"modificadoPor" => $modificadoPor,
 		);
 
-		$this->GeneralModel->updateRecord('oficinas', $data, 'idOficina', $idOficina);
+		$this->GeneralModel->updateRecord($this->schema_cm .'.oficinas', $data, 'idOficina', $idOficina);
 		echo json_encode(array("estatus" => true, "msj" => "Datos Actualizados!" ));
 				
 	}
@@ -186,7 +186,7 @@ class GestorController extends BaseController {
 			"modificadoPor" => $modificadoPor,
 		);
 
-		$this->GeneralModel->updateRecord('sedes', $data, 'idSede', $idSede);
+		$this->GeneralModel->updateRecord($this->schema_cm .'.sedes', $data, 'idSede', $idSede);
 		echo json_encode(array("estatus" => true, "msj" => "Datos Actualizados!" ));
 				
 	}

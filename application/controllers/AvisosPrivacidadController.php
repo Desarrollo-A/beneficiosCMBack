@@ -71,6 +71,7 @@ class AvisosPrivacidadController extends BaseController
 									"modificadoPor" => $this->session->userdata('id_usuario')
 								);
 								$result = $this->GeneralModel->updateRecord($this->schema_cm.".historialdocumento", $updateDocumentData, "idDocumento", $idDocumento);
+
 								$archivoAnterior = $validacionRama[0]['expediente'];
 								$rutaArchivo = 'dist/documentos/avisos-privacidad/';
 								$rutaEliminarArchivo =  $rutaArchivo.$archivoAnterior;

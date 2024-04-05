@@ -6,8 +6,6 @@ class SedesModel extends CI_Model {
         $this->schema_ch = $this->config->item('schema_ch');
         $this->ch = $this->load->database('ch', TRUE);
         parent::__construct();
-        $this->schema_cm = $this->config->item('schema_cm');
-        $this->schema_ch = $this->config->item('schema_ch');
     }
 
     public function getPresencialXEspecialista($idEspecialista){

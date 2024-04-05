@@ -5,14 +5,13 @@
 class DashModel extends CI_Model
 {
 	public function __construct()
-	{
-		parent::__construct();
-		$this->schema_cm = $this->config->item('schema_cm');
-        $this->schema_ch = $this->config->item('schema_ch');
-		$this->ch = $this->load->database('ch', TRUE);
-		
-	}
-
+  {
+      $this->schema_cm = $this->config->item('schema_cm');
+      $this->schema_ch = $this->config->item('schema_ch');
+      $this->ch = $this->load->database('ch', TRUE);
+      parent::__construct();
+  }
+  
 	public function getPregunta($dt)
 	{
 		$query = $this->ch->query("SELECT DISTINCT ec.idPregunta, pg.pregunta, ec.respuestas, pg.idPregunta, ec.idEncuesta, ec.idEncuestaCreada, ec.idArea, ec.idPregunta
