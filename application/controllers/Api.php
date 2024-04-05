@@ -94,7 +94,7 @@ class Api extends BaseController{
 							"modificadoPor" => $usuario,
 							"fechaModificacion" => $fecha,
 						];
-						$response["result"] = $this->GeneralModel->updateRecord("citas", $upd, 'idCita', $idCita);
+						$response["result"] = $this->GeneralModel->updateRecord($this->schema_cm.".citas", $upd, 'idCita', $idCita);
 						if ($response["result"]) {
 							$response["msg"] = "estatus_notificacion=0";
 						}else {

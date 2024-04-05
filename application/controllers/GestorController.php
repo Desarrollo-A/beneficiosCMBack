@@ -316,7 +316,7 @@ class GestorController extends BaseController {
 			"estatus" => intval($dataValue["estatus"])
 		];
 
-		$updateRecord = $this->GeneralModel->updateRecord("PRUEBA_beneficiosCM.atencionxsede", $data, "idAtencionXSede", $id);
+		$updateRecord = $this->GeneralModel->updateRecord($this->schema_cm .".atencionxsede", $data, "idAtencionXSede", $id);
 
 		if($updateRecord){
 			$response["result"] = true;
