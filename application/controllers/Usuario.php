@@ -201,7 +201,7 @@ class Usuario extends BaseController {
 		if ($response['result']) {  
 			$data['fechaModificacion'] = $fecha;
 			$data['modificadoPor'] = $user;
-			$response['result'] = $this->GeneralModel->updateRecord('usuarios', $data, 'idUsuario', $user);
+			$response['result'] = $this->GeneralModel->updateRecord($this->schema_cm .'.usuarios', $data, 'idUsuario', $user);
 	
 			if ($response['result']) {
 				$response['msg'] = "¡Usuario actualizado exitosamente!";
@@ -235,7 +235,7 @@ class Usuario extends BaseController {
 		if ($response['result']) {  
 			$data['fechaModificacion'] = $fecha;
 			$data['modificadoPor'] = $user;
-			$response['result'] = $this->GeneralModel->updateRecord('usuariosexternos', $data, 'idUsuarioExt', $user);
+			$response['result'] = $this->GeneralModel->updateRecord($this->schema_cm .'.usuariosexternos', $data, 'idUsuarioExt', $user);
 	
 			if ($response['result']) {
 				$response['msg'] = "¡Usuario actualizado exitosamente!";
@@ -287,7 +287,7 @@ class Usuario extends BaseController {
 					"password" => encriptar($newPass),
 				);
 				
-				$response=$this->GeneralModel->updateRecord('usuarios', $data, 'idUsuario', $idUsuario);
+				$response=$this->GeneralModel->updateRecord($this->schema_cm .'.usuarios', $data, 'idUsuario', $idUsuario);
 				echo json_encode(array("estatus" => true, "msj" => "Contraseña actualizada!" ));
 					
 			}else{

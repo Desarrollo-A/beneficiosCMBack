@@ -112,13 +112,13 @@ class EncuestasController extends BaseController {
 			"estatus" => 0,
 		);
 
-		$this->GeneralModel->updateRecord('encuestascreadas', $data_1, 'idEncuesta', $idEnc);
+		$this->GeneralModel->updateRecord($this->schema_cm .'.encuestascreadas', $data_1, 'idEncuesta', $idEnc);
 
 		$data_2 = array(
 			"estatus" => $estatus
 		);
 
-		$this->GeneralModel->updateRecord('encuestascreadas', $data_2, 'idEncuesta', $idEncuesta);
+		$this->GeneralModel->updateRecord($this->schema_cm .'.encuestascreadas', $data_2, 'idEncuesta', $idEncuesta);
 		$this->ch->trans_complete();
 				
 		if ($this->ch->trans_status() === FALSE) {
@@ -137,7 +137,7 @@ class EncuestasController extends BaseController {
 			"diasVigencia" => $vigencia
 		);
 
-		$this->GeneralModel->updateRecord('encuestasCreadas', $data, 'idEncuesta', $idEncuesta);
+		$this->GeneralModel->updateRecord($this->schema_cm .'.encuestasCreadas', $data, 'idEncuesta', $idEncuesta);
 		echo json_encode(array("estatus" => true, "msj" => "Dato Actualizado!" ), JSON_NUMERIC_CHECK);
 				
 	}
@@ -194,7 +194,7 @@ class EncuestasController extends BaseController {
 				"proximaEjecucion" => $lunesProximo
 			);
 		
-			$response = $this->GeneralModel->updateRecord('cronConsulta', $data, 'idCronConsulta', 1);
+			$response = $this->GeneralModel->updateRecord($this->schema_cm .'.cronConsulta', $data, 'idCronConsulta', 1);
 
 			$query = $this->db->query("SELECT DISTINCT ct.idPaciente, co.correo, ec.idEncuesta FROM citas ct
 			INNER JOIN usuarios us ON us.idUsuario = ct.idEspecialista
