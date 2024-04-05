@@ -23,7 +23,7 @@ class GeneralModel extends CI_Model {
         ps.idarea AS idArea, ps.estatus_puesto AS estatus, dp.canRegister 
         FROM ". $this->schema_ch .".beneficioscm_vista_usuarios AS us
         INNER JOIN ". $this->schema_ch .".beneficioscm_vista_puestos ps ON ps.idpuesto = us.idpuesto
-        LEFT JOIN datopuesto dp ON dp.idPuesto = ps.idpuesto 
+        LEFT JOIN ". $this->schema_cm .".datopuesto dp ON dp.idPuesto = ps.idpuesto 
         WHERE us.idcontrato = ?", $contrato);
         return $query;
     }
