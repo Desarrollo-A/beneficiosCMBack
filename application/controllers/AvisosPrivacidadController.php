@@ -70,7 +70,8 @@ class AvisosPrivacidadController extends BaseController
 									"fechaModificacion" => date_format($dataExpedienteGenerado['date'], "Y-m-d H:i:s"),
 									"modificadoPor" => $this->session->userdata('id_usuario')
 								);
-								$result = $this->GeneralModel->updateRecord($this->schema_cm .".PRUEBA_beneficiosCM.historialdocumento", $updateDocumentData, "idDocumento", $idDocumento);
+								$result = $this->GeneralModel->updateRecord($this->schema_cm.".historialdocumento", $updateDocumentData, "idDocumento", $idDocumento);
+
 								$archivoAnterior = $validacionRama[0]['expediente'];
 								$rutaArchivo = 'dist/documentos/avisos-privacidad/';
 								$rutaEliminarArchivo =  $rutaArchivo.$archivoAnterior;
