@@ -49,7 +49,7 @@ class ReportesController extends BaseController {
 				"modificadoPor" => $modificadoPor,
 			);
 			
-			$response=$this->GeneralModel->updateRecord($this->schema_cm .'.PRUEBA_beneficiosCM.citas', $data, 'idCita', $idCita);
+			$response=$this->GeneralModel->updateRecord($this->schema_cm.'.citas', $data, 'idCita', $idCita);
 			echo json_encode(array("estatus" => true, "msj" => "Observación Registrada!" ), JSON_NUMERIC_CHECK);
 				
 		}else{
