@@ -15,7 +15,6 @@ class ReportesModel extends CI_Model {
 	{
 
 		if($dt == '0'){
-
 			$query = $this->ch->query("SELECT ct.idCita, pa.idUsuario AS idColab, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista, 
 			CONCAT (us3.nombre_persona,' ',us3.pri_apellido,' ',us3.sec_apellido) AS paciente, ps.nom_puesto AS area, sd.nsede AS sede,ct.titulo, op.nombre AS estatus, 
 			CONCAT(DATE_FORMAT(ct.fechaInicio, '%Y-%m-%d'), ' ', DATE_FORMAT(ct.fechaInicio, '%H:%i'), ' - ', DATE_FORMAT(ct.fechaFinal, '%H:%i')) AS horario, observaciones, us2.sexo, 
@@ -30,6 +29,7 @@ class ReportesModel extends CI_Model {
 		        WHEN ct.estatusCita = 5 THEN '#ff4d67'
 		        WHEN ct.estatusCita = 6 THEN '#00ffff'
 		        WHEN ct.estatusCita = 7 THEN '#ff0000'
+				WHEN ct.estatusCita = 10 THEN '#33105D'
 		        WHEN ct.estatusCita = 1 AND axs.tipoCita = 2 THEN '#0000ff'
     		END AS color,
 			CASE 
@@ -105,6 +105,7 @@ class ReportesModel extends CI_Model {
 		        WHEN ct.estatusCita = 5 THEN '#ff4d67'
 		        WHEN ct.estatusCita = 6 THEN '#00ffff'
 		        WHEN ct.estatusCita = 7 THEN '#ff0000'
+				WHEN ct.estatusCita = 10 THEN '#33105D'
 		        WHEN ct.estatusCita = 1 AND axs.tipoCita = 2 THEN '#0000ff'
     		END AS color,
 			CASE 
@@ -178,6 +179,7 @@ class ReportesModel extends CI_Model {
 		        WHEN ct.estatusCita = 5 THEN '#ff4d67'
 		        WHEN ct.estatusCita = 6 THEN '#00ffff'
 		        WHEN ct.estatusCita = 7 THEN '#ff0000'
+				WHEN ct.estatusCita = 10 THEN '#33105D'
 		        WHEN ct.estatusCita = 1 AND axs.tipoCita = 2 THEN '#0000ff'
     		END AS color,
 			CASE 

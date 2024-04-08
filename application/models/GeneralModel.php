@@ -81,7 +81,12 @@ class GeneralModel extends CI_Model {
     public function getAtencionXsede(){
         
         $query = $this->ch->query("SELECT axs.idAtencionXSede AS id,axs.idSede, sd.nsede AS sede, axs.idArea, axs.idEspecialista, axs.tipoCita, 
-        o.idoficina AS idOficina, o.noficina AS oficina, o.direccion AS ubicación, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre,
+        o.idoficina AS idOficina,
+        CASE 
+        WHEN axs.idOficina = 0 THEN 'VIRTUAL' 
+        WHEN axs.idOficina <> 0 THEN o.noficina 
+        END AS oficina, 
+         o.direccion AS ubicación, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre,
         ps.idpuesto AS idPuesto, ps.nom_puesto AS puesto, op.nombre AS modalidad, axs.estatus,
         CASE
         WHEN axs.idArea IS NULL THEN 'SIN ÁREA'
@@ -89,7 +94,7 @@ class GeneralModel extends CI_Model {
         END AS nombreArea
         FROM ". $this->schema_cm .".atencionxsede axs
         INNER JOIN ". $this->schema_ch .".beneficioscm_vista_sedes sd ON sd.idsede = axs.idSede
-        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_oficinas o ON o.idoficina = axs.idOficina
+        LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_oficinas o ON o.idoficina = axs.idOficina
         INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = axs.idEspecialista
         INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
         INNER JOIN ". $this->schema_ch .".beneficioscm_vista_puestos ps ON ps.idpuesto = us2.idpuesto 
@@ -159,6 +164,7 @@ class GeneralModel extends CI_Model {
             WHEN ct.estatusCita = 5 THEN '#ff4d67'
             WHEN ct.estatusCita = 6 THEN '#00ffff'
             WHEN ct.estatusCita = 7 THEN '#ff0000'
+            WHEN ct.estatusCita = 10 THEN '#33105D'
             WHEN ct.estatusCita = 1 AND axs.tipoCita = 2 THEN '#0000ff'
 	    END AS color,
 		CASE 
