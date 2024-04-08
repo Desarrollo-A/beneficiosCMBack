@@ -76,7 +76,7 @@ class LoginController extends BaseController {
                 $usuarioExiste = $this->GeneralModel->usuarioExiste($insertData["idContrato"]);
             
                 if($usuarioExiste->num_rows() === 0){
-                    $resultado = $this->GeneralModel->addRecord( $this->schema_cm.".usuarios", $insertData);
+                    $resultado = $this->GeneralModel->addRecordReturnId( $this->schema_cm.".usuarios", $insertData);
                     
                     $insertData = array(
                         "idUsuario" => $resultado,
