@@ -563,10 +563,16 @@ class Usuario extends BaseController {
         $response['result'] = isset($user);
         if ($response['result']) {
             $rs = $this->UsuariosModel->getUserByNumEmp($user)->result();
-            $response['result'] = count($rs) > 0;
+			
+			$response['result'] = count($rs) > 0;
             if ($response['result']) {
-                $response['msg'] = '¡Colaborador consultado exitosamente!';
-                $response['data'] = $rs;
+				$response['result'] = $rs[0]->activo == 1;
+				if ($response['result']) {
+					$response['msg'] = '¡Colaborador consultado exitosamente!';
+					$response['data'] = $rs;
+				}else {
+					$response['msg'] = '¡Colaborador inactivo!';
+				}
             } else {
                 $response['msg'] = '¡No existen el colaborador!';
             }

@@ -341,6 +341,7 @@ class DashModel extends CI_Model
             COUNT(CASE WHEN ct.estatusCita = 4 THEN ct.idPaciente END) AS asistencia,
             COUNT(CASE WHEN ct.estatusCita = 5 THEN ct.idPaciente END) AS justificada,
             COUNT(CASE WHEN ct.estatusCita = 6 THEN ct.idPaciente END) AS pendiente,
+			COUNT(CASE WHEN ct.estatusCita = 10 THEN ct.idPaciente END) AS procesandoPago,
             COUNT(ct.idCita) AS citas
             FROM ". $this->schema_cm .".usuarios us
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
@@ -357,6 +358,7 @@ class DashModel extends CI_Model
             COUNT(CASE WHEN ct.estatusCita = 4 THEN ct.idPaciente END) AS asistencia,
             COUNT(CASE WHEN ct.estatusCita = 5 THEN ct.idPaciente END) AS justificada,
             COUNT(CASE WHEN ct.estatusCita = 6 THEN ct.idPaciente END) AS pendiente,
+			COUNT(CASE WHEN ct.estatusCita = 10 THEN ct.idPaciente END) AS procesandoPago,
             COUNT(ct.idCita) AS citas
             FROM ". $this->schema_cm .".usuarios us
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
