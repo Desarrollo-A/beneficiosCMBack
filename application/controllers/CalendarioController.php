@@ -277,7 +277,7 @@ class CalendarioController extends BaseController{
                             }
                         }
                         if ($response['result']) {
-                            $checkPresencial = $this->CalendarioModel->checkPresencial($idSede, $idEspecialista, $fechaInicio);
+                            $checkPresencial = $this->CalendarioModel->checkPresencial($idSede, $idEspecialista, date('Y-m-d', strtotime($fechaInicio)));
                             $response['result'] = $checkPresencial->num_rows() > 0;
                             if (!$response['result']) {
                                 $response['msg'] = "¡El especialista cambió los dias de atención!"; 
@@ -403,7 +403,7 @@ class CalendarioController extends BaseController{
 				$response["msg"] = "El horario ya esta ocupado";
 			} else if ($checkOccupied->num_rows() > 0) {
 				$response["result"] = false;
-				$response["msg"] = "Horario no disponible";
+				$response["msg"] = "Horario no disponible"; 
 			}  else if ($checkUser->num_rows() == 0 && $reagenda == 0) {
 				$response["result"] = false;
 				$response["msg"] = " El paciente debe finalizar sus beneficios mensuales";
@@ -629,7 +629,7 @@ class CalendarioController extends BaseController{
 				$response["result"] = false;
 				$response["msg"] = "El horario ya ha sido ocupado";
 			} else {
-				$updateRecord = $this->GeneralModel->updateRecord($this->schema_cm .".horariosOcupados", $values, "idUnico", $dataValue["id"]);
+				$updateRecord = $this->GeneralModel->updateRecord($this->schema_cm .".horariosocupados", $values, "idUnico", $dataValue["id"]);
 
 				if ($updateRecord) {
 					$response["result"] = true;
@@ -1052,7 +1052,7 @@ class CalendarioController extends BaseController{
 				"modificadoPor" => $usuario,
 				"fechaModificacion" => $fecha
 			];
-			$response["result"] = $this->GeneralModel->addRecord( $this->schema_cm.".detallePagos", $values);
+			$response["result"] = $this->GeneralModel->addRecord( $this->schema_cm.".detallepagos", $values);
 			if ($response["result"]) {
 				$rs = $this->CalendarioModel->getDetallePago($folio)->result();
 				if (!empty($rs) && isset($rs[0]->idDetalle)) {
@@ -1244,6 +1244,33 @@ class CalendarioController extends BaseController{
 				"idDetalle" => $detalle,
 				"evaluacion" => $evaluacion,
 				"idEventoGoogle" => $googleEventId,
+				"modificadoPor" => $idUsuario,
+				"fechaModificacion" => date("Y-m-d H:i:s"),
+			];
+			$response["result"] = $this->GeneralModel->updateRecord($this->schema_cm .".citas", $values, 'idCita', $idCita);
+			if ($response["result"]) {
+				$response["msg"] = "¡Se ha actualizado la información de la cita!";
+			}else {
+				$response["msg"] = "¡Surgió un error al intentar actualizar los datos de cita!";
+			}
+		}else {
+			$response['msg'] = "¡Parámetros inválidos!";
+		}
+
+		$this->output->set_content_type("application/json");
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
+	}
+
+	public function updateStatusAppointmentData() {
+		$idUsuario     = $this->input->post('dataValue[idUsuario]');
+		$idCita        = $this->input->post('dataValue[idCita]');
+		$estatus       = $this->input->post('dataValue[estatus]');
+
+		$response['result'] = isset($idUsuario, $idCita, $estatus);
+		if ($response['result']) {
+			
+			$values = [
+				"estatusCita" => $estatus,
 				"modificadoPor" => $idUsuario,
 				"fechaModificacion" => date("Y-m-d H:i:s"),
 			];
