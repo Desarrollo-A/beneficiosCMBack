@@ -9,6 +9,7 @@ class Api extends BaseController{
 		$this->load->model('GeneralModel');
 		$this->load->model('CalendarioModel');
         $this->load->library("email");
+        $this->load->library('GoogleApi');
 		$this->load->helper(array('form','funciones'));
 		$this->ch = $this->load->database('ch', TRUE);
 		$this->schema_cm = $this->config->item('schema_cm');
@@ -96,10 +97,10 @@ class Api extends BaseController{
 							"modificadoPor" => $usuario,
 							"fechaModificacion" => $fecha,
 						];
-						$response["result"] = $this->GeneralModel->updateRecord("citas", $upd, 'idCita', $idCita);
+						$response["result"] = $this->GeneralModel->updateRecord($this->schema_cm .".citas", $upd, 'idCita', $idCita);
 						if ($response["result"]) {
 							$response["msg"] = "estatus_notificacion=0";
-                            // $this->creaEventoGoogleYNotifica($idCita);
+                            $this->creaEventoGoogleYNotifica($idCita);
                         }else {
 							$response["msg"] = "¡Surgió un error al enlazar la cita con el pago!";
 						}
@@ -126,14 +127,15 @@ class Api extends BaseController{
 		echo $citasEnProcesoPago;
 	}
 
-    public function creaEventoGoogleYNotifica(){
-        $idCita = 6;
+    public function creaEventoGoogleYNotifica($idCita){
+    // public function creaEventoGoogleYNotifica(){
+        // $idCita = 66; // 41 42
         $response['result'] = isset($idCita);
         if ($response['result']) {
             $rs = $this->CalendarioModel->getCitaById($idCita)->result();
-            var_dump($rs); exit; die;
+
             /* PROCESO DE MANDAR CORREO AL USUARIO */
-		    $fecha = date('Y-m-d H:i:s');
+            $fecha = date('Y-m-d H:i:s');
 		    $config['protocol']  = 'smtp';
 		    $config['smtp_host'] = 'smtp.gmail.com';
 		    $config['smtp_user'] = 'no-reply@ciudadmaderas.com';
@@ -172,12 +174,11 @@ class Api extends BaseController{
 		    $subject = "Citas Beneficios CM - " . $fecha;
 		    $this->email->subject($subject);
 
-		    if ($this->email->send()) {
-		    	$response["result"] = true;
+            $response["result"] = $this->email->send();
+		    if ($response["result"]) {
 		    	$response["msg"] = "Se ha enviado el correo";
 		    }
 		    else {
-		    	$response["result"] = false;
 		    	$response["msg"] = "Error al enviar el correo";
 		    }
 
@@ -194,6 +195,82 @@ class Api extends BaseController{
 
 		    $this->GeneralModel->addRecord( $this->schema_cm.".emaillogs", $logData);
 
+            // COMIENZA PROCESO DE EVENTO DE GOOGLE
+            $response["result2"] = (!isset($rs[0]->idEventoGoogle) OR $rs[0]->idEventoGoogle === "");
+            if ($response["result2"]) {
+                $data = [
+                    "email" => 'programador.analista36@ciudadmaderas.com', // $rs[0]->correo ? $rs[0]->correo : $rs[0]->correoEspecialista,
+                    "title" => $rs[0]->title,
+                    "location" => $rs[0]->ubicación,
+                    "description" => $rs[0]->title,
+                    "start" => date('Y-m-d\TH:i:s', strtotime($rs[0]->start)),
+                    "end" => date('Y-m-d\TH:i:s', strtotime($rs[0]->end)),
+                    "attendees" => array(
+                        array(
+                            "email" => 'programador.analista36@ciudadmaderas.com', // $rs[0]->correo ? $rs[0]->correo : $rs[0]->correoEspecialista,
+                            "responseStatus" => "accepted"
+                        ),
+                        array(
+                            "email" => 'programador.analista32@ciudadmaderas.com', //$rs[0]->correo ? $rs[0]->correo : $rs[0]->correoEspecialista,
+                            "responseStatus" => "accepted"
+                        )
+                    ),
+                ];
+
+                $this->googleapi->getAccessToken($data["email"]);
+
+                $data = json_encode(array(
+                    'summary' => $data["title"],
+                    'location' => $data["location"],
+                    'description' => $data["description"],
+                    'start' => array(
+                        'dateTime' => $data["start"],
+                        'timeZone' => 'America/Mexico_City',
+                    ),
+                    'end' => array(
+                        'dateTime' => $data["end"],
+                        'timeZone' => 'America/Mexico_City',
+                    ),
+                    'attendees' => $data["attendees"],
+                    'source' => [
+                        'title' => 'Beneficios Maderas',
+                        'url' => 'https://prueba.gphsis.com/beneficiosmaderas/'
+                    ],
+                    'reminders' => array(
+                        'useDefault' => FALSE,
+                        'overrides' => array(
+                            array('method' => 'email', 'minutes' => 24 * 60), // 1 dia antes
+                            array('method' => 'email', 'minutes' => 4 * 60), // 4 horas antes
+                            array('method' => 'popup', 'minutes' => 24 * 60), // 1 dia antes
+                            array('method' => 'popup', 'minutes' => 4 * 60), // 4 horas antes
+                        ),
+                    ),
+                    'visibility' => 'public',
+                    'colorId' => '07'
+                ), JSON_NUMERIC_CHECK);
+
+                $event = $this->googleapi->createCalendarEvent('primary', $data);
+                $response['result2'] = !isset($event->error); 
+
+                if ($response['result2']) {
+                    $response['msg2'] = "¡Evento registrado en el calendario de google!";
+                    $upd = [
+                        "idEventoGoogle" => $event->id,
+                        "modificadoPor" => $rs[0]->idPaciente,
+                        "fechaModificacion" => $fecha,
+                    ];
+                    $response["result3"] = $this->GeneralModel->updateRecord($this->schema_cm .".citas", $upd, 'idCita', $idCita);
+					if ($response["result3"]) {
+						$response["msg3"] = "Evento de google creado exitosamente";
+                    }else {
+						$response["msg3"] = "¡Surgió un error al enlazar la cita con el pago!";
+					}
+                }else {
+                    $response['msg2'] = "¡No se pudo insertar el evento en el calendario de google!"; 
+                }
+            }else {
+                $response['msg2'] = "¡Evento con id listo!"; 
+            }
         }else {
             $response['msg'] = "¡Parámetros inválidos!";
         }
