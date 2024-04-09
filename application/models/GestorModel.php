@@ -193,13 +193,76 @@ class GestorModel extends CI_Model {
         
         $query = $this->ch->query(
                 "SELECT idHorario, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista,
-                CONCAT(TIME_FORMAT(he.horaInicio, '%H:%i'), ' - ', TIME_FORMAT(he.horaFin, '%H:%i')) AS horario,
-                CONCAT(TIME_FORMAT(he.horaInicioSabado, '%H:%i'), ' - ', TIME_FORMAT(he.horaFinSabado, '%H:%i')) AS horarioSabado,
+                us2.npuesto AS beneficio, CONCAT(TIME_FORMAT(he.horaInicio, '%H:%i'), ' - ', TIME_FORMAT(he.horaFin, '%H:%i')) AS horario,
+                IFNULL (CONCAT(TIME_FORMAT(he.horaInicioSabado, '%H:%i'), ' - ', TIME_FORMAT(he.horaFinSabado, '%H:%i')), 'SIN HORARIO') AS horarioSabado,
                 he.estatus, he.horaInicio, he.horaFin, he.sabados, he.horaInicioSabado, he.horaFinSabado
                 FROM ". $this->schema_cm .".horariosespecificos he
-                INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = he.idEspecialista
-                INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.num_empleado = us.idUsuario ");
+                INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = he.idEspecialista 
+                INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato");
 
         return $query;
+    }
+
+    public function especialistas(){
+        $query = $this->ch-> query("SELECT us.idUsuario, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, ''), ' (', IFNULL(us2.npuesto , ''), ')') AS especialista 
+        FROM ". $this->schema_cm .".usuarios us
+        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
+        WHERE us.idRol  = 3
+        AND NOT EXISTS (
+            SELECT 1 
+            FROM ". $this->schema_cm .".horariosespecificos he 
+            WHERE he.idEspecialista = us.idUsuario
+        )
+        ORDER BY us2.nombre_persona ASC");
+        return $query->result();
+    }
+
+    public function insertHorario($dt)
+    {
+        $data = json_decode($dt, true);
+
+        if (isset($data)) {
+
+                $espe = $data["espe"];
+                $horaInicio = $data["horaInicio"];
+                $horaFin = $data["horaFin"];
+                $sabado = $data["sabado"];
+                $horaInicioSabado = $data["horaInicioSabado"];
+                $horaFinSabado = $data["horaFinSabado"];
+                $creadoPor = $data["creadoPor"];
+
+				if (empty($espe) ||
+                    empty($horaInicio) ||
+                    empty($horaFin) ||
+                    empty($creadoPor) ||
+                    ($sabado == 1 && 
+                    ($horaInicioSabado == null || 
+                    $horaFinSabado == null))) {
+
+					echo json_encode(array("estatus" => false, "msj" => "Faltan datos!" ));
+
+				}else if(($horaInicio > $horaFin) || ($sabado == 1 && ($horaInicioSabado >  $horaFinSabado)))
+                {
+                    echo json_encode(array("estatus" => false, "msj" => "La fecha de inicio no puede ser mayor a la final" ));
+                }
+                else{
+
+                    $this->db->query("INSERT INTO ". $this->schema_cm .".horariosespecificos (idEspecialista, horaInicio, horaFin, sabados, horaInicioSabado, horaFinSabado, creadoPor ) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?)", 
+                    array($espe, $horaInicio, $horaFin, $sabado, $horaInicioSabado, $horaFinSabado, $creadoPor));
+                    
+                    $this->db->trans_complete();
+
+                    if ($this->db->trans_status() === FALSE) {
+                        echo "Error al realizar el registro";
+                    } else {
+                        echo json_encode(array("estatus" => true, "msj" => "Registro realizado exitosamente" ));
+                    }
+                
+                }
+
+        } else {
+			echo json_encode(array("estatus" => false, "msj" => "Error Faltan Datos" ));
+		}
     }
 }
