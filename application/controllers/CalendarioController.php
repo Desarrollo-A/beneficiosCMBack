@@ -13,6 +13,7 @@ class CalendarioController extends BaseController{
 		$this->load->library("email");
 		$this->load->library('GoogleApi');
 		$this->ch = $this->load->database('ch', TRUE);
+		date_default_timezone_set('America/Mexico_City');
 		$this->schema_cm = $this->config->item('schema_cm');
         $this->schema_ch = $this->config->item('schema_ch');
 	}
@@ -34,9 +35,10 @@ class CalendarioController extends BaseController{
 
         $occupied = $this->CalendarioModel->getOccupied($month, $idUsuario, $dates);
         $appointment = $this->CalendarioModel->getAppointment($month, $idUsuario, $dates);
+		$external = $this->CalendarioModel->getExternalAppointments($month, $idUsuario, $dates);
 
-        if ($occupied->num_rows() > 0 || $appointment->num_rows() > 0)
-            $response["events"] = array_merge($occupied->result(), $appointment->result());
+        if ($occupied->num_rows() > 0 || $appointment->num_rows() > 0 || $external->num_rows() > 0)
+            $response["events"] = array_merge($occupied->result(), $appointment->result(), $external->result());
         else
             $response["events"] = array();
 
@@ -321,7 +323,8 @@ class CalendarioController extends BaseController{
                             "fechaModificacion" => $fecha, 
 							"fechaCreacion" => $fecha,
 							"modificadoPor" => $idPaciente, "idDetalle" => $detalle,
-                            "idEventoGoogle" => $idGoogleEvent
+                            "idEventoGoogle" => $idGoogleEvent,
+							"fechaIntentoPago" => $fecha
                         ];
                         $rs = $this->GeneralModel->addRecordReturnId( $this->schema_cm.".citas", $values);
                         $response["result"] = $rs > 0;
@@ -405,7 +408,7 @@ class CalendarioController extends BaseController{
 			} else if ($checkOccupied->num_rows() > 0) {
 				$response["result"] = false;
 				$response["msg"] = "Horario no disponible"; 
-			}  else if ($checkUser->num_rows() == 0 && $reagenda == 0) {
+			}  else if ($checkUser->num_rows() == 0 && $reagenda == 0 && $fundacion == 0) {
 				$response["result"] = false;
 				$response["msg"] = " El paciente debe finalizar sus beneficios mensuales";
 			} else if($checkUser->num_rows() === 0 && $reagenda == 1 && $month != date('m') || $checkUser->num_rows() === 0 && $reagenda == 1 && $year != date('Y')){
@@ -1501,4 +1504,29 @@ class CalendarioController extends BaseController{
 		$this->output->set_content_type('application/json');
         $this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
+
+	public function actualizaFechaIntentoPago(){
+		$idUsuario = $this->input->post('dataValue[idUsuario]');
+		$idCita = $this->input->post('dataValue[idCita]');
+		$fecha = date('Y-m-d H:i:s');
+
+		$values = [
+			"estatusCita" => 10, // Procesando pago 
+			"fechaIntentoPago" => $fecha,
+			"modificadoPor" => $idUsuario, 
+			"fechaModificacion" => $fecha,
+		];
+
+		$updateRecord = $this->GeneralModel->updateRecord($this->schema_cm .".citas", $values, "idCita", $idCita);
+		$response["result"] = $updateRecord;
+		if ($response["result"]) {
+			$response["msg"] = "Fecha de intento de pago actualizada";
+		} else {
+			$response["msg"] = "Error al actualizar el dato";
+		}
+
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
+	}
+
 }
