@@ -118,12 +118,26 @@ class CalendarioModel extends CI_Model
         return $query;
     }
     
-    public function getHorarioBeneficio($beneficio){
-        $query = $this->ch->query(
-            "SELECT *FROM ". $this->schema_cm .".horariosporbeneficio WHERE idBeneficio = ?",
-            array($beneficio)
+    public function getHorarioBeneficio($beneficio, $especialistah){
+
+        $queryEspecialistas = $this->ch->query(
+            "SELECT * FROM ". $this->schema_cm .".horariosespecificos WHERE idEspecialista = ? AND estatus = 1",
+            array($especialistah)
         );
-        return $query;
+
+        if ($queryEspecialistas->num_rows() > 0) {
+
+            return $queryEspecialistas;
+            
+        }else{
+
+            $queryBeneficio = $this->ch->query(
+                "SELECT * FROM ". $this->schema_cm .".horariosporbeneficio WHERE idBeneficio = ?",
+                array($beneficio)
+            );
+
+            return $queryBeneficio;
+        }
     }
 
     public function getOccupiedRange($fechaInicio, $fechaFin, $idUsuario){

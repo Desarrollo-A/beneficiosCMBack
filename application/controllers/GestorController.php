@@ -330,4 +330,71 @@ class GestorController extends BaseController {
 		$this->output->set_content_type('application/json');
 		$this->output->set_output(json_encode($response));
 	}
+
+	public function getHorariosEspecificos(){
+
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->GestorModel->getHorariosEspecificos($dt)->result();
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
+
+	public function updateHorario(){
+
+		$idHorario= $this->input->post('dataValue[id]');
+		$horaInicio= $this->input->post('dataValue[horaInicio]');
+		$horaFin= $this->input->post('dataValue[horaFin]');
+		$sabado= $this->input->post('dataValue[sabado]');
+		$horaInicioSabado= $this->input->post('dataValue[horaInicioSabado]');
+		$horaFinSabado= $this->input->post('dataValue[horaFinSabado]');
+		$modificadoPor= $this->input->post('dataValue[modificadoPor]');
+
+		$data = array(
+			"idHorario" => $idHorario,
+			"horaInicio" => $horaInicio,
+			"horaFin" => $horaFin,		
+			"sabados" => $sabado,
+			"horaInicioSabado" => $horaInicioSabado,
+			"horaFinSabado" => $horaFinSabado,
+			"modificadoPor" => $modificadoPor,
+		);
+
+		$this->GeneralModel->updateRecord($this->schema_cm.'.horariosespecificos', $data, 'idHorario', $idHorario);
+		echo json_encode(array("estatus" => true, "msj" => "Horario Actualizado!" ));
+				
+	}
+
+	public function updateEstatusHorario(){
+		$dataValue = $this->input->post("dataValue", true);
+		$id = $dataValue["idHorario"];
+
+		$data = [
+			"estatus" => intval($dataValue["estatus"])
+		];
+
+		$updateRecord = $this->GeneralModel->updateRecord($this->schema_cm.'.horariosespecificos', $data, "idHorario", $id);
+
+		if($updateRecord){
+			$response["result"] = true;
+			$response["msg"] = "Se ha actualizado el estatus";
+		}
+		else{
+			$response["result"] = false;
+			$response["msg"] = "Ha ocurrido un error al actualizar";
+		}
+
+		$this->output->set_content_type('application/json');
+		$this->output->set_output(json_encode($response));
+	}
+
+	public function insertHorario(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->GestorModel->insertHorario($dt);
+	}
+
+	public function especialistas(){
+		$data['data'] = $this->GestorModel->especialistas();
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
 }
