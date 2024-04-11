@@ -100,8 +100,7 @@ class EncuestasModel extends CI_Model {
 		if (isset($items)) {
 
 			foreach ($items as $item) {
-				if (!isset($item->pregunta, $item->resp) || empty($item->pregunta) 
-				|| is_null($item->resp) || empty($item->resp) || is_null($item->pregunta)) {
+				if (!isset($item->resp)) {
 					echo json_encode(array("estatus" => false, "msj" => "Hay preguntas sin contestar!" ));
 					$datosValidos = false;
 					break; 
@@ -115,28 +114,11 @@ class EncuestasModel extends CI_Model {
 
 					$idPregunta++;
 
-					$pregunta = $item->pregunta;
 					$resp = $item->resp;
 					$idUsuario = $item->idUsuario;
 					$idEncuesta = $item->idEnc;
 					$idArea = $item->idArea;
                     $idEsp = $item->idEsp;
-
-					$abierta = is_numeric($resp) ? 1 : 0;
-
-                    /* $query_idEspecialista = $this->ch->query("SELECT ct.idEspecialista, MAX(ct.fechaFinal) AS fechaMasReciente
-					FROM ". $this->schema_ch .".beneficioscm_vista_usuarios us2
-					INNER JOIN ". $this->schema_cm .".usuarios us ON us.idContrato = us2.idcontrato
-					INNER JOIN ". $this->schema_cm .".citas ct ON ct.idEspecialista = us.idUsuario
-					WHERE us2.idcontrato = $idArea AND ct.idPaciente = $idUsuario
-					GROUP BY ct.idEspecialista
-					ORDER BY fechaMasReciente DESC
-					LIMIT 1;");
-
-                    $idEspecialista = [];
-                    foreach ($query_idEspecialista->result() as $row) {
-                        $idEspecialista[] = $row->idEspecialista;
-                    } */
                     
                     $this->ch->query("INSERT INTO ". $this->schema_cm .".encuestascontestadas (idPregunta, idRespuesta, idEspecialista, idArea, idEncuesta, fechaCreacion, idUsuario, creadoPor, modificadoPor ) 
 					VALUES (?, ?, ?, ?, ?, NOW(), ?, ?, ?)", 
