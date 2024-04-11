@@ -66,7 +66,7 @@ class UsuariosModel extends CI_Model {
 			 WHERE US.idRol = ?
 			 AND US.estatus = ?
 			 AND us2.idsede
-			 IN ( SELECT DISTINCT idSede FROM atencionxsede WHERE idEspecialista = ? )
+			 IN ( SELECT DISTINCT idSede FROM ". $this->schema_cm .".atencionxsede WHERE idEspecialista = ? )
 			 UNION
 			 SELECT  us2.idUsuarioExt AS idUsuario, 0 AS idContrato, 0 AS 'password', us2.idRol, us2.externo, 0 AS idAreaBeneficio, us2.estatus, us2.creadoPor, us2.fechaCreacion, us2.modificadoPor, us2.fechaModificacion, 0 AS idSede,  0 AS idarea, 0 tipoPuesto, 0 AS fechaIngreso, 
 			 CONCAT('(Lamat)', ' ', CONCAT(IFNULL(us2.nombre, ''))) AS nombreCompleto, 0 AS nombrePuesto, 0 AS tipo_puesto 
@@ -155,7 +155,7 @@ class UsuariosModel extends CI_Model {
     {
         $query = $this->ch->query(
         "SELECT *FROM ". $this->schema_ch .".beneficioscm_vista_usuarios AS us
-        WHERE us.num_empleado = ?;", array( $numEmpleado ));
+        WHERE us.num_empleado = ? ;", array( $numEmpleado ));
         return $query;
     }
 }

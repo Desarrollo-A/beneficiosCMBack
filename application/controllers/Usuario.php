@@ -201,7 +201,7 @@ class Usuario extends BaseController {
 		if ($response['result']) {  
 			$data['fechaModificacion'] = $fecha;
 			$data['modificadoPor'] = $user;
-			$response['result'] = $this->GeneralModel->updateRecord('usuarios', $data, 'idUsuario', $user);
+			$response['result'] = $this->GeneralModel->updateRecord($this->schema_cm .'.usuarios', $data, 'idUsuario', $user);
 	
 			if ($response['result']) {
 				$response['msg'] = "¡Usuario actualizado exitosamente!";
@@ -235,7 +235,7 @@ class Usuario extends BaseController {
 		if ($response['result']) {  
 			$data['fechaModificacion'] = $fecha;
 			$data['modificadoPor'] = $user;
-			$response['result'] = $this->GeneralModel->updateRecord('usuariosexternos', $data, 'idUsuarioExt', $user);
+			$response['result'] = $this->GeneralModel->updateRecord($this->schema_cm .'.usuariosexternos', $data, 'idUsuarioExt', $user);
 	
 			if ($response['result']) {
 				$response['msg'] = "¡Usuario actualizado exitosamente!";
@@ -287,7 +287,7 @@ class Usuario extends BaseController {
 					"password" => encriptar($newPass),
 				);
 				
-				$response=$this->GeneralModel->updateRecord('usuarios', $data, 'idUsuario', $idUsuario);
+				$response=$this->GeneralModel->updateRecord($this->schema_cm .'.usuarios', $data, 'idUsuario', $idUsuario);
 				echo json_encode(array("estatus" => true, "msj" => "Contraseña actualizada!" ));
 					
 			}else{
@@ -433,7 +433,7 @@ class Usuario extends BaseController {
 		$data["fechaModificacion"] = $fecha;
 		$data["modificadoPor"] = 1;
 
-		$updated = $this->GeneralModel->updateRecord("usuarios", $data, "idContrato", $idContrato);
+		$updated = $this->GeneralModel->updateRecord($this->schema_cm .".usuarios", $data, "idContrato", $idContrato);
 
 		if($updated){
 			$result->result = true;
@@ -504,7 +504,7 @@ class Usuario extends BaseController {
 		$data["fechaModificacion"] = $fecha;
 		$data["modificadoPor"] = 1;
 
-		$updated = $this->GeneralModel->updateRecord("usuarios", $data, "idContrato", $idContrato);
+		$updated = $this->GeneralModel->updateRecord($this->schema_cm .".usuarios", $data, "idContrato", $idContrato);
 
 		if($updated){
 			$result->result = true;
@@ -541,11 +541,11 @@ class Usuario extends BaseController {
 			$this->email->message($html_message);
 			$this->email->subject("Código de verificación Beneficios CDM");
 
-			$this->ch->query("DELETE FROM PRUEBA_beneficiosCM.tokenregistro WHERE correo = '?'", $correo);
+			$this->ch->query("DELETE FROM ". $this->schema_cm .".tokenregistro WHERE correo = '?'", $correo);
 
 			if ($this->email->send()) {
 				echo json_encode(array("estatus" => true, "msj" => "Envio exitoso" ), JSON_NUMERIC_CHECK); 
-				$this->ch->query("INSERT INTO PRUEBA_beneficiosCM.tokenregistro (correo, token, fechaCreacion) 
+				$this->ch->query("INSERT INTO ". $this->schema_cm .".tokenregistro (correo, token, fechaCreacion) 
 					VALUES (?,?, NOW())", 
 					array($correo, $data));
 			} else {
@@ -563,10 +563,16 @@ class Usuario extends BaseController {
         $response['result'] = isset($user);
         if ($response['result']) {
             $rs = $this->UsuariosModel->getUserByNumEmp($user)->result();
-            $response['result'] = count($rs) > 0;
+			
+			$response['result'] = count($rs) > 0;
             if ($response['result']) {
-                $response['msg'] = '¡Colaborador consultado exitosamente!';
-                $response['data'] = $rs;
+				$response['result'] = $rs[0]->activo == 1;
+				if ($response['result']) {
+					$response['msg'] = '¡Colaborador consultado exitosamente!';
+					$response['data'] = $rs;
+				}else {
+					$response['msg'] = '¡Colaborador inactivo!';
+				}
             } else {
                 $response['msg'] = '¡No existen el colaborador!';
             }

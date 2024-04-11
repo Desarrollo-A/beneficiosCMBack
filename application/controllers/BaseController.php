@@ -19,7 +19,8 @@ abstract class BaseController extends CI_Controller{
 
         // Lineas para la verificación de 
         $allowed_routes = ['LoginController/login', 'Usuario/getUserByNumEmp', 'Usuario/sendMail', 'Usuario/GetToken', 'LoginController/addRegistroEmpleado',
-                            "Usuario/authorized", "Api/confirmarPago", "Api/encodedHash", "Usuario/loginCH", "Usuario/updateCH", "Usuario/bajaCH"];
+            "Usuario/authorized", "Api/confirmarPago", "Api/encodedHash", "Usuario/loginCH", "Usuario/updateCH", "Usuario/bajaCH", "Api/tareaCancelaCitasSinPago",
+            "Api/creaEventoGoogleYNotifica"];
 
         $uri = $this->uri->uri_string();
 

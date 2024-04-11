@@ -9,15 +9,12 @@ class ReportesModel extends CI_Model {
         $this->schema_ch = $this->config->item('schema_ch');
 		$this->ch = $this->load->database('ch', TRUE);
 		parent::__construct();
-		$this->schema_cm = $this->config->item('schema_cm');
-        $this->schema_ch = $this->config->item('schema_ch');
 	}
 
     public function citas($dt)
 	{
 
 		if($dt == '0'){
-
 			$query = $this->ch->query("SELECT ct.idCita, pa.idUsuario AS idColab, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista, 
 			CONCAT (us3.nombre_persona,' ',us3.pri_apellido,' ',us3.sec_apellido) AS paciente, ps.nom_puesto AS area, sd.nsede AS sede,ct.titulo, op.nombre AS estatus, 
 			CONCAT(DATE_FORMAT(ct.fechaInicio, '%Y-%m-%d'), ' ', DATE_FORMAT(ct.fechaInicio, '%H:%i'), ' - ', DATE_FORMAT(ct.fechaFinal, '%H:%i')) AS horario, observaciones, us2.sexo, 
@@ -32,6 +29,7 @@ class ReportesModel extends CI_Model {
 		        WHEN ct.estatusCita = 5 THEN '#ff4d67'
 		        WHEN ct.estatusCita = 6 THEN '#00ffff'
 		        WHEN ct.estatusCita = 7 THEN '#ff0000'
+				WHEN ct.estatusCita = 10 THEN '#33105D'
 		        WHEN ct.estatusCita = 1 AND axs.tipoCita = 2 THEN '#0000ff'
     		END AS color,
 			CASE 
@@ -107,6 +105,7 @@ class ReportesModel extends CI_Model {
 		        WHEN ct.estatusCita = 5 THEN '#ff4d67'
 		        WHEN ct.estatusCita = 6 THEN '#00ffff'
 		        WHEN ct.estatusCita = 7 THEN '#ff0000'
+				WHEN ct.estatusCita = 10 THEN '#33105D'
 		        WHEN ct.estatusCita = 1 AND axs.tipoCita = 2 THEN '#0000ff'
     		END AS color,
 			CASE 
@@ -180,6 +179,7 @@ class ReportesModel extends CI_Model {
 		        WHEN ct.estatusCita = 5 THEN '#ff4d67'
 		        WHEN ct.estatusCita = 6 THEN '#00ffff'
 		        WHEN ct.estatusCita = 7 THEN '#ff0000'
+				WHEN ct.estatusCita = 10 THEN '#33105D'
 		        WHEN ct.estatusCita = 1 AND axs.tipoCita = 2 THEN '#0000ff'
     		END AS color,
 			CASE 
@@ -343,10 +343,10 @@ class ReportesModel extends CI_Model {
 				FROM ". $this->schema_cm .".citas ct 
 				INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idPaciente
 				INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
-				INNER JOIN detallepaciente dtp ON dtp.idUsuario = us.idUsuario
-				INNER JOIN catalogos cat ON cat.idCatalogo = 13
-				INNER JOIN citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = $idUs
-				LEFT JOIN opcionesporcatalogo op ON op.idCatalogo = cat.idCatalogo AND  op.idOpcion = dtp.estatusNut
+				INNER JOIN ". $this->schema_cm .".detallepaciente dtp ON dtp.idUsuario = us.idUsuario
+				INNER JOIN ". $this->schema_cm .".catalogos cat ON cat.idCatalogo = 13
+				INNER JOIN ". $this->schema_cm .".citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = $idUs
+				LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = cat.idCatalogo AND  op.idOpcion = dtp.estatusNut
 				WHERE ct.idEspecialista = $idUs AND estatusNut IS NOT null AND ci.estatusCita = 4");
 				break;
 
@@ -357,10 +357,10 @@ class ReportesModel extends CI_Model {
 				FROM ". $this->schema_cm .".citas ct 
 				INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idPaciente
 				INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
-				INNER JOIN detallepaciente dtp ON dtp.idUsuario = us.idUsuario
-				INNER JOIN catalogos cat ON cat.idCatalogo = 13
-				INNER JOIN citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = $idUs
-				LEFT JOIN opcionesporcatalogo op ON op.idCatalogo = cat.idCatalogo AND  op.idOpcion = dtp.estatusPsi
+				INNER JOIN ". $this->schema_cm .".detallepaciente dtp ON dtp.idUsuario = us.idUsuario
+				INNER JOIN ". $this->schema_cm .".catalogos cat ON cat.idCatalogo = 13
+				INNER JOIN ". $this->schema_cm .".citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = $idUs
+				LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = cat.idCatalogo AND  op.idOpcion = dtp.estatusPsi
 				WHERE ct.idEspecialista = $idUs AND estatusPsi IS NOT null AND ci.estatusCita = 4");
 				break;
 
@@ -371,10 +371,10 @@ class ReportesModel extends CI_Model {
 				FROM ". $this->schema_cm .".citas ct 
 				INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idPaciente
 				INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
-				INNER JOIN detallepaciente dtp ON dtp.idUsuario = us.idUsuario
-				INNER JOIN catalogos cat ON cat.idCatalogo = 13
-				INNER JOIN citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = $idUs
-				LEFT JOIN opcionesporcatalogo op ON op.idCatalogo = cat.idCatalogo AND  op.idOpcion = dtp.estatusQB
+				INNER JOIN ". $this->schema_cm .".detallepaciente dtp ON dtp.idUsuario = us.idUsuario
+				INNER JOIN ". $this->schema_cm .".catalogos cat ON cat.idCatalogo = 13
+				INNER JOIN ". $this->schema_cm .".citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = $idUs
+				LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = cat.idCatalogo AND  op.idOpcion = dtp.estatusQB
 				WHERE ct.idEspecialista = $idUs AND estatusQB IS NOT null AND ci.estatusCita = 4");
 				break;
 
@@ -385,10 +385,10 @@ class ReportesModel extends CI_Model {
 				FROM ". $this->schema_cm .".citas ct 
 				INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idPaciente
 				INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
-				INNER JOIN detallepaciente dtp ON dtp.idUsuario = us.idUsuario
-				INNER JOIN catalogos cat ON cat.idCatalogo = 13
-				INNER JOIN citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = $idUs
-				LEFT JOIN opcionesporcatalogo op ON op.idCatalogo = cat.idCatalogo AND  op.idOpcion = dtp.estatusGE
+				INNER JOIN ". $this->schema_cm .".detallepaciente dtp ON dtp.idUsuario = us.idUsuario
+				INNER JOIN ". $this->schema_cm .".catalogos cat ON cat.idCatalogo = 13
+				INNER JOIN ". $this->schema_cm .".citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = $idUs
+				LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = cat.idCatalogo AND  op.idOpcion = dtp.estatusGE
 				WHERE ct.idEspecialista = $idUs AND estatusGE IS NOT null AND ci.estatusCita = 4");
 				break;
 		}
@@ -876,7 +876,7 @@ class ReportesModel extends CI_Model {
 			INNER JOIN ". $this->schema_cm .".detallepagos dp ON dp.idDetalle = ct.idDetalle
 			INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idEspecialista
 			LEFT JOIN ". $this->schema_cm .".atencionxsede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
-			LEFT JOIN opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
+			LEFT JOIN ". $this->schema_cm .".opcionesPorCatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
 			WHERE (ct.estatusCita = 2 OR ct.estatusCita = 7) AND (ct.fechaCreacion >= '$fechaI' AND ct.fechaCreacion < '$fechaF')
 			AND (dp.estatusPago = 1 OR dp.estatusPago = 3)
 			AND op2.nombre IN ('$modalidad')
@@ -1049,7 +1049,7 @@ class ReportesModel extends CI_Model {
         LEFT JOIN ". $this->schema_cm .".detallepagos dp ON dp.idDetalle = ct.idDetalle
         LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo oxc ON oxc.idOpcion = dp.metodoPago AND oxc.idCatalogo = 11
         LEFT JOIN ". $this->schema_cm .".motivosporcita mpc ON mpc.idCita = ct.idCita
-        LEFT JOIN catalogos cat ON cat.idCatalogo = CASE 
+        LEFT JOIN ". $this->schema_cm .".catalogos cat ON cat.idCatalogo = CASE 
             WHEN us2.idpuesto = 537 THEN 8
             WHEN us2.idpuesto = 585 THEN 7
             WHEN us2.idpuesto = 686 THEN 9
@@ -1080,7 +1080,7 @@ class ReportesModel extends CI_Model {
             LEFT JOIN ". $this->schema_cm .".detallepagos dp ON dp.idDetalle = ct.idDetalle
             LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo oxc ON oxc.idOpcion = dp.metodoPago AND oxc.idCatalogo = 11
             LEFT JOIN ". $this->schema_cm .".motivosporcita mpc ON mpc.idCita = ct.idCita
-            LEFT JOIN catalogos cat ON cat.idCatalogo = CASE 
+            LEFT JOIN ". $this->schema_cm .".catalogos cat ON cat.idCatalogo = CASE 
                 WHEN us2.idpuesto = 537 THEN 8
                 WHEN us2.idpuesto = 585 THEN 7
                 WHEN us2.idpuesto = 686 THEN 9

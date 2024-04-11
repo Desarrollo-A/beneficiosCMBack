@@ -23,7 +23,7 @@ class GeneralModel extends CI_Model {
         ps.idarea AS idArea, ps.estatus_puesto AS estatus, dp.canRegister 
         FROM ". $this->schema_ch .".beneficioscm_vista_usuarios AS us
         INNER JOIN ". $this->schema_ch .".beneficioscm_vista_puestos ps ON ps.idpuesto = us.idpuesto
-        LEFT JOIN datopuesto dp ON dp.idPuesto = ps.idpuesto 
+        LEFT JOIN ". $this->schema_cm .".datopuesto dp ON dp.idPuesto = ps.idpuesto 
         WHERE us.idcontrato = ?", $contrato);
         return $query;
     }
@@ -81,7 +81,12 @@ class GeneralModel extends CI_Model {
     public function getAtencionXsede(){
         
         $query = $this->ch->query("SELECT axs.idAtencionXSede AS id,axs.idSede, sd.nsede AS sede, axs.idArea, axs.idEspecialista, axs.tipoCita, 
-        o.idoficina AS idOficina, o.noficina AS oficina, o.direccion AS ubicación, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre,
+        o.idoficina AS idOficina,
+        CASE 
+        WHEN axs.idOficina = 0 THEN 'VIRTUAL' 
+        WHEN axs.idOficina <> 0 THEN o.noficina 
+        END AS oficina, 
+         o.direccion AS ubicación, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre,
         ps.idpuesto AS idPuesto, ps.nom_puesto AS puesto, op.nombre AS modalidad, axs.estatus,
         CASE
         WHEN axs.idArea IS NULL THEN 'SIN ÁREA'
@@ -89,14 +94,14 @@ class GeneralModel extends CI_Model {
         END AS nombreArea
         FROM ". $this->schema_cm .".atencionxsede axs
         INNER JOIN ". $this->schema_ch .".beneficioscm_vista_sedes sd ON sd.idsede = axs.idSede
-        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_oficinas o ON o.idoficina = axs.idOficina
-        INNER JOIN usuarios us ON us.idUsuario = axs.idEspecialista
+        LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_oficinas o ON o.idoficina = axs.idOficina
+        INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = axs.idEspecialista
         INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
         INNER JOIN ". $this->schema_ch .".beneficioscm_vista_puestos ps ON ps.idpuesto = us2.idpuesto 
-        INNER JOIN catalogos ct ON ct.idCatalogo = 5
+        INNER JOIN ". $this->schema_cm .".catalogos ct ON ct.idCatalogo = 5
         LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_area ar ON ar.idsubarea = axs.idArea
         LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_departamento dt ON dt.iddepto = ar.iddepto  
-        INNER JOIN opcionesporcatalogo op ON op.idCatalogo = ct.idCatalogo AND op.idOpcion = axs.tipoCita");
+        INNER JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = ct.idCatalogo AND op.idOpcion = axs.tipoCita");
         return $query;
 
     }
@@ -149,7 +154,7 @@ class GeneralModel extends CI_Model {
         $query = $this->ch-> query("SELECT ct.idCita AS id, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista, us2.idpuesto AS beneficio, sd.nsede AS sede, op.nombre AS estatus, 
 		CONCAT(DATE_FORMAT(ct.fechaInicio, '%Y-%m-%d'), ' ', DATE_FORMAT(ct.fechaInicio, '%H:%i'), ' - ', DATE_FORMAT(ct.fechaFinal, '%H:%i')) AS horario,
 		ofi.noficina AS oficina, IFNULL(oxc.nombre, 'Pendiente de pago') AS metodoPago, ct.estatusCita,
-		IFNULL(GROUP_CONCAT(ops.nombre SEPARATOR ', '), 'Sin motivos de cita') AS motivoCita,
+		IFNULL(GROUP_CONCAT(ops.nombre SEPARATOR ', '), 'SIN MOTIVOS DE CITA') AS motivoCita,
         CASE
 	        WHEN ct.estatusCita = 0 THEN '#ff0000'
 	        WHEN ct.estatusCita = 1 AND axs.tipoCita = 1 THEN '#ffa500'
@@ -159,6 +164,7 @@ class GeneralModel extends CI_Model {
             WHEN ct.estatusCita = 5 THEN '#ff4d67'
             WHEN ct.estatusCita = 6 THEN '#00ffff'
             WHEN ct.estatusCita = 7 THEN '#ff0000'
+            WHEN ct.estatusCita = 10 THEN '#33105D'
             WHEN ct.estatusCita = 1 AND axs.tipoCita = 2 THEN '#0000ff'
 	    END AS color,
 		CASE 

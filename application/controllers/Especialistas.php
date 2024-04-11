@@ -76,7 +76,7 @@ class Especialistas extends BaseController{
                         "idSede" => $sede
                     ];
 
-                    $is_ok = $this->GeneralModel->updateRecord('presencialxsede', $values, 'idEvento', $id[0]->idEvento);
+                    $is_ok = $this->GeneralModel->updateRecord($this->schema_cm .'.presencialxsede', $values, 'idEvento', $id[0]->idEvento);
                 }
                 else{
                     $is_ok = $this->SedesModel->addHorarioPresencial($date->format("Y-m-d"), $sede, $especialista);
