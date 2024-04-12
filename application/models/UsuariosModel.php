@@ -45,6 +45,18 @@ class UsuariosModel extends CI_Model {
         return $query;
     }
 
+    public function loginAPI($username, $password){
+        $table = $this->schema_cm . ".usuarios_api";
+
+        $query = "SELECT *
+        FROM $table
+        WHERE
+            username = '$username'
+        AND password = '$password'";
+
+        return $this->ch->query($query)->row();
+    }
+
 	public function getAreas()
 	{
 
