@@ -528,7 +528,7 @@ class CalendarioModel extends CI_Model
         $query = $this->ch->query(
             "SELECT TRIM(CAST(ct.idCita AS CHAR(36))) AS id,  ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', ue.nombre,
             ct.fechaInicio AS occupied, 'date' AS 'type', ct.estatusCita AS estatus, ct.idPaciente, ue.telPersonal AS telPersonal, ue.correo AS correo,
-            ct.idDetalle, ct.idAtencionXSede, ue.externo, CONCAT(IFNULL(usEspCH.nombre_persona, ''), ' ', IFNULL(usEspCH.pri_apellido, ''), ' ', IFNULL(usEspCH.sec_apellido, '')) AS especialista, ct.fechaCreacion, usEspCH.tipo_puesto AS tipoPuesto,
+            ct.idDetalle, ct.idAtencionXSede, us.externo, CONCAT(IFNULL(usEspCH.nombre_persona, ''), ' ', IFNULL(usEspCH.pri_apellido, ''), ' ', IFNULL(usEspCH.sec_apellido, '')) AS especialista, ct.fechaCreacion, usEspCH.tipo_puesto AS tipoPuesto,
             tf.fechasFolio, ct.idEventoGoogle, ct.tipoCita, aps.tipoCita as modalidad, aps.idSede, dp.estatusPago,
             CASE WHEN ct.estatusCita = 0 THEN '#ff0000'
                 WHEN ct.estatusCita = 1 AND aps.tipoCita = 1 THEN '#ffa500'
@@ -546,15 +546,17 @@ class CalendarioModel extends CI_Model
                WHEN usEspCH.idPuesto = 686 THEN 'guía espiritual'
                WHEN usEspCH.idPuesto = 158 THEN 'quantum balance'
                END AS beneficio
-            FROM PRUEBA_beneficiosCM.citas AS ct 
-            INNER JOIN PRUEBA_beneficiosCM.usuariosexternos AS ue ON ue.idUsuarioExt = ct.idPaciente
-            LEFT JOIN (SELECT idDetalle, GROUP_CONCAT(DATE_FORMAT(fechaInicio, '%d / %m / %Y A las %H:%i horas.'), '') AS fechasFolio FROM PRUEBA_beneficiosCM.citas WHERE estatusCita IN( ? ) AND citas.idCita = idCita GROUP BY citas.idDetalle) AS tf ON tf.idDetalle = ct.idDetalle
-            LEFT JOIN PRUEBA_beneficiosCM.usuarios AS usEspe ON usEspe.idUsuario = ct.idEspecialista
-            LEFT JOIN PRUEBA_CH.beneficioscm_vista_usuarios AS usEspCH ON usEspCH.idcontrato = usEspe.idContrato
-            LEFT JOIN PRUEBA_beneficiosCM.atencionxsede AS aps ON ct.idAtencionXSede = aps.idAtencionXSede
-            LEFT JOIN PRUEBA_beneficiosCM.detallepagos AS dp ON dp.idDetalle = ct.idDetalle
+            FROM ".$this->schema_cm .".citas AS ct 
+            LEFT JOIN ".$this->schema_cm .".usuarios as us ON us.idUsuario = ct.idPaciente
+            LEFT JOIN ".$this->schema_cm .".usuariosexternos AS ue ON ue.idContrato = us.idContrato
+            LEFT JOIN (SELECT idDetalle, GROUP_CONCAT(DATE_FORMAT(fechaInicio, '%d / %m / %Y A las %H:%i horas.'), '') AS fechasFolio FROM 
+                ".$this->schema_cm .".citas WHERE estatusCita IN( ? ) AND citas.idCita = idCita GROUP BY citas.idDetalle) AS tf ON tf.idDetalle = ct.idDetalle
+            LEFT JOIN ".$this->schema_cm .".usuarios AS usEspe ON usEspe.idUsuario = ct.idEspecialista
+            LEFT JOIN ".$this->schema_ch .".beneficioscm_vista_usuarios AS usEspCH ON usEspCH.idcontrato = usEspe.idContrato
+            LEFT JOIN ".$this->schema_cm .".atencionxsede AS aps ON ct.idAtencionXSede = aps.idAtencionXSede
+            LEFT JOIN ".$this->schema_cm .".detallepagos AS dp ON dp.idDetalle = ct.idDetalle
             WHERE YEAR(fechaInicio) IN (?, ?) AND MONTH(fechaInicio) IN (?, ?, ?)  
-            AND ct.idEspecialista = ? AND ue.externo = ? AND ct.estatusCita IN(?, ?, ?, ?, ?, ?, ?, ?);",
+            AND ct.idEspecialista = ? AND us.externo = ? AND ct.estatusCita IN(?, ?, ?, ?, ?, ?, ?, ?);",
             array( 8, $dates["year1"], $dates["year2"], $dates["month1"], $month, $dates["month2"], $idUsuario, 1, 1, 2, 3, 4, 5, 6, 7, 10 )
         );
 
