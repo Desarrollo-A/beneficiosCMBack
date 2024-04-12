@@ -153,13 +153,19 @@ class Usuario extends BaseController {
             $fecha = date('Y-m-d H:i:s');
             $rows = array();
             foreach ($data as $user) {
+
+				$complemento = date('YmdHis');
+				$iniciales = getIniciales($user['nombre']);
+
+				// Insert hacia la tabla de usuarios externos
                 $row = array(
+					'idUsuarioExt' => null,
+					'idContrato' => $iniciales.$complemento,
                     'nombre' => $user['nombre'],
                     'correo' => isset($user['correo']) ? $user['correo'] : null,
                     'telPersonal' => isset($user['telPersonal']) ? $user['telPersonal'] : null,
 					'sexo' => $user['sexo'],
 					'idRol' => 2,
-					'externo' => 1,
                     'estatus' => 1,
 					'creadoPor' => $user['creadoPor'],
                     'fechaCreacion' => $fecha,
@@ -167,9 +173,44 @@ class Usuario extends BaseController {
                     'fechaModificacion' => $fecha,
                 );
                 $rows[] = $row;
+
+				// Insert hacia la tabla de usuarios
+				$row2 = array(
+					'idContrato' => $iniciales.$complemento,
+					'password' => null,
+					'idRol' => 2,
+					'externo' => 1,
+					'idAreaBeneficio' => NULL, 
+                    'estatus' => 1,
+					'creadoPor' => $user['creadoPor'],
+                    'fechaCreacion' => $fecha,
+                    'modificadoPor' => $user['creadoPor'],
+                    'fechaModificacion' => $fecha,
+                );
+				$rows2[] = $row2;
             }
         
-            $response['result'] = $this->GeneralModel->insertBatch($table, $rows);
+            $res = $this->GeneralModel->insertBatch($this->schema_cm.'.'.$table, $rows);
+			$res2 = $this->GeneralModel->insertBatchAndGetIds($this->schema_cm .'.usuarios', $rows2);
+
+			foreach ($res2 as $index => $id) {
+				$row3 = array(
+					'idUsuario' => $id,
+					'estatusNut' => NULL,
+					'estatusPsi' => NULL,
+					'estatusQB' => NULL,
+					'estatusGE' => NULL, 
+                    'estatus' => 1,
+					'creadoPor' => $user['creadoPor'],
+                    'fechaCreacion' => $fecha,
+                    'modificadoPor' => $user['creadoPor'],
+                    'fechaModificacion' => $fecha,
+				);
+				$rows3[] = $row3;
+			}
+			$res3 = $this->GeneralModel->insertBatch($this->schema_cm .'.detallepaciente', $rows3);
+			
+			$response['result'] = $res3;
             
             if ($response['result']) {
                 $response['msg'] = "¡Listado insertado exitosamente!";
@@ -234,8 +275,7 @@ class Usuario extends BaseController {
 		
 		if ($response['result']) {  
 			$data['fechaModificacion'] = $fecha;
-			$data['modificadoPor'] = $user;
-			$response['result'] = $this->GeneralModel->updateRecord($this->schema_cm .'.usuariosexternos', $data, 'idUsuarioExt', $user);
+			$response['result'] = $this->GeneralModel->updateRecord($this->schema_cm .'.usuariosexternos', $data, 'idContrato', $user);
 	
 			if ($response['result']) {
 				$response['msg'] = "¡Usuario actualizado exitosamente!";
@@ -323,9 +363,9 @@ class Usuario extends BaseController {
 
 		$decoded = base64_decode($token);
 
-		list($numEmpleado, $password) = explode(":", $decoded);
+		list($username, $password) = explode(":", $decoded);
 
-		$usuario = $this->UsuariosModel->login($numEmpleado, encriptar(trim($password)))->row();
+		$usuario = $this->UsuariosModel->loginAPI($username, encriptar(trim($password)));
 
 		if(!isset($usuario)){
 			$result->msg = 'No existe el usuario';
@@ -449,7 +489,7 @@ class Usuario extends BaseController {
 	public function bajaCH(){
 		$auth = $this->headers('Authorization');
 		$token = null;
-		$idContrato = $this->input->POST('idcontrato');
+		$idContrato = $this->input->get('idcontrato');
 		$fecha = date('Y-m-d H:i:s');
 
 		$result = (object) [
@@ -483,7 +523,7 @@ class Usuario extends BaseController {
 
 		$usuario = $decoded->data;
 
-		if($usuario->idRol != 4){
+		if($usuario->status != 1){
 			$result->msg = 'No tiene permisos para esta acción';
 			$this->json($result, JSON_NUMERIC_CHECK);
 		}
