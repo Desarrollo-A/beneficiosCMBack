@@ -13,7 +13,7 @@ class UsuariosModel extends CI_Model {
 
     public function usuarios()
 	{
-		$query = $this->ch-> query("SELECT * FROM ". $this->schema_cm .".usuarios");
+		$query = $this->ch-> query("SELECT * FROM ".$this->schema_cm .".usuarios");
 		return $query->result();
 	}
 
@@ -25,7 +25,9 @@ class UsuariosModel extends CI_Model {
 
 	public function getUsersExternos()
 	{
-		$query = $this->ch->query("SELECT *FROM ". $this->schema_cm .".usuariosexternos WHERE externo = 1");
+		$query = $this->ch->query("SELECT *FROM ".$this->schema_cm .".usuarios AS u
+		LEFT JOIN ".$this->schema_cm .".usuariosexternos AS ue ON ue.idContrato = u.idContrato
+		WHERE u.externo = 1;");
 		return $query;
 	}
 
@@ -47,7 +49,6 @@ class UsuariosModel extends CI_Model {
 
 	public function getAreas()
 	{
-
 		$query = $this->ch->query("SELECT * FROM ". $this->schema_cm .".usuarios AS us
 		LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato");
 
@@ -57,21 +58,20 @@ class UsuariosModel extends CI_Model {
 	public function getNameUser($idEspecialista)
 	{
 		$query = $this->ch->query(
-			"SELECT US.*, SE.idsede AS idSede, PS.idArea, us2.tipo_puesto AS tipoPuesto, us2.fingreso AS fechaIngreso, CONCAT(CONCAT (us2.nombre_persona,' ',us2.pri_apellido,' ',us2.sec_apellido), ' ', '(', SE.nsede, ')') AS nombreCompleto, 
-			 PS.nom_puesto as nombrePuesto, PS.tipo_puesto
-			 FROM ". $this->schema_cm .".usuarios US
-			 INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = US.idContrato
-			 INNER JOIN ". $this->schema_ch .".beneficioscm_vista_puestos PS ON us2.idpuesto = PS.idpuesto 
-			 INNER JOIN ". $this->schema_ch .".beneficioscm_vista_sedes SE ON SE.idsede = us2.idsede 
-			 WHERE US.idRol = ?
-			 AND US.estatus = ?
-			 AND us2.idsede
-			 IN ( SELECT DISTINCT idSede FROM ". $this->schema_cm .".atencionxsede WHERE idEspecialista = ? )
-			 UNION
-			 SELECT  us2.idUsuarioExt AS idUsuario, 0 AS idContrato, 0 AS 'password', us2.idRol, us2.externo, 0 AS idAreaBeneficio, us2.estatus, us2.creadoPor, us2.fechaCreacion, us2.modificadoPor, us2.fechaModificacion, 0 AS idSede,  0 AS idarea, 0 tipoPuesto, 0 AS fechaIngreso, 
-			 CONCAT('(Lamat)', ' ', CONCAT(IFNULL(us2.nombre, ''))) AS nombreCompleto, 0 AS nombrePuesto, 0 AS tipo_puesto 
-			 FROM ". $this->schema_cm .".usuariosexternos AS us2",
-			 array( 2, 1, $idEspecialista )
+			"SELECT US.*, SE.idsede AS idSede, PS.idArea, us2.tipo_puesto AS tipoPuesto, us2.fingreso AS fechaIngreso, 
+			CONCAT(CONCAT (us2.nombre_persona,' ',us2.pri_apellido,' ',us2.sec_apellido),' ', '(', SE.nsede, ')') AS nombreCompleto, PS.nom_puesto as nombrePuesto, PS.tipo_puesto 
+			FROM ". $this->schema_cm .".usuarios US 
+			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = US.idContrato 
+			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_puestos PS ON us2.idpuesto = PS.idpuesto 
+			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_sedes SE ON SE.idsede = us2.idsede 
+			WHERE US.idRol = 2 AND US.estatus = 1 AND us2.idsede IN ( SELECT DISTINCT idSede FROM PRUEBA_beneficiosCM.atencionxsede WHERE idEspecialista = '8' ) 
+			UNION ( SELECT u.idUsuario AS idUsuario, u.idContrato, u.password, us2.idRol, u.externo, u.idAreaBeneficio, us2.estatus, us2.creadoPor, us2.fechaCreacion,
+			 us2.modificadoPor, us2.fechaModificacion, 1 AS idSede, 0 AS idarea, 0 tipoPuesto, 0 AS fechaIngreso, CONCAT('(Lamat)', ' ', CONCAT(IFNULL(us2.nombre, ''))) AS nombreCompleto,
+			0 AS nombrePuesto, 0 AS tipo_puesto 
+			FROM ". $this->schema_cm .".usuarios as u 
+			INNER JOIN ". $this->schema_cm .".usuariosexternos AS us2 ON us2.idContrato = u.idContrato 
+			WHERE u.externo = 1 )",
+			 array( 2, 1, $idEspecialista, 1 )
 		);
 		
 		return $query;

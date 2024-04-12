@@ -60,6 +60,21 @@ class GeneralModel extends CI_Model {
         }
     }
 
+    public function insertBatchAndGetIds($table, $data) {
+        $this->ch->trans_begin();
+        $this->ch->insert_batch($table, $data);
+        $insert_id = $this->ch->insert_id();
+        $affected_rows = $this->ch->affected_rows();
+        if (!$this->ch->trans_status())  { // Hubo errores en la consulta, entonces se cancela la transacción.
+            $this->ch->trans_rollback();
+            return false;
+        } else { // Todas las consultas se hicieron correctamente.
+            $this->ch->trans_commit();
+            return range($insert_id, $insert_id + $affected_rows - 1);
+        }
+    }
+
+
     public function updateBatch($table, $data, $key)
     {
         $this->ch->trans_begin();
