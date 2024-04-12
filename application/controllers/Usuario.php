@@ -323,9 +323,9 @@ class Usuario extends BaseController {
 
 		$decoded = base64_decode($token);
 
-		list($numEmpleado, $password) = explode(":", $decoded);
+		list($username, $password) = explode(":", $decoded);
 
-		$usuario = $this->UsuariosModel->login($numEmpleado, encriptar(trim($password)))->row();
+		$usuario = $this->UsuariosModel->loginAPI($username, encriptar(trim($password)));
 
 		if(!isset($usuario)){
 			$result->msg = 'No existe el usuario';
@@ -449,7 +449,7 @@ class Usuario extends BaseController {
 	public function bajaCH(){
 		$auth = $this->headers('Authorization');
 		$token = null;
-		$idContrato = $this->input->POST('idcontrato');
+		$idContrato = $this->input->get('idcontrato');
 		$fecha = date('Y-m-d H:i:s');
 
 		$result = (object) [
@@ -483,7 +483,7 @@ class Usuario extends BaseController {
 
 		$usuario = $decoded->data;
 
-		if($usuario->idRol != 4){
+		if($usuario->status != 1){
 			$result->msg = 'No tiene permisos para esta acción';
 			$this->json($result, JSON_NUMERIC_CHECK);
 		}

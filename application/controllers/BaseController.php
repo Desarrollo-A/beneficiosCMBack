@@ -9,7 +9,7 @@ abstract class BaseController extends CI_Controller{
 
         //$this->load->helper(array('form','funciones'));
 
-        //$this->load->library('Token');
+        $this->load->library('Token');
         //$this->load->library('GoogleApi');
         date_default_timezone_set('America/Mexico_City');
 
@@ -18,11 +18,11 @@ abstract class BaseController extends CI_Controller{
         header('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Token, Authorization');
 
         // Lineas para la verificación de 
-        $allowed_routes = ['LoginController/login', 'Usuario/getUserByNumEmp', 'Usuario/sendMail', 'Usuario/GetToken', 'LoginController/addRegistroEmpleado',
-            "Usuario/authorized", "Api/confirmarPago", "Api/encodedHash", "Usuario/loginCH", "Usuario/updateCH", "Usuario/bajaCH", "Api/tareaCancelaCitasSinPago",
-            "Api/creaEventoGoogleYNotifica"];
+        $allowed_routes = ['logincontroller/login', 'usuario/getuserbynumemp', 'usuario/sendmail', 'usuario/gettoken', 'logincontroller/addregistroempleado',
+            "usuario/authorized", "api/confirmarpago", "api/encodedhash", "usuario/loginch", "usuario/updatech", "usuario/bajach", "api/tareacancelacitassinpago",
+            "api/creaeventogoogleynotifica"];
 
-        $uri = $this->uri->uri_string();
+        $uri = strtolower($this->uri->uri_string());
 
         if(!in_array($uri, $allowed_routes)){
             $response['status'] = 'error';
