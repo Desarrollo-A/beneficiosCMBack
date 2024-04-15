@@ -153,11 +153,11 @@ class UsuariosModel extends CI_Model {
 		$correo = $dt_array["correo"];
         $token = $dt_array["token"]["codigo"];
 
-        $query = $this->ch->query("SELECT * FROM ". $this->schema_cm .".tokenregistro WHERE correo = ? AND token = ?", array("\"$correo\"", $token));
+        $query = $this->ch->query("SELECT * FROM ". $this->schema_cm .".tokenregistro WHERE correo = ? AND token = ?", array($correo, $token));
 
 		if ($query->num_rows() > 0) {
 			echo json_encode(array("estatus" => true, "msj" => "Código correcto" ), JSON_NUMERIC_CHECK); 
-			$this->ch->query("DELETE FROM ". $this->schema_cm .".tokenregistro WHERE correo = ?", array("\"$correo\""));
+			$this->ch->query("DELETE FROM ". $this->schema_cm .".tokenregistro WHERE correo = ?", array($correo));
 		}else{
 			echo json_encode(array("estatus" => false, "msj" => "El código insertado no es correcto"), JSON_NUMERIC_CHECK);
 		}
