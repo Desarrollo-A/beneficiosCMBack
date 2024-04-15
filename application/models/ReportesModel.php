@@ -309,7 +309,7 @@ class ReportesModel extends CI_Model {
 				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us4 ON us4.idpuesto = 585
 				LEFT JOIN ". $this->schema_cm .".usuarios us3 ON us3.idRol = 3 AND us3.idContrato = us4.idcontrato 
 				LEFT JOIN ". $this->schema_cm .".citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = us3.idUsuario 
-				LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = ct.idCatalogo AND op.idOpcion = dp.estatusNut 
+				LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = ct.idCatalogo AND op.idOpcion = dp.estatusPsi
 				WHERE estatusPsi IS NOT null AND ci.estatusCita = 4 AND us.externo = $tipoUsuario");
 				break;
 				
@@ -327,7 +327,7 @@ class ReportesModel extends CI_Model {
 				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us4 ON us4.idpuesto = 158
 				LEFT JOIN ". $this->schema_cm .".usuarios us3 ON us3.idRol = 3 AND us3.idContrato = us4.idcontrato 
 				LEFT JOIN ". $this->schema_cm .".citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = us3.idUsuario 
-				LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = ct.idCatalogo AND op.idOpcion = dp.estatusNut 
+				LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = ct.idCatalogo AND op.idOpcion = dp.estatusQB 
 				WHERE estatusQB IS NOT null AND ci.estatusCita = 4 AND us.externo = $tipoUsuario");
 				break;
 
@@ -345,7 +345,7 @@ class ReportesModel extends CI_Model {
 				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us4 ON us4.idpuesto = 686
 				LEFT JOIN ". $this->schema_cm .".usuarios us3 ON us3.idRol = 3 AND us3.idContrato = us4.idcontrato 
 				LEFT JOIN ". $this->schema_cm .".citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = us3.idUsuario 
-				LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = ct.idCatalogo AND op.idOpcion = dp.estatusNut 
+				LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = ct.idCatalogo AND op.idOpcion = dp.estatusGE
 				WHERE estatusGE IS NOT null AND ci.estatusCita = 4 AND us.externo = $tipoUsuario");
 				break;
 		}
@@ -1089,7 +1089,7 @@ class ReportesModel extends CI_Model {
           LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo ops ON ops.idOpcion = mpc.idMotivo AND ops.idCatalogo = cat.idCatalogo
         WHERE ct.idPaciente = $idUsuario AND oc.idCatalogo = 2 AND us2.idpuesto = $espe AND us.externo = $tipoUsuario
         GROUP BY us2.nombre_persona, us2.pri_apellido,us2.sec_apellido,us3.nombre_persona, us3.pri_apellido,    
-          us3.sec_apellido, ct.idPaciente, ct.titulo, oc.nombre, ct.estatusCita, ct.idDetalle, ct.tipoCita, ct.fechaInicio, ct.fechaFinal, ops.nombre
+          us3.sec_apellido, ext.nombre, ct.idPaciente, ct.titulo, oc.nombre, ct.estatusCita, ct.idDetalle, ct.tipoCita, ct.fechaInicio, ct.fechaFinal, mpc.idCita
         ORDER BY ct.fechaInicio, ct.fechaFinal DESC");
 
         return $query;
@@ -1121,7 +1121,7 @@ class ReportesModel extends CI_Model {
               LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo ops ON ops.idOpcion = mpc.idMotivo AND ops.idCatalogo = cat.idCatalogo
             WHERE ct.idPaciente = $idUsuario AND oc.idCatalogo = 2 AND us2.idpuesto = $espe AND es.idUsuario = $idEspe AND us.externo = $tipoUsuario
             GROUP BY us2.nombre_persona, us2.pri_apellido,us2.sec_apellido,us3.nombre_persona, us3.pri_apellido,    
-              us3.sec_apellido, ct.idPaciente, ct.titulo, oc.nombre, ct.estatusCita, ct.idDetalle, ct.tipoCita, ct.fechaInicio, ct.fechaFinal, ops.nombre
+              us3.sec_apellido, ct.idPaciente, ct.titulo, oc.nombre, ct.estatusCita, ct.idDetalle, ct.tipoCita, ct.fechaInicio, ct.fechaFinal, mpc.idCita
             ORDER BY ct.fechaInicio, ct.fechaFinal DESC");
             return $query;
 
