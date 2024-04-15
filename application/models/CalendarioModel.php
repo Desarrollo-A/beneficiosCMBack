@@ -35,8 +35,8 @@ class CalendarioModel extends CI_Model
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_sedes AS sed ON sed.idsede = atc.idSede 
             LEFT JOIN (SELECT idDetalle, GROUP_CONCAT(DATE_FORMAT(fechaInicio, '%d / %m / %Y A las %H:%i horas.'), '') AS fechasFolio FROM ". $this->schema_cm .".citas WHERE estatusCita IN(8) GROUP BY idDetalle) tf ON tf.idDetalle = ct.idDetalle 
             LEFT JOIN ". $this->schema_cm .".detallepagos as dp ON dp.idDetalle = ct.idDetalle
-            WHERE YEAR(fechaInicio) = ? AND MONTH(fechaInicio) = ? AND ct.idPaciente = ? AND ct.estatusCita IN(?, ?, ?, ?, ?, ?, ?, ?);",
-            array( $year, $month, $idUsuario, 1, 2, 3, 4, 5, 6, 7, 10)
+            WHERE YEAR(fechaInicio) = ? AND MONTH(fechaInicio) = ? AND ct.idPaciente = ? AND ct.estatus = ? AND ct.estatusCita IN(?, ?, ?, ?, ?, ?, ?, ?);",
+            array( $year, $month, $idUsuario, 1, 1, 2, 3, 4, 5, 6, 7, 10)
         );
 
         return $query;
@@ -118,11 +118,11 @@ class CalendarioModel extends CI_Model
         return $query;
     }
     
-    public function getHorarioBeneficio($beneficio, $especialistah){
+    public function getHorarioBeneficio($beneficio, $especialista){
 
         $queryEspecialistas = $this->ch->query(
             "SELECT * FROM ". $this->schema_cm .".horariosespecificos WHERE idEspecialista = ? AND estatus = 1",
-            array($especialistah)
+            array($especialista)
         );
 
         if ($queryEspecialistas->num_rows() > 0) {
@@ -517,6 +517,7 @@ class CalendarioModel extends CI_Model
             WHERE YEAR(fechaInicio) IN (?, ?)
             AND MONTH(fechaInicio) IN (?, ?, ?)
             AND ct.idEspecialista = ?
+            AND ct.estatus IN (1)
             AND ct.estatusCita IN(?, ?, ?, ?, ?, ?, ?, ?)",
             array( 8, $dates["year1"], $dates["year2"], $dates["month1"], $month, $dates["month2"], $idUsuario, 1, 2, 3, 4, 5, 6, 7, 10 )
         );
@@ -555,8 +556,8 @@ class CalendarioModel extends CI_Model
             LEFT JOIN ".$this->schema_ch .".beneficioscm_vista_usuarios AS usEspCH ON usEspCH.idcontrato = usEspe.idContrato
             LEFT JOIN ".$this->schema_cm .".atencionxsede AS aps ON ct.idAtencionXSede = aps.idAtencionXSede
             LEFT JOIN ".$this->schema_cm .".detallepagos AS dp ON dp.idDetalle = ct.idDetalle
-            WHERE YEAR(fechaInicio) IN (?, ?) AND MONTH(fechaInicio) IN (?, ?, ?)  
-            AND ct.idEspecialista = ? AND us.externo = ? AND ct.estatusCita IN(?, ?, ?, ?, ?, ?, ?, ?);",
+            WHERE YEAR(fechaInicio) IN (?, ?) AND MONTH(fechaInicio) IN (?, ?, ?)   
+            AND ct.estatus IN (1) AND ct.idEspecialista = ? AND us.externo = ? AND ct.estatusCita IN(?, ?, ?, ?, ?, ?, ?, ?);",
             array( 8, $dates["year1"], $dates["year2"], $dates["month1"], $month, $dates["month2"], $idUsuario, 1, 1, 2, 3, 4, 5, 6, 7, 10 )
         );
 
@@ -605,7 +606,7 @@ class CalendarioModel extends CI_Model
             INNER JOIN ". $this->schema_cm .".atencionxsede AS ats ON ats.idAtencionXSede = ct.idAtencionXSede
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_sedes AS sed ON sed.idsede = ats.idSede
             LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_oficinas AS ofi ON ofi.idoficina = ats.idOficina
-            WHERE estatusCita IN(1) AND ct.idEspecialista = 8 AND fechaInicio < CURRENT_TIMESTAMP();", array(1, $idUsuario));
+            WHERE ct.estatus IN (1) AND estatusCita IN(1) AND ct.idEspecialista = 8 AND fechaInicio < CURRENT_TIMESTAMP();", array(1, $idUsuario));
 
         return $query;
     }
@@ -631,7 +632,7 @@ class CalendarioModel extends CI_Model
         INNER join ". $this->schema_ch .".beneficioscm_vista_sedes AS sed ON sed.idSede = atc.idSede
 		LEFT JOIN (SELECT idDetalle, GROUP_CONCAT(DATE_FORMAT(fechaInicio, '%d / %m / %Y A las %H:%i horas.'), '') AS fechasFolio FROM ". $this->schema_cm .".citas WHERE estatusCita IN(8) GROUP BY idDetalle) tf ON tf.idDetalle = ct.idDetalle 
         LEFT JOIN ". $this->schema_cm .".detallepagos as dp ON dp.idDetalle = ct.idDetalle
-          WHERE ct.estatusCita IN(?) AND ct.idPaciente = ?", array(6, $idUsuario));
+          WHERE ct.estatus IN (1) AND ct.estatusCita IN(?) AND ct.idPaciente = ?", array(6, $idUsuario));
 
         return $query;
     }
@@ -656,10 +657,10 @@ class CalendarioModel extends CI_Model
             INNER JOIN ". $this->schema_cm .".atencionxsede AS atc ON atc.idAtencionXSede = ct.idAtencionXSede  
             LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_oficinas AS ofi ON ofi.idoficina = atc.idOficina
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_sedes AS sed ON sed.idSede = atc.idSede
-		    LEFT JOIN (SELECT idDetalle, GROUP_CONCAT(DATE_FORMAT(fechaInicio, '%d / %m / %Y A las %H:%i horas.'), '') AS fechasFolio FROM ". $this->schema_cm .".citas WHERE estatusCita IN(8) GROUP BY idDetalle) tf ON tf.idDetalle = ct.idDetalle 
+		    LEFT JOIN (SELECT idDetalle, GROUP_CONCAT(DATE_FORMAT(fechaInicio, '%d / %m / %Y A las %H:%i horas.'), '') AS fechasFolio FROM ". $this->schema_cm .".citas WHERE estatusCita IN(8) AND estatus IN (1)  GROUP BY idDetalle) tf ON tf.idDetalle = ct.idDetalle 
             INNER JOIN ". $this->schema_cm .".encuestascreadas AS ec ON ec.idArea = usEspe2.idpuesto
             LEFT JOIN ". $this->schema_cm .".detallepagos as dp ON dp.idDetalle = ct.idDetalle
-            WHERE ct.estatusCita IN(?) AND ct.evaluacion is NULL AND ct.idPaciente = ? AND (ec.idPregunta = 1 AND ec.estatus = 1)", array(4, $idUsuario));
+            WHERE ct.estatus IN (1) AND ct.estatusCita IN(?) AND ct.evaluacion is NULL AND ct.idPaciente = ? AND (ec.idPregunta = 1 AND ec.estatus = 1)", array(4, $idUsuario));
 
         return $query;
     }
