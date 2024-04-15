@@ -302,7 +302,7 @@ class Usuario extends BaseController {
 			$response['msg'] = '¡No existen registros!';
 		}
 		$this->output->set_content_type("application/json");
-        $this->output->set_output(json_encode($response));
+        $this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
 	public function decodePass(){

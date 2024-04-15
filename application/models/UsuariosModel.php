@@ -76,7 +76,7 @@ class UsuariosModel extends CI_Model {
 			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = US.idContrato 
 			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_puestos PS ON us2.idpuesto = PS.idpuesto 
 			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_sedes SE ON SE.idsede = us2.idsede 
-			WHERE US.idRol = ? AND US.estatus = ? AND us2.idsede IN ( SELECT DISTINCT idSede FROM PRUEBA_beneficiosCM.atencionxsede WHERE idEspecialista = ? ) 
+			WHERE US.idRol = ? AND US.estatus = ? AND us2.idsede IN ( SELECT DISTINCT idSede FROM ". $this->schema_cm .".atencionxsede WHERE idEspecialista = ? ) 
 			UNION ( SELECT u.idUsuario AS idUsuario, u.idContrato, u.password, us2.idRol, u.externo, u.idAreaBeneficio, us2.estatus, us2.creadoPor, us2.fechaCreacion,
 			 us2.modificadoPor, us2.fechaModificacion, 1 AS idSede, 0 AS idarea, 0 tipoPuesto, 0 AS fechaIngreso, CONCAT('(Lamat)', ' ', CONCAT(IFNULL(us2.nombre, ''))) AS nombreCompleto,
 			0 AS nombrePuesto, 0 AS tipo_puesto 
