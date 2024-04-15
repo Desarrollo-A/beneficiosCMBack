@@ -275,7 +275,7 @@ class Api extends BaseController{
             $response['msg'] = "¡Parámetros inválidos!";
         }
 
-        $this->output->set_content_type('application/json');
-		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
+        // $this->output->set_content_type('application/json');
+		// $this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 }
