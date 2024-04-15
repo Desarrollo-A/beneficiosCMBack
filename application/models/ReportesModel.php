@@ -283,9 +283,9 @@ class ReportesModel extends CI_Model {
 				IFNULL (CONCAT((us2.nombre_persona), ' ',(us2.pri_apellido), ' ', (us2.sec_apellido)), ext.nombre) AS nombre, 
 				IFNULL(us2.ndepto, 'NO APLICA') AS depto, IFNULL(us2.nsede, 'QRO') AS sede, 
 				IFNULL(us2.npuesto, 'NO APLICA') AS puesto, IFNULL(us2.mail_emp, ext.correo) AS correo, op.nombre AS estNut 
-				FROM PRUEBA_beneficiosCM.detallepaciente dp 
+				FROM ". $this->schema_cm .".detallepaciente dp 
 				LEFT JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = dp.idUsuario 
-				LEFT JOIN PRUEBA_CH.beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
+				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
 				LEFT JOIN ". $this->schema_cm .".usuariosexternos ext ON ext.idcontrato = us.idContrato
 				LEFT JOIN ". $this->schema_cm .".catalogos ct ON ct.idCatalogo = 13 
 				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us4 ON us4.idpuesto = 537 
@@ -301,9 +301,9 @@ class ReportesModel extends CI_Model {
 				IFNULL (CONCAT((us2.nombre_persona), ' ',(us2.pri_apellido), ' ', (us2.sec_apellido)), ext.nombre) AS nombre, 
 				IFNULL(us2.ndepto, 'NO APLICA') AS depto, IFNULL(us2.nsede, 'QRO') AS sede, 
 				IFNULL(us2.npuesto, 'NO APLICA') AS puesto, IFNULL(us2.mail_emp, ext.correo) AS correo, op.nombre AS estPsi
-				FROM PRUEBA_beneficiosCM.detallepaciente dp 
+				FROM ". $this->schema_cm .".detallepaciente dp 
 				LEFT JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = dp.idUsuario 
-				LEFT JOIN PRUEBA_CH.beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
+				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
 				LEFT JOIN ". $this->schema_cm .".usuariosexternos ext ON ext.idcontrato = us.idContrato
 				LEFT JOIN ". $this->schema_cm .".catalogos ct ON ct.idCatalogo = 13 
 				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us4 ON us4.idpuesto = 585
@@ -319,9 +319,9 @@ class ReportesModel extends CI_Model {
 				IFNULL (CONCAT((us2.nombre_persona), ' ',(us2.pri_apellido), ' ', (us2.sec_apellido)), ext.nombre) AS nombre, 
 				IFNULL(us2.ndepto, 'NO APLICA') AS depto, IFNULL(us2.nsede, 'QRO') AS sede, 
 				IFNULL(us2.npuesto, 'NO APLICA') AS puesto, IFNULL(us2.mail_emp, ext.correo) AS correo, op.nombre AS estQB
-				FROM PRUEBA_beneficiosCM.detallepaciente dp 
+				FROM ". $this->schema_cm .".detallepaciente dp 
 				LEFT JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = dp.idUsuario 
-				LEFT JOIN PRUEBA_CH.beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
+				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
 				LEFT JOIN ". $this->schema_cm .".usuariosexternos ext ON ext.idcontrato = us.idContrato
 				LEFT JOIN ". $this->schema_cm .".catalogos ct ON ct.idCatalogo = 13 
 				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us4 ON us4.idpuesto = 158
@@ -337,9 +337,9 @@ class ReportesModel extends CI_Model {
 				IFNULL (CONCAT((us2.nombre_persona), ' ',(us2.pri_apellido), ' ', (us2.sec_apellido)), ext.nombre) AS nombre, 
 				IFNULL(us2.ndepto, 'NO APLICA') AS depto, IFNULL(us2.nsede, 'QRO') AS sede, 
 				IFNULL(us2.npuesto, 'NO APLICA') AS puesto, IFNULL(us2.mail_emp, ext.correo) AS correo, op.nombre AS estGE
-				FROM PRUEBA_beneficiosCM.detallepaciente dp 
+				FROM ". $this->schema_cm .".detallepaciente dp 
 				LEFT JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = dp.idUsuario 
-				LEFT JOIN PRUEBA_CH.beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
+				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
 				LEFT JOIN ". $this->schema_cm .".usuariosexternos ext ON ext.idcontrato = us.idContrato
 				LEFT JOIN ". $this->schema_cm .".catalogos ct ON ct.idCatalogo = 13 
 				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us4 ON us4.idpuesto = 686
