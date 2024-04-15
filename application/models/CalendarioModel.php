@@ -36,8 +36,8 @@ class CalendarioModel extends CI_Model
             LEFT JOIN (SELECT idDetalle, GROUP_CONCAT(DATE_FORMAT(fechaInicio, '%d / %m / %Y A las %H:%i horas.'), '') AS fechasFolio FROM ". $this->schema_cm .".citas WHERE estatusCita IN(8) GROUP BY idDetalle) tf ON tf.idDetalle = ct.idDetalle 
             LEFT JOIN ". $this->schema_cm .".detallepagos as dp ON dp.idDetalle = ct.idDetalle
             LEFT JOIN ". $this->schema_cm .".encuestascreadas AS ec ON ec.idArea = usEspe2.idpuesto
-            WHERE YEAR(fechaInicio) = ? AND MONTH(fechaInicio) = ? AND ct.idPaciente = ? AND ct.estatus = ? AND ct.estatusCita IN(?, ?, ?, ?, ?, ?, ?, ?);",
-            array( $year, $month, $idUsuario, 1, 1, 2, 3, 4, 5, 6, 7, 10)
+            WHERE ec.idPregunta = ? AND YEAR(fechaInicio) = ? AND MONTH(fechaInicio) = ? AND ct.idPaciente = ? AND ct.estatus = ? AND ct.estatusCita IN(?, ?, ?, ?, ?, ?, ?, ?);",
+            array( 1, $year, $month, $idUsuario, 1, 1, 2, 3, 4, 5, 6, 7, 10)
 
         );
 
@@ -357,7 +357,7 @@ class CalendarioModel extends CI_Model
                     LEFT JOIN (SELECT idDetalle, GROUP_CONCAT(DATE_FORMAT(fechaInicio, '%d / %m / %Y A las %H:%i horas.'), '') AS fechasFolio FROM ". $this->schema_cm .".citas WHERE estatusCita IN(8) GROUP BY idDetalle) tf ON tf.idDetalle = ct.idDetalle
         LEFT JOIN ". $this->schema_cm .".detallepagos as dp ON dp.idDetalle = ct.idDetalle
         LEFT JOIN ". $this->schema_cm .".encuestascreadas AS ec ON ec.idArea = usEspe2.idpuesto
-        WHERE idCita = ?",
+        WHERE ec.idPregunta = 1 AND idCita = ?",
         array( $idCita ));
 
         return $query;
@@ -636,7 +636,7 @@ class CalendarioModel extends CI_Model
 		LEFT JOIN (SELECT idDetalle, GROUP_CONCAT(DATE_FORMAT(fechaInicio, '%d / %m / %Y A las %H:%i horas.'), '') AS fechasFolio FROM ". $this->schema_cm .".citas WHERE estatusCita IN(8) GROUP BY idDetalle) tf ON tf.idDetalle = ct.idDetalle 
         LEFT JOIN ". $this->schema_cm .".detallepagos as dp ON dp.idDetalle = ct.idDetalle
         LEFT JOIN ". $this->schema_cm .".encuestascreadas AS ec ON ec.idArea = usEspe2.idpuesto
-        WHERE ct.estatus IN (1) AND ct.estatusCita IN(?) AND ct.idPaciente = ?", array(6, $idUsuario));
+        WHERE ec.idPregunta = 1 AND ct.estatus IN (1) AND ct.estatusCita IN(?) AND ct.idPaciente = ?", array(6, $idUsuario));
 
 
         return $query;
@@ -665,7 +665,7 @@ class CalendarioModel extends CI_Model
 		    LEFT JOIN (SELECT idDetalle, GROUP_CONCAT(DATE_FORMAT(fechaInicio, '%d / %m / %Y A las %H:%i horas.'), '') AS fechasFolio FROM ". $this->schema_cm .".citas WHERE estatusCita IN(8) AND estatus IN (1)  GROUP BY idDetalle) tf ON tf.idDetalle = ct.idDetalle 
             INNER JOIN ". $this->schema_cm .".encuestascreadas AS ec ON ec.idArea = usEspe2.idpuesto
             LEFT JOIN ". $this->schema_cm .".detallepagos as dp ON dp.idDetalle = ct.idDetalle
-            WHERE ct.estatus IN (1) AND ct.estatusCita IN(?) AND ct.evaluacion is NULL AND ct.idPaciente = ? AND (ec.idPregunta = 1 AND ec.estatus = 1)", array(4, $idUsuario));
+            WHERE ec.idPregunta = 1 AND ct.estatus IN (1) AND ct.estatusCita IN(?) AND ct.evaluacion is NULL AND ct.idPaciente = ? AND (ec.idPregunta = 1 AND ec.estatus = 1)", array(4, $idUsuario));
 
         return $query;
     }
