@@ -558,7 +558,10 @@ class Usuario extends BaseController {
 
 	public function sendMail() {
 
-			$correo = $this->input->post('dataValue', true);
+			$correoVar = $this->input->post('dataValue', true);
+			$correo = substr($correoVar, 1, -1);
+
+			$this->ch->query("DELETE FROM ". $this->schema_cm .".tokenregistro WHERE correo = ?", $correo);
 
 			$config['protocol']  = 'smtp';
 			$config['smtp_host'] = 'smtp.gmail.com';
@@ -580,8 +583,6 @@ class Usuario extends BaseController {
 			$this->email->to($correo);
 			$this->email->message($html_message);
 			$this->email->subject("Código de verificación Beneficios CDM");
-
-			$this->ch->query("DELETE FROM ". $this->schema_cm .".tokenregistro WHERE correo = '?'", $correo);
 
 			if ($this->email->send()) {
 				echo json_encode(array("estatus" => true, "msj" => "Envio exitoso" ), JSON_NUMERIC_CHECK); 
