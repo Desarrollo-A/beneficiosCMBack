@@ -845,9 +845,9 @@ class CalendarioController extends BaseController{
 			$rs = $this->CalendarioModel->isPrimeraCita($usuario, $beneficio)->result();
 			$response['result'] = count($rs) == 0;
 			if ($response['result']) {
-				$response['msg'] = '¡Usuario con registros de citas!';
+				$response['msg'] = '¡Primera cita del usuario!';
 			} else {
-				$response['msg'] = '¡No existen registros!';
+				$response['msg'] = '¡Usuario con más citas!';
 			}
 		}else {
 			$response['msg'] = "¡Parámetros inválidos!";

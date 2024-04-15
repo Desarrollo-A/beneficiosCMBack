@@ -84,7 +84,7 @@ class Api extends BaseController{
 				"modificadoPor" => $usuario,
 				"fechaModificacion" => $fecha
 			];
-			$rs = $this->GeneralModel->addRecordReturnId("detallepagos", $values);
+			$rs = $this->GeneralModel->addRecordReturnId($this->schema_cm .".detallepagos", $values);
 			$response["result"] = $rs > 0;
 			if ($response["result"]) {
 				if (isset($rs)) {					
