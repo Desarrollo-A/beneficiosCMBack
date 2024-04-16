@@ -44,7 +44,7 @@ class AvisosPrivacidadController extends BaseController
 		$accion = $this->input->post('accion');
 		//tipoDeAccion: 1: nuevo 2: Editar
 		$nombreEspecialidad = $this->input->post('nombreEspecialidad');
-		$nombreEspecialidad =  eliminar_acentos($nombreEspecialidad);
+		// $nombreEspecialidad =  eliminar_acentos($nombreEspecialidad);
 		$file = $_FILES["archivo"]['name'];
 		$fileExt = pathinfo($file, PATHINFO_EXTENSION);
 		$folder = 'dist/documentos/avisos-privacidad/';
