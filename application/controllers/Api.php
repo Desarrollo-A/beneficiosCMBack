@@ -121,12 +121,6 @@ class Api extends BaseController{
         echo 'estatus_notificacion=0';
     }
 
-	public function tareaCancelaCitasSinPago()
-	{
-		$citasEnProcesoPago = $this->CalendarioModel->tareaCancelaCitasSinPago();
-		echo $citasEnProcesoPago;
-	}
-
     public function creaEventoGoogleYNotifica($idCita){
     // public function creaEventoGoogleYNotifica(){
         // $idCita = 66; // 41 42
