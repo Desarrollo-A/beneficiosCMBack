@@ -228,15 +228,20 @@ class GeneralModel extends CI_Model {
 
     public function getEstatusCitas(){
 
-        $query = $this->ch->query("SELECT idOpcion, nombre, 'color' = CASE
+        $query = $this->ch->query("SELECT idOpcion, nombre, 
+        CASE
         WHEN idOpcion = 1 THEN '#ffa500'
         WHEN idOpcion = 2 THEN '#ff0000'
         WHEN idOpcion = 3 THEN '#808080'
         WHEN idOpcion = 4 THEN '#008000'
         WHEN idOpcion = 5 THEN '#ff4d67'
         WHEN idOpcion = 6 THEN '#00ffff'
-        END
-        FROM ". $this->schema_cm .".opcionesporcatalogo WHERE idCatalogo = 2 AND idOpcion NOT IN (7, 8, 9);");
+        WHEN idOpcion = 7 THEN '#ff0000'
+        WHEN idOpcion = 8 THEN '#ffe800'
+        WHEN idOpcion = 9 THEN '#0000ff'
+        WHEN idOpcion = 10 THEN '#33105D'
+        END AS color
+        FROM ". $this->schema_cm .".opcionesporcatalogo WHERE idCatalogo = 2 AND idOpcion IN (1, 2, 3, 4, 5, 6, 10);");
         return $query;
 
     }

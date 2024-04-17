@@ -10,6 +10,7 @@ class Usuario extends BaseController {
 		parent::__construct();
 		$this->load->database('default');
 		$this->ch = $this->load->database('ch', TRUE);
+		$this->load->model('CalendarioModel');
 		$this->load->model('UsuariosModel');
 		$this->load->model('GeneralModel');
 		$this->load->model('MenuModel');
@@ -364,9 +365,8 @@ class Usuario extends BaseController {
 		$decoded = base64_decode($token);
 
 		list($username, $password) = explode(":", $decoded);
-
-		$usuario = $this->UsuariosModel->loginAPI($username, encriptar(trim($password)));
-
+		$usuario = $this->UsuariosModel->loginAPI($username, encriptar(trim($password)))->row();
+		
 		if(!isset($usuario)){
 			$result->msg = 'No existe el usuario';
 			$this->json($result, JSON_NUMERIC_CHECK);
@@ -489,7 +489,7 @@ class Usuario extends BaseController {
 	public function bajaCH(){
 		$auth = $this->headers('Authorization');
 		$token = null;
-		$idContrato = $this->input->get('idcontrato');
+		$idContrato = $this->input->POST('idcontrato');
 		$fecha = date('Y-m-d H:i:s');
 
 		$result = (object) [
@@ -545,10 +545,11 @@ class Usuario extends BaseController {
 		$data["modificadoPor"] = 1;
 
 		$updated = $this->GeneralModel->updateRecord($this->schema_cm .".usuarios", $data, "idContrato", $idContrato);
+		$cancela = $this->CalendarioModel->cancelaCitasPorBajaUsuario($idContrato);
 
-		if($updated){
+		if($updated && $cancela){
 			$result->result = true;
-			$result->msg = 'Empleado dado de baja';
+			$result->msg = 'Proceso completo exitoso';
 		}else{
 			$result->msg = 'No se pudo dar de baja el empleado';
 		}
