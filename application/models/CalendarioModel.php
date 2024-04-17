@@ -670,23 +670,10 @@ class CalendarioModel extends CI_Model
         return $query;
     }
 
-    // Actualiza cita de usuarios y cancela dependiendo el origen, las agendadas por especialista cancela a las 24 horas y si no es a los 10 min
-    public function tareaCancelaCitasSinPago(){
+    public function cancelaCitasPorBajaUsuario($idContrato){
         $query = $this->ch->query(
-            "UPDATE ". $this->schema_cm .".citas
-            SET estatusCita = 9, modificadoPor = 1, fechaModificacion = CURRENT_TIMESTAMP()
-            WHERE idCita IN (
-              SELECT id FROM (
-                SELECT idCita as id FROM ". $this->schema_cm .".citas 
-                WHERE estatus = 1 AND 
-                ((estatusCita = 10 AND fechaIntentoPago IS NOT NULL
-                AND tipoCita IN (1, 2) AND NOW() >= fechaIntentoPago + INTERVAL 10 MINUTE ) 
-                OR 
-                (estatusCita = 6 AND fechaCreacion IS NOT NULL
-                AND tipoCita IN (3) AND NOW() >= fechaCreacion + INTERVAL 24 HOUR ))
-              ) AS tmp
-            );");
-
+            "UPDATE PRUEBA_beneficiosCM.citas SET estatusCita = 11, modificadoPor = 1, fechaModificacion = CURRENT_TIMESTAMP() 
+            WHERE idPaciente = (SELECT idUsuario FROM PRUEBA_beneficiosCM.usuarios WHERE idContrato = ?) AND estatus = 1 AND estatusCita IN (1);", array($idContrato));
         return $query;
     }
 }
