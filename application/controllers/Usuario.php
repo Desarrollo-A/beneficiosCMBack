@@ -591,7 +591,7 @@ class Usuario extends BaseController {
 					VALUES (?,?, NOW())", 
 					array($correo, $data));
 			} else {
-				echo json_encode(array("estatus" => false, "msj" => "A ocurrido un error"), JSON_NUMERIC_CHECK);
+				echo json_encode(array("estatus" => false, "msj" => "Ha ocurrido un error"), JSON_NUMERIC_CHECK);
 			}
 	}
 
