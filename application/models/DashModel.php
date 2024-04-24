@@ -300,7 +300,7 @@ class DashModel extends CI_Model
 		INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us3 ON us3.idcontrato = us2.idContrato
 		LEFT JOIN ". $this->schema_cm .".atencionxsede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
 		LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita 
-		WHERE us3.idpuesto = $area $usuarioCond
+		WHERE us3.idpuesto = $area $usuarioCond AND ct.estatusCita IN(4)
 		AND (ct.fechaFinal >= '$fhI' AND ct.fechaFinal <= '$fhF') $especialidadCond");
 
     return $query;
