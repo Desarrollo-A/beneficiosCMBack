@@ -76,9 +76,9 @@ class CalendarioController extends BaseController{
 	public function getHorarioBeneficio()
 	{
 		$beneficio = $this->input->post('dataValue[beneficio]');
-		$especialistah = $this->input->post('dataValue[especialistah]');
+		$especialista = $this->input->post('dataValue[especialistah]');
 
-		$rs = $this->CalendarioModel->getHorarioBeneficio($beneficio, $especialistah)->result();
+		$rs = $this->CalendarioModel->getHorarioBeneficio($beneficio, $especialista)->result();
 		$response['result'] = count($rs) > 0;
 		if ($response['result']) {
 			$response['msg'] = '¡Horario cargado exitosamente!';
