@@ -288,7 +288,7 @@ class DashModel extends CI_Model
     $fecha->modify('+1 day');
     $fhF = $fecha->format('Y-m-d');
 
-    $especialidadCond = $especialidad != 0 ? "AND us.idUsuario = $especialidad" : "";
+    $especialidadCond = $especialidad != 0 ? "AND us2.idUsuario = $especialidad" : "";
     $usuarioCond = $usuario != 2 ? "AND us.externo = $usuario" : "";
 
 		$query = $this->ch->query("SELECT 
@@ -319,7 +319,7 @@ class DashModel extends CI_Model
         $fecha->modify('+1 day');
 		$fhF = $fecha->format('Y-m-d');
 
-		$especialidadCond = $especialidad != 0 ? "AND us.idUsuario = $especialidad" : "";
+		$especialidadCond = $especialidad != 0 ? "AND us2.idUsuario = $especialidad" : "";
     	$usuarioCond = $usuario != 2 ? "AND us.externo = $usuario" : "";
 
             $query = $this->ch->query("SELECT 
