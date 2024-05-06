@@ -20,11 +20,11 @@ class ReportesModel extends CI_Model {
 		$tipoReporte = "";
 
 		if($dt == '0'){
-			$tipoReporte  = "";
-		}else if($dt !== '0' || $dt !== '2'){
-			$tipoReporte = "AND ct.estatusCita = $dt";
+			$tipoReporte  = "AND ct.estatusCita < 8";
 		}else if($dt == '2'){
-			$tipoReporte = "AND (ct.estatusCita = 2 OR ct.estatusCita = 7)";
+			$tipoReporte = "AND ct.estatusCita IN (2, 7)";
+		}else{
+			$tipoReporte = "AND ct.estatusCita = $dt";
 		}
 
 		$usuarioCond = $tipoUsuario != 2 ? "AND pa.externo = $tipoUsuario" : "";
@@ -86,7 +86,7 @@ class ReportesModel extends CI_Model {
 			LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo oxc ON oxc.idOpcion = dp.metodoPago AND oxc.idCatalogo = 11
 			LEFT JOIN ". $this->schema_cm .".motivosporcita mpc ON mpc.idCita = ct.idCita
   			LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo ops ON ops.idCatalogo = cat.idCatalogo AND ops.idOpcion = mpc.idMotivo	
-			WHERE op.idCatalogo = 2 AND ct.estatusCita < 8 $usuarioCond $tipoReporte
+			WHERE op.idCatalogo = 2 $usuarioCond $tipoReporte
 			GROUP BY 
   				ct.idCita, 
   				pa.idUsuario, 
