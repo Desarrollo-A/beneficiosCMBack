@@ -676,4 +676,21 @@ class CalendarioModel extends CI_Model
             WHERE idPaciente = (SELECT idUsuario FROM ". $this->schema_cm .".usuarios WHERE idContrato = ?) AND estatus = 1 AND estatusCita IN (1);", array($idContrato));
         return $query;
     }
+
+    public function getBeneficioActivo($idUsuario){
+        $query = $this->ch->query("SELECT *FROM ". $this->schema_cm .".detallepaciente WHERE idUsuario = ?", $idUsuario);
+        
+        return $query;
+    }
+
+    function getDocumento($idEspecialidad)
+	{
+		$query = $this->ch->query("SELECT hd.*, opc.nombre as nombreDocumento, opc2.nombre as nombreEspecialidad
+		 FROM ". $this->schema_cm .".historialdocumento hd
+		LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo opc ON opc.idOpcion = hd.tipoDocumento AND opc.idCatalogo = 11
+		LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo opc2 ON opc2.idOpcion = hd.tipoEspecialidad AND opc2.idCatalogo = 1
+		 WHERE hd.estatus=1 AND
+		 hd.tipoDocumento = 1 AND hd.tipoEspecialidad = $idEspecialidad order by fechaModificacion desc");
+		return $query;
+	}
 }
