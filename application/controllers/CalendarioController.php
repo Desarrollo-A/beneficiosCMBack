@@ -1557,7 +1557,6 @@ class CalendarioController extends BaseController{
 				$beneficio = 4;
 				break;
 		}
-
 		$get = $this->CalendarioModel->getDocumento($beneficio)->result();
 
 		$this->output->set_content_type('application/json');
