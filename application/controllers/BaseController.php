@@ -1,7 +1,12 @@
 <?php
 
+require 'vendor/autoload.php';
+use Google\Cloud\Storage\StorageClient;
 abstract class BaseController extends CI_Controller{
+
     public function __construct(){
+
+
         parent::__construct();
         $this->load->database('default');
 
@@ -24,6 +29,8 @@ abstract class BaseController extends CI_Controller{
 
         $uri = strtolower($this->uri->uri_string());
 
+
+
         if(!in_array($uri, $allowed_routes)){
             $response['status'] = 'error';
 
@@ -45,6 +52,12 @@ abstract class BaseController extends CI_Controller{
                     $this->json($response);
                 }
         }
+
+        $storage = new StorageClient([
+            'keyFilePath' => APPPATH . 'config/google.json'
+        ]);
+    
+        $this->bucket = $storage->bucket('bucket_prueba_php');
     }
 
     public function headers($key = null){
@@ -143,6 +156,21 @@ abstract class BaseController extends CI_Controller{
         exit();
 
         //$this->googleapi->editEvent($token, $id_event, $data);
+    }
+
+    public function upload($path, $filename){
+        $file = $this->bucket->upload(
+            fopen($path, 'r'),
+            [
+                'name' => $name,
+            ]
+        );
+
+        if($file->exists()){
+            return True;
+        }
+
+        return False;
     }
 }
 
