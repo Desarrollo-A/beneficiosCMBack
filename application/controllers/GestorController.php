@@ -397,4 +397,255 @@ class GestorController extends BaseController {
 		$this->output->set_content_type('application/json');
         $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
 	}
+
+	public function getDepartamentos(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->GestorModel->getDepartamentos($dt);
+
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
+
+	public function getAreasPs(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->GestorModel->getAreasPs($dt);
+
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
+
+	public function getPuestos(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->GestorModel->getPuestos($dt);
+
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
+
+	public function updateEstatusPuestos(){
+		$dataValue = $this->input->post("dataValue", true);
+
+		$id = $dataValue["id"];
+		$idUser = $dataValue["idUser"];
+		$estatus = $dataValue["estatus"];
+
+		switch ($estatus) {
+			case 1:
+				$data = [
+					"canRegister" => 0
+				];
+
+				$updateRecord = $this->GeneralModel->updateRecord($this->schema_cm.'.datopuesto', $data, "idPuesto", $id);
+
+				if($updateRecord){
+					$response["result"] = true;
+					$response["msg"] = "Se ha actualizado el estatus";
+				}
+				else{
+					$response["result"] = false;
+					$response["msg"] = "Ha ocurrido un error al actualizar";
+				}
+
+				break;
+			case 0:
+				$data = [
+					"canRegister" => 1
+				];
+
+				$query = $this->db->query("SELECT * FROM ". $this->schema_cm .".datopuesto WHERE idPuesto = $id");
+
+				if ($query->num_rows() == 0) {
+
+					$this->ch->query("INSERT INTO ". $this->schema_cm .".datopuesto (idPuesto, canRegister, estatus, creadoPor, modificadoPor ) 
+					VALUES (?, ?, ?, ?, ?)", 
+					array($id, 1, 1, $idUser, $idUser ));
+				}
+
+				$updateRecord = $this->GeneralModel->updateRecord($this->schema_cm.'.datopuesto', $data, "idPuesto", $id);
+				
+				if($updateRecord){
+					$response["result"] = true;
+					$response["msg"] = "Se ha actualizado el estatus";
+				}
+				else{
+					$response["result"] = false;
+					$response["msg"] = "Ha ocurrido un error al actualizar";
+				}
+
+				break;
+		}
+
+		$this->output->set_content_type('application/json');
+		$this->output->set_output(json_encode($response));
+	}
+
+	public function updateEstatusAreas(){
+		$dataValue = $this->input->post("dataValue", true);
+
+		$id = $dataValue["id"];
+		$idUser = $dataValue["idUser"];
+		$estatus = $dataValue["estatus"];
+
+		switch ($estatus) {
+			case 1:
+				$data = [
+					"canRegister" => 0
+				];
+
+				$query = $this->db->query("SELECT ps.idpuesto 
+					FROM ". $this->schema_ch .".beneficioscm_vista_area ar
+					LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_puestos ps ON ps.idarea = ar.idsubarea 
+					WHERE ar.idsubarea = $id");
+
+				$idPuesto = 0;
+				if ($query->num_rows() > 0) {
+
+					foreach ($query->result() as $row) {
+						$idPuesto = $row->idpuesto;
+
+						$updateRecord = $this->GeneralModel->updateRecord($this->schema_cm.'.datopuesto', $data, "idPuesto", $idPuesto);
+					}
+
+				}
+
+				if($updateRecord){
+					$response["result"] = true;
+					$response["msg"] = "Se ha actualizado el estatus";
+				}
+				else{
+					$response["result"] = false;
+					$response["msg"] = "Ha ocurrido un error al actualizar";
+				}
+
+				break;
+			case 0:
+				$data = [
+					"canRegister" => 1
+				];
+
+				$query = $this->db->query("SELECT ps.idpuesto 
+					FROM ". $this->schema_ch .".beneficioscm_vista_area ar
+					LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_puestos ps ON ps.idarea = ar.idsubarea 
+					WHERE ar.idsubarea = $id");
+
+				$idPuesto = 0;
+				if ($query->num_rows() > 0) {
+
+					foreach ($query->result() as $row) {
+						$idPuesto = $row->idpuesto;
+
+						$query_puestos = $this->db->query("SELECT * FROM ". $this->schema_cm .".datopuesto WHERE idPuesto = $idPuesto");
+
+						if ($query_puestos->num_rows() == 0) {
+
+							$this->ch->query("INSERT INTO ". $this->schema_cm .".datopuesto (idPuesto, canRegister, estatus, creadoPor, modificadoPor ) 
+							VALUES (?, ?, ?, ?, ?)", 
+							array($idPuesto, 1, 1, $idUser, $idUser ));
+						}
+
+						$updateRecord = $this->GeneralModel->updateRecord($this->schema_cm.'.datopuesto', $data, "idPuesto", $idPuesto);
+					}
+
+				}
+				
+				if($updateRecord){
+					$response["result"] = true;
+					$response["msg"] = "Se ha actualizado el estatus";
+				}
+				else{
+					$response["result"] = false;
+					$response["msg"] = "Ha ocurrido un error al actualizar";
+				}
+
+				break;
+		}
+
+		$this->output->set_content_type('application/json');
+		$this->output->set_output(json_encode($response));
+	}
+
+	public function updateEstatusDepartamentos(){
+		$dataValue = $this->input->post("dataValue", true);
+
+		$id = $dataValue["id"];
+		$idUser = $dataValue["idUser"];
+		$estatus = $dataValue["estatus"];
+
+		switch ($estatus) {
+			case 1:
+				$data = [
+					"canRegister" => 0
+				];
+
+				$query = $this->db->query("SELECT ps.idpuesto FROM ". $this->schema_ch .".beneficioscm_vista_departamento dep
+				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_area ar ON ar.iddepto = dep.iddepto 
+				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_puestos ps ON ps.idarea = ar.idsubarea 
+				WHERE dep.iddepto = $id");
+
+				$idPuesto = 0;
+				if ($query->num_rows() > 0) {
+
+					foreach ($query->result() as $row) {
+						$idPuesto = $row->idpuesto;
+
+						$updateRecord = $this->GeneralModel->updateRecord($this->schema_cm.'.datopuesto', $data, "idPuesto", $idPuesto);
+					}
+
+				}
+
+				if($updateRecord){
+					$response["result"] = true;
+					$response["msg"] = "Se ha actualizado el estatus";
+				}
+				else{
+					$response["result"] = false;
+					$response["msg"] = "Ha ocurrido un error al actualizar";
+				}
+
+				break;
+			case 0:
+				$data = [
+					"canRegister" => 1
+				];
+
+				$query = $this->db->query("SELECT ps.idpuesto FROM ". $this->schema_ch .".beneficioscm_vista_departamento dep
+				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_area ar ON ar.iddepto = dep.iddepto 
+				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_puestos ps ON ps.idarea = ar.idsubarea 
+				WHERE dep.iddepto = $id");
+
+				$idPuesto = 0;
+				if ($query->num_rows() > 0) {
+
+					foreach ($query->result() as $row) {
+						$idPuesto = $row->idpuesto;
+
+						$query_puestos = $this->db->query("SELECT * FROM ". $this->schema_cm .".datopuesto WHERE idPuesto = $idPuesto");
+
+						if ($query_puestos->num_rows() == 0) {
+
+							$this->ch->query("INSERT INTO ". $this->schema_cm .".datopuesto (idPuesto, canRegister, estatus, creadoPor, modificadoPor ) 
+							VALUES (?, ?, ?, ?, ?)", 
+							array($idPuesto, 1, 1, $idUser, $idUser ));
+						}
+
+						$updateRecord = $this->GeneralModel->updateRecord($this->schema_cm.'.datopuesto', $data, "idPuesto", $idPuesto);
+					}
+
+				}
+				
+				if($updateRecord){
+					$response["result"] = true;
+					$response["msg"] = "Se ha actualizado el estatus";
+				}
+				else{
+					$response["result"] = false;
+					$response["msg"] = "Ha ocurrido un error al actualizar";
+				}
+
+				break;
+		}
+
+		$this->output->set_content_type('application/json');
+		$this->output->set_output(json_encode($response));
+	}
 }
