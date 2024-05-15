@@ -1563,4 +1563,26 @@ class CalendarioController extends BaseController{
         $this->output->set_output(json_encode($get, JSON_NUMERIC_CHECK));
 	}
 
+	public function getSedeEsp()
+	{
+		$idEsp = $this->input->post('dataValue[especialista]');
+
+		$response['result'] = isset($idEsp);
+		if ($response['result']) {
+			$rs = $this->CalendarioModel->getSedeEsp($idEsp)->result();
+			$response['result'] = count($rs) > 0;
+			if ($response['result']) {
+				$response['msg'] = '¡Listado de beneficios cargado exitosamente!';
+				$response['data'] = $rs;
+			} else {
+				$response['msg'] = '¡No existen registros!';
+			}
+		}else {
+			$response['msg'] = "¡Parámetros inválidos!";
+		}
+
+		$this->output->set_content_type("application/json");
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
+	}
+
 }

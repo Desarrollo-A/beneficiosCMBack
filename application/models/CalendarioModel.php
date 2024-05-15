@@ -488,7 +488,7 @@ class CalendarioModel extends CI_Model
             "SELECT TRIM(CAST(ct.idCita AS CHAR(36))) AS id,  ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end',
             ct.fechaInicio AS occupied, 'date' AS 'type', ct.estatusCita AS estatus, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre, ct.idPaciente, us2.telefono_personal AS telPersonal, us2.mail_emp AS correo,
             se.nsede AS sede, ofi.noficina as oficina, ct.idDetalle, ct.idAtencionXSede, us.externo, CONCAT(IFNULL(usEspCH.nombre_persona, ''), ' ', IFNULL(usEspCH.pri_apellido, ''), ' ', IFNULL(usEspCH.sec_apellido, '')) AS especialista, ct.fechaCreacion, usEspCH.tipo_puesto AS tipoPuesto,
-            tf.fechasFolio, idEventoGoogle, ct.tipoCita, aps.tipoCita as modalidad, aps.idSede, dp.estatusPago,
+            tf.fechasFolio, idEventoGoogle, ct.tipoCita, aps.tipoCita as modalidad, aps.idSede, dp.estatusPago, us2.idsede AS idSedePaciente,
             CASE
                 WHEN ct.estatusCita = 0 THEN '#ff0000'
                 WHEN ct.estatusCita = 1 AND aps.tipoCita = 1 THEN '#ffa500'
@@ -693,4 +693,11 @@ class CalendarioModel extends CI_Model
 		 hd.tipoDocumento = 1 AND hd.tipoEspecialidad = $idEspecialidad order by fechaModificacion desc");
 		return $query;
 	}
+
+    public function getSedeEsp($idEsp){
+        $query = $this->ch->query("SELECT us2.idsede FROM ". $this->schema_cm .".usuarios us
+        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
+        WHERE us.idUsuario = $idEsp");
+       return $query;
+    }
 }
