@@ -124,7 +124,9 @@ class GeneralModel extends CI_Model {
     public function getSedes(){
 
         $query = $this->ch->query("SELECT idsede AS idSede, nsede AS sede 
-        FROM ". $this->schema_ch .".beneficioscm_vista_sedes WHERE idsede NOT IN(7)");
+        FROM ". $this->schema_ch .".beneficioscm_vista_sedes 
+        WHERE idsede NOT IN(7) AND estatus_sede = 1
+        ORDER BY nsede ASC");
         return $query;
 
     }
