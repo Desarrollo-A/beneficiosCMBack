@@ -272,10 +272,10 @@ class GestorModel extends CI_Model {
             WHEN SUM(CASE WHEN dp.canRegister = 1 THEN 1 ELSE 0 END) > 0 THEN 1
             ELSE 0
         END AS estatus
-        FROM PRUEBA_CH.beneficioscm_vista_departamento dep
-        LEFT JOIN PRUEBA_CH.beneficioscm_vista_area ar ON ar.iddepto = dep.iddepto 
-        LEFT JOIN PRUEBA_CH.beneficioscm_vista_puestos ps ON ps.idarea = ar.idsubarea 
-        LEFT JOIN PRUEBA_beneficiosCM.datopuesto dp ON dp.idPuesto = ps.idpuesto
+        FROM ". $this->schema_ch .".beneficioscm_vista_departamento dep
+        LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_area ar ON ar.iddepto = dep.iddepto 
+        LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_puestos ps ON ps.idarea = ar.idsubarea 
+        LEFT JOIN ". $this->schema_cm .".datopuesto dp ON dp.idPuesto = ps.idpuesto
         WHERE dep.estatus_depto = 1 AND ps.estatus_puesto = 1
         GROUP BY dep.iddepto ,dep.ndepto
         ORDER BY dep.ndepto ASC");
@@ -288,9 +288,9 @@ class GestorModel extends CI_Model {
             WHEN SUM(CASE WHEN dp.canRegister = 1 THEN 1 ELSE 0 END) > 0 THEN 1
             ELSE 0
         END AS estatus
-        FROM PRUEBA_CH.beneficioscm_vista_area ar 
-        LEFT JOIN PRUEBA_CH.beneficioscm_vista_puestos ps ON ps.idarea = ar.idsubarea 
-        LEFT JOIN PRUEBA_beneficiosCM.datopuesto dp ON dp.idPuesto = ps.idpuesto 
+        FROM ". $this->schema_ch .".beneficioscm_vista_area ar 
+        LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_puestos ps ON ps.idarea = ar.idsubarea 
+        LEFT JOIN ". $this->schema_cm .".datopuesto dp ON dp.idPuesto = ps.idpuesto 
         WHERE ar.estatus_area = 1 AND ps.estatus_puesto = 1 AND ar.iddepto = $idDpto
         GROUP BY ar.idsubarea, ar.narea
         ORDER BY ar.narea ASC");
@@ -303,8 +303,8 @@ class GestorModel extends CI_Model {
             WHEN dp.canRegister IS NULL THEN 0
             ELSE dp.canRegister 
         END AS estatus
-        FROM PRUEBA_CH.beneficioscm_vista_puestos ps
-        LEFT JOIN PRUEBA_beneficiosCM.datopuesto dp ON dp.idPuesto = ps.idpuesto 
+        FROM ". $this->schema_ch .".beneficioscm_vista_puestos ps
+        LEFT JOIN ". $this->schema_cm .".datopuesto dp ON dp.idPuesto = ps.idpuesto 
         WHERE ps.estatus_puesto = 1 AND ps.idarea = $idArea 
         ORDER BY ps.nom_puesto ASC");
         return $query->result();
