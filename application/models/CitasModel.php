@@ -23,7 +23,7 @@ class CitasModel extends CI_Model{
 
             $query = "SELECT *
             FROM ". $this->schema_cm .".citas as ct
-            LEFT JOIN atencionxsede as axs ON ct.idAtencionXSede = axs.idAtencionXSede
+            LEFT JOIN ". $this->schema_cm .".atencionxsede as axs ON ct.idAtencionXSede = axs.idAtencionXSede
             WHERE ct.idEspecialista='$idEspecialista'
             AND ct.estatusCita IN (1)
             AND NOT axs.idSede = '$idSede'
