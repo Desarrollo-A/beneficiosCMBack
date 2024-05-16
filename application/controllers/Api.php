@@ -152,7 +152,7 @@ class Api extends BaseController{
                 "fecha" => date('d/m/Y', strtotime($rs[0]->start)),
                 "horaInicio" => date('h:i a', strtotime($rs[0]->start)),
                 "horaFinal" => date('h:i a', strtotime($rs[0]->end)),
-                "correo" => ["programador.analista36@ciudadmaderas.com"] // [$rs[0]->correo]
+                "correo" => [$rs[0]->correo]
             ];
 
             $data2 = [
@@ -193,7 +193,7 @@ class Api extends BaseController{
             $response["result2"] = (!isset($rs[0]->idEventoGoogle) OR $rs[0]->idEventoGoogle === "");
             if ($response["result2"]) {
                 $data = [
-                    "email" => 'programador.analista36@ciudadmaderas.com', // $rs[0]->correo ? $rs[0]->correo : $rs[0]->correoEspecialista,
+                    "email" => $rs[0]->correo ? $rs[0]->correo : $rs[0]->correoEspecialista,
                     "title" => $rs[0]->title,
                     "location" => $rs[0]->ubicación,
                     "description" => $rs[0]->title,
@@ -201,11 +201,11 @@ class Api extends BaseController{
                     "end" => date('Y-m-d\TH:i:s', strtotime($rs[0]->end)),
                     "attendees" => array(
                         array(
-                            "email" => 'programador.analista36@ciudadmaderas.com', // $rs[0]->correo ? $rs[0]->correo : $rs[0]->correoEspecialista,
+                            "email" => $rs[0]->correo ? $rs[0]->correo : $rs[0]->correoEspecialista,
                             "responseStatus" => "accepted"
                         ),
                         array(
-                            "email" => 'programador.analista32@ciudadmaderas.com', //$rs[0]->correo ? $rs[0]->correo : $rs[0]->correoEspecialista,
+                            "email" => $rs[0]->correo ? $rs[0]->correo : $rs[0]->correoEspecialista,
                             "responseStatus" => "accepted"
                         )
                     ),
