@@ -382,7 +382,7 @@ class DashModel extends CI_Model
 			LEFT JOIN ". $this->schema_cm .".usuarios usEX ON usEX.idUsuario = ct.idPaciente AND usEX.externo  = 1
 			INNER JOIN ". $this->schema_cm .".usuarios us2 ON us2.idUsuario = ct.idEspecialista 
 			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us3 ON us3.idcontrato = us2.idContrato
-			WHERE ct.estatusCita = 4 AND us3.idpuesto = $area AND ct.idEspecialista = $especialidad AND (ct.fechaFinal >= '$fhI' 
+			WHERE ct.estatusCita = 4 AND us3.idpuesto = $area AND (ct.fechaFinal >= '$fhI' 
 			AND ct.fechaFinal <= '$fhF')");
 
         }else{
