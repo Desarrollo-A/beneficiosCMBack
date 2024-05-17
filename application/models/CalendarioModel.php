@@ -673,7 +673,7 @@ class CalendarioModel extends CI_Model
     public function cancelaCitasPorBajaUsuario($idContrato){
         $query = $this->ch->query(
             "UPDATE ". $this->schema_cm .".citas SET estatusCita = 11, modificadoPor = 1, fechaModificacion = CURRENT_TIMESTAMP() 
-            WHERE idPaciente = (SELECT idUsuario FROM ". $this->schema_cm .".usuarios WHERE idContrato = ?) AND estatus = 1 AND estatusCita IN (1);", array($idContrato));
+            WHERE idPaciente = (SELECT idUsuario FROM ". $this->schema_cm .".usuarios WHERE idContrato = ?) AND estatus = 1;", array($idContrato));
         return $query;
     }
 }
