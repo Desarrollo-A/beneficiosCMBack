@@ -586,7 +586,7 @@ class Usuario extends BaseController {
 			$this->email->subject("Código de verificación Beneficios Maderas");
 
 			if ($this->email->send()) {
-				echo json_encode(array("estatus" => true, "msj" => "Envio exitoso" ), JSON_NUMERIC_CHECK); 
+				echo json_encode(array("estatus" => true, "msj" => "Envió exitoso" ), JSON_NUMERIC_CHECK); 
 				$this->ch->query("INSERT INTO ". $this->schema_cm .".tokenregistro (correo, token, fechaCreacion) 
 					VALUES (?,?, NOW())", 
 					array($correo, $data));
