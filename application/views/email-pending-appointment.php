@@ -471,10 +471,10 @@
 												<?= $data["temaEmail"] ?>
 											</h4>
 											<h4 class="custom-font1">
-												Realiza el pago para poder hacer uso del beneficio
+												Realiza el pago para poder hacer uso del beneficio.
 											</h4>
 											<p class="no-margin custom-font2">
-												La cita tiene un plazo de pago de 1 dia de lo contrario
+												La cita tiene un plazo de pago de 1 día de lo contrario
 												se cancelará.
 											</p>
 
