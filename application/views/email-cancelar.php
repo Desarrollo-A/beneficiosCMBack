@@ -377,7 +377,7 @@
 								<td>
 									<div class="text" style="padding: 0 3.5em; text-align: center; padding-bottom: 10%">
 										<h3 style="color:#003360"><?= $data["titulo"]?></h3>
-										<h4 class="no-margin custom-font2">Tu reservarción de <strong><?= $data["beneficio"]?></strong> ha sido cancelada</h4>
+										<h4 class="no-margin custom-font2">Tu reservación de <strong><?= $data["beneficio"]?></strong> ha sido cancelada</h4>
 										<h4 class="custom-font2">Especialista: <?= $data["especialista"]?></h4>
 										<h4 class='custom-font1'>Detalles de la cita</h4>
 										<h5 class="no-margin custom-font2"><img src="<?= base_url() ?>dist/img/calendar-alt-solid.png" class="icon"> Fecha: <?= $data["fecha"] ?></h5>
