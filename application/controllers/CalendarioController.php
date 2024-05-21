@@ -1532,4 +1532,60 @@ class CalendarioController extends BaseController{
         $this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
+	public function getBeneficioActivo(){
+		$idUsuario = $this->input->post('dataValue[idUsuario]');
+		$get = $this->CalendarioModel->getBeneficioActivo($idUsuario)->result();
+
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($get, JSON_NUMERIC_CHECK));
+	}
+
+	public function getDocumento(){
+		$beneficio = $this->input->post("dataValue[beneficio]");
+
+		switch($beneficio){
+			case 585:
+				$beneficio = 1;
+				break;
+
+			case 537:
+				$beneficio = 2;
+				break;
+
+			case 686:
+				$beneficio = 3;
+				break;
+
+			case 158:
+				$beneficio = 4;
+				break;
+		}
+		$get = $this->CalendarioModel->getDocumento($beneficio)->result();
+
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($get, JSON_NUMERIC_CHECK));
+	}
+
+	public function getSedeEsp()
+	{
+		$idEsp = $this->input->post('dataValue[especialista]');
+
+		$response['result'] = isset($idEsp);
+		if ($response['result']) {
+			$rs = $this->CalendarioModel->getSedeEsp($idEsp)->result();
+			$response['result'] = count($rs) > 0;
+			if ($response['result']) {
+				$response['msg'] = '¡Listado de beneficios cargado exitosamente!';
+				$response['data'] = $rs;
+			} else {
+				$response['msg'] = '¡No existen registros!';
+			}
+		}else {
+			$response['msg'] = "¡Parámetros inválidos!";
+		}
+
+		$this->output->set_content_type("application/json");
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
+	}
+
 }
