@@ -422,4 +422,14 @@ class DashModel extends CI_Model
 
     }
 
+	public function getDepaDemanda()
+	{
+		$query = $this->ch->query("SELECT DISTINCT ec.idPregunta, pg.pregunta, ec.respuestas, pg.idPregunta, ec.idEncuesta, ec.idEncuestaCreada, ec.idArea, ec.idPregunta
+		FROM ". $this->schema_cm .".encuestascreadas ec
+		INNER JOIN ". $this->schema_cm .".preguntasgeneradas pg ON pg.idPregunta = ec.idPregunta AND pg.idEncuesta = ec.idEncuesta
+		WHERE ec.estatus = 1 AND (pg.abierta = 1 AND ec.idArea = $dt AND pg.idArea = $dt AND ec.respuestas <= 4)");
+
+		$result = $query->result();
+	}
+
 }

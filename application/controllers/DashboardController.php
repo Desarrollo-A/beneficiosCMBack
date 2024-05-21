@@ -199,4 +199,11 @@ class DashboardController extends BaseController {
 		$this->output->set_content_type("application/json");
 		$this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
 	}
+
+	public function getDepaDemanda(){
+		$data['data'] = $this->DashModel->getDepaDemanda()->result();
+
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
 }
