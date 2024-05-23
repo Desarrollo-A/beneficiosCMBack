@@ -329,7 +329,7 @@ class Usuario extends BaseController {
 				);
 				
 				$response=$this->GeneralModel->updateRecord($this->schema_cm .'.usuarios', $data, 'idUsuario', $idUsuario);
-				echo json_encode(array("estatus" => true, "msj" => "Contraseña actualizada!" ));
+				echo json_encode(array("estatus" => true, "msj" => "Contraseña actualizada" ));
 					
 			}else{
 				echo json_encode(array("estatus" => false, "msj" => "Error en actualizar contraseña"));

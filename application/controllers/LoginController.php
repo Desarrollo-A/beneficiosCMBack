@@ -67,11 +67,11 @@ class LoginController extends BaseController {
         $informacionDePuesto = $this->GeneralModel->getInfoPuesto($datosEmpleado['idcontrato'])->row();
         
         if (!$informacionDePuesto) {
-            echo json_encode(array("result" => false, "msg" => "No hemos encontrado la información del puesto" ), JSON_NUMERIC_CHECK);
+            echo json_encode(array("result" => false, "msg" => "No hay información del puesto" ), JSON_NUMERIC_CHECK);
         }else {
             $canRegister = $informacionDePuesto->canRegister;
             if ($canRegister === 0 || $canRegister === '0') {
-                echo json_encode(array("result" => false, "msg" => "Por el momento no puede gozar de los beneficios"), JSON_NUMERIC_CHECK);
+                echo json_encode(array("result" => false, "msg" => "Por el momento no puedes gozar de los beneficios"), JSON_NUMERIC_CHECK);
             }else {
                 $usuarioExiste = $this->GeneralModel->usuarioExiste($insertData["idContrato"]);
             
