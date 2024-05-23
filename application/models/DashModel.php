@@ -422,4 +422,33 @@ class DashModel extends CI_Model
 
     }
 
+	public function getDemandaBeneficio($dt){
+
+		$depa = $dt["departamento"];
+
+		if($depa == 0){
+
+		$query = $this->ch->query("SELECT
+			departamento,
+			value
+		FROM (
+			SELECT
+				us2.ndepto AS departamento,
+				COUNT(CASE WHEN ct.estatusCita = 4 THEN 1 END) AS value
+			FROM PRUEBA_beneficiosCM.usuarios us
+			LEFT JOIN PRUEBA_CH.beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
+			LEFT JOIN PRUEBA_CH.beneficioscm_vista_departamento dep ON dep.iddepto = us2.idpuesto 
+			LEFT JOIN PRUEBA_beneficiosCM.datopuesto dt ON dt.idPuesto = us2.idpuesto  
+			LEFT JOIN PRUEBA_beneficiosCM.citas ct ON ct.idPaciente = us.idUsuario 
+			WHERE dt.canRegister = 1
+			GROUP BY us2.ndepto
+		) AS subquery
+		ORDER BY value DESC
+		LIMIT 10;");
+
+		}
+
+		return $query;
+	}
+
 }
