@@ -382,8 +382,8 @@
                                         <br>
                                         <hr>
                                         <b>
-                                            Use este código para continuar con el proceso de registro de Beneficios CDM. 
-                                            Si usted no hizo esta solicitud, ignore el mensaje.
+                                            Usa este código para continuar con el proceso de registro de Beneficios CDM. 
+                                            Si tú no has hecho esta solicitud, ignora el mensaje.
                                         </b>
                                     </div>
                                 </td>
