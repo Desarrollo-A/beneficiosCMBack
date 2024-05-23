@@ -50,7 +50,7 @@ class ReportesController extends BaseController {
 			);
 			
 			$response=$this->GeneralModel->updateRecord($this->schema_cm.'.citas', $data, 'idCita', $idCita);
-			echo json_encode(array("estatus" => true, "msj" => "Observación Registrada!" ), JSON_NUMERIC_CHECK);
+			echo json_encode(array("estatus" => true, "msj" => "Observación registrada" ), JSON_NUMERIC_CHECK);
 				
 		}else{
 
