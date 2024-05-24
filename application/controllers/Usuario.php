@@ -329,7 +329,7 @@ class Usuario extends BaseController {
 				);
 				
 				$response=$this->GeneralModel->updateRecord($this->schema_cm .'.usuarios', $data, 'idUsuario', $idUsuario);
-				echo json_encode(array("estatus" => true, "msj" => "Contraseña actualizada!" ));
+				echo json_encode(array("estatus" => true, "msj" => "Contraseña actualizada" ));
 					
 			}else{
 				echo json_encode(array("estatus" => false, "msj" => "Error en actualizar contraseña"));
@@ -595,7 +595,7 @@ class Usuario extends BaseController {
 			$this->email->subject("Código de verificación Beneficios Maderas");
 
 			if ($this->email->send()) {
-				echo json_encode(array("estatus" => true, "msj" => "Envio exitoso" ), JSON_NUMERIC_CHECK); 
+				echo json_encode(array("estatus" => true, "msj" => "Envió exitoso" ), JSON_NUMERIC_CHECK); 
 				$this->ch->query("INSERT INTO ". $this->schema_cm .".tokenregistro (correo, token, fechaCreacion) 
 					VALUES (?,?, NOW())", 
 					array($correo, $data));

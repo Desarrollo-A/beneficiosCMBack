@@ -145,7 +145,7 @@ class GestorController extends BaseController {
 		);
 
 		$this->GeneralModel->updateRecord($this->schema_cm.'.atencionxsede', $data, 'idAtencionXSede', $id);
-		echo json_encode(array("estatus" => true, "msj" => "Estatus Actualizado!" ));
+		echo json_encode(array("estatus" => true, "msj" => "Estatus actualizado" ));
 				
 	}
 
@@ -167,7 +167,7 @@ class GestorController extends BaseController {
 		);
 
 		$this->GeneralModel->updateRecord($this->schema_cm .'.oficinas', $data, 'idOficina', $idOficina);
-		echo json_encode(array("estatus" => true, "msj" => "Datos Actualizados!" ));
+		echo json_encode(array("estatus" => true, "msj" => "Datos actualizados" ));
 				
 	}
 
@@ -187,7 +187,7 @@ class GestorController extends BaseController {
 		);
 
 		$this->GeneralModel->updateRecord($this->schema_cm .'.sedes', $data, 'idSede', $idSede);
-		echo json_encode(array("estatus" => true, "msj" => "Datos Actualizados!" ));
+		echo json_encode(array("estatus" => true, "msj" => "Datos actualizados" ));
 				
 	}
 
@@ -360,7 +360,7 @@ class GestorController extends BaseController {
 		);
 
 		$this->GeneralModel->updateRecord($this->schema_cm.'.horariosespecificos', $data, 'idHorario', $idHorario);
-		echo json_encode(array("estatus" => true, "msj" => "Horario Actualizado!" ));
+		echo json_encode(array("estatus" => true, "msj" => "Horario actualizado" ));
 				
 	}
 
@@ -439,11 +439,11 @@ class GestorController extends BaseController {
 
 				if($updateRecord){
 					$response["result"] = true;
-					$response["msg"] = "Se ha actualizado el estatus";
+					$response["msg"] = "Estatus actualizado";
 				}
 				else{
 					$response["result"] = false;
-					$response["msg"] = "Ha ocurrido un error al actualizar";
+					$response["msg"] = "Error al actualizar";
 				}
 
 				break;
@@ -465,11 +465,11 @@ class GestorController extends BaseController {
 				
 				if($updateRecord){
 					$response["result"] = true;
-					$response["msg"] = "Se ha actualizado el estatus";
+					$response["msg"] = "Estatus actualizado";
 				}
 				else{
 					$response["result"] = false;
-					$response["msg"] = "Ha ocurrido un error al actualizar";
+					$response["msg"] = "Error al actualizar";
 				}
 
 				break;
@@ -510,11 +510,11 @@ class GestorController extends BaseController {
 
 				if($updateRecord){
 					$response["result"] = true;
-					$response["msg"] = "Se ha actualizado el estatus";
+					$response["msg"] = "Estatus actualizado";
 				}
 				else{
 					$response["result"] = false;
-					$response["msg"] = "Ha ocurrido un error al actualizar";
+					$response["msg"] = "Error al actualizar";
 				}
 
 				break;
@@ -550,11 +550,11 @@ class GestorController extends BaseController {
 				
 				if($updateRecord){
 					$response["result"] = true;
-					$response["msg"] = "Se ha actualizado el estatus";
+					$response["msg"] = "Estatus actualizado";
 				}
 				else{
 					$response["result"] = false;
-					$response["msg"] = "Ha ocurrido un error al actualizar";
+					$response["msg"] = "Error al actualizar";
 				}
 
 				break;
@@ -595,11 +595,11 @@ class GestorController extends BaseController {
 
 				if($updateRecord){
 					$response["result"] = true;
-					$response["msg"] = "Se ha actualizado el estatus";
+					$response["msg"] = "Estatus actualizado";
 				}
 				else{
 					$response["result"] = false;
-					$response["msg"] = "Ha ocurrido un error al actualizar";
+					$response["msg"] = "Error al actualizar";
 				}
 
 				break;
@@ -635,11 +635,11 @@ class GestorController extends BaseController {
 				
 				if($updateRecord){
 					$response["result"] = true;
-					$response["msg"] = "Se ha actualizado el estatus";
+					$response["msg"] = "Estatus actualizado";
 				}
 				else{
 					$response["result"] = false;
-					$response["msg"] = "Ha ocurrido un error al actualizar";
+					$response["msg"] = "Error al actualizar";
 				}
 
 				break;

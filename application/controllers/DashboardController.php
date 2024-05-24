@@ -200,10 +200,35 @@ class DashboardController extends BaseController {
 		$this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
 	}
 
-	public function getDepaDemanda(){
-		$data['data'] = $this->DashModel->getDepaDemanda()->result();
+
+	public function getDepartamentos(){
+		$data['data'] = $this->DashModel->getDepartamentos()->result();
 
 		$this->output->set_content_type('application/json');
         $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
+
+	public function getAreas(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->DashModel->getAreas($dt)->result();
+
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
+
+	public function getPuestos(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->DashModel->getPuestos($dt)->result();
+
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
+
+	public function getDemandaBeneficio(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->DashModel->getDemandaBeneficio($dt)->result();
+		
+		$this->output->set_content_type("application/json");
+		$this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
 	}
 }

@@ -54,7 +54,8 @@ class ReportesModel extends CI_Model {
 				WHEN ct.estatusCita = 5 THEN '#ff4d67' 
 				WHEN ct.estatusCita = 6 THEN '#00ffff' 
 				WHEN ct.estatusCita = 7 THEN '#ff0000' 
-				WHEN ct.estatusCita = 10 THEN '#33105D' 
+				WHEN ct.estatusCita = 10 THEN '#33105D'
+				WHEN ct.estatusCita = 11 THEN '#ff0000' 
 				WHEN ct.estatusCita = 1 AND axs.tipoCita = 2 THEN '#ffa500' 
 			END AS color, 
 			CASE 

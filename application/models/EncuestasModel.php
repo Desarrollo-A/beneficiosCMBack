@@ -150,7 +150,7 @@ class EncuestasModel extends CI_Model {
 			$items = $dataArray->items;
 
 			if (empty($area)) {
-				echo json_encode(array("estatus" => false, "msj" => "Error hay Campos Vacios" ));
+				echo json_encode(array("estatus" => false, "msj" => "Error hay campos vacios" ));
 				$datosValidos = false;
 			}
 
@@ -212,11 +212,11 @@ class EncuestasModel extends CI_Model {
 				if ($this->ch->trans_status() === FALSE) {
 					echo "Error al realizar la transacción";
 				} else {
-					echo json_encode(array("estatus" => true, "msj" => "Encuesta Creada Correctamente" ));
+					echo json_encode(array("estatus" => true, "msj" => "Encuesta creada correctamente" ));
 				}
 			}
 		} else {
-			echo json_encode(array("estatus" => false, "msj" => "Error Faltan Datos" ));
+			echo json_encode(array("estatus" => false, "msj" => "Error faltan datos" ));
 		}
     }
 
