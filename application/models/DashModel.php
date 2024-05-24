@@ -422,6 +422,7 @@ class DashModel extends CI_Model
 
     }
 
+
 	public function getDepartamentos(){
 		$query = $this->ch-> query("SELECT dep.iddepto AS id, dep.ndepto AS departamento
 		FROM PRUEBA_beneficiosCM.datopuesto dt
@@ -539,6 +540,7 @@ class DashModel extends CI_Model
 		}
 
 		return $query;
+
 	}
 
 }

@@ -30,6 +30,13 @@ class LoginController extends BaseController {
 	public function addRegistroEmpleado(){
         $this->ch->trans_begin();
         $datosEmpleado = $this->input->post('dataValue[params]');
+        $mail = $this->input->post('dataValue[params][mailForm]');
+        $idContrato = $this->input->post('dataValue[params][idcontrato]');
+
+        $this->UsuariosModel->insertTempMail($mail, $idContrato);
+
+var_dump($datosEmpleado);
+exit;
 
         switch ($datosEmpleado['idpuesto']){
             case "158":
@@ -70,8 +77,10 @@ class LoginController extends BaseController {
             echo json_encode(array("result" => false, "msg" => "No hay información del puesto" ), JSON_NUMERIC_CHECK);
         }else {
             $canRegister = $informacionDePuesto->canRegister;
-            if ($canRegister === 0 || $canRegister === '0') {
-                echo json_encode(array("result" => false, "msg" => "Por el momento no puedes gozar de los beneficios"), JSON_NUMERIC_CHECK);
+
+            if ($canRegister === 0 || $canRegister === '0' || $canRegister == NULL) {
+                echo json_encode(array("result" => false, "msg" => "Por el momento no puede gozar de los beneficios"), JSON_NUMERIC_CHECK);
+
             }else {
                 $usuarioExiste = $this->GeneralModel->usuarioExiste($insertData["idContrato"]);
             
