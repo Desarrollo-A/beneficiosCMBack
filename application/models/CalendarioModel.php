@@ -35,7 +35,7 @@ class CalendarioModel extends CI_Model
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_sedes AS sed ON sed.idsede = atc.idSede 
             LEFT JOIN (SELECT idDetalle, GROUP_CONCAT(DATE_FORMAT(fechaInicio, '%d / %m / %Y A las %H:%i horas.'), '') AS fechasFolio FROM ". $this->schema_cm .".citas WHERE estatusCita IN(8) GROUP BY idDetalle) tf ON tf.idDetalle = ct.idDetalle 
             LEFT JOIN ". $this->schema_cm .".detallepagos as dp ON dp.idDetalle = ct.idDetalle
-            LEFT JOIN ". $this->schema_cm .".encuestascreadas AS ec ON ec.idArea = usEspe2.idpuesto
+            LEFT JOIN ". $this->schema_cm .".encuestascreadas AS ec ON ec.idArea = usEspe2.idpuesto AND ec.estatus = 1
             WHERE ec.idPregunta = ? AND YEAR(fechaInicio) = ? AND MONTH(fechaInicio) = ? AND ct.idPaciente = ? AND ct.estatus = ? AND ct.estatusCita IN(?, ?, ?, ?, ?, ?, ?, ?) GROUP BY (id);",
             array( 1, $year, $month, $idUsuario, 1, 1, 2, 3, 4, 5, 6, 7, 10)
 
