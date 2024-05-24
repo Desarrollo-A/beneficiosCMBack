@@ -200,6 +200,7 @@ class DashboardController extends BaseController {
 		$this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
 	}
 
+
 	public function getDepartamentos(){
 		$data['data'] = $this->DashModel->getDepartamentos()->result();
 

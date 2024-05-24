@@ -411,10 +411,10 @@ class CalendarioController extends BaseController{
 			} else if ($checkOccupied->num_rows() > 0) {
 				$response["result"] = false;
 				$response["msg"] = "Horario no disponible"; 
-			}  else if ($checkUser->num_rows() == 0 && $reagenda == 0 && $fundacion == 0) {
+			}  /* else if ($checkUser->num_rows() == 0 && $reagenda == 0 && $fundacion == 0) {
 				$response["result"] = false;
 				$response["msg"] = " El paciente debe finalizar sus beneficios mensuales";
-			} else if($checkUser->num_rows() === 0 && $reagenda == 1 && $month != date('m') || $checkUser->num_rows() === 0 && $reagenda == 1 && $year != date('Y')){
+			} */ else if($checkUser->num_rows() === 0 && $reagenda == 1 && $month != date('m') || $checkUser->num_rows() === 0 && $reagenda == 1 && $year != date('Y')){
 				$response["result"] = false;
 				$response["msg"] = "Solo se puede reagendar en el mismo mes";
 			} else if (!isset($pass)) {
@@ -987,6 +987,7 @@ class CalendarioController extends BaseController{
 		if ($response['result']) {
 			$rs = $this->CalendarioModel->getPendientesPago($usuario)->result();
 			$rs2 = $this->CalendarioModel->getPendientesEvaluacion($usuario)->result();
+
 			$response['result'] = count($rs) > 0 || count($rs2) > 0;
 			if ($response['result']) {
 				$response['data']['pago'] = $rs;

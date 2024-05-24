@@ -562,6 +562,15 @@ class Usuario extends BaseController {
 			$correoVar = $this->input->post('dataValue', true);
 			$correo = substr($correoVar, 1, -1);
 
+			$query_mailexist = $this->ch->query("SELECT us2.idUsuario FROM ". $this->schema_ch .".beneficioscm_vista_usuarios us
+			INNER JOIN ". $this->schema_cm .".usuarios us2 ON us2.idContrato = us.idcontrato 
+			LEFT JOIN ". $this->schema_cm .".correostemporales ct ON ct.idContrato = us.idcontrato 
+			WHERE us.mail_emp = '$correo' OR ct.correo = '$correo'");
+
+			if ($query_mailexist->num_rows() > 0) {
+				echo json_encode(array("estatus" => false, "msj" => "El correo ingresado ya está en uso"), JSON_NUMERIC_CHECK);
+			}else{
+
 			$this->ch->query("DELETE FROM ". $this->schema_cm .".tokenregistro WHERE correo = ?", $correo);
 
 			$config['protocol']  = 'smtp';
@@ -593,6 +602,8 @@ class Usuario extends BaseController {
 			} else {
 				echo json_encode(array("estatus" => false, "msj" => "Ocurrió un error"), JSON_NUMERIC_CHECK);
 			}
+
+		}
 	}
 
 	public function getToken(){
@@ -605,18 +616,30 @@ class Usuario extends BaseController {
         $response['result'] = isset($user);
         if ($response['result']) {
             $rs = $this->UsuariosModel->getUserByNumEmp($user)->result();
-			
+
+			$CorreoCh = '';
+			$tipoPuesto = '';
+                foreach ($rs as $row) {
+				$CorreoCh = $row->mail_emp;
+				$tipoPuesto = $row->tipo_puesto;
+            }
+
 			$response['result'] = count($rs) > 0;
             if ($response['result']) {
 				$response['result'] = $rs[0]->activo == 1;
 				if ($response['result']) {
+					if($CorreoCh == '' && $tipoPuesto != 'Operativa'){
+						$response['msg'] = '¡No se tiene registrado un correo del colaborador!';
+						$response['result'] = false;
+					}else{
 					$response['msg'] = '¡Colaborador consultado exitosamente!';
 					$response['data'] = $rs;
+					}
 				}else {
 					$response['msg'] = '¡Colaborador inactivo!';
 				}
             } else {
-                $response['msg'] = '¡No existen el colaborador!';
+                $response['msg'] = '¡No existe el colaborador!';
             }
         }else {
             $response['msg'] = "¡Parámetros inválidos!";
