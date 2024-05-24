@@ -422,4 +422,123 @@ class DashModel extends CI_Model
 
     }
 
+	public function getDepartamentos(){
+		$query = $this->ch-> query("SELECT dep.iddepto AS id, dep.ndepto AS departamento
+		FROM PRUEBA_beneficiosCM.datopuesto dt
+		INNER JOIN PRUEBA_CH.beneficioscm_vista_puestos ps ON ps.idpuesto = dt.idPuesto 
+		INNER JOIN PRUEBA_CH.beneficioscm_vista_area ar ON ar.idsubarea = ps.idarea 
+		INNER JOIN PRUEBA_CH.beneficioscm_vista_departamento dep ON dep.iddepto = ar.iddepto 
+		WHERE dt.canRegister = 1
+		GROUP BY dep.iddepto
+		ORDER BY dep.ndepto ASC");
+        return $query;
+	}
+
+	public function getAreas($dt){
+		$query = $this->ch-> query("SELECT ar.idsubarea AS id,ar.narea AS area 
+		FROM PRUEBA_beneficiosCM.datopuesto dt
+		INNER JOIN PRUEBA_CH.beneficioscm_vista_puestos ps ON ps.idpuesto = dt.idPuesto 
+		INNER JOIN PRUEBA_CH.beneficioscm_vista_area ar ON ar.idsubarea = ps.idarea 
+		WHERE dt.canRegister = 1 AND ar.iddepto = $dt
+		GROUP BY ar.idsubarea
+		ORDER BY ar.narea ASC");
+        return $query;
+	}
+
+	public function getPuestos($dt){
+		$query = $this->ch-> query("SELECT ps.idpuesto AS id, ps.nom_puesto AS puesto 
+		FROM PRUEBA_beneficiosCM.datopuesto dt
+		INNER JOIN PRUEBA_CH.beneficioscm_vista_puestos ps ON ps.idpuesto = dt.idPuesto 
+		WHERE dt.canRegister = 1 AND ps.idarea = $dt
+		ORDER BY ps.nom_puesto ASC");
+        return $query;
+	}
+
+	public function getDemandaBeneficio($dt){
+
+		$beneficio = $dt["beneficio"];
+		$depa = $dt["departamento"];
+		$area = $dt["area"];
+		$puesto = $dt["puestos"];
+
+		if($depa == 0){
+
+		$query = $this->ch->query("SELECT
+			label,
+			value
+		FROM (
+			SELECT
+				us2.ndepto AS label,
+				COUNT(CASE WHEN ct.estatusCita = 4 THEN 1 END) AS value
+			FROM PRUEBA_beneficiosCM.usuarios us
+			LEFT JOIN PRUEBA_CH.beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
+			LEFT JOIN PRUEBA_CH.beneficioscm_vista_departamento dep ON dep.iddepto = us2.idpuesto   
+			LEFT JOIN PRUEBA_beneficiosCM.citas ct ON ct.idPaciente = us.idUsuario 
+			LEFT JOIN PRUEBA_beneficiosCM.usuarios us3 ON us3.idUsuario = ct.idEspecialista
+			LEFT JOIN PRUEBA_CH.beneficioscm_vista_usuarios us4 ON us4.idcontrato = us3.idContrato
+			WHERE us4.idpuesto = $beneficio
+			GROUP BY us2.ndepto
+		) AS subquery
+		ORDER BY value DESC
+		LIMIT 10;");
+
+		}else if($depa != 0 && $area == 0){
+
+			$query = $this->ch->query("SELECT
+			label,
+			value
+			FROM (
+				SELECT
+					us2.ndepto AS label,
+					COUNT(CASE WHEN ct.estatusCita = 4 AND us2.iddepto = $depa THEN 1 END) AS value
+				FROM PRUEBA_beneficiosCM.usuarios us
+				LEFT JOIN PRUEBA_CH.beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
+				LEFT JOIN PRUEBA_CH.beneficioscm_vista_departamento dep ON dep.iddepto = us2.idpuesto 
+				LEFT JOIN PRUEBA_beneficiosCM.citas ct ON ct.idPaciente = us.idUsuario 
+				LEFT JOIN PRUEBA_beneficiosCM.usuarios us3 ON us3.idUsuario = ct.idEspecialista
+				LEFT JOIN PRUEBA_CH.beneficioscm_vista_usuarios us4 ON us4.idcontrato = us3.idContrato
+				WHERE us4.idpuesto = $beneficio AND us2.iddepto = $depa
+				GROUP BY us2.ndepto
+			) AS subquery");
+
+		}else if($depa != 0 && $area != 0 && $puesto == 0){
+
+			$query = $this->ch->query("SELECT
+			label,
+			value
+			FROM (
+				SELECT
+					us2.narea AS label,
+					COUNT(CASE WHEN ct.estatusCita = 4 AND us2.idarea = $area THEN 1 END) AS value
+				FROM PRUEBA_beneficiosCM.usuarios us
+				LEFT JOIN PRUEBA_CH.beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
+				LEFT JOIN PRUEBA_beneficiosCM.citas ct ON ct.idPaciente = us.idUsuario 
+				LEFT JOIN PRUEBA_beneficiosCM.usuarios us3 ON us3.idUsuario = ct.idEspecialista
+				LEFT JOIN PRUEBA_CH.beneficioscm_vista_usuarios us4 ON us4.idcontrato = us3.idContrato
+				WHERE us4.idpuesto = $beneficio AND us2.idarea = $area
+				GROUP BY us2.narea
+			) AS subquery");
+			
+		}else if($depa != 0 && $area != 0 && $puesto != 0){
+
+			$query = $this->ch->query("SELECT
+			label,
+			value
+			FROM (
+				SELECT
+					us2.npuesto AS label,
+					COUNT(CASE WHEN ct.estatusCita = 4 AND us2.idpuesto = $puesto THEN 1 END) AS value
+				FROM PRUEBA_beneficiosCM.usuarios us
+				LEFT JOIN PRUEBA_CH.beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
+				LEFT JOIN PRUEBA_beneficiosCM.citas ct ON ct.idPaciente = us.idUsuario 
+				LEFT JOIN PRUEBA_beneficiosCM.usuarios us3 ON us3.idUsuario = ct.idEspecialista
+				LEFT JOIN PRUEBA_CH.beneficioscm_vista_usuarios us4 ON us4.idcontrato = us3.idContrato
+				WHERE us4.idpuesto = $beneficio AND us2.idpuesto = $puesto
+				GROUP BY us2.npuesto
+			) AS subquery");
+		}
+
+		return $query;
+	}
+
 }
