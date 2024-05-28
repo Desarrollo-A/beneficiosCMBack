@@ -104,4 +104,30 @@ class ReportesController extends BaseController {
         $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
 
     }
+
+	public function demandaDepartamentos(){
+		$data['data'] = $this->ReportesModel->demandaDepartamentos()->result();
+		echo json_encode($data, JSON_NUMERIC_CHECK);
+	}
+
+	public function allDemandaAreas(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->ReportesModel->allDemandaAreas($dt)->result();
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
+
+	public function demandaAreas(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->ReportesModel->demandaAreas($dt)->result();
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
+
+	public function demandaPuestos(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->ReportesModel->demandaPuestos($dt)->result();
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
 }
