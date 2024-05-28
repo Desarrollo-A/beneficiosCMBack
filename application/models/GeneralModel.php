@@ -247,4 +247,15 @@ class GeneralModel extends CI_Model {
         return $query;
 
     }
+
+    public function getAllAreas(){
+		$query = $this->ch-> query("SELECT ar.idsubarea AS id,ar.narea AS area 
+		FROM PRUEBA_beneficiosCM.datopuesto dt
+		INNER JOIN PRUEBA_CH.beneficioscm_vista_puestos ps ON ps.idpuesto = dt.idPuesto 
+		INNER JOIN PRUEBA_CH.beneficioscm_vista_area ar ON ar.idsubarea = ps.idarea 
+		WHERE dt.canRegister = 1
+		GROUP BY ar.idsubarea
+		ORDER BY ar.narea ASC");
+        return $query;
+	}
 }
