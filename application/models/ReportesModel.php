@@ -30,10 +30,10 @@ class ReportesModel extends CI_Model {
 		$usuarioCond = $tipoUsuario != 2 ? "AND pa.externo = $tipoUsuario" : "";
 
 			$query = $this->ch->query("SELECT ct.idCita, pa.idUsuario AS idColab, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista, 
-			IFNULL (CONCAT (us3.nombre_persona,' ',us3.pri_apellido,' ',us3.sec_apellido), ext.nombre) AS paciente, 
-			ps.nom_puesto AS area, IFNULL(sd.nsede, 'QRO') AS sede,ct.titulo, op.nombre AS estatus, 
+			us3.num_empleado AS numEmpleado, IFNULL (CONCAT (us3.nombre_persona,' ',us3.pri_apellido,' ',us3.sec_apellido), ext.nombre) AS paciente, 
+			ps.nom_puesto AS area, IFNULL(sd.nsede, 'QRO') AS sede,ct.titulo, op.nombre AS estatus, us3.narea, us3.npuesto, 
 			CONCAT(DATE_FORMAT(ct.fechaInicio, '%Y-%m-%d'), ' ', DATE_FORMAT(ct.fechaInicio, '%H:%i'), ' - ', DATE_FORMAT(ct.fechaFinal, '%H:%i')) AS horario, observaciones, IFNULL(us3.sexo, ext.sexo) AS sexo, 
-			ct.estatusCita, ct.fechaInicio, IFNULL(dep.ndepto, 'NO APLICA') AS depto, IFNULL(op2.nombre, 'Presencial') AS modalidad,
+			ct.estatusCita, ct.fechaInicio, IFNULL(dep.ndepto, 'NO APLICA') AS depto, IFNULL(op2.nombre, 'Presencial') AS modalidad,  CONCAT('$', ' ',dp.cantidad) AS monto, ops2.nombre AS tipoCita,
 			IFNULL(GROUP_CONCAT(ops.nombre SEPARATOR ', '), 'SIN MOTIVOS DE CITA') AS motivoCita, IFNULL(oxc.nombre, 'Pendiente de pago') AS metodoPago,
 			CASE 
 				WHEN $tipoUsuario = 1 THEN 'RIO DE LA LOZA' 
@@ -86,7 +86,8 @@ class ReportesModel extends CI_Model {
 			LEFT JOIN ". $this->schema_cm .".detallepagos dp ON dp.idDetalle = ct.idDetalle
 			LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo oxc ON oxc.idOpcion = dp.metodoPago AND oxc.idCatalogo = 11
 			LEFT JOIN ". $this->schema_cm .".motivosporcita mpc ON mpc.idCita = ct.idCita
-  			LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo ops ON ops.idCatalogo = cat.idCatalogo AND ops.idOpcion = mpc.idMotivo	
+  			LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo ops ON ops.idCatalogo = cat.idCatalogo AND ops.idOpcion = mpc.idMotivo
+			LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo ops2 ON ops2.idCatalogo = 10	
 			WHERE op.idCatalogo = 2 $usuarioCond $tipoReporte
 			GROUP BY 
   				ct.idCita, 
