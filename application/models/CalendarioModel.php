@@ -536,7 +536,7 @@ class CalendarioModel extends CI_Model
             LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_oficinas AS ofi ON ofi.idoficina = aps.idOficina
             LEFT JOIN (SELECT idDetalle, GROUP_CONCAT(DATE_FORMAT(fechaInicio, '%d / %m / %Y A las %H:%i horas.'), '') AS fechasFolio FROM ". $this->schema_cm .".citas WHERE estatusCita IN( ? ) AND citas.idCita = idCita GROUP BY citas.idDetalle) AS tf ON tf.idDetalle = ct.idDetalle
             LEFT JOIN ". $this->schema_cm .".detallepagos as dp ON dp.idDetalle = ct.idDetalle
-            LEFT JOIN PRUEBA_beneficiosCM.correostemporales AS c ON c.idContrato = us2.idcontrato 
+            LEFT JOIN ". $this->schema_cm .".correostemporales AS c ON c.idContrato = us2.idcontrato 
             WHERE YEAR(fechaInicio) IN (?, ?)
             AND MONTH(fechaInicio) IN (?, ?, ?)
             AND ct.idEspecialista = ?
@@ -662,7 +662,7 @@ class CalendarioModel extends CI_Model
 		LEFT JOIN (SELECT idDetalle, GROUP_CONCAT(DATE_FORMAT(fechaInicio, '%d / %m / %Y A las %H:%i horas.'), '') AS fechasFolio FROM ". $this->schema_cm .".citas WHERE estatusCita IN(8) GROUP BY idDetalle) tf ON tf.idDetalle = ct.idDetalle 
         LEFT JOIN ". $this->schema_cm .".detallepagos as dp ON dp.idDetalle = ct.idDetalle
         LEFT JOIN ". $this->schema_cm .".encuestascreadas AS ec ON ec.idArea = usEspe2.idpuesto
-        LEFT JOIN PRUEBA_beneficiosCM.correostemporales AS c ON c.idContrato = us2.idcontrato 
+        LEFT JOIN ". $this->schema_cm .".correostemporales AS c ON c.idContrato = us2.idcontrato 
         WHERE ec.idPregunta = 1 AND ct.estatus IN (1) AND ct.estatusCita IN(?) AND ct.idPaciente = ? GROUP BY (id)", array(6, $idUsuario));
 
 

@@ -173,7 +173,7 @@ class UsuariosModel extends CI_Model {
 	public function getUserByNumEmp($numEmpleado)
     {
 		$TempMail = $this->ch->query(
-			"SELECT * from PRUEBA_CH.beneficioscm_vista_usuarios us
+			"SELECT * from ". $this->schema_ch .".beneficioscm_vista_usuarios us
 			INNER JOIN PRUEBA_beneficiosCM.correostemporales c ON c.idContrato = us.idcontrato 
 			WHERE us.num_empleado = ?", array( $numEmpleado ));
 
@@ -197,9 +197,8 @@ class UsuariosModel extends CI_Model {
 			LEFT JOIN ". $this->schema_cm .".correostemporales c ON c.idContrato = us.idcontrato 
 			WHERE us.num_empleado = ?", array( $numEmpleado ));
 		}
-		
         return $query;
-    }
+	}
 
 	public function insertTempMail($correo, $idContrato)
     {
