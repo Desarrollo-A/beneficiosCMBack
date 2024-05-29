@@ -1025,12 +1025,12 @@ class ReportesModel extends CI_Model {
 			us.ndepto AS label,
 			COUNT(CASE WHEN ct.estatusCita = 4 THEN 1 END) AS value
 		FROM
-			PRUEBA_CH.beneficioscm_vista_usuarios us
-		LEFT JOIN PRUEBA_beneficiosCM.usuarios us2 ON
+			". $this->schema_ch .".beneficioscm_vista_usuarios us
+		LEFT JOIN ". $this->schema_cm .".usuarios us2 ON
 			us2.idContrato = us.idcontrato
-		LEFT JOIN PRUEBA_beneficiosCM.citas ct ON
+		LEFT JOIN ". $this->schema_cm .".citas ct ON
 			ct.idPaciente = us2.idUsuario
-		LEFT JOIN PRUEBA_beneficiosCM.datopuesto dp ON
+		LEFT JOIN ". $this->schema_cm .".datopuesto dp ON
 			dp.idPuesto = us.idpuesto
 		WHERE
 			dp.canRegister = 1
@@ -1044,11 +1044,11 @@ class ReportesModel extends CI_Model {
 
 		$query = $this->ch->query("SELECT us.idarea AS id, us.narea AS label, 
 		COUNT(CASE WHEN ct.estatusCita = 4 THEN 1 END) AS value
-		FROM PRUEBA_CH.beneficioscm_vista_departamento dep
-		INNER JOIN PRUEBA_CH.beneficioscm_vista_area ar ON ar.iddepto = dep.iddepto 
-		INNER JOIN PRUEBA_CH.beneficioscm_vista_usuarios us ON us.idarea = ar.idsubarea 
-		LEFT JOIN PRUEBA_beneficiosCM.usuarios us2 ON us2.idContrato = us.idcontrato 
-		LEFT JOIN PRUEBA_beneficiosCM.citas ct ON ct.idPaciente = us2.idUsuario
+		FROM ". $this->schema_ch .".beneficioscm_vista_departamento dep
+		INNER JOIN ". $this->schema_ch .".beneficioscm_vista_area ar ON ar.iddepto = dep.iddepto 
+		INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us ON us.idarea = ar.idsubarea 
+		LEFT JOIN ". $this->schema_cm .".usuarios us2 ON us2.idContrato = us.idcontrato 
+		LEFT JOIN ". $this->schema_cm .".citas ct ON ct.idPaciente = us2.idUsuario
 		GROUP BY us.narea");
 		return $query;
 
@@ -1058,11 +1058,11 @@ class ReportesModel extends CI_Model {
 
 		$query = $this->ch->query("SELECT us.idarea AS id, us.narea AS label,
 		COUNT(CASE WHEN ct.estatusCita = 4 THEN 1 END) AS value
-		FROM PRUEBA_CH.beneficioscm_vista_departamento dep
-		INNER JOIN PRUEBA_CH.beneficioscm_vista_area ar ON ar.iddepto = dep.iddepto 
-		INNER JOIN PRUEBA_CH.beneficioscm_vista_usuarios us ON us.idarea = ar.idsubarea 
-		LEFT JOIN PRUEBA_beneficiosCM.usuarios us2 ON us2.idContrato = us.idcontrato 
-		LEFT JOIN PRUEBA_beneficiosCM.citas ct ON ct.idPaciente = us2.idUsuario
+		FROM ". $this->schema_ch .".beneficioscm_vista_departamento dep
+		INNER JOIN ". $this->schema_ch .".beneficioscm_vista_area ar ON ar.iddepto = dep.iddepto 
+		INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us ON us.idarea = ar.idsubarea 
+		LEFT JOIN ". $this->schema_cm .".usuarios us2 ON us2.idContrato = us.idcontrato 
+		LEFT JOIN ". $this->schema_cm .".citas ct ON ct.idPaciente = us2.idUsuario
 		WHERE dep.iddepto = $dt
 		GROUP BY us.narea");
 		return $query;
@@ -1073,12 +1073,12 @@ class ReportesModel extends CI_Model {
 
 		$query = $this->ch->query("SELECT us.idpuesto AS id, us.npuesto  AS label, 
 		COUNT(CASE WHEN ct.estatusCita = 4 THEN 1 END) AS value
-		FROM PRUEBA_CH.beneficioscm_vista_departamento dep
-		INNER JOIN PRUEBA_CH.beneficioscm_vista_area ar ON ar.iddepto = dep.iddepto 
-		INNER JOIN PRUEBA_CH.beneficioscm_vista_puestos ps ON ps.idarea = ar.idsubarea  
-		INNER JOIN PRUEBA_CH.beneficioscm_vista_usuarios us ON us.idpuesto = ps.idpuesto  
-		LEFT JOIN PRUEBA_beneficiosCM.usuarios us2 ON us2.idContrato = us.idcontrato 
-		LEFT JOIN PRUEBA_beneficiosCM.citas ct ON ct.idPaciente = us2.idUsuario
+		FROM ". $this->schema_ch .".beneficioscm_vista_departamento dep
+		INNER JOIN ". $this->schema_ch .".beneficioscm_vista_area ar ON ar.iddepto = dep.iddepto 
+		INNER JOIN ". $this->schema_ch .".beneficioscm_vista_puestos ps ON ps.idarea = ar.idsubarea  
+		INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us ON us.idpuesto = ps.idpuesto  
+		LEFT JOIN ". $this->schema_cm .".usuarios us2 ON us2.idContrato = us.idcontrato 
+		LEFT JOIN ". $this->schema_cm .".citas ct ON ct.idPaciente = us2.idUsuario
 		WHERE ar.idsubarea = $dt
 		GROUP BY us.npuesto ");
 		return $query;

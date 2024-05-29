@@ -564,8 +564,8 @@ class Usuario extends BaseController {
 
 			$query_mailexist = $this->ch->query("SELECT us2.idUsuario FROM ". $this->schema_ch .".beneficioscm_vista_usuarios us
 			INNER JOIN ". $this->schema_cm .".usuarios us2 ON us2.idContrato = us.idcontrato 
-			LEFT JOIN ". $this->schema_cm .".correostemporales ct ON ct.idContrato = us.idcontrato 
-			WHERE us.mail_emp = '$correo' OR ct.correo = '$correo'");
+			-- LEFT JOIN ". $this->schema_cm .".correostemporales ct ON ct.idContrato = us.idcontrato 
+			WHERE us.mail_emp = '$correo' -- OR ct.correo = '$correo'");
 
 			if ($query_mailexist->num_rows() > 0) {
 				echo json_encode(array("estatus" => false, "msj" => "El correo ingresado ya está en uso"), JSON_NUMERIC_CHECK);
