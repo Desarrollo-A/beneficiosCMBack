@@ -32,11 +32,11 @@ class LoginController extends BaseController {
         $datosEmpleado = $this->input->post('dataValue[params]');
         $mail = $this->input->post('dataValue[params][mailForm]');
         $idContrato = $this->input->post('dataValue[params][idcontrato]');
+        $mailCh = $this->input->post('dataValue[params][mail_emp]');
 
-        $this->UsuariosModel->insertTempMail($mail, $idContrato);
-
-var_dump($datosEmpleado);
-exit;
+        if( $mailCh == '' ||  $mailCh == NULL){
+            $this->UsuariosModel->insertTempMail($mail, $idContrato);
+        }
 
         switch ($datosEmpleado['idpuesto']){
             case "158":

@@ -30,10 +30,10 @@ class ReportesModel extends CI_Model {
 		$usuarioCond = $tipoUsuario != 2 ? "AND pa.externo = $tipoUsuario" : "";
 
 			$query = $this->ch->query("SELECT ct.idCita, pa.idUsuario AS idColab, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista, 
-			IFNULL (CONCAT (us3.nombre_persona,' ',us3.pri_apellido,' ',us3.sec_apellido), ext.nombre) AS paciente, 
-			ps.nom_puesto AS area, IFNULL(sd.nsede, 'QRO') AS sede,ct.titulo, op.nombre AS estatus, 
+			us3.num_empleado AS numEmpleado, IFNULL (CONCAT (us3.nombre_persona,' ',us3.pri_apellido,' ',us3.sec_apellido), ext.nombre) AS paciente, 
+			ps.nom_puesto AS area, IFNULL(sd.nsede, 'QRO') AS sede,ct.titulo, op.nombre AS estatus, us3.narea, us3.npuesto, 
 			CONCAT(DATE_FORMAT(ct.fechaInicio, '%Y-%m-%d'), ' ', DATE_FORMAT(ct.fechaInicio, '%H:%i'), ' - ', DATE_FORMAT(ct.fechaFinal, '%H:%i')) AS horario, observaciones, IFNULL(us3.sexo, ext.sexo) AS sexo, 
-			ct.estatusCita, ct.fechaInicio, IFNULL(dep.ndepto, 'NO APLICA') AS depto, IFNULL(op2.nombre, 'Presencial') AS modalidad,
+			ct.estatusCita, ct.fechaInicio, IFNULL(dep.ndepto, 'NO APLICA') AS depto, IFNULL(op2.nombre, 'Presencial') AS modalidad,  CONCAT('$', ' ',dp.cantidad) AS monto, ops2.nombre AS tipoCita,
 			IFNULL(GROUP_CONCAT(ops.nombre SEPARATOR ', '), 'SIN MOTIVOS DE CITA') AS motivoCita, IFNULL(oxc.nombre, 'Pendiente de pago') AS metodoPago,
 			CASE 
 				WHEN $tipoUsuario = 1 THEN 'RIO DE LA LOZA' 
@@ -86,7 +86,8 @@ class ReportesModel extends CI_Model {
 			LEFT JOIN ". $this->schema_cm .".detallepagos dp ON dp.idDetalle = ct.idDetalle
 			LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo oxc ON oxc.idOpcion = dp.metodoPago AND oxc.idCatalogo = 11
 			LEFT JOIN ". $this->schema_cm .".motivosporcita mpc ON mpc.idCita = ct.idCita
-  			LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo ops ON ops.idCatalogo = cat.idCatalogo AND ops.idOpcion = mpc.idMotivo	
+  			LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo ops ON ops.idCatalogo = cat.idCatalogo AND ops.idOpcion = mpc.idMotivo
+			LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo ops2 ON ops2.idCatalogo = 10	
 			WHERE op.idCatalogo = 2 $usuarioCond $tipoReporte
 			GROUP BY 
   				ct.idCita, 
@@ -1024,12 +1025,12 @@ class ReportesModel extends CI_Model {
 			us.ndepto AS label,
 			COUNT(CASE WHEN ct.estatusCita = 4 THEN 1 END) AS value
 		FROM
-			PRUEBA_CH.beneficioscm_vista_usuarios us
-		LEFT JOIN PRUEBA_beneficiosCM.usuarios us2 ON
+			". $this->schema_ch .".beneficioscm_vista_usuarios us
+		LEFT JOIN ". $this->schema_cm .".usuarios us2 ON
 			us2.idContrato = us.idcontrato
-		LEFT JOIN PRUEBA_beneficiosCM.citas ct ON
+		LEFT JOIN ". $this->schema_cm .".citas ct ON
 			ct.idPaciente = us2.idUsuario
-		LEFT JOIN PRUEBA_beneficiosCM.datopuesto dp ON
+		LEFT JOIN ". $this->schema_cm .".datopuesto dp ON
 			dp.idPuesto = us.idpuesto
 		WHERE
 			dp.canRegister = 1
@@ -1043,11 +1044,11 @@ class ReportesModel extends CI_Model {
 
 		$query = $this->ch->query("SELECT us.idarea AS id, us.narea AS label, 
 		COUNT(CASE WHEN ct.estatusCita = 4 THEN 1 END) AS value
-		FROM PRUEBA_CH.beneficioscm_vista_departamento dep
-		INNER JOIN PRUEBA_CH.beneficioscm_vista_area ar ON ar.iddepto = dep.iddepto 
-		INNER JOIN PRUEBA_CH.beneficioscm_vista_usuarios us ON us.idarea = ar.idsubarea 
-		LEFT JOIN PRUEBA_beneficiosCM.usuarios us2 ON us2.idContrato = us.idcontrato 
-		LEFT JOIN PRUEBA_beneficiosCM.citas ct ON ct.idPaciente = us2.idUsuario
+		FROM ". $this->schema_ch .".beneficioscm_vista_departamento dep
+		INNER JOIN ". $this->schema_ch .".beneficioscm_vista_area ar ON ar.iddepto = dep.iddepto 
+		INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us ON us.idarea = ar.idsubarea 
+		LEFT JOIN ". $this->schema_cm .".usuarios us2 ON us2.idContrato = us.idcontrato 
+		LEFT JOIN ". $this->schema_cm .".citas ct ON ct.idPaciente = us2.idUsuario
 		GROUP BY us.narea");
 		return $query;
 
@@ -1057,11 +1058,11 @@ class ReportesModel extends CI_Model {
 
 		$query = $this->ch->query("SELECT us.idarea AS id, us.narea AS label,
 		COUNT(CASE WHEN ct.estatusCita = 4 THEN 1 END) AS value
-		FROM PRUEBA_CH.beneficioscm_vista_departamento dep
-		INNER JOIN PRUEBA_CH.beneficioscm_vista_area ar ON ar.iddepto = dep.iddepto 
-		INNER JOIN PRUEBA_CH.beneficioscm_vista_usuarios us ON us.idarea = ar.idsubarea 
-		LEFT JOIN PRUEBA_beneficiosCM.usuarios us2 ON us2.idContrato = us.idcontrato 
-		LEFT JOIN PRUEBA_beneficiosCM.citas ct ON ct.idPaciente = us2.idUsuario
+		FROM ". $this->schema_ch .".beneficioscm_vista_departamento dep
+		INNER JOIN ". $this->schema_ch .".beneficioscm_vista_area ar ON ar.iddepto = dep.iddepto 
+		INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us ON us.idarea = ar.idsubarea 
+		LEFT JOIN ". $this->schema_cm .".usuarios us2 ON us2.idContrato = us.idcontrato 
+		LEFT JOIN ". $this->schema_cm .".citas ct ON ct.idPaciente = us2.idUsuario
 		WHERE dep.iddepto = $dt
 		GROUP BY us.narea");
 		return $query;
@@ -1072,12 +1073,12 @@ class ReportesModel extends CI_Model {
 
 		$query = $this->ch->query("SELECT us.idpuesto AS id, us.npuesto  AS label, 
 		COUNT(CASE WHEN ct.estatusCita = 4 THEN 1 END) AS value
-		FROM PRUEBA_CH.beneficioscm_vista_departamento dep
-		INNER JOIN PRUEBA_CH.beneficioscm_vista_area ar ON ar.iddepto = dep.iddepto 
-		INNER JOIN PRUEBA_CH.beneficioscm_vista_puestos ps ON ps.idarea = ar.idsubarea  
-		INNER JOIN PRUEBA_CH.beneficioscm_vista_usuarios us ON us.idpuesto = ps.idpuesto  
-		LEFT JOIN PRUEBA_beneficiosCM.usuarios us2 ON us2.idContrato = us.idcontrato 
-		LEFT JOIN PRUEBA_beneficiosCM.citas ct ON ct.idPaciente = us2.idUsuario
+		FROM ". $this->schema_ch .".beneficioscm_vista_departamento dep
+		INNER JOIN ". $this->schema_ch .".beneficioscm_vista_area ar ON ar.iddepto = dep.iddepto 
+		INNER JOIN ". $this->schema_ch .".beneficioscm_vista_puestos ps ON ps.idarea = ar.idsubarea  
+		INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us ON us.idpuesto = ps.idpuesto  
+		LEFT JOIN ". $this->schema_cm .".usuarios us2 ON us2.idContrato = us.idcontrato 
+		LEFT JOIN ". $this->schema_cm .".citas ct ON ct.idPaciente = us2.idUsuario
 		WHERE ar.idsubarea = $dt
 		GROUP BY us.npuesto ");
 		return $query;
