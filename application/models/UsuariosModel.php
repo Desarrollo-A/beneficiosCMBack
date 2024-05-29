@@ -79,7 +79,7 @@ class UsuariosModel extends CI_Model {
 			END AS correo 
 			FROM ". $this->schema_cm .".usuarios US 
 			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = US.idContrato 
-			LEFT JOIN PRUEBA_beneficiosCM.correostemporales AS c ON c.idContrato = us2.idcontrato 
+			LEFT JOIN ". $this->schema_cm .".correostemporales AS c ON c.idContrato = us2.idcontrato 
 			WHERE US.idRol = ? AND US.estatus = ? AND us2.idsede IN ( SELECT DISTINCT idSede FROM ". $this->schema_cm .".atencionxsede WHERE idEspecialista = ? ) 
 			UNION ( SELECT u.idUsuario AS idUsuario, u.idContrato, u.password, us2.idRol, u.externo, u.idAreaBeneficio, us2.estatus, us2.creadoPor, us2.fechaCreacion,
 			 us2.modificadoPor, us2.fechaModificacion, 1 AS idSede, 0 AS idarea, 0 tipoPuesto, 0 AS fechaIngreso, CONCAT('(Lamat)', ' ', CONCAT(IFNULL(us2.nombre, ''))) AS nombreCompleto,
@@ -172,7 +172,7 @@ class UsuariosModel extends CI_Model {
     {
 		$TempMail = $this->ch->query(
 			"SELECT * from ". $this->schema_ch .".beneficioscm_vista_usuarios us
-			INNER JOIN PRUEBA_beneficiosCM.correostemporales c ON c.idContrato = us.idcontrato 
+			INNER JOIN ". $this->schema_cm .".correostemporales c ON c.idContrato = us.idcontrato 
 			WHERE us.num_empleado = ?", array( $numEmpleado ));
 
 		if ($TempMail->num_rows() > 0) {
