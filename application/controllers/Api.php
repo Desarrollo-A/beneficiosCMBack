@@ -193,7 +193,7 @@ class Api extends BaseController{
             $response["result2"] = (!isset($rs[0]->idEventoGoogle) OR $rs[0]->idEventoGoogle === "");
             if ($response["result2"]) {
                 $data = [
-                    "email" => $rs[0]->correo ? $rs[0]->correo : $rs[0]->correoEspecialista,
+                    "email" => $rs[0]->correo,
                     "title" => $rs[0]->title,
                     "location" => $rs[0]->ubicación,
                     "description" => $rs[0]->title,
@@ -201,11 +201,11 @@ class Api extends BaseController{
                     "end" => date('Y-m-d\TH:i:s', strtotime($rs[0]->end)),
                     "attendees" => array(
                         array(
-                            "email" => $rs[0]->correo ? $rs[0]->correo : $rs[0]->correoEspecialista,
+                            "email" => $rs[0]->correo,
                             "responseStatus" => "accepted"
                         ),
                         array(
-                            "email" => $rs[0]->correo ? $rs[0]->correo : $rs[0]->correoEspecialista,
+                            "email" => $rs[0]->correoEspecialista,
                             "responseStatus" => "accepted"
                         )
                     ),
