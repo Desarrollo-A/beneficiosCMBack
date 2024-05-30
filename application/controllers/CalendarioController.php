@@ -681,7 +681,7 @@ class CalendarioController extends BaseController{
 		try {
 			$updateRecord = $this->GeneralModel->updateRecord($this->schema_cm .".citas", $valuesUpdate, "idCita", $idCita);
 			if ($updateRecord) {
-				$insertBatch = $this->GeneralModel->insertBatch("motivosporcita", $valuesAdd);
+				$insertBatch = $this->GeneralModel->insertBatch($this->schema_cm .".motivosporcita", $valuesAdd);
 
 				if ($insertBatch) {
 					$response["result"] = true;
