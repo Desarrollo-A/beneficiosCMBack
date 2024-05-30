@@ -20,7 +20,7 @@ class ReportesModel extends CI_Model {
 		$tipoReporte = "";
 
 		if($dt == '0'){
-			$tipoReporte  = "AND ct.estatusCita < 8";
+			$tipoReporte  = "AND ct.estatusCita < 9";
 		}else if($dt == '2'){
 			$tipoReporte = "AND ct.estatusCita IN (2, 7)";
 		}else{
