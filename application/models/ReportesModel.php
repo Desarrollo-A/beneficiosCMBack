@@ -31,9 +31,9 @@ class ReportesModel extends CI_Model {
 
 			$query = $this->ch->query("SELECT ct.idCita, pa.idUsuario AS idColab, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista, 
 			us3.num_empleado AS numEmpleado, IFNULL (CONCAT (us3.nombre_persona,' ',us3.pri_apellido,' ',us3.sec_apellido), ext.nombre) AS paciente, 
-			ps.nom_puesto AS area, IFNULL(sd.nsede, 'QRO') AS sede,ct.titulo, op.nombre AS estatus, us3.narea, us3.npuesto, 
+			ps.nom_puesto AS area, IFNULL(sd.nsede, 'QRO') AS sede,ct.titulo, us3.narea, us3.npuesto, 
 			CONCAT(DATE_FORMAT(ct.fechaInicio, '%Y-%m-%d'), ' ', DATE_FORMAT(ct.fechaInicio, '%H:%i'), ' - ', DATE_FORMAT(ct.fechaFinal, '%H:%i')) AS horario, observaciones, IFNULL(us3.sexo, ext.sexo) AS sexo, 
-			ct.estatusCita, ct.fechaInicio, ct.fechaFinal, IFNULL(dep.ndepto, 'NO APLICA') AS depto, IFNULL(op2.nombre, 'Presencial') AS modalidad,  CONCAT('$', ' ',dp.cantidad) AS monto, ops2.nombre AS tipoCita,
+			estatusCita, ct.fechaInicio, ct.fechaFinal, IFNULL(dep.ndepto, 'NO APLICA') AS depto, IFNULL(op2.nombre, 'Presencial') AS modalidad,  CONCAT('$', ' ',dp.cantidad) AS monto, ops2.nombre AS tipoCita,
 			IFNULL(GROUP_CONCAT(ops.nombre SEPARATOR ', '), 'SIN MOTIVOS DE CITA') AS motivoCita, IFNULL(oxc.nombre, 'Pendiente de pago') AS metodoPago,
 			CASE 
 				WHEN $tipoUsuario = 1 THEN 'RIO DE LA LOZA' 
@@ -45,9 +45,9 @@ class ReportesModel extends CI_Model {
 				WHEN pa.externo = 1 THEN 'Externo' 
 			END AS usuario,
 			CASE 
-				WHEN ct.estatusCita = 0 THEN '#ff0000' 
-				WHEN ct.estatusCita = 1 AND axs.tipoCita = 1 THEN '#ffa500' 
-				WHEN ct.estatusCita = 1 THEN '#ffa500' 
+				WHEN ct.estatusCita = 1 AND ct.tipoCita = 1 THEN '#ffe800'
+				WHEN ct.estatusCita = 1 AND ct.tipoCita = 2 THEN '#0000ff' 
+                WHEN ct.estatusCita = 1 AND ct.tipoCita = 3 THEN '#ffa500'
 				WHEN ct.estatusCita = 2 THEN '#ff0000' 
 				WHEN ct.estatusCita = 3 THEN '#808080' 
 				WHEN ct.estatusCita = 4 THEN '#008000' 
@@ -56,8 +56,12 @@ class ReportesModel extends CI_Model {
 				WHEN ct.estatusCita = 7 THEN '#ff0000' 
 				WHEN ct.estatusCita = 10 THEN '#33105D'
 				WHEN ct.estatusCita = 11 THEN '#ff0000' 
-				WHEN ct.estatusCita = 1 AND axs.tipoCita = 2 THEN '#ffa500' 
 			END AS color, 
+			CASE
+				WHEN ct.estatusCita = 1 AND ct.tipoCita = 1 THEN 'Por Asistir - Primera cita'
+				WHEN ct.estatusCita = 1 AND ct.tipoCita = 2 THEN 'Por Asistir - En línea'  
+				ELSE op.nombre
+			END AS estatus, 
 			CASE 
 				WHEN ct.estatusCita IN (2, 7, 8) THEN 'Cancelado' 
 				ELSE 'Exitoso' 
