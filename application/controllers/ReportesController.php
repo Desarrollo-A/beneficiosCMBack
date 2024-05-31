@@ -36,10 +36,11 @@ class ReportesController extends BaseController {
 
 	public function observacion(){
 
-		$idCita= $this->input->post('dataValue[idCita]');
-		$descripcion= $this->input->post('dataValue[descripcion]');
-		$estatus= $this->input->post('dataValue[ests]');
-		$modificadoPor= $this->input->post('dataValue[modificadoPor]');
+		$idCita= $this->form('idCita');
+		$descripcion= $this->form('descripcion');
+		$estatus= $this->form('ests');
+		$modificadoPor= $this->form('modificadoPor');
+		$archivo= $this->file('archivo');
 
 		if( !empty($idCita) && !empty($descripcion) )
 		{
@@ -48,8 +49,19 @@ class ReportesController extends BaseController {
 				"estatusCita" => $estatus,
 				"modificadoPor" => $modificadoPor,
 			);
+
+			if($archivo){
+				$file_ext = pathinfo($archivo->name, PATHINFO_EXTENSION);
+				$file_name =  "justificacion-$idCita.$file_ext";
+
+				$upload = $this->upload($archivo->tmp_name, $file_name);
+
+				if($upload){
+					$data['archivoObservacion'] = $file_name;
+				}
+			}
 			
-			$response=$this->GeneralModel->updateRecord($this->schema_cm.'.citas', $data, 'idCita', $idCita);
+			$this->GeneralModel->updateRecord($this->schema_cm.'.citas', $data, 'idCita', $idCita);
 			echo json_encode(array("estatus" => true, "msj" => "Observación registrada" ), JSON_NUMERIC_CHECK);
 				
 		}else{

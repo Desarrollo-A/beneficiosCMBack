@@ -31,7 +31,7 @@ class ReportesModel extends CI_Model {
 
 			$query = $this->ch->query("SELECT ct.idCita, pa.idUsuario AS idColab, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista, 
 			us3.num_empleado AS numEmpleado, IFNULL (CONCAT (us3.nombre_persona,' ',us3.pri_apellido,' ',us3.sec_apellido), ext.nombre) AS paciente, 
-			ps.nom_puesto AS area, IFNULL(sd.nsede, 'QRO') AS sede,ct.titulo, us3.narea, us3.npuesto, 
+			ps.nom_puesto AS area, IFNULL(sd.nsede, 'QRO') AS sede,ct.titulo, us3.narea, us3.npuesto, ct.archivoObservacion AS archivo,
 			CONCAT(DATE_FORMAT(ct.fechaInicio, '%Y-%m-%d'), ' ', DATE_FORMAT(ct.fechaInicio, '%H:%i'), ' - ', DATE_FORMAT(ct.fechaFinal, '%H:%i')) AS horario, observaciones, IFNULL(us3.sexo, ext.sexo) AS sexo, 
 			estatusCita, ct.fechaInicio, ct.fechaFinal, IFNULL(dep.ndepto, 'NO APLICA') AS depto, IFNULL(op2.nombre, 'Presencial') AS modalidad,  CONCAT('$', ' ',dp.cantidad) AS monto, ops2.nombre AS tipoCita,
 			IFNULL(GROUP_CONCAT(ops.nombre SEPARATOR ', '), 'SIN MOTIVOS DE CITA') AS motivoCita, IFNULL(oxc.nombre, 'Pendiente de pago') AS metodoPago,
