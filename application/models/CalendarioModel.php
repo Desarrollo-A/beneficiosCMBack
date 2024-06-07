@@ -29,7 +29,18 @@ class CalendarioModel extends CI_Model
             usEspe2.sexo as sexoEspecialista, tf.fechasFolio, ct.idEventoGoogle, ct.evaluacion, dp.estatusPago, ec.idEncuesta,
             CASE WHEN ofi.noficina IS NULL THEN 'VIRTUAL' ELSE ofi.noficina END as 'oficina',
             CASE WHEN ofi.direccion IS NULL THEN 'VIRTUAL' ELSE ofi.direccion END as 'ubicación', 
-            CASE WHEN ct.estatusCita = 1 AND atc.tipoCita = 1 THEN '#ffa500' WHEN ct.estatusCita = 2 THEN '#ff0000' WHEN ct.estatusCita = 3 THEN '#808080' WHEN ct.estatusCita = 4 THEN '#008000' WHEN ct.estatusCita = 5 THEN '#ff4d67' WHEN ct.estatusCita = 6 THEN '#00ffff' WHEN ct.estatusCita = 7 THEN '#ff0000' WHEN ct.estatusCita = 10 THEN '#33105D' WHEN ct.estatusCita = 1 AND atc.tipoCita = 2 THEN '#0000ff' END AS 'color', 
+            CASE 
+            WHEN ct.estatusCita = 1 AND ct.tipoCita = 1 THEN '#ffe800'
+            WHEN ct.estatusCita = 1 AND ct.tipoCita = 2 THEN '#0000ff'
+            WHEN ct.estatusCita = 1 AND ct.tipoCita = 3 THEN '#ffa500'
+            WHEN ct.estatusCita = 2 THEN '#ff0000' 
+            WHEN ct.estatusCita = 3 THEN '#808080' 
+            WHEN ct.estatusCita = 4 THEN '#008000' 
+            WHEN ct.estatusCita = 5 THEN '#ff4d67' 
+            WHEN ct.estatusCita = 6 THEN '#00ffff' 
+            WHEN ct.estatusCita = 7 THEN '#ff0000' 
+            WHEN ct.estatusCita = 10 THEN '#33105D' 
+            END AS 'color', 
             CASE WHEN usEspe2.idpuesto = 537 THEN 'nutrición' WHEN usEspe2.idpuesto = 585 THEN 'psicología' WHEN usEspe2.idpuesto = 686 THEN 'guía espiritual' WHEN usEspe2.idpuesto = 158 THEN 'quantum balance' END AS 'beneficio'
             FROM ". $this->schema_cm .".citas AS ct 
             INNER JOIN ". $this->schema_cm .".usuarios AS us ON us.idUsuario = ct.idPaciente 
@@ -342,8 +353,10 @@ class CalendarioModel extends CI_Model
         END AS correo,
         usEspe2.mail_emp as correoEspecialista, CONCAT(IFNULL(usEspe2.nombre_persona, ''), ' ', IFNULL(usEspe2.pri_apellido, ''), ' ', IFNULL(usEspe2.sec_apellido, '')) as especialista,
         usEspe2.sexo as sexoEspecialista, tf.fechasFolio, ct.idEventoGoogle, ct.evaluacion, dp.estatusPago, ec.idEncuesta,
-        CASE
-        WHEN ct.estatusCita = 1 AND atc.tipoCita = 1 THEN '#ffa500'
+        CASE 
+        WHEN ct.estatusCita = 1 AND ct.tipoCita = 1 THEN '#ffe800'
+        WHEN ct.estatusCita = 1 AND ct.tipoCita = 2 THEN '#0000ff'
+        WHEN ct.estatusCita = 1 AND ct.tipoCita = 3 THEN '#ffa500'
         WHEN ct.estatusCita = 2 THEN '#ff0000'
         WHEN ct.estatusCita = 3 THEN '#808080'
         WHEN ct.estatusCita = 4 THEN '#008000'
@@ -351,7 +364,6 @@ class CalendarioModel extends CI_Model
         WHEN ct.estatusCita = 6 THEN '#00ffff'
         WHEN ct.estatusCita = 7 THEN '#ff0000'
         WHEN ct.estatusCita = 10 THEN '#33105D'
-        WHEN ct.estatusCita = 1 AND atc.tipoCita = 2 THEN '#0000ff'
         END AS 'color',
         CASE 
         WHEN usEspe2.idpuesto = 537 THEN 'nutrición'
@@ -510,7 +522,9 @@ class CalendarioModel extends CI_Model
             tf.fechasFolio, idEventoGoogle, ct.tipoCita, aps.tipoCita as modalidad, aps.idSede, dp.estatusPago, us2.idsede AS idSedePaciente,
             CASE
                 WHEN ct.estatusCita = 0 THEN '#ff0000'
-                WHEN ct.estatusCita = 1 AND aps.tipoCita = 1 THEN '#ffa500'
+                WHEN ct.estatusCita = 1 AND ct.tipoCita = 1 THEN '#ffe800'
+                WHEN ct.estatusCita = 1 AND ct.tipoCita = 2 THEN '#0000ff'
+                WHEN ct.estatusCita = 1 AND ct.tipoCita = 3 THEN '#ffa500'
                 WHEN ct.estatusCita = 2 THEN '#ff0000'
                 WHEN ct.estatusCita = 3 THEN '#808080'
                 WHEN ct.estatusCita = 4 THEN '#008000'
@@ -518,7 +532,6 @@ class CalendarioModel extends CI_Model
                 WHEN ct.estatusCita = 6 THEN '#00ffff'
                 WHEN ct.estatusCita = 7 THEN '#ff0000'
                 WHEN ct.estatusCita = 10 THEN '#33105D'
-                WHEN ct.estatusCita = 1 AND aps.tipoCita = 2 THEN '#0000ff'
             END AS color,
             CASE
             WHEN usEspCH.idPuesto = 537 THEN 'nutrición'
@@ -555,7 +568,9 @@ class CalendarioModel extends CI_Model
             ct.idDetalle, ct.idAtencionXSede, us.externo, CONCAT(IFNULL(usEspCH.nombre_persona, ''), ' ', IFNULL(usEspCH.pri_apellido, ''), ' ', IFNULL(usEspCH.sec_apellido, '')) AS especialista, ct.fechaCreacion, usEspCH.tipo_puesto AS tipoPuesto,
             tf.fechasFolio, ct.idEventoGoogle, ct.tipoCita, aps.tipoCita as modalidad, aps.idSede, dp.estatusPago,
             CASE WHEN ct.estatusCita = 0 THEN '#ff0000'
-                WHEN ct.estatusCita = 1 AND aps.tipoCita = 1 THEN '#ffa500'
+               WHEN ct.estatusCita = 1 AND ct.tipoCita = 1 THEN '#ffe800'
+               WHEN ct.estatusCita = 1 AND ct.tipoCita = 2 THEN '#0000ff'
+               WHEN ct.estatusCita = 1 AND ct.tipoCita = 3 THEN '#ffa500'
                WHEN ct.estatusCita = 2 THEN '#ff0000'
                WHEN ct.estatusCita = 3 THEN '#808080'
                WHEN ct.estatusCita = 4 THEN '#008000'
@@ -563,7 +578,6 @@ class CalendarioModel extends CI_Model
                WHEN ct.estatusCita = 6 THEN '#00ffff'
                WHEN ct.estatusCita = 7 THEN '#ff0000'
                WHEN ct.estatusCita = 10 THEN '#33105D'
-               WHEN ct.estatusCita = 1 AND aps.tipoCita = 2 THEN '#0000ff'
                 END AS color,
             CASE WHEN usEspCH.idPuesto = 537 THEN 'nutrición'
                WHEN usEspCH.idPuesto= 585 THEN 'psicología'

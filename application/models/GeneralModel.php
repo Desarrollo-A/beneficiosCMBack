@@ -168,13 +168,15 @@ class GeneralModel extends CI_Model {
     public function getCitas($dt)
     {
 
-        $query = $this->ch-> query("SELECT ct.idCita AS id, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista, us2.idpuesto AS beneficio, sd.nsede AS sede, op.nombre AS estatus, 
+        $query = $this->ch-> query("SELECT ct.idCita AS id, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista, us2.idpuesto AS beneficio, sd.nsede AS sede, 
 		CONCAT(DATE_FORMAT(ct.fechaInicio, '%Y-%m-%d'), ' ', DATE_FORMAT(ct.fechaInicio, '%H:%i'), ' - ', DATE_FORMAT(ct.fechaFinal, '%H:%i')) AS horario,
 		ofi.noficina AS oficina, IFNULL(oxc.nombre, 'Pendiente de pago') AS metodoPago, ct.estatusCita, us2.idsede AS idSedeEsp,
 		IFNULL(GROUP_CONCAT(ops.nombre SEPARATOR ', '), 'SIN MOTIVOS DE CITA') AS motivoCita,
         CASE
 	        WHEN ct.estatusCita = 0 THEN '#ff0000'
-	        WHEN ct.estatusCita = 1 AND axs.tipoCita = 1 THEN '#ffa500'
+	        WHEN ct.estatusCita = 1 AND ct.tipoCita = 1 THEN '#ffe800'
+			WHEN ct.estatusCita = 1 AND ct.tipoCita = 2 THEN '#0000ff' 
+            WHEN ct.estatusCita = 1 AND ct.tipoCita = 3 THEN '#ffa500'
 	        WHEN ct.estatusCita = 2 THEN '#ff0000'
 	        WHEN ct.estatusCita = 3 THEN '#808080'
 	        WHEN ct.estatusCita = 4 THEN '#008000'
@@ -182,8 +184,13 @@ class GeneralModel extends CI_Model {
             WHEN ct.estatusCita = 6 THEN '#00ffff'
             WHEN ct.estatusCita = 7 THEN '#ff0000'
             WHEN ct.estatusCita = 10 THEN '#33105D'
-            WHEN ct.estatusCita = 1 AND axs.tipoCita = 2 THEN '#0000ff'
 	    END AS color,
+        CASE
+			WHEN ct.estatusCita = 1 AND ct.tipoCita = 1 THEN 'Por Asistir - Primera cita'
+			WHEN ct.estatusCita = 1 AND ct.tipoCita = 2 THEN 'Por Asistir - En línea' 
+            WHEN ct.estatusCita = 1 AND ct.tipoCita = 3 THEN 'Por Asistir - Cita normal'   
+			ELSE op.nombre
+		END AS estatus, 
 		CASE 
 		WHEN ct.estatusCita IN (2, 7, 8) THEN 'Cancelado'
 		ELSE 'Exitoso'
