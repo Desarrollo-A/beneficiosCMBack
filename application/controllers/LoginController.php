@@ -76,9 +76,22 @@ class LoginController extends BaseController {
         if (!$informacionDePuesto) {
             echo json_encode(array("result" => false, "msg" => "No hay información del puesto" ), JSON_NUMERIC_CHECK);
         }else {
+            
+            $antiguedad = 0;
+            $fingreso = $informacionDePuesto->fingreso;
+            $dateOfEntry = new DateTime($fingreso);
+            $currentDate = new DateTime();
+            $threeMonthsAgo = $currentDate->sub(new DateInterval('P3M'));
+
+            if ($dateOfEntry < $threeMonthsAgo) {
+                $antiguedad = 1;
+            } else {
+                $antiguedad = 0;
+            }
+
             $canRegister = $informacionDePuesto->canRegister;
 
-            if ($canRegister === 0 || $canRegister === '0' || $canRegister == NULL) {
+            if ($canRegister === 0 || $canRegister === '0' || $canRegister == NULL || $antiguedad == 0) {
                 echo json_encode(array("result" => false, "msg" => "Por el momento no puede gozar de los beneficios"), JSON_NUMERIC_CHECK);
 
             }else {
