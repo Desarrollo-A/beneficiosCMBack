@@ -31,11 +31,13 @@ class AvisosPrivacidadController extends BaseController
 		if ($data == false){
 			$this->output->set_output(json_encode(false, JSON_NUMERIC_CHECK));
 		}else{
-			$fileName = base_url() . '/documentos/archivo/' . $data[0]['expediente'];
+			// $fileName = base_url() . '/documentos/archivo/' . $data[0]['expediente'];
 
-			/* $this->output->set_content_type('application/json');
+			$fileName = $data['base_url'] = base_url() . 'dist/documentos/avisos-privacidad/' . $data[0]['expediente'];
+
+			$this->output->set_content_type('application/json');
 	
-			$content = @file_get_contents($fileName); */
+			$content = @file_get_contents($fileName);
 
 			if ($fileName) {
 				$this->output->set_output(json_encode($this->AvisosPrivacidadModel->getAvisoPrivacidadByEsp($idEspecialidad), JSON_NUMERIC_CHECK));
@@ -47,7 +49,7 @@ class AvisosPrivacidadController extends BaseController
 
 	function actualizarArchivoPrivacidad(){
 		$accion = $this->input->post('accion');
-		$archivo= $this->file('archivo');
+		// $archivo= $this->file('archivo');
 
 		//tipoDeAccion: 1: nuevo 2: Editar
 		$nombreEspecialidad = $this->input->post('nombreEspecialidad');
@@ -58,7 +60,7 @@ class AvisosPrivacidadController extends BaseController
 
 		$file_name =  "Aviso-Privacidad-$nombreEspecialidad.$fileExt";
 
-		// $folder = 'dist/documentos/avisos-privacidad/';
+		$folder = 'dist/documentos/avisos-privacidad/';
 		$dataExpedienteGenerado = $this->nuevoNombreArchivo($nombreEspecialidad,$file);
 
 		$id_usuario_actual = $this->input->post('idUsuario');
@@ -68,8 +70,8 @@ class AvisosPrivacidadController extends BaseController
 				return;
 			}
 			else{
-					$movement = $this->upload($archivo->tmp_name, $file_name);
-					// $movement = move_uploaded_file($_FILES["archivo"]['tmp_name'], $folder . $dataExpedienteGenerado['expediente']);
+					// $movement = $this->upload($archivo->tmp_name, $file_name);
+					$movement = move_uploaded_file($_FILES["archivo"]['tmp_name'], $folder . $dataExpedienteGenerado['expediente']);
 					if ($movement) {
 
 						//acciónEditar
@@ -79,7 +81,8 @@ class AvisosPrivacidadController extends BaseController
 
 							if (count($validacionRama) > 0) {
 								$updateDocumentData = array(
-									"expediente" => $file_name,
+									// "expediente" => $file_name,
+									"expediente" => $dataExpedienteGenerado['expediente'],
 									"fechaModificacion" => date_format($dataExpedienteGenerado['date'], "Y-m-d H:i:s"),
 									"modificadoPor" => $this->session->userdata('id_usuario')
 								);
@@ -97,7 +100,8 @@ class AvisosPrivacidadController extends BaseController
 							$idEspecialidad = $this->input->post('idEspecialidad');
 							$insertDocumentData = array(
 								"movimiento" => 'Se sube un nuevo archivo por usuario',
-								"expediente" => $file_name,
+								// "expediente" => $file_name,
+								"expediente" => $dataExpedienteGenerado['expediente'],
 								"estatus" => 1,
 								"tipoDocumento" => 1,
 								"tipoEspecialidad" => $idEspecialidad,

@@ -1,14 +1,14 @@
 <?php
-require 'vendor/autoload.php';
+/* require 'vendor/autoload.php'; */
 
-use Google\Cloud\Storage\StorageClient;
+/* use Google\Cloud\Storage\StorageClient; */
 abstract class BaseController extends CI_Controller{
 
     public function __construct(){
         parent::__construct();
         $this->load->database('default');
 
-        $storage = new StorageClient([
+        /* $storage = new StorageClient([
             'keyFilePath' => APPPATH . 'config/google.json'
         ]);
 
@@ -16,7 +16,7 @@ abstract class BaseController extends CI_Controller{
 
         $bucket = $this->config->item("bucket");
 
-        $this->bucket = $storage->bucket($bucket);
+        $this->bucket = $storage->bucket($bucket); */
 
         $this->load->model('UsuariosModel');
 
@@ -158,7 +158,7 @@ abstract class BaseController extends CI_Controller{
         //$this->googleapi->editEvent($token, $id_event, $data);
     }
 
-    public function upload($path, $filename){
+    /* public function upload($path, $filename){
         $file = $this->bucket->upload(
             fopen($path, 'r'),
             [
@@ -207,7 +207,7 @@ abstract class BaseController extends CI_Controller{
         }
 
         return $data;
-    }
+    } */
 
 }
 
