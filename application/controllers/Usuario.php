@@ -628,7 +628,7 @@ class Usuario extends BaseController {
             if ($response['result']) {
 				$response['result'] = $rs[0]->activo == 1;
 				if ($response['result']) {
-					if($CorreoCh == '' && $tipoPuesto != 'Operativa'){
+					if($CorreoCh == '' /* && $tipoPuesto != 'Operativa' */){
 						$response['msg'] = '¡No se tiene registrado un correo del colaborador!';
 						$response['result'] = false;
 					}else{

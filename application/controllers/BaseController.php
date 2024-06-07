@@ -1,9 +1,22 @@
 <?php
+require 'vendor/autoload.php';
 
+use Google\Cloud\Storage\StorageClient;
 abstract class BaseController extends CI_Controller{
+
     public function __construct(){
         parent::__construct();
         $this->load->database('default');
+
+        $storage = new StorageClient([
+            'keyFilePath' => APPPATH . 'config/google.json'
+        ]);
+
+        $this->config->load("google_api");
+
+        $bucket = $this->config->item("bucket");
+
+        $this->bucket = $storage->bucket($bucket);
 
         $this->load->model('UsuariosModel');
 
@@ -20,7 +33,7 @@ abstract class BaseController extends CI_Controller{
         // Lineas para la verificación de 
         $allowed_routes = ['logincontroller/login', 'usuario/getuserbynumemp', 'usuario/sendmail', 'usuario/gettoken', 'logincontroller/addregistroempleado',
             "usuario/authorized", "api/confirmarpago", "api/encodedhash", "usuario/loginch", "usuario/updatech", "usuario/bajach", "api/tareacancelacitassinpago",
-            "api/creaeventogoogleynotifica"];
+            "api/creaeventogoogleynotifica", "documentos/archivo"];
 
         $uri = strtolower($this->uri->uri_string());
 
@@ -144,6 +157,58 @@ abstract class BaseController extends CI_Controller{
 
         //$this->googleapi->editEvent($token, $id_event, $data);
     }
+
+    public function upload($path, $filename){
+        $file = $this->bucket->upload(
+            fopen($path, 'r'),
+            [
+                'name' => $filename,
+            ]
+        );
+
+        if($file->exists()){
+            return True;
+        }
+
+        return False;
+    }
+
+    public function file($key = null){
+        $data = (object) $_FILES;
+
+        if(!isset($data)){
+            return null;
+        }
+
+        if(isset($key)){
+            if(isset($data->$key)){
+                return (object) $data->$key;
+            }else{
+                return null;
+            }
+        }
+
+        return $data;
+    }
+
+    public function form($key = null){
+        $data = (object) $this->input->post();
+
+        if(!isset($data)){
+            return null;
+        }
+
+        if(isset($key)){
+            if(isset($data->$key)){
+                return $data->$key;
+            }else{
+                return null;
+            }
+        }
+
+        return $data;
+    }
+
 }
 
 ?>
