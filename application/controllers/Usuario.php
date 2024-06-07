@@ -567,7 +567,7 @@ class Usuario extends BaseController {
 			-- LEFT JOIN ". $this->schema_cm .".correostemporales ct ON ct.idContrato = us.idcontrato 
 			WHERE us.mail_emp = '$correo' -- OR ct.correo = '$correo'");
 
-			if ($query_mailexist->num_rows() > 0 && ) {
+			if ($query_mailexist->num_rows() > 0) {
 				echo json_encode(array("estatus" => false, "msj" => "El correo ingresado ya está en uso"), JSON_NUMERIC_CHECK);
 			}else{
 
