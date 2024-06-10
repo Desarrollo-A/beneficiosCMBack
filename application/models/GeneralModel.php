@@ -20,7 +20,7 @@ class GeneralModel extends CI_Model {
     public function getInfoPuesto($contrato){
         
         $query = $this->ch-> query("SELECT ps.idpuesto AS idPuesto, ps.nom_puesto AS puesto, ps.tipo_puesto AS tipoPuesto,  
-        ps.idarea AS idArea, ps.estatus_puesto AS estatus, dp.canRegister 
+        ps.idarea AS idArea, us.fingreso, ps.estatus_puesto AS estatus, dp.canRegister 
         FROM ". $this->schema_ch .".beneficioscm_vista_usuarios AS us
         INNER JOIN ". $this->schema_ch .".beneficioscm_vista_puestos ps ON ps.idpuesto = us.idpuesto
         LEFT JOIN ". $this->schema_cm .".datopuesto dp ON dp.idPuesto = ps.idpuesto 
@@ -30,7 +30,7 @@ class GeneralModel extends CI_Model {
 
     public function especialistas()
 	{
-		$query = $this->ch-> query("SELECT idpuesto AS idPuesto, nom_puesto AS nombre FROM ". $this->schema_ch .".beneficioscm_vista_puestos WHERE idpuesto = 537 OR idpuesto = 686 OR idpuesto = 158 OR idpuesto = 585");
+		$query = $this->ch-> query("SELECT idpuesto AS idPuesto, nom_puesto AS nombre FROM ". $this->schema_ch .".beneficioscm_vista_puestos WHERE idpuesto = 537 OR idpuesto = 686 OR idpuesto = 585");
         return $query->result();
 	}
 

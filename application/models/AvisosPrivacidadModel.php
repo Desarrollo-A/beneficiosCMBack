@@ -24,7 +24,7 @@ class AvisosPrivacidadModel extends CI_Model
 		WHEN idOpcion = 686 THEN 686
 		WHEN idOpcion = 158 THEN 158
 		END AS 'idPuesto'
-		from ". $this->schema_cm .".opcionesporcatalogo where idCatalogo = 1"); 
+		from ". $this->schema_cm .".opcionesporcatalogo where idCatalogo = 1 AND estatus = 1"); 
 		return $query->result_array();
 	}
 
