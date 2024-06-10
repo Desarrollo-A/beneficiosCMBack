@@ -30,7 +30,7 @@ class GeneralModel extends CI_Model {
 
     public function especialistas()
 	{
-		$query = $this->ch-> query("SELECT idpuesto AS idPuesto, nom_puesto AS nombre FROM ". $this->schema_ch .".beneficioscm_vista_puestos WHERE idpuesto = 537 OR idpuesto = 686 OR idpuesto = 158 OR idpuesto = 585");
+		$query = $this->ch-> query("SELECT idpuesto AS idPuesto, nom_puesto AS nombre FROM ". $this->schema_ch .".beneficioscm_vista_puestos WHERE idpuesto = 537 OR idpuesto = 686 OR idpuesto = 585");
         return $query->result();
 	}
 
