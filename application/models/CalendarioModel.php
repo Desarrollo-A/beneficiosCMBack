@@ -100,6 +100,36 @@ class CalendarioModel extends CI_Model
 
     public function getModalidadesEspecialista($sede, $especialista, $area)
     {
+        $atXsed = "";
+
+		// Excepcion de especialistas para hacer citas sin importar su sedes asignadas
+		if($especialista == 7 || $especialista == 8 || $especialista == 6 || $especialista == 108){
+            $query = $this->ch->query("SELECT CASE WHEN tipoCita = 1 then CONCAT('PRESENCIAL - ', ofi.direccion) WHEN tipoCita = 2 THEN 'EN LíNEA' END AS 'modalidad',
+            us.idUsuario as id, us2.idpuesto, 
+            CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista, 
+            ofi.direccion as ubicacionOficina, atxs.tipoCita, atxs.idAtencionXSede
+            FROM PRUEBA_beneficiosCM.usuarios us
+            INNER JOIN PRUEBA_CH.beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
+            INNER JOIN PRUEBA_beneficiosCM.atencionxsede atxs ON atxs.idEspecialista = us.idUsuario
+            INNER JOIN PRUEBA_CH.beneficioscm_vista_oficinas AS ofi ON ofi.idoficina = atxs.idOficina
+            WHERE us.idUsuario = $especialista");
+		}else{
+			$query = $this->ch->query(
+                "SELECT CASE WHEN tipoCita = 1 then 'PRESENCIAL' WHEN tipoCita = 2 THEN 'EN LíNEA' END AS 'modalidad', us.idUsuario as id,
+                us2.idpuesto,  CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista,
+                ofi.direccion as ubicacionOficina, axs.tipoCita, axs.idAtencionXSede, us2.nsede as lugarAtiende 
+                FROM ". $this->schema_cm .".atencionxsede AS axs
+                INNER JOIN ". $this->schema_cm .".usuarios AS us ON us.idUsuario = axs.idEspecialista 
+                INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
+                LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_oficinas AS ofi ON ofi.idoficina = axs.idOficina 
+                WHERE axs.estatus = ? AND axs.idSede = ? AND ((axs.idEspecialista = ? AND axs.idArea is NULL ) OR (axs.idEspecialista = ? AND axs.idArea = ?));", 
+                array(1, $sede, $especialista, $especialista, $area));
+		}
+        return $query;
+    }
+
+    public function getModalidadesEspecialistaBene($sede, $especialista, $area)
+    {
         $query = $this->ch->query(
             "SELECT CASE WHEN tipoCita = 1 then 'PRESENCIAL' WHEN tipoCita = 2 THEN 'EN LíNEA' END AS 'modalidad', us.idUsuario as id,
             us2.idpuesto,  CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista,

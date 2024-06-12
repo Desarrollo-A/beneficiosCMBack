@@ -72,6 +72,15 @@ class UsuariosModel extends CI_Model {
 
 	public function getNameUser($idEspecialista)
 	{
+		$atXsed = "";
+
+		// Excepcion de especialistas para hacer citas sin importar su sedes asignadas
+		if($idEspecialista == 7 || $idEspecialista == 8 || $idEspecialista == 6 || $idEspecialista == 108){
+			$atXsed  = "";
+		}else{
+			$atXsed  = "AND us2.idsede IN ( SELECT DISTINCT idSede FROM ". $this->schema_cm .".atencionxsede WHERE idEspecialista = $idEspecialista )";
+		}
+
 		$query = $this->ch->query(
 			"SELECT US.*, us2.idsede AS idSede, us2.idArea, us2.tipo_puesto AS tipoPuesto, us2.fingreso AS fechaIngreso,
 			CONCAT(CONCAT (us2.nombre_persona,' ',us2.pri_apellido,' ',us2.sec_apellido),' ', '(', us2.nsede, ')') AS nombreCompleto, us2.npuesto as nombrePuesto, us2.tipo_puesto, 
@@ -83,14 +92,14 @@ class UsuariosModel extends CI_Model {
 			FROM ". $this->schema_cm .".usuarios US 
 			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = US.idContrato 
 			LEFT JOIN ". $this->schema_cm .".correostemporales AS c ON c.idContrato = us2.idcontrato 
-			WHERE US.idRol = ? AND US.estatus = ? AND us2.idsede IN ( SELECT DISTINCT idSede FROM ". $this->schema_cm .".atencionxsede WHERE idEspecialista = ? ) 
+			WHERE US.idRol = ? AND US.estatus = ? $atXsed
 			UNION ( SELECT u.idUsuario AS idUsuario, u.idContrato, u.password, us2.idRol, u.externo, u.idAreaBeneficio, us2.estatus, us2.creadoPor, us2.fechaCreacion,
 			 us2.modificadoPor, us2.fechaModificacion, 1 AS idSede, 0 AS idarea, 0 tipoPuesto, 0 AS fechaIngreso, CONCAT('(Lamat)', ' ', CONCAT(IFNULL(us2.nombre, ''))) AS nombreCompleto,
 			0 AS nombrePuesto, 0 AS tipo_puesto, us2.correo
 			FROM ". $this->schema_cm .".usuarios as u 
 			INNER JOIN ". $this->schema_cm .".usuariosexternos AS us2 ON us2.idContrato = u.idContrato 
 			WHERE u.externo = ? )",
-			 array( 2, 1, $idEspecialista, 1 )
+			 array( 2, 1, 1 )
 		);
 		
 		return $query;
