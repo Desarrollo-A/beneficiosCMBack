@@ -648,4 +648,11 @@ class GestorController extends BaseController {
 		$this->output->set_content_type('application/json');
 		$this->output->set_output(json_encode($response));
 	}
+
+	public function getUsuarios(){
+
+		$data['data'] = $this->GestorModel->getUsuarios();
+		echo json_encode($data, JSON_NUMERIC_CHECK);
+
+	}
 }

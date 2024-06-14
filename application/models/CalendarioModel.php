@@ -108,10 +108,10 @@ class CalendarioModel extends CI_Model
             us.idUsuario as id, us2.idpuesto, 
             CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista, 
             ofi.direccion as ubicacionOficina, atxs.tipoCita, atxs.idAtencionXSede
-            FROM PRUEBA_beneficiosCM.usuarios us
-            INNER JOIN PRUEBA_CH.beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
-            INNER JOIN PRUEBA_beneficiosCM.atencionxsede atxs ON atxs.idEspecialista = us.idUsuario
-            INNER JOIN PRUEBA_CH.beneficioscm_vista_oficinas AS ofi ON ofi.idoficina = atxs.idOficina
+            FROM ". $this->schema_cm .".usuarios us
+            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
+            INNER JOIN ". $this->schema_cm .".atencionxsede atxs ON atxs.idEspecialista = us.idUsuario
+            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_oficinas AS ofi ON ofi.idoficina = atxs.idOficina
             WHERE us.idUsuario = $especialista");
 		}else{
 			$query = $this->ch->query(

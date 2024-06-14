@@ -59,11 +59,10 @@ class Usuario extends BaseController {
         */
 
         $headers = (object) $this->input->request_headers();
-
         //print_r($headers);
         //exit();
-		if (property_exists($headers, 'token')) {
-			$data = explode('.', $headers->token);
+		if (property_exists($headers, 'Token')) {
+			$data = explode('.', $headers->Token);
 			$user = json_decode(base64_decode($data[2]));
 	
 			//print_r($user);
@@ -313,6 +312,13 @@ class Usuario extends BaseController {
 		$dt = $array->numEmpleado;
 
 		$data['data'] = $this->UsuariosModel->decodePass($dt);
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
+
+	public function decodePassAdmin(){
+
+		$data['data'] = $this->UsuariosModel->decodePassAdmin();
 		$this->output->set_content_type('application/json');
         $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
 	}

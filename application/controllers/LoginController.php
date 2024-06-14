@@ -140,6 +140,7 @@ class LoginController extends BaseController {
 
 	public function check(){
 		$token = $this->headers('Token');
+
 		$data = explode('.', $token);
 		$user = json_decode(base64_decode($data[2]));
 
@@ -156,12 +157,13 @@ class LoginController extends BaseController {
         $datosEmpleado = $array == '' ? json_decode( file_get_contents('php://input')) : json_decode($array);
         $datosEmpleado->password = encriptar($datosEmpleado->password);
         $data = $this->UsuariosModel->login($datosEmpleado->numempleado,$datosEmpleado->password)->result();
-        // var_dump($data); exit; die;
+
         if(empty($data)){
             echo json_encode(array('response' => [],
                                     'message' => 'El número de empleado no se encuentra registrado',
                                     'result' => 0), JSON_NUMERIC_CHECK);
-        }else{
+        }
+        else{
             $datosSesion = array(
                 'id_usuario'            =>      $data[0]->idUsuario,
                 'idContrato'            =>      $data[0]->idContrato,

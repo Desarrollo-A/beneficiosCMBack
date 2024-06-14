@@ -279,7 +279,6 @@ class GestorModel extends CI_Model {
         LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_area ar ON ar.iddepto = dep.iddepto 
         LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_puestos ps ON ps.idarea = ar.idsubarea 
         LEFT JOIN ". $this->schema_cm .".datopuesto dp ON dp.idPuesto = ps.idpuesto
-        WHERE AND ps.estatus_puesto = 1
         GROUP BY dep.iddepto ,dep.ndepto
         ORDER BY dep.ndepto ASC");
         return $query->result();
@@ -294,7 +293,7 @@ class GestorModel extends CI_Model {
         FROM ". $this->schema_ch .".beneficioscm_vista_area ar 
         LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_puestos ps ON ps.idarea = ar.idsubarea 
         LEFT JOIN ". $this->schema_cm .".datopuesto dp ON dp.idPuesto = ps.idpuesto 
-        WHERE ps.estatus_puesto = 1 AND ar.iddepto = $idDpto
+        WHERE ar.iddepto = $idDpto
         GROUP BY ar.idsubarea, ar.narea
         ORDER BY ar.narea ASC");
         return $query->result();
@@ -310,6 +309,23 @@ class GestorModel extends CI_Model {
         LEFT JOIN ". $this->schema_cm .".datopuesto dp ON dp.idPuesto = ps.idpuesto 
         WHERE ps.idarea = $idArea 
         ORDER BY ps.nom_puesto ASC");
+        return $query->result();
+    }
+
+    public function getUsuarios(){
+        $query = $this->ch-> query("SELECT us2.idUsuario AS id, us.num_empleado AS numEmpleado,  
+        CONCAT(IFNULL(us.nombre_persona, ''), ' ', IFNULL(us.pri_apellido, ''), ' ', IFNULL(us.sec_apellido, '')) AS nombre, us.mail_emp AS correo,
+        us2.estatus, us.idcontrato AS contrato, us2.password, us.nsede AS sede, CONCAT(IFNULL(us.iddepto, ''), ' ',IFNULL(us.ndepto, '')) AS departamento,
+        CONCAT(IFNULL(us.idarea, ''), ' ',IFNULL(us.narea, '')) AS area, CONCAT(IFNULL(us.idpuesto, ''), ' ',IFNULL(us.npuesto, '')) AS puesto,
+        CASE 
+            WHEN us2.idRol = 2 THEN 'Beneficiario' 
+            WHEN us2.idRol = 3 THEN 'Especialista' 
+            WHEN us2.idRol = 4 THEN 'Administrador' 
+        END AS rol
+        FROM ". $this->schema_ch .".beneficioscm_vista_usuarios us
+        INNER JOIN ". $this->schema_cm .".usuarios us2 ON us2.idContrato = us.idcontrato 
+        WHERE us2.externo = 0");
+
         return $query->result();
     }
 }
