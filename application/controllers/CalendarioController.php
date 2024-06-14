@@ -771,6 +771,30 @@ class CalendarioController extends BaseController{
 		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
+	public function getModalidadesEspecialistaBene()
+	{
+		$sede = $this->input->post('dataValue[sede]');
+		$especialista = $this->input->post('dataValue[especialista]');
+		$area = $this->input->post('dataValue[area]');
+		
+		$response['result'] = isset($sede, $especialista);
+		if ($response['result']) {
+			$rs = $this->CalendarioModel->getModalidadesEspecialistaBene($sede, $especialista, $area)->result();
+			$response['result'] = count($rs) > 0;
+			if ($response['result']) {
+				$response['msg'] = '¡Listado de modalidades cargado exitosamente!';
+				$response['data'] = $rs;
+			} else {
+				$response['msg'] = '¡No existen registros!';
+			}
+		}else {
+            $response['msg'] = "¡Parámetros inválidos!";
+        }
+
+		$this->output->set_content_type("application/json");
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
+	}
+
 	public function getAppointmentsByUser()
 	{
 		$year = $this->input->post('dataValue[year]');

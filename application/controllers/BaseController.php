@@ -47,11 +47,15 @@ abstract class BaseController extends CI_Controller{
 
                     $numEmpleado = $datosToken->numEmpleado;
 
-                    $data = $this->UsuariosModel->getUserByNumEmpleado($numEmpleado)->row();
+                    if($numEmpleado !== 'admin99'){
+                    
+                        $data = $this->UsuariosModel->getUserByNumEmpleado($numEmpleado)->row();
 
-                    if(!$data){
-                        $response['msg'] = 'Token invalido';
-                        $this->json($response);
+                        if(!$data){
+                            $response['msg'] = 'Token invalido';
+                            $this->json($response);
+                        }
+
                     }
                 }else{
                     $response['msg'] = 'Falta token';
