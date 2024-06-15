@@ -205,4 +205,48 @@ class UsuariosModel extends CI_Model {
 		$this->ch->query("INSERT INTO ". $this->schema_cm .".correostemporales (correo, idContrato)
 		VALUES (?, ?);", array($correo, $idContrato));
     }
+
+	public function getCorreoEmpleado($noEmp){
+		$query = $this->ch->query("SELECT idUsuario, us1.idContrato, idRol, estatus, mail_emp, num_empleado, 
+		CONCAT(nombre_persona, ' ', pri_apellido, ' ', sec_apellido) AS nombreUsuario
+			FROM ". $this->schema_cm .".usuarios us1 
+			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us1.idContrato = us2.idContrato
+			WHERE num_empleado = ? AND estatus = ?", array($noEmp, 1));
+
+		return $query;
+	}
+
+	public function deleteToken($mailUsuario){
+		$query = $this->ch->query("DELETE t1 FROM ". $this->schema_cm .".tokenregistro t1
+			JOIN ". $this->schema_cm .".tokenregistro t2 ON t1.idTokenRegistro = t2.idTokenRegistro
+			WHERE t2.correo = ?", $mailUsuario);
+
+		return $query;
+	}
+
+	public function checkToken($code){
+		$query = $this->ch->query("SELECT *FROM ". $this->schema_cm .".tokenregistro WHERE token = ?", $code);
+
+		return $query;
+	}
+
+	public function checkTokenByMail($mailEmp){
+		$query = $this->ch->query("SELECT *FROM ". $this->schema_cm .".tokenregistro WHERE correo = ?", $mailEmp);
+
+		return $query;
+	}
+
+	public function deleteOldToken($mailEmp){
+		$query = $this->ch->query("DELETE t1 FROM ". $this->schema_cm .".tokenregistro t1
+			JOIN ". $this->schema_cm .".tokenregistro t2 ON t1.idTokenRegistro = t2.idTokenRegistro
+			WHERE t2.correo = ? AND t2.fechaCreacion < DATE_SUB(NOW(), INTERVAL 5 MINUTE)", $mailEmp);
+
+			return $query;
+	}
+
+	public function saveToken($mailUsuario, $token){
+		$query = $this->ch->query("INSERT INTO ". $this->schema_cm .".tokenregistro (correo, token, fechaCreacion) VALUES(?, ?, NOW())", array($mailUsuario, $token));
+
+		return $query;
+	}
 }
