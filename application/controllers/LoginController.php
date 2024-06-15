@@ -227,7 +227,7 @@ class LoginController extends BaseController {
 
             $this->email->initialize($config);
 		    $this->email->from("testemail@ciudadmaderas.com"); // from("no-reply@ciudadmaderas.com");
-		    $this->email->to("programador.analista34@ciudadmaderas.com");
+		    $this->email->to($data["mail"]);
 		    $this->email->message($html_message);
 		    $subject = "Beneficios CM | Recuperar contraseña- " . $fecha;
 		    $this->email->subject($subject);
