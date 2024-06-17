@@ -31,7 +31,7 @@ abstract class BaseController extends CI_Controller{
         header('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Token, Authorization');
 
         // Lineas para la verificación de 
-        $allowed_routes = ['logincontroller/login', 'usuario/getuserbynumemp', 'usuario/sendmail', 'usuario/gettoken', 'logincontroller/addregistroempleado',
+        $allowed_routes = ['logincontroller/login', 'usuario/getuserbynumemp', 'usuario/sendmail', 'usuario/gettoken', 'logincontroller/addregistroempleado', 'logincontroller/recuperarpassword', 'logincontroller/validarnumemp', 'logincontroller/guardarnuevapassword',
             "usuario/authorized", "api/confirmarpago", "api/encodedhash", "usuario/loginch", "usuario/updatech", "usuario/bajach", "api/tareacancelacitassinpago",
             "api/creaeventogoogleynotifica", "documentos/archivo"];
 
