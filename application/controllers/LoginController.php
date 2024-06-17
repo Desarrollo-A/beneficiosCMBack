@@ -15,6 +15,7 @@ class LoginController extends BaseController {
         $this->schema_cm = $this->config->item('schema_cm');
         $this->schema_ch = $this->config->item('schema_ch');
 		$this->load->helper(array('form','funciones'));
+        $this->load->library("email");
 	}
 
 	public function index()
@@ -188,6 +189,166 @@ class LoginController extends BaseController {
                 return json_encode(array('user' => $data[0], 'accessToken' => $tokenPart1.'.'.$tokenPart2.'.'.$tokenPart3, 'result' => 1), JSON_NUMERIC_CHECK);
             }               
         }
+    }
+
+    public function recuperarPassword(){
+        $dataValue = $this->input->post("dataValue");
+        $noEmp = $dataValue["noEmp"];
+        
+        $getUsuario = $this->UsuariosModel->getCorreoEmpleado($noEmp)->result(); // se obtiene el correo del usuario activo en base al no de empleado
+        $fecha = date('Y-m-d H:i:s');
+
+        $this->ch->trans_begin();
+        
+        if(!empty($getUsuario)){ //  se valida que venga un dato en el result
+            $mailUsuario = $getUsuario[0]->mail_emp;
+            $token = $data["data"] = substr(md5(time()), 0, 6);
+
+            $deleteToken = $this->UsuariosModel->deleteToken($mailUsuario); // se borra los tokens que se hayan almacenado anteriormente
+
+            $dataMail["data"] = array(
+                "nombre" => $getUsuario[0]->nombreUsuario,
+                "noEmp" => $getUsuario[0]->num_empleado,
+                "token" => $token
+            );
+
+            $data["mail"] = $mailUsuario;
+            $data["view"] = "email-password";
+
+		    $config['protocol']  = 'smtp';
+		    $config['smtp_host'] = 'smtp.gmail.com';
+		    $config['smtp_user'] = 'no-reply@ciudadmaderas.com';
+		    $config['smtp_pass'] = 'JDe64%8q5D';
+		    $config['smtp_port'] = 465;
+		    $config['charset']   = 'utf-8';
+		    $config['mailtype']  = 'html';
+		    $config['newline']   = "\r\n";
+		    $config['smtp_crypto']   = 'ssl';
+
+            $html_message = $this->load->view($data["view"], $dataMail, true); // la variable de data["view"] para cargar una vista dinamica
+
+            $this->email->initialize($config);
+		    $this->email->from("testemail@ciudadmaderas.com"); // from("no-reply@ciudadmaderas.com");
+		    $this->email->to($data["mail"]);
+		    $this->email->message($html_message);
+		    $subject = "Beneficios CM | Recuperar contraseña- " . $fecha;
+		    $this->email->subject($subject);
+
+		    if ($this->email->send()) {
+                $saveToken = $this->UsuariosModel->saveToken($mailUsuario, $token); // se guarda el registro en la tabla
+
+                $this->ch->trans_commit();
+		    	$response["result"] = true;
+		    	$response["msg"] = "Se ha enviado el correo";
+                $response["mailEmp"] = $mailUsuario;
+		    }
+		    else {
+                $this->ch->trans_rollback();
+		    	$response["result"] = false;
+		    	$response["msg"] = "Error al enviar el correo";                
+		    }
+        }
+        else{
+            $this->ch->trans_rollback();
+            $response["result"] = false;
+            $response["msg"] = "El número de empleado no esta registrado";
+        }
+
+        $this->output->set_content_type("application/json");
+        $this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
+    }
+
+    public function validarNumEmp(){
+        $dataValue = $this->input->post("dataValue");
+        $noEmp = $dataValue["noEmp"];
+
+        $getCorreo = $this->UsuariosModel->getCorreoEmpleado($noEmp)->result();
+
+        if(!empty($getCorreo)){
+            $mailEmp = $getCorreo[0]->mail_emp; // correo de usuario
+            $idEmp = $getCorreo[0]->idUsuario; // id de empleado
+            
+            $deleteToken = $this->UsuariosModel->deleteOldToken($mailEmp); // esta consulta es para eliminar el registro de los tokens que llevan mas de 5 minutos
+            $checkToken = $this->UsuariosModel->checkTokenByMail($mailEmp)->result(); // para checkar si tiene algun token valido 
+
+            if(!empty($checkToken)){
+                $response["result"] = true;
+                $response["msg"] = "Token valido disponible!";
+                $response["mailEmp"] = $mailEmp;
+                $response["idEmp"] = $idEmp;
+            }
+            else{
+                $response["result"] = false;
+                $response["msg"] = "Sin tokens validos";
+            }            
+        }
+        else{
+            $response["result"] = false;
+            $response["msg"] = "El número de empleado no esta registrado";
+        }
+
+        $this->output->set_content_type("application/json");
+        $this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
+    }
+
+    public function guardarNuevaPassword(){
+        date_default_timezone_set('America/Mexico_City'); // zona default horario
+
+        $dataValue = $this->input->post("dataValue");
+        $noEmp = $dataValue["noEmp"];
+        $code = $dataValue["code"];
+        $password = $dataValue["password"];
+        $mailEmp = $dataValue["mailEmp"];
+        $idEmp = $dataValue["idEmp"];
+        $banderaSuccess = true; // bandera para saber los procesos que pasan correctamente
+
+        if(isset($noEmp) && isset($password) && isset($mailEmp) && isset($code) && isset($idEmp)){
+            $this->ch->trans_begin();
+
+            // se checa si existe el token
+            $checkToken = $this->UsuariosModel->checkToken($code)->result();
+            if(empty($checkToken)){ // si no hay resultados en buscar el token, se da false
+                $banderaSuccess = false;
+                $msg = "Token incorrecto";
+            }
+            else{
+                $updateData = array( // datos a modificar en el usuario
+                    "password" => encriptar($password),
+                    "modificadoPor" => $idEmp,
+                    "fechaModificacion" => date('Y-m-d H:i:s')
+                );
+
+                // despúes se hace el cambio de la contraseña y se comprueba que se haya hecho el cambio
+                $update = $this->GeneralModel->updateRecord($this->schema_cm.".usuarios", $updateData, "idUsuario", $idEmp);
+                if(!$update){
+                    $banderaSuccess = false;
+                    $msg = "Error al actualizar la contraseña!";
+                }
+                else{
+                    // si existe el token se borra
+                    $deleteToken = $this->UsuariosModel->deleteToken($mailEmp);
+                }
+            }
+                
+            if($banderaSuccess){
+                $this->ch->trans_commit();
+                $response["result"] = true;
+                $response["msg"] = "Se ha actualizado la contraseña!";
+            }
+            else{
+                $this->ch->trans_rollback();
+                $response["result"] = false;
+                $response["msg"] = $msg;
+            }
+        }
+        else{
+            $this->ch->trans_rollback();
+            $response["result"] = false;
+            $response["msg"] = "Faltan datos en el formulario!";
+        }
+
+        $this->output->set_content_type("application/json");
+        $this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
     }
 }
 
