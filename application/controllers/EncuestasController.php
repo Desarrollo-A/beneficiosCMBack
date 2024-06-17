@@ -99,9 +99,10 @@ class EncuestasController extends BaseController {
 		$idEncuesta= $this->input->post('dataValue[idEncuesta]');
 		$estatus= $this->input->post('dataValue[estatus]');
 		$area= $this->input->post('dataValue[area]');
+		$tipoEncuesta= $this->input->post('dataValue[tipoEncuesta]');
 
 		$query_idEncuesta = $this->ch->query("SELECT * 
-		FROM ". $this->schema_cm .".encuestascreadas WHERE idArea = $area AND estatus = 1");
+		FROM ". $this->schema_cm .".encuestascreadas WHERE idArea = $area AND estatus = 1 AND tipoEncuesta = $tipoEncuesta");
 
         $idEnc = 0;
         foreach ($query_idEncuesta->result() as $row) {
@@ -250,6 +251,13 @@ class EncuestasController extends BaseController {
 		$dt = $this->input->post('dataValue', true);
 
 		$data['data'] = $this->EncuestasModel->getValidEncContestada($dt);
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
+
+	public function getTipoEncuesta(){
+
+		$data['data'] = $this->EncuestasModel->getTipoEncuesta()->result();
 		$this->output->set_content_type('application/json');
         $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
 	}
