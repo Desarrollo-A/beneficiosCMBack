@@ -35,10 +35,6 @@ class LoginController extends BaseController {
         $idContrato = $this->input->post('dataValue[params][idcontrato]');
         $mailCh = $this->input->post('dataValue[params][mail_emp]');
 
-        if( $mailCh == '' ||  $mailCh == NULL){
-            $this->UsuariosModel->insertTempMail($mail, $idContrato);
-        }
-
         switch ($datosEmpleado['idpuesto']){
             case "158":
                 $idRol = 3;
@@ -100,6 +96,8 @@ class LoginController extends BaseController {
             
                 if($usuarioExiste->num_rows() === 0){
                     $resultado = $this->GeneralModel->addRecordReturnId( $this->schema_cm.".usuarios", $insertData);
+
+                    $this->UsuariosModel->insertTempMail($mail, $idContrato);
                     
                     $insertData = array(
                         "idUsuario" => $resultado,

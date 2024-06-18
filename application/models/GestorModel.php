@@ -314,7 +314,7 @@ class GestorModel extends CI_Model {
 
     public function getUsuarios(){
         $query = $this->ch-> query("SELECT us2.idUsuario AS id, us.num_empleado AS numEmpleado,  
-        CONCAT(IFNULL(us.nombre_persona, ''), ' ', IFNULL(us.pri_apellido, ''), ' ', IFNULL(us.sec_apellido, '')) AS nombre, us.mail_emp AS correo,
+        CONCAT(IFNULL(us.nombre_persona, ''), ' ', IFNULL(us.pri_apellido, ''), ' ', IFNULL(us.sec_apellido, '')) AS nombre, c.correo AS correo,
         us2.estatus, us.idcontrato AS contrato, us2.password, us.nsede AS sede, CONCAT(IFNULL(us.iddepto, ''), ' ',IFNULL(us.ndepto, '')) AS departamento,
         CONCAT(IFNULL(us.idarea, ''), ' ',IFNULL(us.narea, '')) AS area, CONCAT(IFNULL(us.idpuesto, ''), ' ',IFNULL(us.npuesto, '')) AS puesto,
         CASE 
@@ -324,6 +324,7 @@ class GestorModel extends CI_Model {
         END AS rol
         FROM ". $this->schema_ch .".beneficioscm_vista_usuarios us
         INNER JOIN ". $this->schema_cm .".usuarios us2 ON us2.idContrato = us.idcontrato 
+        LEFT JOIN ". $this->schema_cm .".correostemporales AS c ON c.idContrato = us2.idcontrato 
         WHERE us2.externo = 0");
 
         return $query->result();
