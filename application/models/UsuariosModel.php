@@ -245,12 +245,12 @@ class UsuariosModel extends CI_Model {
     }
 
 	public function getCorreoEmpleado($noEmp){
-		$query = $this->ch->query("SELECT idUsuario, us1.idContrato, idRol, estatus, c.correo AS mail_emp, num_empleado, 
+		$query = $this->ch->query("SELECT idUsuario, us1.idContrato, us1.idRol, us1.estatus, c.correo AS mail_emp, num_empleado, 
 		CONCAT(nombre_persona, ' ', pri_apellido, ' ', sec_apellido) AS nombreUsuario
 			FROM ". $this->schema_cm .".usuarios us1 
 			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us1.idContrato = us2.idContrato
 			INNER JOIN ". $this->schema_cm .".correostemporales c ON c.idContrato = us2.idcontrato 
-			WHERE num_empleado = ? AND estatus = ?", array($noEmp, 1));
+			WHERE num_empleado = ? AND us1.estatus = ?", array($noEmp, 1));
 
 		return $query;
 	}
