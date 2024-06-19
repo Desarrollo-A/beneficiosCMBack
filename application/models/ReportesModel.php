@@ -138,7 +138,7 @@ class ReportesModel extends CI_Model {
 				$query = $this->ch-> query("SELECT DISTINCT dp.idDetallePaciente AS id, us.idUsuario, 
 				IFNULL (CONCAT((us2.nombre_persona), ' ',(us2.pri_apellido), ' ', (us2.sec_apellido)), ext.nombre) AS nombre, 
 				IFNULL(us2.ndepto, 'NO APLICA') AS depto, IFNULL(us2.nsede, 'QRO') AS sede, 
-				IFNULL(us2.npuesto, 'NO APLICA') AS puesto, IFNULL(us2.mail_emp, ext.correo) AS correo, op.nombre AS estNut,
+				IFNULL(us2.npuesto, 'NO APLICA') AS puesto, IFNULL(c.correo, ext.correo) AS correo, op.nombre AS estNut,
 				CASE 
 				WHEN us.externo = 0 THEN 'Colaborador' 
 				WHEN us.externo = 1 THEN 'Externo' 
@@ -152,6 +152,7 @@ class ReportesModel extends CI_Model {
 				LEFT JOIN ". $this->schema_cm .".usuarios us3 ON us3.idRol = 3 AND us3.idContrato = us4.idcontrato 
 				LEFT JOIN ". $this->schema_cm .".citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = us3.idUsuario 
 				LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = ct.idCatalogo AND op.idOpcion = dp.estatusNut 
+				LEFT JOIN ". $this->schema_cm .".correostemporales AS c ON c.idContrato = us2.idcontrato 
 				WHERE estatusNut IS NOT null AND ci.estatusCita = 4 $usuarioCond");
 				break;
 
@@ -160,7 +161,7 @@ class ReportesModel extends CI_Model {
 				$query = $this->ch-> query("SELECT DISTINCT dp.idDetallePaciente AS id, us.idUsuario, 
 				IFNULL (CONCAT((us2.nombre_persona), ' ',(us2.pri_apellido), ' ', (us2.sec_apellido)), ext.nombre) AS nombre, 
 				IFNULL(us2.ndepto, 'NO APLICA') AS depto, IFNULL(us2.nsede, 'QRO') AS sede, 
-				IFNULL(us2.npuesto, 'NO APLICA') AS puesto, IFNULL(us2.mail_emp, ext.correo) AS correo, op.nombre AS estPsi,
+				IFNULL(us2.npuesto, 'NO APLICA') AS puesto, IFNULL(c.correo, ext.correo) AS correo, op.nombre AS estPsi,
 				CASE 
 				WHEN us.externo = 0 THEN 'Colaborador' 
 				WHEN us.externo = 1 THEN 'Externo' 
@@ -174,6 +175,7 @@ class ReportesModel extends CI_Model {
 				LEFT JOIN ". $this->schema_cm .".usuarios us3 ON us3.idRol = 3 AND us3.idContrato = us4.idcontrato 
 				LEFT JOIN ". $this->schema_cm .".citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = us3.idUsuario 
 				LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = ct.idCatalogo AND op.idOpcion = dp.estatusPsi
+				LEFT JOIN ". $this->schema_cm .".correostemporales AS c ON c.idContrato = us2.idcontrato 
 				WHERE estatusPsi IS NOT null AND ci.estatusCita = 4 $usuarioCond");
 				break;
 				
@@ -182,7 +184,7 @@ class ReportesModel extends CI_Model {
 				$query = $this->ch-> query("SELECT DISTINCT dp.idDetallePaciente AS id, us.idUsuario, 
 				IFNULL (CONCAT((us2.nombre_persona), ' ',(us2.pri_apellido), ' ', (us2.sec_apellido)), ext.nombre) AS nombre, 
 				IFNULL(us2.ndepto, 'NO APLICA') AS depto, IFNULL(us2.nsede, 'QRO') AS sede, 
-				IFNULL(us2.npuesto, 'NO APLICA') AS puesto, IFNULL(us2.mail_emp, ext.correo) AS correo, op.nombre AS estQB,
+				IFNULL(us2.npuesto, 'NO APLICA') AS puesto, IFNULL(c.correo, ext.correo) AS correo, op.nombre AS estQB,
 				CASE 
 				WHEN us.externo = 0 THEN 'Colaborador' 
 				WHEN us.externo = 1 THEN 'Externo' 
@@ -196,6 +198,7 @@ class ReportesModel extends CI_Model {
 				LEFT JOIN ". $this->schema_cm .".usuarios us3 ON us3.idRol = 3 AND us3.idContrato = us4.idcontrato 
 				LEFT JOIN ". $this->schema_cm .".citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = us3.idUsuario 
 				LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = ct.idCatalogo AND op.idOpcion = dp.estatusQB 
+				LEFT JOIN ". $this->schema_cm .".correostemporales AS c ON c.idContrato = us2.idcontrato 
 				WHERE estatusQB IS NOT null AND ci.estatusCita = 4 $usuarioCond");
 				break;
 
@@ -204,7 +207,7 @@ class ReportesModel extends CI_Model {
 				$query = $this->ch-> query("SELECT DISTINCT dp.idDetallePaciente AS id, us.idUsuario, 
 				IFNULL (CONCAT((us2.nombre_persona), ' ',(us2.pri_apellido), ' ', (us2.sec_apellido)), ext.nombre) AS nombre, 
 				IFNULL(us2.ndepto, 'NO APLICA') AS depto, IFNULL(us2.nsede, 'QRO') AS sede, 
-				IFNULL(us2.npuesto, 'NO APLICA') AS puesto, IFNULL(us2.mail_emp, ext.correo) AS correo, op.nombre AS estGE,
+				IFNULL(us2.npuesto, 'NO APLICA') AS puesto, IFNULL(c.correo, ext.correo) AS correo, op.nombre AS estGE,
 				CASE 
 				WHEN us.externo = 0 THEN 'Colaborador' 
 				WHEN us.externo = 1 THEN 'Externo' 
@@ -218,6 +221,7 @@ class ReportesModel extends CI_Model {
 				LEFT JOIN ". $this->schema_cm .".usuarios us3 ON us3.idRol = 3 AND us3.idContrato = us4.idcontrato 
 				LEFT JOIN ". $this->schema_cm .".citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = us3.idUsuario 
 				LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = ct.idCatalogo AND op.idOpcion = dp.estatusGE
+				LEFT JOIN ". $this->schema_cm .".correostemporales AS c ON c.idContrato = us2.idcontrato 
 				WHERE estatusGE IS NOT null AND ci.estatusCita = 4 $usuarioCond");
 				break;
 		}

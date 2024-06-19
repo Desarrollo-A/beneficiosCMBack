@@ -356,19 +356,19 @@
 			<table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"
 				style="margin: auto;">
 				<tr>
-					<td valign="top" class="bg_white" style="padding: 5em 2.5em 0 2.5em;">
-						<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
-							<tr>
-								<td class="logo" style="text-align: center; padding: 5em 2.5em 0 2.5em;">
-									<img src="<?= base_url() ?>dist/img/recover.jpg" alt="" style="width: 250px; max-width: 250px; height: auto; margin: auto; display: block;">
-								</td>
-							</tr>
-						</table>
-					</td>
-				</tr><!-- end tr -->
+                    <td valign="top" class="bg_white">
+                        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tr>
+                                <td class="logo" style="text-align: center; padding: 5em 2.5em 0 2.5em;">
+                                    <img src="<?= base_url() ?>dist/img/logo1.png" alt="" style="width: 250px; max-width: 250px; height: auto; margin: auto; display: block;">
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr><!-- end tr -->
 				<tr>
 					<td valign="middle" class="hero bg_white">
-						<img src="<?= base_url() ?>dist/img/appointment.png" alt=""
+						<img src="<?= base_url() ?>dist/img/recover.jpg" alt=""
 							style="width: 400px; max-width: 600px; height: auto; margin: auto; display: block;">
 					</td>
 				</tr><!-- end tr -->
@@ -384,15 +384,17 @@
                                         <h4 class="custom-font1">Token: </h4>
                                         <h2 class="no-margin custom-font2"><?= $data["token"] ?></h2>
                                     </br>
-                                        <h4>Si no has solicitado el cambio de contraseña, póngase en contacto con soporte.</h4>									
+									<br>
+                                        <hr>
+                                        <b>Si no has solicitado el cambio de contraseña, ponte en contacto con soporte.</b>									
 									</div>
 								</td>
 							</tr>
 							<tr>
-								<td class="logo" style="text-align: center; padding: 1em;">
-									<img src="<?= base_url() ?>dist/img/Logo_CM2.png" alt="" style="width: 110px; max-width: 110px; height: auto; margin: auto; display: block;">
-								</td>
-							</tr>
+                                <td class="logo" style="text-align: center; padding: 1em;">
+                                    <img src="<?= base_url() ?>dist/img/Logo_CM2.png" alt="" style="width: 110px; max-width: 110px; height: auto; margin: auto; display: block;">
+                                </td>
+                            </tr>
 						</table>
 					</td>
 				</tr>

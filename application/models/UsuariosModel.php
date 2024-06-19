@@ -54,13 +54,7 @@ class UsuariosModel extends CI_Model {
 				us2.fingreso AS 'fechaIngreso', us2.tipo_puesto AS 'tipoPuesto',
 				us2.idsede AS 'idSede', us2.nsede AS 'sede', us2.idpuesto AS 'idPuesto', us2.npuesto AS 'puesto', us2.idarea AS 'idArea', 
 				us2.narea as 'area', us2.iddepto AS 'idDepto', us2.ndepto as 'departamento', us.idAreaBeneficio, 
-				us.estatus, us.creadoPor, us.fechaCreacion, us.modificadoPor, us.fechaModificacion,
-				CASE
-					WHEN c.correo = '' THEN us2.mail_emp
-					WHEN c.correo IS NULL THEN us2.mail_emp
-					WHEN c.estatus = 0 THEN us2.mail_emp
-					ELSE c.correo
-				END AS correo 
+				us.estatus, us.creadoPor, us.fechaCreacion, us.modificadoPor, us.fechaModificacion, c.correo AS correo
 				FROM ". $this->schema_cm .".usuarios AS us 
 				INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
 				LEFT JOIN ". $this->schema_cm .".correostemporales c ON c.idContrato = us.idcontrato 
@@ -99,12 +93,8 @@ class UsuariosModel extends CI_Model {
 
 		$query = $this->ch->query(
 			"SELECT US.*, us2.idsede AS idSede, us2.idArea, us2.tipo_puesto AS tipoPuesto, us2.fingreso AS fechaIngreso,
-			CONCAT(CONCAT (us2.nombre_persona,' ',us2.pri_apellido,' ',us2.sec_apellido),' ', '(', us2.nsede, ')') AS nombreCompleto, us2.npuesto as nombrePuesto, us2.tipo_puesto, 
-			CASE
-				WHEN c.correo = '' THEN us2.mail_emp
-				WHEN c.correo IS NULL  THEN us2.mail_emp
-				ELSE c.correo
-			END AS correo 
+			CONCAT(CONCAT (us2.nombre_persona,' ',us2.pri_apellido,' ',us2.sec_apellido),' ', '(', us2.nsede, ')') AS nombreCompleto,
+			us2.npuesto as nombrePuesto, us2.tipo_puesto, c.correo AS correo 
 			FROM ". $this->schema_cm .".usuarios US 
 			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = US.idContrato 
 			LEFT JOIN ". $this->schema_cm .".correostemporales AS c ON c.idContrato = us2.idcontrato 
@@ -224,7 +214,7 @@ class UsuariosModel extends CI_Model {
 
 	public function getUserByNumEmp($numEmpleado)
     {
-		$TempMail = $this->ch->query(
+		/* $TempMail = $this->ch->query(
 			"SELECT * from ". $this->schema_ch .".beneficioscm_vista_usuarios us
 			INNER JOIN ". $this->schema_cm .".correostemporales c ON c.idContrato = us.idcontrato 
 			WHERE us.num_empleado = ?", array( $numEmpleado ));
@@ -237,18 +227,14 @@ class UsuariosModel extends CI_Model {
 					LEFT JOIN ". $this->schema_cm .".correostemporales c ON c.idContrato = us.idcontrato 
 					WHERE us.num_empleado = ?", array( $numEmpleado ));
 
-		}else{
+		}else{ */
 
         $query = $this->ch->query(
-        "SELECT *,
-			CASE
-				WHEN mail_emp = '' THEN c.correo
-				ELSE mail_emp
-			END AS correo
+        "SELECT *, c.correo AS correo
 			FROM ". $this->schema_ch .".beneficioscm_vista_usuarios AS us
 			LEFT JOIN ". $this->schema_cm .".correostemporales c ON c.idContrato = us.idcontrato 
 			WHERE us.num_empleado = ?", array( $numEmpleado ));
-		}
+		/* } */
         return $query;
 	}
 
@@ -259,11 +245,12 @@ class UsuariosModel extends CI_Model {
     }
 
 	public function getCorreoEmpleado($noEmp){
-		$query = $this->ch->query("SELECT idUsuario, us1.idContrato, idRol, estatus, mail_emp, num_empleado, 
+		$query = $this->ch->query("SELECT idUsuario, us1.idContrato, us1.idRol, us1.estatus, c.correo AS mail_emp, num_empleado, 
 		CONCAT(nombre_persona, ' ', pri_apellido, ' ', sec_apellido) AS nombreUsuario
 			FROM ". $this->schema_cm .".usuarios us1 
 			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us1.idContrato = us2.idContrato
-			WHERE num_empleado = ? AND estatus = ?", array($noEmp, 1));
+			INNER JOIN ". $this->schema_cm .".correostemporales c ON c.idContrato = us2.idcontrato 
+			WHERE num_empleado = ? AND us1.estatus = ?", array($noEmp, 1));
 
 		return $query;
 	}
