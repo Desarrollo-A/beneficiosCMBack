@@ -200,7 +200,7 @@ class UsuariosModel extends CI_Model {
 		$dt_array = json_decode($dt, true);
 
 		$correo = $dt_array["correo"];
-        $token = $dt_array["token"]["codigo"];
+        $token = $dt_array["token"];
 
         $query = $this->ch->query("SELECT * FROM ". $this->schema_cm .".tokenregistro WHERE correo = ? AND token = ?", array($correo, $token));
 
