@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: 📂 Upload models
-        uses: wlixcc/SFTP-Deploy-Action@v1.2.1
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
 
         with:
           server: 104.198.134.0
