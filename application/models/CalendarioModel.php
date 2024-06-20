@@ -49,8 +49,8 @@ class CalendarioModel extends CI_Model
             LEFT JOIN ". $this->schema_cm .".encuestascreadas AS ec ON ec.idArea = usEspe2.idpuesto AND ec.estatus = 1
             LEFT JOIN ". $this->schema_cm .".correostemporales c ON c.idContrato = us2.idcontrato 
             LEFT JOIN ". $this->schema_cm .".correostemporales c2 ON c2.idContrato = usEspe2.idcontrato 
-            WHERE ec.idPregunta = ? AND YEAR(fechaInicio) = ? AND MONTH(fechaInicio) = ? AND ct.idPaciente = ? AND ct.estatus = ? AND ct.estatusCita IN(?, ?, ?, ?, ?, ?, ?, ?) GROUP BY (id);",
-            array( 1, $year, $month, $idUsuario, 1, 1, 2, 3, 4, 5, 6, 7, 10)
+            WHERE YEAR(fechaInicio) = ? AND MONTH(fechaInicio) = ? AND ct.idPaciente = ? AND ct.estatus = ? AND ct.estatusCita IN(?, ?, ?, ?, ?, ?, ?, ?) GROUP BY (id);",
+            array( $year, $month, $idUsuario, 1, 1, 2, 3, 4, 5, 6, 7, 10)
 
         );
 
