@@ -330,6 +330,7 @@ class CalendarioController extends BaseController{
                         $response["result"] = $rs > 0;
                         $response["data"] = $rs;
                         if ($response["result"]) {
+
                             $response["msg"] = "¡Se ha agendado la cita con éxito!";
                         } else {
                             $response["msg"] = "¡Surgió un error al intentar guardar la cita!";
@@ -684,6 +685,7 @@ class CalendarioController extends BaseController{
 				$insertBatch = $this->GeneralModel->insertBatch($this->schema_cm .".motivosporcita", $valuesAdd);
 
 				if ($insertBatch) {
+					$this->evaluacion($idCita);
 					$response["result"] = true;
 					$response["msg"] = "Se ha finalizado la cita";
 				}
@@ -699,6 +701,38 @@ class CalendarioController extends BaseController{
 		$this->output->set_content_type('application/json');
 		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
+
+	public function evaluacion($idCita){
+        $response['result'] = isset($idCita);
+
+        if ($response['result']) {
+
+            $query = $this->ch->query("SELECT tipoCita FROM ". $this->schema_cm .".citas
+			WHERE idCita = $idCita");
+
+			$tipoCita = 0;
+			foreach ($query->result() as $row) {
+				$tipoCita = $row->tipoCita;
+			}
+
+			if($tipoCita == 1){
+				$data = array(
+					"primeraSesion" => 0,
+				);
+		
+				$this->GeneralModel->updateRecord($this->schema_cm .'.evaluacionencuestas', $data, 'idCita', $idCita);
+			}else{
+				$data = array(
+					"satisfaccion" => 0,
+				);
+		
+				$this->GeneralModel->updateRecord($this->schema_cm .'.evaluacionencuestas', $data, 'idCita', $idCita);
+			}
+
+        }else {
+            $response['msg'] = "¡Parámetros inválidos!";
+        }
+    }
 
 	public function getBeneficiosPorSede()
 	{
@@ -1612,5 +1646,7 @@ class CalendarioController extends BaseController{
 		$this->output->set_content_type("application/json");
 		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
+
+	
 
 }

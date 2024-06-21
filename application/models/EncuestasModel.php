@@ -56,6 +56,14 @@ class EncuestasModel extends CI_Model {
 		return $query;
     }
 
+    public function getEncuestaContestar($dt)
+    {
+        $query = $this->ch->query("SELECT DISTINCT ec.idEncuesta, ec.idPregunta, pg.pregunta, ec.respuestas, ec.idArea FROM ". $this->schema_cm .".encuestascreadas ec
+        INNER JOIN ". $this->schema_cm .".preguntasgeneradas pg ON pg.idPregunta = ec.idPregunta AND pg.idEncuesta = ec.idEncuesta
+        WHERE ec.tipoEncuesta = $dt AND ec.estatus = 1");
+		return $query;
+    }
+
     public function getResp1()
     {
         $query = $this->ch-> query("SELECT  rp.idRespuestaGeneral AS value, rp.respuesta AS label, rp.tipo, rp.grupo, idRespuestaGeneral AS id
@@ -284,4 +292,21 @@ class EncuestasModel extends CI_Model {
         $query = $this->ch-> query("SELECT idOpcion AS id, nombre FROM opcionesporcatalogo o WHERE idCatalogo = 16 AND estatus = 1"); 
 		return $query;
     }
+
+    public function evaluacionEncuesta($idUsuario)
+	{
+        $query = $this->ch->query("SELECT enc.idCita, enc.primeraSesion, enc.satisfaccion, enc.reagenda, enc.cancelacion, ps.nom_puesto AS especialidad, 
+        DATE(ct.fechaModificacion) AS fecha, ct.idEspecialista, ps.idpuesto
+        FROM ". $this->schema_cm .".citas ct
+        INNER JOIN ". $this->schema_cm .".evaluacionencuestas enc ON enc.idCita = ct.idCita
+        INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idEspecialista 
+        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
+        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_puestos ps ON ps.idpuesto = us2.idpuesto 
+        WHERE ct.idPaciente = $idUsuario
+        AND (enc.primeraSesion IS NOT NULL OR enc.satisfaccion IS NOT NULL
+            OR enc.reagenda IS NOT NULL OR enc.cancelacion IS NOT NULL)
+        ");
+
+       return $query;
+	}
 }

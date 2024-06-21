@@ -101,6 +101,7 @@ class Api extends BaseController{
 						if ($response["result"]) {
 							$response["msg"] = "estatus_notificacion=0";
                             $this->creaEventoGoogleYNotifica($idCita);
+                            $this->creaEvaluaciones($idCita);
                         }else {
 							$response["msg"] = "¡Surgió un error al enlazar la cita con el pago!";
 						}
@@ -272,4 +273,18 @@ class Api extends BaseController{
         // $this->output->set_content_type('application/json');
 		// $this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
+
+    public function creaEvaluaciones($idCita){
+        $response['result'] = isset($idCita);
+        if ($response['result']) {
+
+            $data = [
+                'idCita' => $idCita
+            ];
+            $this->GeneralModel->addRecord($this->schema_cm.".evaluacionencuestas", $data);
+
+        }else {
+            $response['msg'] = "¡Parámetros inválidos!";
+        }
+    }
 }

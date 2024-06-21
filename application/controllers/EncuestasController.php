@@ -46,6 +46,13 @@ class EncuestasController extends BaseController {
         $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
 	}
 
+	public function getEncuestaContestar(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->EncuestasModel->getEncuestaContestar($dt)->result();
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
+
 	public function getResp1(){
 		$data['data'] = $this->EncuestasModel->getResp1()->result();
 		$this->output->set_content_type('application/json');
@@ -261,4 +268,102 @@ class EncuestasController extends BaseController {
 		$this->output->set_content_type('application/json');
         $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
 	}
+
+	public function evaluacionEncuesta()
+	{
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->EncuestasModel->evaluacionEncuesta($dt)->result();
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+
+	}
+
+	public function updateEvaluacion() {
+		$idCita = $this->input->post('dataValue[idCita]');
+		$tipoEncuesta = $this->input->post('dataValue[tipoEncuesta]');
+		$idUsuario = $this->input->post('dataValue[idUsuario]');
+
+		$response['result'] = isset($tipoEncuesta, $idCita);
+		if ($response['result']) {
+
+			$colum = "";
+			switch ($tipoEncuesta) {
+				case 1:
+					$colum = "primeraSesion";
+					break;
+				case 2:
+					$colum = "cancelacion";
+					break;
+				case 3:
+					$colum = "reagenda";
+					break;
+				case 4:
+					$colum = "satisfaccion";
+					break;	
+			}
+			
+			$values = [
+				$colum => 1,
+				"modificadoPor" => $idUsuario,
+				"fechaModificacion" => date("Y-m-d H:i:s"),
+			];
+			$response["result"] = $this->GeneralModel->updateRecord($this->schema_cm .".evaluacionencuestas", $values, 'idCita', $idCita);
+			if ($response["result"]) {
+				$response["msg"] = "¡Evaluación actualizada";
+			}else {
+				$response["msg"] = "¡Error al intentar actualizar la evaluación!";
+			}
+		}else {
+			$response['msg'] = "¡Parámetros inválidos!";
+		}
+
+		$this->output->set_content_type("application/json");
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
+	}
+
+	public function evaluacionReagenda() {
+		$idCita = $this->input->post('dataValue[idCita]');
+
+		$response['result'] = isset($idCita);
+		if ($response['result']) {
+			$data = [
+				"reagenda" => 0,
+			];
+			$response["result"] = $this->GeneralModel->updateRecord($this->schema_cm .".evaluacionencuestas", $data, 'idCita', $idCita);
+		}else {
+			$response['msg'] = "¡Parámetros inválidos!";
+		}
+	}
+	
+	public function evaluacionCancelacion(){
+		$idCita = $this->input->post('dataValue[idCita]');
+        $response['result'] = isset($idCita);
+
+        if ($response['result']) {
+
+				$data = array(
+					"cancelacion" => 0,
+				);
+		
+				$this->GeneralModel->updateRecord($this->schema_cm .'.evaluacionencuestas', $data, 'idCita', $idCita);
+
+        }else {
+            $response['msg'] = "¡Parámetros inválidos!";
+        }
+    }
+
+	public function creaEvaluaciones(){
+		$idCita = $this->input->post('dataValue[idCita]');
+        $response['result'] = isset($idCita);
+        if ($response['result']) {
+
+            $data = [
+                'idCita' => $idCita
+            ];
+            $this->GeneralModel->addRecord($this->schema_cm.".evaluacionencuestas", $data);
+
+        }else {
+            $response['msg'] = "¡Parámetros inválidos!";
+        }
+    }
 }
