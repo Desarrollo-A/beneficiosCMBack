@@ -109,7 +109,7 @@ class EncuestasController extends BaseController {
 		$tipoEncuesta= $this->input->post('dataValue[tipoEncuesta]');
 
 		$query_idEncuesta = $this->ch->query("SELECT * 
-		FROM ". $this->schema_cm .".encuestascreadas WHERE idArea = $area AND estatus = 1 AND tipoEncuesta = $tipoEncuesta");
+		FROM ". $this->schema_cm .".encuestascreadas WHERE estatus = 1 AND tipoEncuesta = $tipoEncuesta");
 
         $idEnc = 0;
         foreach ($query_idEncuesta->result() as $row) {

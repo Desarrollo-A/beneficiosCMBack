@@ -14,13 +14,12 @@ class DashModel extends CI_Model
   
 	public function getPregunta($dt)
 	{
-		$idArea = isset($dt[0]["idArea"]) ? $dt[0]["idArea"] : 0;
 		$tipoEnc = isset($dt[1]["tipoEnc"]) ? $dt[1]["tipoEnc"] : 0;
 
 		$query = $this->ch->query("SELECT DISTINCT ec.idPregunta, pg.pregunta, ec.tipoEncuesta, ec.respuestas, pg.idPregunta, ec.idEncuesta, ec.idEncuestaCreada, ec.idArea, ec.idPregunta
 		FROM ". $this->schema_cm .".encuestascreadas ec
 		LEFT JOIN ". $this->schema_cm .".preguntasgeneradas pg ON pg.idPregunta = ec.idPregunta AND pg.idEncuesta = ec.idEncuesta
-		WHERE ec.estatus = 1 AND ec.tipoEncuesta = $tipoEnc AND (pg.abierta = 1 AND ec.idArea = $idArea AND pg.idArea = $idArea AND ec.respuestas != 5)");
+		WHERE ec.estatus = 1 AND ec.tipoEncuesta = $tipoEnc AND (pg.abierta = 1 AND ec.respuestas != 5)");
 
 		$result = $query->result();
 
@@ -55,8 +54,8 @@ class DashModel extends CI_Model
 					"SELECT DISTINCT pg.pregunta  
 					FROM ". $this->schema_cm .".encuestascreadas ec
 					INNER JOIN ". $this->schema_cm .".preguntasgeneradas pg ON pg.idPregunta = ec.idPregunta
-					WHERE ec.estatus = 1 AND abierta = 1 AND pg.idArea = ? AND pg.idPregunta = ? AND ec.idPregunta = ? AND ec.tipoEncuesta = ?",
-					array($idEspecialidad, $idPregunta, $idPregunta, $tipoEnc)
+					WHERE ec.estatus = 1 AND abierta = 1 AND pg.idPregunta = ? AND ec.idPregunta = ? AND ec.tipoEncuesta = ?",
+					array($idPregunta, $idPregunta, $tipoEnc)
 				);
 
 				if ($query_pregunta->num_rows() > 0) {
@@ -129,7 +128,7 @@ class DashModel extends CI_Model
 					INNER JOIN ". $this->schema_cm .".respuestasgenerales rg ON rg.idRespuestaGeneral = ec.idRespuesta
 					CROSS JOIN 
 					(SELECT COUNT(*) AS total FROM ". $this->schema_cm .".encuestascontestadas WHERE idEncuesta = $idEncuesta AND idPregunta = $idPregunta AND idArea = $area) AS total_count
-					WHERE ec.idEncuesta = $idEncuesta AND ec.idPregunta = $idPregunta AND ec.idArea = $area
+					WHERE ec.idEncuesta = $idEncuesta AND ec.idPregunta = $idPregunta
 					AND (ec.fechaCreacion >= '$fhI' AND ec.fechaCreacion <= '$fhF')
 					GROUP BY rg.respuesta, ec.idPregunta, ec.idArea, ec.idEncuesta;");
 

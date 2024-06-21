@@ -155,13 +155,12 @@ class EncuestasModel extends CI_Model {
 
 		$datosValidos = true;
 
-		if (isset($dataArray->area) && isset($dataArray->tipoEncuesta) && isset($dataArray->items)) {
+		if (isset($dataArray->tipoEncuesta) && isset($dataArray->items)) {
             $estatus = $dataArray->estatus;
-			$area = $dataArray->area;
             $tipoEncuesta = $dataArray->tipoEncuesta;
 			$items = $dataArray->items;
 
-			if (empty($area) || empty($tipoEncuesta)) {
+			if (empty($tipoEncuesta)) {
 				echo json_encode(array("estatus" => false, "msj" => "Error hay campos vacios" ));
 				$datosValidos = false;
 			}
@@ -180,7 +179,7 @@ class EncuestasModel extends CI_Model {
 
                 if($estatus == 1){
 
-                    $query_idEncuesta = $this->ch->query("SELECT * FROM ". $this->schema_cm .".encuestascreadas WHERE idArea = $area AND tipoEncuesta = $tipoEncuesta AND estatus = 1");
+                    $query_idEncuesta = $this->ch->query("SELECT * FROM ". $this->schema_cm .".encuestascreadas WHERE tipoEncuesta = $tipoEncuesta AND estatus = 1");
 
                     $idEnc = 0;
                     foreach ($query_idEncuesta->result() as $row) {
@@ -209,13 +208,13 @@ class EncuestasModel extends CI_Model {
 
                     if($respuesta != 5){$abierta = 1;}
 
-                    $this->ch->query("INSERT INTO ". $this->schema_cm .".preguntasgeneradas (idPregunta, pregunta, estatus, abierta, idArea, idEncuesta) 
-					VALUES (?, ?, 1, ?, ?, ?)", 
-					array($idPregunta, $pregunta, $abierta, $area, $idEncuesta ));
+                    $this->ch->query("INSERT INTO ". $this->schema_cm .".preguntasgeneradas (idPregunta, pregunta, estatus, abierta, idEncuesta) 
+					VALUES (?, ?, 1, ?, ?)", 
+					array($idPregunta, $pregunta, $abierta, $idEncuesta ));
 
-                    $this->ch->query("INSERT INTO ". $this->schema_cm .".encuestascreadas (idPregunta, respuestas, idArea, estatus, fechaCreacion, idEncuesta, tipoEncuesta) 
-                    VALUES (?, ?, ?, ?, NOW(), ?, ?)", 
-                    array($idPregunta, $respuesta, $area, $estatus, $idEncuesta, $tipoEncuesta));
+                    $this->ch->query("INSERT INTO ". $this->schema_cm .".encuestascreadas (idPregunta, respuestas, estatus, fechaCreacion, idEncuesta, tipoEncuesta) 
+                    VALUES (?, ?, ?, NOW(), ?, ?)", 
+                    array($idPregunta, $respuesta, $estatus, $idEncuesta, $tipoEncuesta));
 
 				}
 
@@ -259,7 +258,6 @@ class EncuestasModel extends CI_Model {
             ) AS vars,
                 ". $this->schema_cm .".encuestascreadas ec
             LEFT JOIN opcionesporcatalogo ops ON ops.idOpcion = ec.tipoEncuesta AND ops.idCatalogo = 16
-            WHERE ec.idArea = $dt
             ORDER BY ec.idEncuesta, ec.fechaCreacion DESC
         ) AS subquery
         WHERE rn = 1;");   
