@@ -90,6 +90,7 @@ class Api extends BaseController{
 				if (isset($rs)) {					
 					$partes = explode('-', $referencia); // Sacamos el ultimo dato de la referencia
 					$idCita = substr(end($partes), 1); //Cortamos la inicial del dato que es una letra para extraer solo el numero del id
+                    
 					if ($concepto == 1) { // Actualizamos el id de cita
 						$upd = [
 							"idDetalle" => $rs,

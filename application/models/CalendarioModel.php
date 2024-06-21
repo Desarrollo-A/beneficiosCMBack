@@ -404,7 +404,7 @@ class CalendarioModel extends CI_Model
         LEFT JOIN ". $this->schema_cm .".encuestascreadas AS ec ON ec.idArea = usEspe2.idpuesto
         LEFT JOIN ". $this->schema_cm .".correostemporales c ON c.idContrato = us2.idcontrato 
         LEFT JOIN ". $this->schema_cm .".correostemporales c2 ON c2.idContrato = usEspe2.idcontrato 
-        WHERE ec.idPregunta = 1 AND idCita = ? GROUP BY (id)",
+        WHERE idCita = ? GROUP BY (id)",
         array( $idCita ));
 
         return $query;
@@ -691,7 +691,7 @@ class CalendarioModel extends CI_Model
         LEFT JOIN ". $this->schema_cm .".encuestascreadas AS ec ON ec.idArea = usEspe2.idpuesto
         LEFT JOIN ". $this->schema_cm .".correostemporales AS c ON c.idContrato = us2.idcontrato 
         LEFT JOIN ". $this->schema_cm .".correostemporales AS c2 ON c2.idContrato = usEspe2.idcontrato 
-        WHERE ec.idPregunta = 1 AND ct.estatus IN (1) AND ct.estatusCita IN(?) AND ct.idPaciente = ? GROUP BY (id)", array(6, $idUsuario));
+        WHERE ct.estatus IN (1) AND ct.estatusCita IN(?) AND ct.idPaciente = ? GROUP BY (id)", array(6, $idUsuario));
 
 
         return $query;
@@ -722,7 +722,7 @@ class CalendarioModel extends CI_Model
             LEFT JOIN ". $this->schema_cm .".detallepagos as dp ON dp.idDetalle = ct.idDetalle
             LEFT JOIN ". $this->schema_cm .".correostemporales AS c ON c.idContrato = us2.idcontrato 
             LEFT JOIN ". $this->schema_cm .".correostemporales AS c2 ON c2.idContrato = usEspe2.idcontrato 
-            WHERE ec.idPregunta = 1 AND ct.estatus IN (1) AND ct.estatusCita IN(?) AND ct.evaluacion is NULL AND ct.idPaciente = ? AND (ec.idPregunta = 1 AND ec.estatus = 1) GROUP BY (id)", array(4, $idUsuario));
+            WHERE AND ct.estatus IN (1) AND ct.estatusCita IN(?) AND ct.evaluacion is NULL AND ct.idPaciente = ? GROUP BY (id)", array(4, $idUsuario));
 
         return $query;
     }
