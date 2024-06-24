@@ -85,7 +85,7 @@ class UsuariosModel extends CI_Model {
 		$atXsed = "";
 
 		// Excepcion de especialistas para hacer citas sin importar su sedes asignadas
-		if($idEspecialista == 7 || $idEspecialista == 8 || $idEspecialista == 6 || $idEspecialista == 108){
+		if($idEspecialista == "7" || $idEspecialista == "8" || $idEspecialista == "6" || $idEspecialista == "108"){
 			$atXsed  = "";
 		}else{
 			$atXsed  = "AND us2.idsede IN ( SELECT DISTINCT idSede FROM ". $this->schema_cm .".atencionxsede WHERE idEspecialista = $idEspecialista )";
@@ -98,7 +98,7 @@ class UsuariosModel extends CI_Model {
 			FROM ". $this->schema_cm .".usuarios US 
 			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = US.idContrato 
 			LEFT JOIN ". $this->schema_cm .".correostemporales AS c ON c.idContrato = us2.idcontrato 
-			WHERE US.idRol = ? AND US.estatus = ? $atXsed
+			WHERE US.idRol = ? AND US.estatus = ? ".$atXsed."
 			UNION ( SELECT u.idUsuario AS idUsuario, u.idContrato, u.password, us2.idRol, u.externo, u.idAreaBeneficio, us2.estatus, us2.creadoPor, us2.fechaCreacion,
 			 us2.modificadoPor, us2.fechaModificacion, 1 AS idSede, 0 AS idarea, 0 tipoPuesto, 0 AS fechaIngreso, CONCAT('(Lamat)', ' ', CONCAT(IFNULL(us2.nombre, ''))) AS nombreCompleto,
 			0 AS nombrePuesto, 0 AS tipo_puesto, us2.correo
