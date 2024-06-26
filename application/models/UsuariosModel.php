@@ -54,11 +54,12 @@ class UsuariosModel extends CI_Model {
 				us2.fingreso AS 'fechaIngreso', us2.tipo_puesto AS 'tipoPuesto',
 				us2.idsede AS 'idSede', us2.nsede AS 'sede', us2.idpuesto AS 'idPuesto', us2.npuesto AS 'puesto', us2.idarea AS 'idArea', 
 				us2.narea as 'area', us2.iddepto AS 'idDepto', us2.ndepto as 'departamento', us.idAreaBeneficio, 
-				us.estatus, us.creadoPor, us.fechaCreacion, us.modificadoPor, us.fechaModificacion, c.correo AS correo
+				us.estatus, us.creadoPor, us.fechaCreacion, us.modificadoPor, us.fechaModificacion, c.correo AS correo,
+				us2.activo
 				FROM ". $this->schema_cm .".usuarios AS us 
 				INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
 				LEFT JOIN ". $this->schema_cm .".correostemporales c ON c.idContrato = us.idcontrato 
-				WHERE us2.num_empleado = ? AND us.password = ? AND us2.activo = 1;", array( $numEmpleado, $password ));
+				WHERE us2.num_empleado = ? AND us.password = ?", array( $numEmpleado, $password ));
 		}
         
         return $query;
