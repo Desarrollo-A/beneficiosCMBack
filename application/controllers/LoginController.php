@@ -161,6 +161,10 @@ class LoginController extends BaseController {
             echo json_encode(array('response' => [],
                                     'message' => 'El número de empleado no se encuentra registrado',
                                     'result' => 0), JSON_NUMERIC_CHECK);
+        }else if($data[0]->activo == "0"){
+            echo json_encode(array('response' => [],
+            'message' => 'El empleado no se encuentra activo',
+            'result' => 0), JSON_NUMERIC_CHECK);
         }
         else{
             $datosSesion = array(
