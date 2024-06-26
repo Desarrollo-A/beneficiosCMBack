@@ -113,7 +113,7 @@ class GestorModel extends CI_Model {
 
     public function checkAxs($dt, $idArea){
         
-        $query = $this->ch->query("SELECT *from ". $this->schema_cm .".atencionxsede where idEspecialista = ? AND idSede = ? AND (idArea = ? OR idArea IS NULL) AND tipoCita = ?",
+        $query = $this->ch->query("SELECT *from ". $this->schema_cm .".atencionxsede WHERE estatus = 1 AND idEspecialista = ? AND idSede = ? AND (idArea = ? OR idArea IS NULL) AND tipoCita = ?",
         array($dt["especialista"], $dt["sede"], $idArea, $dt["modalidad"]));
 
         return $query;
@@ -139,7 +139,7 @@ class GestorModel extends CI_Model {
 
     public function checkAxsNull($dt){
         
-        $query = $this->ch->query("SELECT *from ". $this->schema_cm .".atencionxsede where idEspecialista = ? AND idSede = ? AND (idArea IS NULL OR idArea IS NOT NULL) AND tipoCita = ?", 
+        $query = $this->ch->query("SELECT *from ". $this->schema_cm .".atencionxsede where estatus = 1 AND idEspecialista = ? AND idSede = ? AND (idArea IS NULL OR idArea IS NOT NULL) AND tipoCita = ?", 
         array($dt["especialista"], $dt["sede"], $dt["modalidad"]));
 
         return $query;
