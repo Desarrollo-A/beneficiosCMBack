@@ -249,7 +249,7 @@ class LoginController extends BaseController {
         else{
             $this->ch->trans_rollback();
             $response["result"] = false;
-            $response["msg"] = "El número de empleado no esta registrado";
+            $response["msg"] = "El número de empleado no está registrado";
         }
 
         $this->output->set_content_type("application/json");
