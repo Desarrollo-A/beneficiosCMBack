@@ -42,7 +42,8 @@ class UsuariosModel extends CI_Model {
 				24 AS idArea, 'Desarrollo' AS area, 7 AS idDepto, 'TI' AS departamento,
 				us.estatus, us.creadoPor, us.fechaCreacion, us.modificadoPor, us.fechaModificacion,
 				c.correo AS correo, us.idRol, us.idAreaBeneficio, 
-				us.estatus, us.creadoPor, us.fechaCreacion, us.modificadoPor, us.fechaModificacion
+				us.estatus, us.creadoPor, us.fechaCreacion, us.modificadoPor, us.fechaModificacion,
+				'1' AS activo
 				FROM ". $this->schema_cm .".usuarios AS us
 				INNER JOIN ". $this->schema_cm .".correostemporales c ON c.idContrato = us.idcontrato 
 				WHERE us.idUsuario = 1 AND us.password = ?;", array( $password ));
