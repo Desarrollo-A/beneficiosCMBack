@@ -56,12 +56,23 @@ class EncuestasModel extends CI_Model {
 		return $query;
     }
 
+    public function getEncuestaContestar($dt)
+    {
+        $query = $this->ch->query("SELECT DISTINCT ec.idEncuesta, ec.idPregunta, pg.pregunta, ec.respuestas, ec.idArea FROM ". $this->schema_cm .".encuestascreadas ec
+        INNER JOIN ". $this->schema_cm .".preguntasgeneradas pg ON pg.idPregunta = ec.idPregunta AND pg.idEncuesta = ec.idEncuesta
+        WHERE ec.tipoEncuesta = $dt AND ec.estatus = 1");
+		return $query;
+    }
+
     public function getResp1()
     {
-        $query = $this->ch-> query("SELECT  rp.idRespuestaGeneral AS value, rp.respuesta AS label, rp.tipo  FROM ". $this->schema_cm .".catalogos ca 
+        $query = $this->ch-> query("SELECT  rp.idRespuestaGeneral AS value, rp.respuesta AS label, rp.tipo, rp.grupo, idRespuestaGeneral AS id
+        FROM ". $this->schema_cm .".catalogos ca 
         INNER JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = ca.idCatalogo AND ca.idCatalogo = 4
         INNER JOIN ". $this->schema_cm .".respuestasgenerales rp ON rp.grupo = op.idOpcion
-        WHERE idOpcion = 1"); 
+        WHERE idOpcion != 5
+        ORDER BY 
+        rp.idRespuestaGeneral ASC;"); 
 		return $query;
     }
 
@@ -144,12 +155,12 @@ class EncuestasModel extends CI_Model {
 
 		$datosValidos = true;
 
-		if (isset($dataArray->area) && isset($dataArray->items)) {
+		if (isset($dataArray->tipoEncuesta) && isset($dataArray->items)) {
             $estatus = $dataArray->estatus;
-			$area = $dataArray->area;
+            $tipoEncuesta = $dataArray->tipoEncuesta;
 			$items = $dataArray->items;
 
-			if (empty($area)) {
+			if (empty($tipoEncuesta)) {
 				echo json_encode(array("estatus" => false, "msj" => "Error hay campos vacios" ));
 				$datosValidos = false;
 			}
@@ -168,7 +179,7 @@ class EncuestasModel extends CI_Model {
 
                 if($estatus == 1){
 
-                    $query_idEncuesta = $this->ch->query("SELECT * FROM ". $this->schema_cm .".encuestascreadas WHERE idArea = $area AND estatus = 1");
+                    $query_idEncuesta = $this->ch->query("SELECT * FROM ". $this->schema_cm .".encuestascreadas WHERE tipoEncuesta = $tipoEncuesta AND estatus = 1");
 
                     $idEnc = 0;
                     foreach ($query_idEncuesta->result() as $row) {
@@ -195,15 +206,15 @@ class EncuestasModel extends CI_Model {
 
                     $abierta = 0;
 
-                    if($respuesta < 5){$abierta = 1;}
+                    if($respuesta != 5){$abierta = 1;}
 
-                    $this->ch->query("INSERT INTO ". $this->schema_cm .".preguntasgeneradas (idPregunta, pregunta, estatus, abierta, idArea, idEncuesta) 
-					VALUES (?, ?, 1, ?, ?, ?)", 
-					array($idPregunta, $pregunta, $abierta, $area, $idEncuesta ));
+                    $this->ch->query("INSERT INTO ". $this->schema_cm .".preguntasgeneradas (idPregunta, pregunta, estatus, abierta, idEncuesta) 
+					VALUES (?, ?, 1, ?, ?)", 
+					array($idPregunta, $pregunta, $abierta, $idEncuesta ));
 
-                    $this->ch->query("INSERT INTO ". $this->schema_cm .".encuestascreadas (idPregunta, respuestas, idArea, estatus, fechaCreacion, idEncuesta) 
-                    VALUES (?, ?, ?, ?, NOW(), ?)", 
-                    array($idPregunta, $respuesta, $area, $estatus, $idEncuesta));
+                    $this->ch->query("INSERT INTO ". $this->schema_cm .".encuestascreadas (idPregunta, respuestas, estatus, fechaCreacion, idEncuesta, tipoEncuesta) 
+                    VALUES (?, ?, ?, NOW(), ?, ?)", 
+                    array($idPregunta, $respuesta, $estatus, $idEncuesta, $tipoEncuesta));
 
 				}
 
@@ -222,19 +233,36 @@ class EncuestasModel extends CI_Model {
 
     public function getEncuestasCreadas($dt){
 
-        $query = $this->ch->query("SELECT idEncuesta, fechaCreacion, estatus
+        $query = $this->ch->query("SELECT
+        idEncuesta,
+        fechaCreacion,
+        estatus,
+        tipoEncuesta AS idTipoEnc,
+        nombre AS tipoEncuesta
         FROM (
-        SELECT idEncuesta, fechaCreacion, estatus,
-            CASE WHEN @prev_idEncuesta = idEncuesta THEN @row_number := @row_number + 1
-                ELSE @row_number := 1 AND @prev_idEncuesta := idEncuesta END AS rn
-                FROM (SELECT @row_number := 0, @prev_idEncuesta := NULL) AS vars,
-                     ". $this->schema_cm .".encuestascreadas
-                WHERE idArea = $dt
-                ORDER BY idEncuesta, fechaCreacion DESC
-            ) AS subquery
+            SELECT
+                ec.idEncuesta,
+                ec.fechaCreacion,
+                ec.estatus,
+                ec.tipoEncuesta,
+                ops.nombre,
+                CASE
+                    WHEN @prev_idEncuesta = ec.idEncuesta THEN @row_number := @row_number + 1
+                    ELSE @row_number := 1
+                END AS rn,
+                @prev_idEncuesta := ec.idEncuesta
+            FROM (
+                SELECT
+                    @row_number := 0,
+                    @prev_idEncuesta := NULL
+            ) AS vars,
+                ". $this->schema_cm .".encuestascreadas ec
+            LEFT JOIN opcionesporcatalogo ops ON ops.idOpcion = ec.tipoEncuesta AND ops.idCatalogo = 16
+            ORDER BY ec.idEncuesta, ec.fechaCreacion DESC
+        ) AS subquery
         WHERE rn = 1;");   
 
-        return $query;
+            return $query;
     }
 
     public function getEstatusUno($dt){
@@ -256,4 +284,27 @@ class EncuestasModel extends CI_Model {
 
         return $query;
     }
+
+    public function getTipoEncuesta()
+    {
+        $query = $this->ch-> query("SELECT idOpcion AS id, nombre FROM opcionesporcatalogo o WHERE idCatalogo = 16 AND estatus = 1"); 
+		return $query;
+    }
+
+    public function evaluacionEncuesta($idUsuario)
+	{
+        $query = $this->ch->query("SELECT enc.idCita, enc.primeraSesion, enc.satisfaccion, enc.reagenda, enc.cancelacion, ps.nom_puesto AS especialidad, 
+        DATE(ct.fechaModificacion) AS fecha, ct.idEspecialista, ps.idpuesto
+        FROM ". $this->schema_cm .".citas ct
+        INNER JOIN ". $this->schema_cm .".evaluacionencuestas enc ON enc.idCita = ct.idCita
+        INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idEspecialista 
+        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
+        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_puestos ps ON ps.idpuesto = us2.idpuesto 
+        WHERE ct.idPaciente = $idUsuario
+        AND (enc.primeraSesion IS NOT NULL OR enc.satisfaccion IS NOT NULL
+            OR enc.reagenda IS NOT NULL OR enc.cancelacion IS NOT NULL)
+        ");
+
+       return $query;
+	}
 }
