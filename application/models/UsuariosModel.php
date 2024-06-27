@@ -43,10 +43,10 @@ class UsuariosModel extends CI_Model {
 				us.estatus, us.creadoPor, us.fechaCreacion, us.modificadoPor, us.fechaModificacion,
 				c.correo AS correo, us.idRol, us.idAreaBeneficio, 
 				us.estatus, us.creadoPor, us.fechaCreacion, us.modificadoPor, us.fechaModificacion,
-				'1' AS activo
+				'1' AS activo, us.password
 				FROM ". $this->schema_cm .".usuarios AS us
 				INNER JOIN ". $this->schema_cm .".correostemporales c ON c.idContrato = us.idcontrato 
-				WHERE us.idUsuario = 1 AND us.password = ?;", array( $password ));
+				WHERE us.idUsuario = 1;");
 		}else{
 			$query = $this->ch->query(
 				"SELECT us.idUsuario, us.idContrato, us2.num_empleado AS 'numEmpleado',
@@ -56,11 +56,11 @@ class UsuariosModel extends CI_Model {
 				us2.idsede AS 'idSede', us2.nsede AS 'sede', us2.idpuesto AS 'idPuesto', us2.npuesto AS 'puesto', us2.idarea AS 'idArea', 
 				us2.narea as 'area', us2.iddepto AS 'idDepto', us2.ndepto as 'departamento', us.idAreaBeneficio, 
 				us.estatus, us.creadoPor, us.fechaCreacion, us.modificadoPor, us.fechaModificacion, c.correo AS correo,
-				us2.activo
+				us2.activo, us.password
 				FROM ". $this->schema_cm .".usuarios AS us 
 				INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
 				LEFT JOIN ". $this->schema_cm .".correostemporales c ON c.idContrato = us.idcontrato 
-				WHERE us2.num_empleado = ? AND us.password = ?", array( $numEmpleado, $password ));
+				WHERE us2.num_empleado = ?", array( $numEmpleado ));
 		}
         
         return $query;
