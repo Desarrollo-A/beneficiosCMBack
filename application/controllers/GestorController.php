@@ -422,6 +422,13 @@ class GestorController extends BaseController {
         $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
 	}
 
+	public function getAllAreas(){
+		$data['data'] = $this->GestorModel->getAllAreas()->result();
+
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
+
 	public function updateEstatusPuestos(){
 		$dataValue = $this->input->post("dataValue", true);
 

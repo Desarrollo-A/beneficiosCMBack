@@ -329,4 +329,13 @@ class GestorModel extends CI_Model {
 
         return $query->result();
     }
+
+    public function getAllAreas(){
+		$query = $this->ch-> query("SELECT ar.idsubarea AS id, ar.narea AS area 
+		FROM ". $this->schema_ch .".beneficioscm_vista_puestos ps 
+		INNER JOIN ". $this->schema_ch .".beneficioscm_vista_area ar ON ar.idsubarea = ps.idarea 
+		GROUP BY ar.idsubarea
+		ORDER BY ar.narea ASC");
+        return $query;
+	}
 }
