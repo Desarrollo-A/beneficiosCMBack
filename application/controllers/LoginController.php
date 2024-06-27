@@ -157,10 +157,15 @@ class LoginController extends BaseController {
         $datosEmpleado->password = encriptar($datosEmpleado->password);
         $data = $this->UsuariosModel->login($datosEmpleado->numempleado,$datosEmpleado->password)->result();
 
+       
         if(empty($data)){
             echo json_encode(array('response' => [],
                                     'message' => 'El número de empleado no se encuentra registrado',
                                     'result' => 0), JSON_NUMERIC_CHECK);
+        }else if($datosEmpleado->password != $data[0]->password){
+            echo json_encode(array('response' => [],
+                'message' => 'La contraseña es incorrecta',
+                'result' => 0), JSON_NUMERIC_CHECK);
         }else if($data[0]->activo == "0"){
             echo json_encode(array('response' => [],
             'message' => 'El colaborador no se encuentra activo',
