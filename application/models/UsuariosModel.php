@@ -42,7 +42,8 @@ class UsuariosModel extends CI_Model {
 				24 AS idArea, 'Desarrollo' AS area, 7 AS idDepto, 'TI' AS departamento,
 				us.estatus, us.creadoPor, us.fechaCreacion, us.modificadoPor, us.fechaModificacion,
 				c.correo AS correo, us.idRol, us.idAreaBeneficio, 
-				us.estatus, us.creadoPor, us.fechaCreacion, us.modificadoPor, us.fechaModificacion
+				us.estatus, us.creadoPor, us.fechaCreacion, us.modificadoPor, us.fechaModificacion,
+				'1' AS activo
 				FROM ". $this->schema_cm .".usuarios AS us
 				INNER JOIN ". $this->schema_cm .".correostemporales c ON c.idContrato = us.idcontrato 
 				WHERE us.idUsuario = 1 AND us.password = ?;", array( $password ));
@@ -54,17 +55,12 @@ class UsuariosModel extends CI_Model {
 				us2.fingreso AS 'fechaIngreso', us2.tipo_puesto AS 'tipoPuesto',
 				us2.idsede AS 'idSede', us2.nsede AS 'sede', us2.idpuesto AS 'idPuesto', us2.npuesto AS 'puesto', us2.idarea AS 'idArea', 
 				us2.narea as 'area', us2.iddepto AS 'idDepto', us2.ndepto as 'departamento', us.idAreaBeneficio, 
-				us.estatus, us.creadoPor, us.fechaCreacion, us.modificadoPor, us.fechaModificacion,
-				CASE
-					WHEN c.correo = '' THEN us2.mail_emp
-					WHEN c.correo IS NULL THEN us2.mail_emp
-					WHEN c.estatus = 0 THEN us2.mail_emp
-					ELSE c.correo
-				END AS correo 
+				us.estatus, us.creadoPor, us.fechaCreacion, us.modificadoPor, us.fechaModificacion, c.correo AS correo,
+				us2.activo
 				FROM ". $this->schema_cm .".usuarios AS us 
 				INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
 				LEFT JOIN ". $this->schema_cm .".correostemporales c ON c.idContrato = us.idcontrato 
-				WHERE us2.num_empleado = ? AND us.password = ?;", array( $numEmpleado, $password ));
+				WHERE us2.num_empleado = ? AND us.password = ?", array( $numEmpleado, $password ));
 		}
         
         return $query;
@@ -91,7 +87,7 @@ class UsuariosModel extends CI_Model {
 		$atXsed = "";
 
 		// Excepcion de especialistas para hacer citas sin importar su sedes asignadas
-		if($idEspecialista == 7 || $idEspecialista == 8 || $idEspecialista == 6 || $idEspecialista == 108){
+		if($idEspecialista == "7" || $idEspecialista == "8" || $idEspecialista == "6" || $idEspecialista == "108"){
 			$atXsed  = "";
 		}else{
 			$atXsed  = "AND us2.idsede IN ( SELECT DISTINCT idSede FROM ". $this->schema_cm .".atencionxsede WHERE idEspecialista = $idEspecialista )";
@@ -99,16 +95,12 @@ class UsuariosModel extends CI_Model {
 
 		$query = $this->ch->query(
 			"SELECT US.*, us2.idsede AS idSede, us2.idArea, us2.tipo_puesto AS tipoPuesto, us2.fingreso AS fechaIngreso,
-			CONCAT(CONCAT (us2.nombre_persona,' ',us2.pri_apellido,' ',us2.sec_apellido),' ', '(', us2.nsede, ')') AS nombreCompleto, us2.npuesto as nombrePuesto, us2.tipo_puesto, 
-			CASE
-				WHEN c.correo = '' THEN us2.mail_emp
-				WHEN c.correo IS NULL  THEN us2.mail_emp
-				ELSE c.correo
-			END AS correo 
+			CONCAT(CONCAT (us2.nombre_persona,' ',us2.pri_apellido,' ',us2.sec_apellido),' ', '(', us2.nsede, ')') AS nombreCompleto,
+			us2.npuesto as nombrePuesto, us2.tipo_puesto, c.correo AS correo 
 			FROM ". $this->schema_cm .".usuarios US 
 			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = US.idContrato 
 			LEFT JOIN ". $this->schema_cm .".correostemporales AS c ON c.idContrato = us2.idcontrato 
-			WHERE US.idRol = ? AND US.estatus = ? $atXsed
+			WHERE US.idRol = ? AND US.estatus = ? ".$atXsed."
 			UNION ( SELECT u.idUsuario AS idUsuario, u.idContrato, u.password, us2.idRol, u.externo, u.idAreaBeneficio, us2.estatus, us2.creadoPor, us2.fechaCreacion,
 			 us2.modificadoPor, us2.fechaModificacion, 1 AS idSede, 0 AS idarea, 0 tipoPuesto, 0 AS fechaIngreso, CONCAT('(Lamat)', ' ', CONCAT(IFNULL(us2.nombre, ''))) AS nombreCompleto,
 			0 AS nombrePuesto, 0 AS tipo_puesto, us2.correo
@@ -210,7 +202,7 @@ class UsuariosModel extends CI_Model {
 		$dt_array = json_decode($dt, true);
 
 		$correo = $dt_array["correo"];
-        $token = $dt_array["token"]["codigo"];
+        $token = $dt_array["token"];
 
         $query = $this->ch->query("SELECT * FROM ". $this->schema_cm .".tokenregistro WHERE correo = ? AND token = ?", array($correo, $token));
 
@@ -224,31 +216,20 @@ class UsuariosModel extends CI_Model {
 
 	public function getUserByNumEmp($numEmpleado)
     {
-		$TempMail = $this->ch->query(
-			"SELECT * from ". $this->schema_ch .".beneficioscm_vista_usuarios us
-			INNER JOIN ". $this->schema_cm .".correostemporales c ON c.idContrato = us.idcontrato 
-			WHERE us.num_empleado = ?", array( $numEmpleado ));
-
-		if ($TempMail->num_rows() > 0) {
-
+		/* 
 		$query = $this->ch->query(
 			"SELECT *, c.correo AS correo
 					FROM ". $this->schema_ch .".beneficioscm_vista_usuarios AS us
 					LEFT JOIN ". $this->schema_cm .".correostemporales c ON c.idContrato = us.idcontrato 
-					WHERE us.num_empleado = ?", array( $numEmpleado ));
-
-		}else{
+					WHERE us.num_empleado = ?", array( $numEmpleado )); 
+		*/
 
         $query = $this->ch->query(
-        "SELECT *,
-			CASE
-				WHEN mail_emp = '' THEN c.correo
-				ELSE mail_emp
-			END AS correo
+        "SELECT *, c.correo AS correo
 			FROM ". $this->schema_ch .".beneficioscm_vista_usuarios AS us
 			LEFT JOIN ". $this->schema_cm .".correostemporales c ON c.idContrato = us.idcontrato 
-			WHERE us.num_empleado = ?", array( $numEmpleado ));
-		}
+			WHERE us.activo = 1 AND us.num_empleado = ?", array( $numEmpleado ));
+
         return $query;
 	}
 
@@ -259,11 +240,12 @@ class UsuariosModel extends CI_Model {
     }
 
 	public function getCorreoEmpleado($noEmp){
-		$query = $this->ch->query("SELECT idUsuario, us1.idContrato, idRol, estatus, mail_emp, num_empleado, 
+		$query = $this->ch->query("SELECT idUsuario, us1.idContrato, us1.idRol, us1.estatus, c.correo AS mail_emp, num_empleado, 
 		CONCAT(nombre_persona, ' ', pri_apellido, ' ', sec_apellido) AS nombreUsuario
 			FROM ". $this->schema_cm .".usuarios us1 
 			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us1.idContrato = us2.idContrato
-			WHERE num_empleado = ? AND estatus = ?", array($noEmp, 1));
+			INNER JOIN ". $this->schema_cm .".correostemporales c ON c.idContrato = us2.idcontrato 
+			WHERE num_empleado = ? AND us1.estatus = ?", array($noEmp, 1));
 
 		return $query;
 	}

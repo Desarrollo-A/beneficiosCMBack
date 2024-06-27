@@ -1044,12 +1044,12 @@ class CalendarioController extends BaseController{
 		$response['result'] = isset($usuario);
 		if ($response['result']) {
 			$rs = $this->CalendarioModel->getPendientesPago($usuario)->result();
-			$rs2 = $this->CalendarioModel->getPendientesEvaluacion($usuario)->result();
+			// $rs2 = $this->CalendarioModel->getPendientesEvaluacion($usuario)->result();
 
-			$response['result'] = count($rs) > 0 || count($rs2) > 0;
+			$response['result'] = count($rs) > 0;
 			if ($response['result']) {
 				$response['data']['pago'] = $rs;
-				$response['data']['evaluacion'] = $rs2;
+				// $response['data']['evaluacion'] = $rs2;
 				$response['msg'] = '¡Consulta de citas con estatus pendiente!';
 			}else {
 				$response['msg'] = '¡No existen registros!';

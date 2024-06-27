@@ -18,13 +18,7 @@ class CalendarioModel extends CI_Model
             CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre,
             ct.idPaciente, ct.idEspecialista, ct.idAtencionXSede, ct.tipoCita, atc.tipoCita as modalidad, atc.idSede , usEspe2.idpuesto AS idPuesto, 
             us2.telefono_personal AS telPersonal, usEspe2.telefono_personal as telefonoEspecialista, usEspe2.idarea AS idArea, sed.nsede AS sede, 
-            atc.idOficina, 
-            CASE
-                WHEN c.correo = '' THEN us2.mail_emp
-                WHEN c.estatus = 0 THEN us2.mail_emp
-                ELSE c.correo
-		    END AS correo,
-            usEspe2.mail_emp as correoEspecialista, 
+            atc.idOficina, c.correo AS correo, c2.correo as correoEspecialista, 
             CONCAT(IFNULL(usEspe2.nombre_persona, ''), ' ', IFNULL(usEspe2.pri_apellido, ''), ' ', IFNULL(usEspe2.sec_apellido, '')) AS especialista,
             usEspe2.sexo as sexoEspecialista, tf.fechasFolio, ct.idEventoGoogle, ct.evaluacion, dp.estatusPago, ec.idEncuesta,
             CASE WHEN ofi.noficina IS NULL THEN 'VIRTUAL' ELSE ofi.noficina END as 'oficina',
@@ -54,6 +48,7 @@ class CalendarioModel extends CI_Model
             LEFT JOIN ". $this->schema_cm .".detallepagos as dp ON dp.idDetalle = ct.idDetalle
             LEFT JOIN ". $this->schema_cm .".encuestascreadas AS ec ON ec.idArea = usEspe2.idpuesto AND ec.estatus = 1
             LEFT JOIN ". $this->schema_cm .".correostemporales c ON c.idContrato = us2.idcontrato 
+            LEFT JOIN ". $this->schema_cm .".correostemporales c2 ON c2.idContrato = usEspe2.idcontrato 
             WHERE YEAR(fechaInicio) = ? AND MONTH(fechaInicio) = ? AND ct.idPaciente = ? AND ct.estatus = ? AND ct.estatusCita IN(?, ?, ?, ?, ?, ?, ?, ?) GROUP BY (id);",
             array( $year, $month, $idUsuario, 1, 1, 2, 3, 4, 5, 6, 7, 10)
 
@@ -375,13 +370,8 @@ class CalendarioModel extends CI_Model
         ct.fechaInicio AS occupied, ct.estatusCita AS estatus, ct.idDetalle, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) as nombre, ct.idPaciente, ct.idEspecialista, ct.idAtencionXSede, 
         ct.tipoCita, atc.tipoCita as modalidad, atc.idSede, us2.telefono_personal AS 'telPersonal', usEspe2.telefono_personal AS telefonoEspecialista, 
         CASE WHEN ofi.noficina IS NULL THEN 'VIRTUAL' ELSE ofi.noficina END as 'oficina', CASE WHEN ofi.direccion IS NULL THEN 'VIRTUAL' ELSE ofi.direccion END as 'ubicación',
-        usEspe2.idarea AS 'idArea', s.nsede AS 'sede', atc.idOficina,
-        CASE
-            WHEN c.correo = '' THEN us2.mail_emp
-            WHEN c.correo IS NULL  THEN us2.mail_emp
-            ELSE c.correo
-        END AS correo,
-        usEspe2.mail_emp as correoEspecialista, CONCAT(IFNULL(usEspe2.nombre_persona, ''), ' ', IFNULL(usEspe2.pri_apellido, ''), ' ', IFNULL(usEspe2.sec_apellido, '')) as especialista,
+        usEspe2.idarea AS 'idArea', s.nsede AS 'sede', atc.idOficina, c.correo AS correo, c2.correo as correoEspecialista, 
+        CONCAT(IFNULL(usEspe2.nombre_persona, ''), ' ', IFNULL(usEspe2.pri_apellido, ''), ' ', IFNULL(usEspe2.sec_apellido, '')) as especialista,
         usEspe2.sexo as sexoEspecialista, tf.fechasFolio, ct.idEventoGoogle, ct.evaluacion, dp.estatusPago, ec.idEncuesta,
         CASE 
         WHEN ct.estatusCita = 1 AND ct.tipoCita = 1 THEN '#ffe800'
@@ -413,7 +403,8 @@ class CalendarioModel extends CI_Model
         LEFT JOIN ". $this->schema_cm .".detallepagos as dp ON dp.idDetalle = ct.idDetalle
         LEFT JOIN ". $this->schema_cm .".encuestascreadas AS ec ON ec.idArea = usEspe2.idpuesto
         LEFT JOIN ". $this->schema_cm .".correostemporales c ON c.idContrato = us2.idcontrato 
-        WHERE ec.idPregunta = 1 AND idCita = ? GROUP BY (id)",
+        LEFT JOIN ". $this->schema_cm .".correostemporales c2 ON c2.idContrato = usEspe2.idcontrato 
+        WHERE idCita = ? GROUP BY (id)",
         array( $idCita ));
 
         return $query;
@@ -543,11 +534,7 @@ class CalendarioModel extends CI_Model
         $query = $this->ch->query(
             "SELECT TRIM(CAST(ct.idCita AS CHAR(36))) AS id,  ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end',
             ct.fechaInicio AS occupied, 'date' AS 'type', ct.estatusCita AS estatus, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre, ct.idPaciente, us2.telefono_personal AS telPersonal,
-            CASE
-                WHEN c.correo = '' THEN us2.mail_emp
-                WHEN c.correo IS NULL  THEN us2.mail_emp
-                ELSE c.correo
-            END AS correo,
+            c.correo AS correo,
             se.nsede AS sede, ofi.noficina as oficina, ct.idDetalle, ct.idAtencionXSede, us.externo, CONCAT(IFNULL(usEspCH.nombre_persona, ''), ' ', IFNULL(usEspCH.pri_apellido, ''), ' ', IFNULL(usEspCH.sec_apellido, '')) AS especialista, ct.fechaCreacion, usEspCH.tipo_puesto AS tipoPuesto,
             tf.fechasFolio, idEventoGoogle, ct.tipoCita, aps.tipoCita as modalidad, aps.idSede, dp.estatusPago, us2.idsede AS idSedePaciente,
             CASE
@@ -658,7 +645,7 @@ class CalendarioModel extends CI_Model
         $query = $this->ch->query(
             "SELECT ct.idCita as id, ct.titulo, ct.fechaInicio as 'start', ct.fechaFinal as 'end', 
             CONCAT(IFNULL(usEsp2.nombre_persona, ''), ' ', IFNULL(usEsp2.pri_apellido, ''), ' ', IFNULL(usEsp2.sec_apellido, '')) AS especialista,
-            us2.mail_emp as correo, sed.nsede as sede, ofi.noficina AS oficina,
+            c.correo as correo, sed.nsede as sede, ofi.noficina AS oficina,
             CASE 
             WHEN usEsp2.idpuesto = 537 THEN 'nutrición'
             WHEN usEsp2.idpuesto = 585 THEN 'psicología'
@@ -673,6 +660,7 @@ class CalendarioModel extends CI_Model
             INNER JOIN ". $this->schema_cm .".atencionxsede AS ats ON ats.idAtencionXSede = ct.idAtencionXSede
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_sedes AS sed ON sed.idsede = ats.idSede
             LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_oficinas AS ofi ON ofi.idoficina = ats.idOficina
+            LEFT JOIN ". $this->schema_cm .".correostemporales c ON c.idContrato = us2.idcontrato 
             WHERE ct.estatus IN (1) AND estatusCita IN(1) AND ct.idEspecialista = 8 AND fechaInicio < CURRENT_TIMESTAMP();", array(1, $idUsuario));
 
         return $query;
@@ -682,12 +670,7 @@ class CalendarioModel extends CI_Model
         $query = $this->ch->query("SELECT TRIM(CAST(ct.idCita AS CHAR(36))) AS id, ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', usEspe2.idpuesto AS idPuesto,
         ct.fechaInicio AS occupied, ct.estatusCita AS estatus, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre, ct.idPaciente, us2.telefono_personal, CASE WHEN ofi.noficina IS NULL THEN 'VIRTUAL' ELSE ofi.noficina END as 'oficina',
         CASE WHEN ofi.direccion IS NULL THEN 'VIRTUAL' ELSE ofi.direccion END as 'ubicación', sed.nsede AS sede, atc.idOficina, 
-        CASE
-            WHEN c.correo = '' THEN us2.mail_emp
-            WHEN c.correo IS NULL  THEN us2.mail_emp
-            ELSE c.correo
-        END AS correo , 
-        usEspe2.mail_emp as correoEspecialista,  ct.idEspecialista, 
+        c.correo AS correo, c2.correo AS correoEspecialista, ct.idEspecialista, 
         CONCAT(IFNULL(usEspe2.nombre_persona, ''), ' ', IFNULL(usEspe2.pri_apellido, ''), ' ', IFNULL(usEspe2.sec_apellido, '')) AS especialista, ct.idDetalle, usEspe2.telefono_personal as telefonoEspecialista,
         usEspe2.sexo as sexoEspecialista, tf.fechasFolio, ct.idEventoGoogle, ct.evaluacion, dp.estatusPago, ec.idEncuesta,
         CASE WHEN usEspe2.idpuesto = 537 THEN 'Nutrición'
@@ -707,7 +690,8 @@ class CalendarioModel extends CI_Model
         LEFT JOIN ". $this->schema_cm .".detallepagos as dp ON dp.idDetalle = ct.idDetalle
         LEFT JOIN ". $this->schema_cm .".encuestascreadas AS ec ON ec.idArea = usEspe2.idpuesto
         LEFT JOIN ". $this->schema_cm .".correostemporales AS c ON c.idContrato = us2.idcontrato 
-        WHERE ec.idPregunta = 1 AND ct.estatus IN (1) AND ct.estatusCita IN(?) AND ct.idPaciente = ? GROUP BY (id)", array(6, $idUsuario));
+        LEFT JOIN ". $this->schema_cm .".correostemporales AS c2 ON c2.idContrato = usEspe2.idcontrato 
+        WHERE ct.estatus IN (1) AND ct.estatusCita IN(?) AND ct.idPaciente = ? GROUP BY (id)", array(6, $idUsuario));
 
 
         return $query;
@@ -716,7 +700,7 @@ class CalendarioModel extends CI_Model
     public function getPendientesEvaluacion($idUsuario){
         $query = $this->ch->query("SELECT TRIM(CAST(ct.idCita AS CHAR(36))) AS id, ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end', usEspe2.idpuesto as idPuesto,
             ct.fechaInicio AS occupied, ct.estatusCita AS estatus, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre, ct.idPaciente, us2.telefono_personal, CASE WHEN ofi.noficina IS NULL THEN 'VIRTUAL' ELSE ofi.noficina END as 'oficina',
-            CASE WHEN ofi.direccion IS NULL THEN 'VIRTUAL' ELSE ofi.direccion END as 'ubicación', sed.nsede AS sede, atc.idOficina, us2.mail_emp as correo, usEspe2.mail_emp as correoEspecialista,  ct.idEspecialista,
+            CASE WHEN ofi.direccion IS NULL THEN 'VIRTUAL' ELSE ofi.direccion END as 'ubicación', sed.nsede AS sede, atc.idOficina, c.correo AS correo, c2.correo AS correoEspecialista,  ct.idEspecialista,
             CONCAT(IFNULL(usEspe2.nombre_persona, ''), ' ', IFNULL(usEspe2.pri_apellido, ''), ' ', IFNULL(usEspe2.sec_apellido, '')) AS especialista, ct.idDetalle, usEspe2.telefono_personal as telefonoEspecialista,
             usEspe2.sexo as sexoEspecialista, tf.fechasFolio, ct.idEventoGoogle, ct.evaluacion, ct.idEspecialista AS idEspecialista, ec.idEncuesta, dp.estatusPago,
             CASE 
@@ -736,7 +720,9 @@ class CalendarioModel extends CI_Model
 		    LEFT JOIN (SELECT idDetalle, GROUP_CONCAT(DATE_FORMAT(fechaInicio, '%d / %m / %Y A las %H:%i horas.'), '') AS fechasFolio FROM ". $this->schema_cm .".citas WHERE estatusCita IN(8) AND estatus IN (1)  GROUP BY idDetalle) tf ON tf.idDetalle = ct.idDetalle 
             INNER JOIN ". $this->schema_cm .".encuestascreadas AS ec ON ec.idArea = usEspe2.idpuesto
             LEFT JOIN ". $this->schema_cm .".detallepagos as dp ON dp.idDetalle = ct.idDetalle
-            WHERE ec.idPregunta = 1 AND ct.estatus IN (1) AND ct.estatusCita IN(?) AND ct.evaluacion is NULL AND ct.idPaciente = ? AND (ec.idPregunta = 1 AND ec.estatus = 1) GROUP BY (id)", array(4, $idUsuario));
+            LEFT JOIN ". $this->schema_cm .".correostemporales AS c ON c.idContrato = us2.idcontrato 
+            LEFT JOIN ". $this->schema_cm .".correostemporales AS c2 ON c2.idContrato = usEspe2.idcontrato 
+            WHERE AND ct.estatus IN (1) AND ct.estatusCita IN(?) AND ct.evaluacion is NULL AND ct.idPaciente = ? GROUP BY (id)", array(4, $idUsuario));
 
         return $query;
     }

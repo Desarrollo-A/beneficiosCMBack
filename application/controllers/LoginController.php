@@ -35,10 +35,6 @@ class LoginController extends BaseController {
         $idContrato = $this->input->post('dataValue[params][idcontrato]');
         $mailCh = $this->input->post('dataValue[params][mail_emp]');
 
-        if( $mailCh == '' ||  $mailCh == NULL){
-            $this->UsuariosModel->insertTempMail($mail, $idContrato);
-        }
-
         switch ($datosEmpleado['idpuesto']){
             case "158":
                 $idRol = 3;
@@ -100,6 +96,8 @@ class LoginController extends BaseController {
             
                 if($usuarioExiste->num_rows() === 0){
                     $resultado = $this->GeneralModel->addRecordReturnId( $this->schema_cm.".usuarios", $insertData);
+
+                    $this->UsuariosModel->insertTempMail($mail, $idContrato);
                     
                     $insertData = array(
                         "idUsuario" => $resultado,
@@ -163,6 +161,10 @@ class LoginController extends BaseController {
             echo json_encode(array('response' => [],
                                     'message' => 'El número de empleado no se encuentra registrado',
                                     'result' => 0), JSON_NUMERIC_CHECK);
+        }else if($data[0]->activo == "0"){
+            echo json_encode(array('response' => [],
+            'message' => 'El colaborador no se encuentra activo',
+            'result' => 0), JSON_NUMERIC_CHECK);
         }
         else{
             $datosSesion = array(
@@ -251,7 +253,7 @@ class LoginController extends BaseController {
         else{
             $this->ch->trans_rollback();
             $response["result"] = false;
-            $response["msg"] = "El número de empleado no esta registrado";
+            $response["msg"] = "El número de empleado no está registrado";
         }
 
         $this->output->set_content_type("application/json");
