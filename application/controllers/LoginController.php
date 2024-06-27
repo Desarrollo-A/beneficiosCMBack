@@ -163,7 +163,7 @@ class LoginController extends BaseController {
                                     'result' => 0), JSON_NUMERIC_CHECK);
         }else if($data[0]->activo == "0"){
             echo json_encode(array('response' => [],
-            'message' => 'El empleado no se encuentra activo',
+            'message' => 'El colaborador no se encuentra activo',
             'result' => 0), JSON_NUMERIC_CHECK);
         }
         else{

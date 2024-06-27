@@ -313,19 +313,57 @@ class GestorModel extends CI_Model {
     }
 
     public function getUsuarios(){
-        $query = $this->ch-> query("SELECT us2.idUsuario AS id, us.num_empleado AS numEmpleado,  
-        CONCAT(IFNULL(us.nombre_persona, ''), ' ', IFNULL(us.pri_apellido, ''), ' ', IFNULL(us.sec_apellido, '')) AS nombre, c.correo AS correo,
-        us2.estatus, us.idcontrato AS contrato, us2.password, us.nsede AS sede, CONCAT(IFNULL(us.iddepto, ''), ' ',IFNULL(us.ndepto, '')) AS departamento,
-        CONCAT(IFNULL(us.idarea, ''), ' ',IFNULL(us.narea, '')) AS area, CONCAT(IFNULL(us.idpuesto, ''), ' ',IFNULL(us.npuesto, '')) AS puesto,
-        CASE 
-            WHEN us2.idRol = 2 THEN 'Beneficiario' 
-            WHEN us2.idRol = 3 THEN 'Especialista' 
-            WHEN us2.idRol = 4 THEN 'Administrador' 
-        END AS rol
-        FROM ". $this->schema_ch .".beneficioscm_vista_usuarios us
-        INNER JOIN ". $this->schema_cm .".usuarios us2 ON us2.idContrato = us.idcontrato 
-        LEFT JOIN ". $this->schema_cm .".correostemporales AS c ON c.idContrato = us2.idcontrato 
-        WHERE us2.externo = 0");
+        $query = $this->ch-> query("SELECT
+        us.idUsuario AS id,
+        IFNULL(us2.num_empleado, 'NO APLICA') AS numEmpleado,
+        CONCAT(IFNULL(us2.nombre_persona, us3.nombre), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre,
+        IFNULL(c.correo, us3.correo) AS correo,
+        us.estatus,
+        us.idcontrato AS contrato,
+        us.password,
+        IFNULL(us2.nsede, 'NO APLICA') AS sede,
+        IFNULL(us2.ndepto, 'NO APLICA') AS departamento,
+        IFNULL(us2.narea, 'NO APLICA') AS area,
+        IFNULL(us2.npuesto, 'NO APLICA') AS puesto,
+        CASE
+            WHEN us.idRol = 2 AND us.externo = 0 THEN 'Beneficiario'
+            WHEN us.idRol = 2 AND us.externo = 1 THEN 'Externo'
+            WHEN us.idRol = 3 THEN 'Especialista'
+            WHEN us.idRol = 4 THEN 'Administrador'
+        END AS rol,
+        TRIM(BOTH ', ' FROM CONCAT_WS(', ', 
+            CASE WHEN dt.estatusNut = 1 THEN 'Nutrición' END,
+            CASE WHEN dt.estatusPsi = 1 THEN 'Psicología' END,
+            CASE WHEN dt.estatusGE = 1 THEN 'Guía espiritual' END
+        )) AS servicios,
+        DATE_FORMAT(us.fechaCreacion, '%Y-%m-%d') AS fechaCreacion
+        FROM ". $this->schema_cm .".usuarios us
+        LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
+        LEFT JOIN ". $this->schema_cm .".correostemporales AS c ON c.idContrato = us.idContrato
+        LEFT JOIN ". $this->schema_cm .".usuariosexternos us3 ON us3.idcontrato = us.idContrato
+        LEFT JOIN ". $this->schema_cm .".detallepaciente dt ON dt.idUsuario = us.idUsuario
+        WHERE us.idUsuario != 1
+        GROUP BY
+            us.idUsuario,
+            us2.num_empleado,
+            us2.nombre_persona,
+            us3.nombre,
+            us2.pri_apellido,
+            us2.sec_apellido,
+            c.correo,
+            us.estatus,
+            us.idcontrato,
+            us.password,
+            us2.nsede,
+            us2.iddepto,
+            us2.ndepto,
+            us2.idarea,
+            us2.narea,
+            us2.idpuesto,
+            us2.npuesto,
+            us.idRol,
+            us.externo
+        ORDER BY IFNULL(us2.nombre_persona, us3.nombre) ASC");
 
         return $query->result();
     }
