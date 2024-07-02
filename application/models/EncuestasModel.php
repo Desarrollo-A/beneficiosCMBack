@@ -287,7 +287,7 @@ class EncuestasModel extends CI_Model {
 
     public function getTipoEncuesta()
     {
-        $query = $this->ch-> query("SELECT idOpcion AS id, nombre FROM opcionesporcatalogo o WHERE idCatalogo = 16 AND estatus = 1"); 
+        $query = $this->ch-> query("SELECT idOpcion AS id, nombre FROM ". $this->schema_cm .".opcionesporcatalogo o WHERE idCatalogo = 16 AND estatus = 1"); 
 		return $query;
     }
 
