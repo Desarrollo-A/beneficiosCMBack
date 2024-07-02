@@ -257,7 +257,7 @@ class EncuestasModel extends CI_Model {
                     @prev_idEncuesta := NULL
             ) AS vars,
                 ". $this->schema_cm .".encuestascreadas ec
-            LEFT JOIN opcionesporcatalogo ops ON ops.idOpcion = ec.tipoEncuesta AND ops.idCatalogo = 16
+            LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo ops ON ops.idOpcion = ec.tipoEncuesta AND ops.idCatalogo = 16
             ORDER BY ec.idEncuesta, ec.fechaCreacion DESC
         ) AS subquery
         WHERE rn = 1;");   
