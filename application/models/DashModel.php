@@ -14,10 +14,12 @@ class DashModel extends CI_Model
   
 	public function getPregunta($dt)
 	{
-		$query = $this->ch->query("SELECT DISTINCT ec.idPregunta, pg.pregunta, ec.respuestas, pg.idPregunta, ec.idEncuesta, ec.idEncuestaCreada, ec.idArea, ec.idPregunta
+		$tipoEnc = isset($dt[1]["tipoEnc"]) ? $dt[1]["tipoEnc"] : 0;
+
+		$query = $this->ch->query("SELECT DISTINCT ec.idPregunta, pg.pregunta, ec.tipoEncuesta, ec.respuestas, pg.idPregunta, ec.idEncuesta, ec.idEncuestaCreada, ec.idArea, ec.idPregunta
 		FROM ". $this->schema_cm .".encuestascreadas ec
-		INNER JOIN ". $this->schema_cm .".preguntasgeneradas pg ON pg.idPregunta = ec.idPregunta AND pg.idEncuesta = ec.idEncuesta
-		WHERE ec.estatus = 1 AND (pg.abierta = 1 AND ec.idArea = $dt AND pg.idArea = $dt AND ec.respuestas <= 4)");
+		LEFT JOIN ". $this->schema_cm .".preguntasgeneradas pg ON pg.idPregunta = ec.idPregunta AND pg.idEncuesta = ec.idEncuesta
+		WHERE ec.estatus = 1 AND ec.tipoEncuesta = $tipoEnc AND (pg.abierta = 1 AND ec.respuestas != 5)");
 
 		$result = $query->result();
 
@@ -42,6 +44,7 @@ class DashModel extends CI_Model
 			$idPregunta = isset($dt[0]["idPregunta"]) ? $dt[0]["idPregunta"] : 0;
 			$idEncuesta = isset($dt[1]["idEncuesta"]) ? $dt[1]["idEncuesta"] : 0;
 			$idEspecialidad = isset($dt[2]["idArea"]) ? $dt[2]["idArea"] : $dt[3]["idArea"];
+			$tipoEnc = isset($dt[4]["tipoEnc"]) ? $dt[4]["tipoEnc"] : 0;
 
 			if (($idPregunta != 0) ||
 				($idEncuesta != 0)
@@ -51,8 +54,8 @@ class DashModel extends CI_Model
 					"SELECT DISTINCT pg.pregunta  
 					FROM ". $this->schema_cm .".encuestascreadas ec
 					INNER JOIN ". $this->schema_cm .".preguntasgeneradas pg ON pg.idPregunta = ec.idPregunta
-					WHERE ec.estatus = 1 AND abierta = 1 AND pg.idArea = ? AND pg.idPregunta = ? AND ec.idPregunta = ?",
-					array($idEspecialidad, $idPregunta, $idPregunta)
+					WHERE ec.estatus = 1 AND abierta = 1 AND pg.idPregunta = ? AND ec.idPregunta = ? AND ec.tipoEncuesta = ?",
+					array($idPregunta, $idPregunta, $tipoEnc)
 				);
 
 				if ($query_pregunta->num_rows() > 0) {
@@ -70,6 +73,7 @@ class DashModel extends CI_Model
 						INNER JOIN ". $this->schema_cm .".respuestasgenerales rg ON rg.grupo = ec.respuestas 
 						INNER JOIN ". $this->schema_cm .".preguntasgeneradas pg ON pg.idPregunta = ec.idPregunta
 						WHERE pg.pregunta IN ($idPreguntasString) AND ec.idEncuesta = $idEncuesta AND pg.idEncuesta = $idEncuesta
+						AND ec.tipoEncuesta = $tipoEnc
 						GROUP BY rg.grupo;",
 						array($idEncuesta)
 					);
@@ -97,6 +101,7 @@ class DashModel extends CI_Model
 			$fhI = isset($dt[4]["fhI"]) ? $dt[4]["fhI"] : $dt[5]["fhI"];
         	$fechaFn = isset($dt[5]["fhF"]) ? $dt[5]["fhF"] : $dt[6]["fhF"];
 			$area = isset($dt[6]["idArea"]) ? $dt[6]["idArea"] : $dt[7]["idArea"];
+			$tipoEnc = isset($dt[7]["tipoEnc"]) ? $dt[7]["tipoEnc"] : 0;
 
 			$fecha = new DateTime($fechaFn);
 			$fecha->modify('+1 day');
@@ -123,7 +128,7 @@ class DashModel extends CI_Model
 					INNER JOIN ". $this->schema_cm .".respuestasgenerales rg ON rg.idRespuestaGeneral = ec.idRespuesta
 					CROSS JOIN 
 					(SELECT COUNT(*) AS total FROM ". $this->schema_cm .".encuestascontestadas WHERE idEncuesta = $idEncuesta AND idPregunta = $idPregunta AND idArea = $area) AS total_count
-					WHERE ec.idEncuesta = $idEncuesta AND ec.idPregunta = $idPregunta AND ec.idArea = $area
+					WHERE ec.idEncuesta = $idEncuesta AND ec.idPregunta = $idPregunta
 					AND (ec.fechaCreacion >= '$fhI' AND ec.fechaCreacion <= '$fhF')
 					GROUP BY rg.respuesta, ec.idPregunta, ec.idArea, ec.idEncuesta;");
 

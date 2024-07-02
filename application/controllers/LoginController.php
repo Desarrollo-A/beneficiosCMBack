@@ -78,19 +78,32 @@ class LoginController extends BaseController {
             $fingreso = $informacionDePuesto->fingreso;
             $dateOfEntry = new DateTime($fingreso);
             $currentDate = new DateTime();
-            $threeMonthsAgo = $currentDate->sub(new DateInterval('P3M'));
+
+            // Calcula la fecha de hace un mes
+            $oneMonthAgo = (clone $currentDate)->sub(new DateInterval('P1M'));
+
+            // Calcula la fecha de hace tres meses
+            $threeMonthsAgo = (clone $currentDate)->sub(new DateInterval('P3M'));
 
             if ($dateOfEntry < $threeMonthsAgo) {
+                // Tiene al menos 3 meses de antigüedad
+                $antiguedad = 3;
+            } elseif ($dateOfEntry < $oneMonthAgo) {
+                // Tiene al menos 1 mes de antigüedad
                 $antiguedad = 1;
             } else {
+                // No tiene un mes de antigüedad
                 $antiguedad = 0;
             }
 
             $canRegister = $informacionDePuesto->canRegister;
 
-            if ($canRegister === 0 || $canRegister === '0' || $canRegister == NULL || $antiguedad == 0) {
+            if (($canRegister === 0 || $canRegister === '0' || $canRegister == NULL || $antiguedad < 3) && $informacionDePuesto->idPuesto != 393 ) {
                 echo json_encode(array("result" => false, "msg" => "Por el momento no puede gozar de los beneficios"), JSON_NUMERIC_CHECK);
 
+            }else if(($canRegister === 0 || $canRegister === '0' || $canRegister == NULL || $antiguedad < 1) && $informacionDePuesto->idPuesto = 393){
+                echo json_encode(array("result" => false, "msg" => "Por el momento no puede gozar de los beneficios"), JSON_NUMERIC_CHECK);
+            
             }else {
                 $usuarioExiste = $this->GeneralModel->usuarioExiste($insertData["idContrato"]);
             
@@ -157,10 +170,15 @@ class LoginController extends BaseController {
         $datosEmpleado->password = encriptar($datosEmpleado->password);
         $data = $this->UsuariosModel->login($datosEmpleado->numempleado,$datosEmpleado->password)->result();
 
+       
         if(empty($data)){
             echo json_encode(array('response' => [],
                                     'message' => 'El número de empleado no se encuentra registrado',
                                     'result' => 0), JSON_NUMERIC_CHECK);
+        }else if($datosEmpleado->password != $data[0]->password){
+            echo json_encode(array('response' => [],
+                'message' => 'La contraseña es incorrecta',
+                'result' => 0), JSON_NUMERIC_CHECK);
         }else if($data[0]->activo == "0"){
             echo json_encode(array('response' => [],
             'message' => 'El colaborador no se encuentra activo',
