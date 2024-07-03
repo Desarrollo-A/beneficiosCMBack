@@ -35,11 +35,11 @@ class MenuModel extends CI_Model {
     {
         $subheader = array();
 
-        $items = $this->ch->query("SELECT * FROM ". $this->schema_cm .".menu WHERE father IS NULL ORDER BY posOrder")->result_array();
+        $items = $this->ch->query("SELECT * FROM ". $this->schema_cm .".menu WHERE father IS NULL AND estatus = 1 ORDER BY posOrder")->result_array();
 
         $menus = array();
         foreach ($items as $key_i => $item) {
-            $children = $this->ch->query("SELECT * FROM ". $this->schema_cm .".menu WHERE father=$item[id] ORDER BY posOrder")->result_array();
+            $children = $this->ch->query("SELECT * FROM ". $this->schema_cm .".menu WHERE father=$item[id] AND estatus = 1 ORDER BY posOrder")->result_array();
 
             $childs = array();
             foreach ($children as $key_c => $child) {
