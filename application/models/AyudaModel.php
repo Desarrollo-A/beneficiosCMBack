@@ -10,7 +10,7 @@ class AyudaModel extends CI_Model{
         parent::__construct();
     }
 
-    public function getFaqs(){
+    public function getAllFaqs(){
         $query = $this->ch->query(
             "SELECT *, idFaqs AS id FROM ". $this->schema_cm .".faqs"
         );
@@ -18,9 +18,25 @@ class AyudaModel extends CI_Model{
         return $query->result();
     }
 
+    public function getFaqs(){
+        $query = $this->ch->query(
+            "SELECT *, idFaqs AS id FROM ". $this->schema_cm .".faqs WHERE estatus = 1"
+        );
+
+        return $query->result();
+    }
+
+    public function getAllManuales(){
+        $query = $this->ch->query(
+            "SELECT *, idManual AS id FROM ". $this->schema_cm .".manuales"
+        );
+
+        return $query->result();
+    }
+
     public function getManuales(){
         $query = $this->ch->query(
-            "SELECT * FROM ". $this->schema_cm .".manuales"
+            "SELECT * , idManual AS id FROM ". $this->schema_cm .".manuales WHERE estatus = 1"
         );
 
         return $query->result();
