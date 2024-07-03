@@ -661,7 +661,7 @@ class CalendarioModel extends CI_Model
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_sedes AS sed ON sed.idsede = ats.idSede
             LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_oficinas AS ofi ON ofi.idoficina = ats.idOficina
             LEFT JOIN ". $this->schema_cm .".correostemporales c ON c.idContrato = us2.idcontrato 
-            WHERE ct.estatus IN (1) AND estatusCita IN(1) AND ct.idEspecialista = 8 AND fechaInicio < CURRENT_TIMESTAMP();", array(1, $idUsuario));
+            WHERE ct.estatus IN (1) AND estatusCita IN(?) AND ct.idEspecialista = ? AND fechaInicio < CURRENT_TIMESTAMP();", array(1, $idUsuario));
 
         return $query;
     }

@@ -216,19 +216,11 @@ class UsuariosModel extends CI_Model {
 
 	public function getUserByNumEmp($numEmpleado)
     {
-		/* 
-		$query = $this->ch->query(
-			"SELECT *, c.correo AS correo
-					FROM ". $this->schema_ch .".beneficioscm_vista_usuarios AS us
-					LEFT JOIN ". $this->schema_cm .".correostemporales c ON c.idContrato = us.idcontrato 
-					WHERE us.num_empleado = ?", array( $numEmpleado )); 
-		*/
-
         $query = $this->ch->query(
         "SELECT *, c.correo AS correo
 			FROM ". $this->schema_ch .".beneficioscm_vista_usuarios AS us
 			LEFT JOIN ". $this->schema_cm .".correostemporales c ON c.idContrato = us.idcontrato 
-			WHERE us.activo = 1 AND us.num_empleado = ?", array( $numEmpleado ));
+			WHERE us.num_empleado = ?", array( $numEmpleado ));
 
         return $query;
 	}

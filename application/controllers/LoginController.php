@@ -98,12 +98,19 @@ class LoginController extends BaseController {
 
             $canRegister = $informacionDePuesto->canRegister;
 
-            if (($canRegister === 0 || $canRegister === '0' || $canRegister == NULL || $antiguedad < 3) && $informacionDePuesto->idPuesto != 393 ) {
-                echo json_encode(array("result" => false, "msg" => "Por el momento no puede gozar de los beneficios"), JSON_NUMERIC_CHECK);
+            if (($canRegister === 0 || $canRegister === '0' || $canRegister == NULL || $antiguedad < 3) && $informacionDePuesto->idPuesto != 393 && $idRol != 3 ) {
+                if ($canRegister === 0 || $canRegister === '0' || $canRegister == NULL) {
+                    echo json_encode(array("result" => false, "msg" => "Tu puesto actual no puede gozar de los beneficios"), JSON_NUMERIC_CHECK);
+                } else {
+                    echo json_encode(array("result" => false, "msg" => "Aún no cuentas con la antigüedad para gozar con los beneficios"), JSON_NUMERIC_CHECK);
+                }
 
-            }else if(($canRegister === 0 || $canRegister === '0' || $canRegister == NULL || $antiguedad < 1) && $informacionDePuesto->idPuesto = 393){
-                echo json_encode(array("result" => false, "msg" => "Por el momento no puede gozar de los beneficios"), JSON_NUMERIC_CHECK);
-            
+            }else if(($canRegister === 0 || $canRegister === '0' || $canRegister == NULL || $antiguedad < 1) && $informacionDePuesto->idPuesto = 393 && $idRol != 3){
+                if ($canRegister === 0 || $canRegister === '0' || $canRegister == NULL) {
+                    echo json_encode(array("result" => false, "msg" => "Tu puesto actual no puede gozar de los beneficios"), JSON_NUMERIC_CHECK);
+                } else {
+                    echo json_encode(array("result" => false, "msg" => "Aún no cuentas con la antigüedad para gozar con los beneficios"), JSON_NUMERIC_CHECK);
+                }
             }else {
                 $usuarioExiste = $this->GeneralModel->usuarioExiste($insertData["idContrato"]);
             

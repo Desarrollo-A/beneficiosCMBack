@@ -257,7 +257,7 @@ class EncuestasModel extends CI_Model {
                     @prev_idEncuesta := NULL
             ) AS vars,
                 ". $this->schema_cm .".encuestascreadas ec
-            LEFT JOIN opcionesporcatalogo ops ON ops.idOpcion = ec.tipoEncuesta AND ops.idCatalogo = 16
+            LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo ops ON ops.idOpcion = ec.tipoEncuesta AND ops.idCatalogo = 16
             ORDER BY ec.idEncuesta, ec.fechaCreacion DESC
         ) AS subquery
         WHERE rn = 1;");   
@@ -287,7 +287,7 @@ class EncuestasModel extends CI_Model {
 
     public function getTipoEncuesta()
     {
-        $query = $this->ch-> query("SELECT idOpcion AS id, nombre FROM opcionesporcatalogo o WHERE idCatalogo = 16 AND estatus = 1"); 
+        $query = $this->ch-> query("SELECT idOpcion AS id, nombre FROM ". $this->schema_cm .".opcionesporcatalogo o WHERE idCatalogo = 16 AND estatus = 1"); 
 		return $query;
     }
 
