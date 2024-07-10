@@ -35,7 +35,8 @@ class CalendarioModel extends CI_Model
             WHEN ct.estatusCita = 7 THEN '#ff0000' 
             WHEN ct.estatusCita = 10 THEN '#33105D' 
             END AS 'color', 
-            CASE WHEN usEspe2.idpuesto = 537 THEN 'nutrición' WHEN usEspe2.idpuesto = 585 THEN 'psicología' WHEN usEspe2.idpuesto = 686 THEN 'guía espiritual' WHEN usEspe2.idpuesto = 158 THEN 'quantum balance' END AS 'beneficio'
+            CASE WHEN usEspe2.idpuesto = 537 THEN 'nutrición' WHEN usEspe2.idpuesto = 585 THEN 'psicología' WHEN usEspe2.idpuesto = 686 THEN 'guía espiritual' WHEN usEspe2.idpuesto = 158 THEN 'quantum balance' END AS 'beneficio',
+            ct.fechaIntentoPago 
             FROM ". $this->schema_cm .".citas AS ct 
             INNER JOIN ". $this->schema_cm .".usuarios AS us ON us.idUsuario = ct.idPaciente 
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
@@ -555,7 +556,7 @@ class CalendarioModel extends CI_Model
             WHEN usEspCH.idPuesto= 585 THEN 'psicología'
             WHEN usEspCH.idPuesto = 686 THEN 'guía espiritual'
             WHEN usEspCH.idPuesto = 158 THEN 'quantum balance'
-            END AS beneficio
+            END AS beneficio, ct.fechaIntentoPago 
             FROM ". $this->schema_cm .".citas AS ct
             INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idPaciente
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
@@ -600,7 +601,7 @@ class CalendarioModel extends CI_Model
                WHEN usEspCH.idPuesto= 585 THEN 'psicología'
                WHEN usEspCH.idPuesto = 686 THEN 'guía espiritual'
                WHEN usEspCH.idPuesto = 158 THEN 'quantum balance'
-               END AS beneficio
+               END AS beneficio, ct.fechaIntentoPago 
             FROM ".$this->schema_cm .".citas AS ct 
             LEFT JOIN ".$this->schema_cm .".usuarios as us ON us.idUsuario = ct.idPaciente
             LEFT JOIN ".$this->schema_cm .".usuariosexternos AS ue ON ue.idContrato = us.idContrato
@@ -677,7 +678,7 @@ class CalendarioModel extends CI_Model
         WHEN usEspe2.idpuesto = 585 THEN 'Psicología'
         WHEN usEspe2.idpuesto = 686 THEN 'Guía espiritual'
         WHEN usEspe2.idpuesto = 158 THEN 'Quantum balance'
-        END AS beneficio
+        END AS beneficio, ct.fechaIntentoPago 
         FROM ". $this->schema_cm .".citas AS ct
         INNER JOIN ". $this->schema_cm .".usuarios AS us ON us.idUsuario = ct.idPaciente
         INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
@@ -708,7 +709,7 @@ class CalendarioModel extends CI_Model
             WHEN usEspe2.idpuesto = 585 THEN 'Psicología'
             WHEN usEspe2.idpuesto = 686 THEN 'Guía espiritual'
             WHEN usEspe2.idpuesto = 158 THEN 'Quantum balance'
-            END AS beneficio
+            END AS beneficio, ct.fechaIntentoPago 
             FROM ". $this->schema_cm .".citas AS ct
             INNER JOIN ". $this->schema_cm .".usuarios AS us ON us.idUsuario = ct.idPaciente
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
