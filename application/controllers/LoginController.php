@@ -36,19 +36,22 @@ class LoginController extends BaseController {
         $mailCh = $this->input->post('dataValue[params][mail_emp]');
 
         switch ($datosEmpleado['idpuesto']){
-            case "158":
+            case "158": // QB
                 $idRol = 3;
-                $areaBeneficio = 3;
-            case "585":
-                $idRol = 3;
-                $areaBeneficio = 6;
-            case "686":
-                $idRol = 3; 
-                $areaBeneficio = 5;
-            case "537":
+                $areaBeneficio = 1;
+                break;
+            case "585": // Psicologia
                 $idRol = 3;
                 $areaBeneficio = 4;
-            break;
+                break;
+            case "686": // GUÍA ESPIRITUAL
+                $idRol = 3; 
+                $areaBeneficio = 3;
+                break;
+            case "537": // Nutrición
+                $idRol = 3;
+                $areaBeneficio = 2;
+                break;
             default:
                 $idRol = 2;
                 $areaBeneficio = NULL;

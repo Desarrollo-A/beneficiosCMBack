@@ -96,6 +96,22 @@ class CalendarioModel extends CI_Model
 
     public function getModalidadesEspecialista($sede, $especialista, $area)
     {
+        $query = $this->ch->query(
+            "SELECT CASE WHEN tipoCita = 1 then 'PRESENCIAL' WHEN tipoCita = 2 THEN 'EN LíNEA' END AS 'modalidad', us.idUsuario as id,
+            us2.idpuesto,  CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista,
+            ofi.direccion as ubicacionOficina, axs.tipoCita, axs.idAtencionXSede, us2.nsede as lugarAtiende 
+            FROM ". $this->schema_cm .".atencionxsede AS axs
+            INNER JOIN ". $this->schema_cm .".usuarios AS us ON us.idUsuario = axs.idEspecialista 
+            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
+            LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_oficinas AS ofi ON ofi.idoficina = axs.idOficina 
+            WHERE axs.estatus = ? AND axs.idSede = ? AND ((axs.idEspecialista = ? AND axs.idArea is NULL ) OR (axs.idEspecialista = ? AND axs.idArea = ?));", 
+            array(1, $sede, $especialista, $especialista, $area));
+
+        return $query;
+    }
+
+    public function getModalidadesEspecialistaBene($sede, $especialista, $area)
+    {
         $atXsed = "";
 
 		// Excepcion de especialistas para hacer citas sin importar su sedes asignadas
@@ -121,22 +137,6 @@ class CalendarioModel extends CI_Model
                 WHERE axs.estatus = ? AND axs.idSede = ? AND ((axs.idEspecialista = ? AND axs.idArea is NULL ) OR (axs.idEspecialista = ? AND axs.idArea = ?));", 
                 array(1, $sede, $especialista, $especialista, $area));
 		}
-        return $query;
-    }
-
-    public function getModalidadesEspecialistaBene($sede, $especialista, $area)
-    {
-        $query = $this->ch->query(
-            "SELECT CASE WHEN tipoCita = 1 then 'PRESENCIAL' WHEN tipoCita = 2 THEN 'EN LíNEA' END AS 'modalidad', us.idUsuario as id,
-            us2.idpuesto,  CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista,
-            ofi.direccion as ubicacionOficina, axs.tipoCita, axs.idAtencionXSede, us2.nsede as lugarAtiende 
-            FROM ". $this->schema_cm .".atencionxsede AS axs
-            INNER JOIN ". $this->schema_cm .".usuarios AS us ON us.idUsuario = axs.idEspecialista 
-            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
-            LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_oficinas AS ofi ON ofi.idoficina = axs.idOficina 
-            WHERE axs.estatus = ? AND axs.idSede = ? AND ((axs.idEspecialista = ? AND axs.idArea is NULL ) OR (axs.idEspecialista = ? AND axs.idArea = ?));", 
-            array(1, $sede, $especialista, $especialista, $area));
-
         return $query;
     }
     
