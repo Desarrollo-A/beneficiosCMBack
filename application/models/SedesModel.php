@@ -15,9 +15,7 @@ class SedesModel extends CI_Model {
         sd.nsede as label
         FROM ". $this->schema_cm .".atencionxsede ate
         LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_sedes AS sd ON sd.idsede = ate.idSede
-        WHERE
-        ate.idEspecialista=$idEspecialista AND
-        ate.tipoCita=1";
+        WHERE ate.idEspecialista=$idEspecialista AND ate.tipoCita=1 AND ate.estatus = 1";
 
         $sedes = $this->ch->query($query)->result_array();
 

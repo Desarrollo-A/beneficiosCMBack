@@ -324,7 +324,6 @@ class CalendarioController extends BaseController{
 							"fechaCreacion" => $fecha,
 							"modificadoPor" => $idPaciente, "idDetalle" => $detalle,
                             "idEventoGoogle" => $idGoogleEvent,
-							"fechaIntentoPago" => $fecha
                         ];
                         $rs = $this->GeneralModel->addRecordReturnId( $this->schema_cm.".citas", $values);
                         $response["result"] = $rs > 0;
