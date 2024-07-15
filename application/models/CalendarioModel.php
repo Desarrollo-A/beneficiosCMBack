@@ -36,7 +36,13 @@ class CalendarioModel extends CI_Model
             WHEN ct.estatusCita = 10 THEN '#33105D' 
             END AS 'color', 
             CASE WHEN usEspe2.idpuesto = 537 THEN 'nutrición' WHEN usEspe2.idpuesto = 585 THEN 'psicología' WHEN usEspe2.idpuesto = 686 THEN 'guía espiritual' WHEN usEspe2.idpuesto = 158 THEN 'quantum balance' END AS 'beneficio',
-            ct.fechaIntentoPago 
+            ct.fechaIntentoPago, 
+			CASE WHEN ct.fechaIntentoPago IS NOT NULL THEN DATE_ADD(ct.fechaIntentoPago, INTERVAL 10 MINUTE)
+        	ELSE NULL END AS fechaLimitePago,
+    		CASE 
+        		WHEN ct.fechaIntentoPago IS NOT NULL AND DATE_ADD(ct.fechaIntentoPago, INTERVAL 10 MINUTE) > NOW() 
+        		THEN TIMESTAMPDIFF(SECOND, NOW(), DATE_ADD(ct.fechaIntentoPago, INTERVAL 10 MINUTE)) * 1000
+        	ELSE 0 END AS diferenciaEnMs
             FROM ". $this->schema_cm .".citas AS ct 
             INNER JOIN ". $this->schema_cm .".usuarios AS us ON us.idUsuario = ct.idPaciente 
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
@@ -97,7 +103,7 @@ class CalendarioModel extends CI_Model
     public function getModalidadesEspecialista($sede, $especialista, $area)
     {
         $query = $this->ch->query(
-            "SELECT CASE WHEN tipoCita = 1 then 'PRESENCIAL' WHEN tipoCita = 2 THEN 'EN LíNEA' END AS 'modalidad', us.idUsuario as id,
+            "SELECT CASE WHEN tipoCita = 1 then 'PRESENCIAL' WHEN tipoCita = 2 THEN 'EN LÍNEA' END AS 'modalidad', us.idUsuario as id,
             us2.idpuesto,  CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista,
             ofi.direccion as ubicacionOficina, axs.tipoCita, axs.idAtencionXSede, us2.nsede as lugarAtiende 
             FROM ". $this->schema_cm .".atencionxsede AS axs
@@ -122,12 +128,11 @@ class CalendarioModel extends CI_Model
             ofi.direccion as ubicacionOficina, atxs.tipoCita, atxs.idAtencionXSede
             FROM ". $this->schema_cm .".usuarios us
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
-            INNER JOIN ". $this->schema_cm .".atencionxsede atxs ON atxs.idEspecialista = us.idUsuario
-            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_oficinas AS ofi ON ofi.idoficina = atxs.idOficina
-            WHERE us.idUsuario = $especialista");
+            INNER JOIN ". $this->schema_cm .".atencionxsede atxs ON atxs.idEspecialista = us.idUsuario 
+            LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_oficinas AS ofi ON ofi.idoficina = atxs.idOficina
+            WHERE us.idUsuario = ?", array($sede, $especialista));
 		}else{
-			$query = $this->ch->query(
-                "SELECT CASE WHEN tipoCita = 1 then 'PRESENCIAL' WHEN tipoCita = 2 THEN 'EN LíNEA' END AS 'modalidad', us.idUsuario as id,
+			 $query = $this->ch->query("SELECT CASE WHEN tipoCita = 1 then 'PRESENCIAL' WHEN tipoCita = 2 THEN 'EN LÍNEA' END AS 'modalidad', us.idUsuario as id,
                 us2.idpuesto,  CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista,
                 ofi.direccion as ubicacionOficina, axs.tipoCita, axs.idAtencionXSede, us2.nsede as lugarAtiende 
                 FROM ". $this->schema_cm .".atencionxsede AS axs
