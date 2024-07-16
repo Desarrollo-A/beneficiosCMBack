@@ -220,7 +220,9 @@ class UsuariosModel extends CI_Model {
         "SELECT *, c.correo AS correo
 			FROM ". $this->schema_ch .".beneficioscm_vista_usuarios AS us
 			LEFT JOIN ". $this->schema_cm .".correostemporales c ON c.idContrato = us.idcontrato 
-			WHERE us.num_empleado = ?", array( $numEmpleado ));
+			WHERE us.num_empleado = ?
+			ORDER BY us.idcontrato DESC
+			LIMIT 1;", array( $numEmpleado ));
 
         return $query;
 	}
