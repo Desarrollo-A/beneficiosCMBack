@@ -621,24 +621,12 @@ class Usuario extends BaseController {
         if ($response['result']) {
             $rs = $this->UsuariosModel->getUserByNumEmp($user)->result();
 
-			$CorreoCh = '';
-			$tipoPuesto = '';
-                foreach ($rs as $row) {
-				$CorreoCh = $row->mail_emp;
-				$tipoPuesto = $row->tipo_puesto;
-            }
-
 			$response['result'] = count($rs) > 0;
             if ($response['result']) {
 				$response['result'] = $rs[0]->activo == 1;
 				if ($response['result']) {
-					/* if($CorreoCh == '' && $tipoPuesto != 'Operativa'){
-						$response['msg'] = '¡No se tiene registrado un correo del colaborador!';
-						$response['result'] = false;
-					}else{ */
 					$response['msg'] = '¡Colaborador consultado exitosamente!';
 					$response['data'] = $rs;
-					/* } */
 				}else {
 					$response['msg'] = '¡Colaborador inactivo!';
 				}
