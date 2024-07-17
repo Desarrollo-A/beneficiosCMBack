@@ -1646,6 +1646,11 @@ class CalendarioController extends BaseController{
 		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
-	
+	public function eventCancelaCitasSinPago(){
+		$rs = $this->CalendarioModel->eventCancelaCitasSinPago();
+
+		$this->output->set_content_type("application/json");
+		$this->output->set_output(json_encode($rs, JSON_NUMERIC_CHECK));
+	}
 
 }

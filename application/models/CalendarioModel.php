@@ -758,4 +758,23 @@ class CalendarioModel extends CI_Model
         WHERE us.idUsuario = $idEsp");
        return $query;
     }
+
+    public function eventCancelaCitasSinPago(){
+        $query = $this->ch->query("UPDATE ". $this->schema_cm .".citas
+	        SET estatusCita = 9, modificadoPor = 1, fechaModificacion = CURRENT_TIMESTAMP()
+	        WHERE idCita IN (
+              SELECT id FROM (
+                 SELECT idCita as id FROM ". $this->schema_cm .".citas 
+                 WHERE estatus = 1 AND 
+	        			((estatusCita IN (6, 10) AND tipoCita IN (1, 2) AND NOW() >= fechaCreacion + INTERVAL 10 MINUTE ) 
+	        		OR 
+	        			(estatusCita IN (10) AND fechaIntentoPago IS NOT NULL AND tipoCita IN (3) AND NOW() >= fechaIntentoPago + INTERVAL 10 MINUTE )
+	        		OR 
+	        			(estatusCita = 6 AND tipoCita IN (3) AND NOW() >= fechaCreacion + INTERVAL 24 HOUR ))
+              ) AS tmp
+            )");
+            
+        return $query;
+    }
+    
 }
