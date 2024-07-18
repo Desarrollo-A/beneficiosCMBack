@@ -36,7 +36,21 @@ class CalendarioModel extends CI_Model
             WHEN ct.estatusCita = 10 THEN '#33105D' 
             END AS 'color', 
             CASE WHEN usEspe2.idpuesto = 537 THEN 'nutrición' WHEN usEspe2.idpuesto = 585 THEN 'psicología' WHEN usEspe2.idpuesto = 686 THEN 'guía espiritual' WHEN usEspe2.idpuesto = 158 THEN 'quantum balance' END AS 'beneficio',
-            ct.fechaIntentoPago 
+            ct.fechaIntentoPago, 
+				CASE 
+        			WHEN ct.estatusCita IN (6, 10) AND ct.tipoCita IN (1, 2) THEN DATE_ADD(ct.fechaCreacion, INTERVAL 10 MINUTE)
+        			WHEN ct.estatusCita = 6 AND ct.tipoCita = 3 THEN DATE_ADD(ct.fechaCreacion, INTERVAL 24 HOUR)
+        			WHEN ct.estatusCita = 10 AND ct.tipoCita = 3 AND ct.fechaIntentoPago IS NOT NULL THEN DATE_ADD(ct.fechaIntentoPago, INTERVAL 10 MINUTE)
+        		ELSE NULL 
+    			END AS fechaLimitePago,
+    			CASE 
+        			WHEN ct.estatusCita IN (6, 10) AND ct.tipoCita IN (1, 2)
+        				THEN TIMESTAMPDIFF(SECOND, NOW(), DATE_ADD(ct.fechaCreacion, INTERVAL 10 MINUTE)) * 1000
+        			WHEN ct.estatusCita = 6 AND ct.tipoCita = 3 
+        				THEN TIMESTAMPDIFF(SECOND, NOW(), DATE_ADD(ct.fechaCreacion, INTERVAL 24 HOUR)) * 1000
+        			WHEN ct.estatusCita = 10 AND ct.tipoCita = 3 AND ct.fechaIntentoPago IS NOT NULL
+        				THEN TIMESTAMPDIFF(SECOND, NOW(), DATE_ADD(ct.fechaIntentoPago, INTERVAL 10 MINUTE)) * 1000
+        			ELSE 0 END AS diferenciaEnMs
             FROM ". $this->schema_cm .".citas AS ct 
             INNER JOIN ". $this->schema_cm .".usuarios AS us ON us.idUsuario = ct.idPaciente 
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
@@ -377,7 +391,7 @@ class CalendarioModel extends CI_Model
         WHEN usEspe2.idpuesto = 585 THEN 'psicología'
         WHEN usEspe2.idpuesto = 686 THEN 'guía espiritual'
         WHEN usEspe2.idpuesto = 158 THEN 'quantum balance'
-        END AS 'beneficio'
+        END AS 'beneficio', ct.fechaIntentoPago 
         FROM ". $this->schema_cm .".citas ct
         INNER JOIN ". $this->schema_cm .".usuarios AS us ON us.idUsuario = ct.idPaciente
         INNER JOIN ". $this->schema_cm .".usuarios AS usEspe ON usEspe.idUsuario = ct.idEspecialista
@@ -489,7 +503,7 @@ class CalendarioModel extends CI_Model
     {
         $query = $this->ch->query(
             "SELECT ct.idCita FROM ". $this->schema_cm .".citas AS ct
-            WHERE ct.idPaciente = ? AND ct.idDetalle is NULL AND ct.estatusCita IN (?, ?);",array($usuario, 6, 10)
+            WHERE ct.estatus = 1 AND ct.idPaciente = ? AND ct.idDetalle is NULL AND ct.estatusCita IN (?, ?);",array($usuario, 6, 10)
         );
 
         return $query;
@@ -499,7 +513,7 @@ class CalendarioModel extends CI_Model
     {
         $query = $this->ch->query(
             "SELECT ct.idCita FROM ". $this->schema_cm .".citas AS ct
-            WHERE ct.idPaciente = ? AND ct.evaluacion is NULL AND ct.estatusCita IN (?)",array($usuario, 4)
+            WHERE ct.estatus = 1 AND ct.idPaciente = ? AND ct.evaluacion is NULL AND ct.estatusCita IN (?)",array($usuario, 4)
         );
 
         return $query;
@@ -511,7 +525,7 @@ class CalendarioModel extends CI_Model
             "SELECT ct.idCita FROM ". $this->schema_cm .".citas AS ct
             INNER JOIN ". $this->schema_cm .".usuarios as us ON ct.idEspecialista = us.idUsuario
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato 
-            WHERE ct.idPaciente = ? AND us2.idpuesto = ? AND ct.estatusCita IN (1, 6, 10);",array($usuario, $beneficio)
+            WHERE ct.estatus = 1 AND ct.idPaciente = ? AND us2.idpuesto = ? AND ct.estatusCita IN (1, 6, 10);",array($usuario, $beneficio)
         );
 
         return $query;
@@ -744,4 +758,23 @@ class CalendarioModel extends CI_Model
         WHERE us.idUsuario = $idEsp");
        return $query;
     }
+
+    public function eventCancelaCitasSinPago(){
+        $query = $this->ch->query("UPDATE ". $this->schema_cm .".citas
+	        SET estatusCita = 9, modificadoPor = 1, fechaModificacion = CURRENT_TIMESTAMP()
+	        WHERE idCita IN (
+              SELECT id FROM (
+                 SELECT idCita as id FROM ". $this->schema_cm .".citas 
+                 WHERE estatus = 1 AND 
+	        			((estatusCita IN (6, 10) AND tipoCita IN (1, 2) AND NOW() >= fechaCreacion + INTERVAL 10 MINUTE ) 
+	        		OR 
+	        			(estatusCita IN (10) AND fechaIntentoPago IS NOT NULL AND tipoCita IN (3) AND NOW() >= fechaIntentoPago + INTERVAL 10 MINUTE )
+	        		OR 
+	        			(estatusCita = 6 AND tipoCita IN (3) AND NOW() >= fechaCreacion + INTERVAL 24 HOUR ))
+              ) AS tmp
+            )");
+            
+        return $query;
+    }
+    
 }
