@@ -85,7 +85,9 @@ class UsuariosModel extends CI_Model {
 	public function getNameUser($idEspecialista)
 	{
 		$query = $this->ch->query(
-			"SELECT US.*, us2.idsede AS idSede, us2.idArea, us2.tipo_puesto AS tipoPuesto, us2.fingreso AS fechaIngreso,
+			"SELECT US.idUsuario, US.idContrato, US.password, US.idRol, US.externo, US.idAreaBeneficio,
+ 			US.estatus, US.creadoPor, US.fechaCreacion, US.modificadoPor, US.fechaModificacion,
+			us2.idsede AS idSede, us2.idArea, us2.tipo_puesto AS tipoPuesto, us2.fingreso AS fechaIngreso,
 			CONCAT(CONCAT (us2.nombre_persona,' ',us2.pri_apellido,' ',us2.sec_apellido),' ', '(', us2.nsede, ')') AS nombreCompleto,
 			us2.npuesto as nombrePuesto, us2.tipo_puesto, c.correo AS correo 
 			FROM ". $this->schema_cm .".usuarios US 
