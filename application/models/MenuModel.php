@@ -31,8 +31,11 @@ class MenuModel extends CI_Model {
         return $auth;
     }
 
-    public function getMenu($id_user, $id_rol)
+    public function getMenu($id_user, $id_rol, $permisos)
     {
+        // print_r([$id_user, $id_rol, $permisos]);
+        // exit;
+
         $subheader = array();
 
         $items = $this->ch->query("SELECT * FROM ". $this->schema_cm .".menu WHERE father IS NULL AND estatus = 1 ORDER BY posOrder")->result_array();
@@ -48,7 +51,7 @@ class MenuModel extends CI_Model {
                 $users_can_child = explode(',', $child['users_can']);
                 $users_not_child = explode(',', $child['users_not']);
 
-                if(in_array($id_rol, $roles_child)){
+                if(in_array($id_rol, $roles_child) || in_array($permisos, $roles_child)){
                     if(!in_array($id_user, $users_not_child)){
                         array_push($childs, $child);
                     }
@@ -66,7 +69,7 @@ class MenuModel extends CI_Model {
             $users_can_menu = explode(',', $item['users_can']);
             $users_not_menu = explode(',', $item['users_not']);
 
-            if(in_array($id_rol, $roles_menu)){
+            if(in_array($id_rol, $roles_menu) || in_array($permisos, $roles_menu)){
                 if(!in_array($id_user, $users_not_menu)){
                     array_push($menus, $item);
                 }

@@ -265,4 +265,14 @@ class GeneralModel extends CI_Model {
 		ORDER BY ar.narea ASC");
         return $query;
 	}
+
+    public function getPermisosOptions(){
+        $query = "SELECT
+            idOpcion as value,
+            nombre as label 
+        FROM opcionesporcatalogo 
+        WHERE idCatalogo = 3";
+
+        return $this->ch->query($query)->result();
+    }
 }

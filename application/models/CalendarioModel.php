@@ -76,7 +76,7 @@ class CalendarioModel extends CI_Model
         return $query;
 	}
 
-    public function getEspecialistaPorBeneficioYSede($sede, $area, $beneficio)
+    public function getEspecialistaPorBeneficioYSede($sede, $area, $beneficio, $numEmpleado)
     {
         $query = $this->ch->query(
             "SELECT DISTINCT us.idUsuario as id, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista
@@ -87,7 +87,8 @@ class CalendarioModel extends CI_Model
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_sedes AS s ON s.idsede = us2.idsede 
             LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_oficinas as ofi ON ofi.idoficina = axs.idOficina
             LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_sedes AS so ON so.idsede = ofi.idsede
-            WHERE us.estatus = 1 AND s.estatus_sede = 1 AND axs.estatus = 1 AND us.idRol = 3 AND opc.idCatalogo = 5 
+            WHERE us.estatus = 1 AND s.estatus_sede = 1 AND axs.estatus = 1 AND us.idRol = 3 AND opc.idCatalogo = 5
+            AND us2.num_empleado != '$numEmpleado'
             AND (axs.idSede = ? AND (axs.idArea IS NULL OR axs.idArea = ?)) AND us2.idpuesto = ?;", array($sede, $area, $beneficio)
         );
 

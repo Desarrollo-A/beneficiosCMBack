@@ -46,8 +46,9 @@ class Usuario extends BaseController {
 
 		$id_user = intval($user->idUsuario);
 		$id_rol = intval($user->idRol);
+		$permisos = intval($user->permisos);
 
-		echo json_encode($this->MenuModel->getMenu($id_user, $id_rol));
+		echo json_encode($this->MenuModel->getMenu($id_user, $id_rol, $permisos));
 	}
 
 	public function authorized(){
