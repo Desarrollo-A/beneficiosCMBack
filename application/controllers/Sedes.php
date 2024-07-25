@@ -21,6 +21,14 @@ class Sedes extends BaseController{
     }
 
     public function save(){
+        $area = $this->input->get('area');
+        $especialista = $this->input->get('especialista');
+        $modalidad = $this->input->get('modalidad');
+        $sede = $this->input->get('sede');
+        $checked = $this->input->get('checked') === 'true' ? 1 : 0;
+
+        $this->SedesModel->saveAtencionXEspecialista($area, $especialista, $modalidad, $sede, $checked);
+
         $this->json([]);
     }
 }

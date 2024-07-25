@@ -87,4 +87,35 @@ class SedesModel extends CI_Model {
 
         return $this->ch->query($query)->result();
     }
+
+    public function getAtencionXEspecialista($tipoCita, $idEspecialista){
+        $query = "SELECT
+        ate.idSede as value,
+        sd.nsede as label
+        FROM ". $this->schema_cm .".atencionxsede ate
+        LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_sedes AS sd ON sd.idsede = ate.idSede
+        WHERE ate.idEspecialista=$idEspecialista AND ate.tipoCita=$tipoCita AND ate.estatus = 1";
+
+        $sedes = $this->ch->query($query)->result_array();
+
+        return $sedes;
+    }
+
+    public function saveAtencionXEspecialista($area, $idEspecialista, $tipoCita, $idSede, $estatus){
+        $exist = $this->ch->query("SELECT * FROM ". $this->schema_cm .".atencionxsede
+            WHERE idEspecialista = $idEspecialista
+            AND idSede = $idSede
+            AND tipoCita = $tipoCita")->result();
+
+        if($exist){
+            $this->ch->query("UPDATE ". $this->schema_cm .".atencionxsede
+                SET estatus = $estatus
+                WHERE idEspecialista = $idEspecialista
+                AND idSede = $idSede
+                AND tipoCita = $tipoCita");
+        }else{
+            $this->ch->query("INSERT INTO ". $this->schema_cm .".atencionxsede (idEspecialista, idSede, tipoCita, estatus)
+                VALUES ($idEspecialista, $idSede, $tipoCita, $estatus)");
+        }
+    }
 }
