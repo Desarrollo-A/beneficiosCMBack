@@ -662,4 +662,32 @@ class GestorController extends BaseController {
 		echo json_encode($data, JSON_NUMERIC_CHECK);
 
 	}
+
+	public function getPermisosOptions(){
+		$options = $this->GeneralModel->getPermisosOptions();
+
+		$this->json(['data' => $options]);
+	}
+
+	public function savePermisos(){
+		$data = $this->input->post('dataValue');
+
+		if($data['permisos_id']){
+			$permisos = $data['permisos_id'];
+		}else{
+			$permisos = 'null';
+		}
+
+		$is_ok = $this->GestorModel->updatePermisosUsuarios($data['id'], $permisos);
+
+		if($is_ok){
+			$response["status"] = 'success';
+			$response["msg"] = "Usuario guardado";
+		}else{
+			$response["status"] = 'error';
+			$response["msg"] = "Error al guardar los datos";
+		}
+
+		$this->json($response);
+	}
 }

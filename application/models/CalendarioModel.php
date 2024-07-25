@@ -24,17 +24,19 @@ class CalendarioModel extends CI_Model
             CASE WHEN ofi.noficina IS NULL THEN 'VIRTUAL' ELSE ofi.noficina END as 'oficina',
             CASE WHEN ofi.direccion IS NULL THEN 'VIRTUAL' ELSE ofi.direccion END as 'ubicación', 
             CASE 
-            WHEN ct.estatusCita = 1 AND ct.tipoCita = 1 THEN '#ffe800'
-            WHEN ct.estatusCita = 1 AND ct.tipoCita = 2 THEN '#0000ff'
-            WHEN ct.estatusCita = 1 AND ct.tipoCita = 3 THEN '#ffa500'
-            WHEN ct.estatusCita = 2 THEN '#ff0000' 
-            WHEN ct.estatusCita = 3 THEN '#808080' 
-            WHEN ct.estatusCita = 4 THEN '#008000' 
-            WHEN ct.estatusCita = 5 THEN '#ff4d67' 
-            WHEN ct.estatusCita = 6 THEN '#00ffff' 
-            WHEN ct.estatusCita = 7 THEN '#ff0000' 
-            WHEN ct.estatusCita = 10 THEN '#33105D' 
-            END AS 'color', 
+                WHEN ct.estatusCita = 1 AND ct.tipoCita = 1 THEN '#ffe800'
+                WHEN ct.estatusCita = 1 AND ct.tipoCita = 2 THEN '#0000ff'
+                WHEN ct.estatusCita = 1 AND ct.tipoCita = 3 THEN '#ffa500'
+                WHEN ct.estatusCita = 2 THEN '#ff0000' 
+                WHEN ct.estatusCita = 3 THEN '#808080' 
+                WHEN ct.estatusCita = 4 THEN '#008000' 
+                WHEN ct.estatusCita = 5 THEN '#ff4d67' 
+                WHEN ct.estatusCita = 6 THEN '#00ffff' 
+                WHEN ct.estatusCita = 7 THEN '#ff0000' 
+                WHEN ct.estatusCita = 10 THEN '#33105D' 
+            END AS borderColor,
+            'transparent !important' AS color,
+
             CASE WHEN usEspe2.idpuesto = 537 THEN 'nutrición' WHEN usEspe2.idpuesto = 585 THEN 'psicología' WHEN usEspe2.idpuesto = 686 THEN 'guía espiritual' WHEN usEspe2.idpuesto = 158 THEN 'quantum balance' END AS 'beneficio',
             ct.fechaIntentoPago, 
 				CASE 
@@ -90,7 +92,7 @@ class CalendarioModel extends CI_Model
         return $query;
 	}
 
-    public function getEspecialistaPorBeneficioYSede($sede, $area, $beneficio)
+    public function getEspecialistaPorBeneficioYSede($sede, $area, $beneficio, $numEmpleado)
     {
         $query = $this->ch->query(
             "SELECT DISTINCT us.idUsuario as id, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista
@@ -101,7 +103,8 @@ class CalendarioModel extends CI_Model
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_sedes AS s ON s.idsede = us2.idsede 
             LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_oficinas as ofi ON ofi.idoficina = axs.idOficina
             LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_sedes AS so ON so.idsede = ofi.idsede
-            WHERE us.estatus = 1 AND s.estatus_sede = 1 AND axs.estatus = 1 AND us.idRol = 3 AND opc.idCatalogo = 5 
+            WHERE us.estatus = 1 AND s.estatus_sede = 1 AND axs.estatus = 1 AND us.idRol = 3 AND opc.idCatalogo = 5
+            AND us2.num_empleado != '$numEmpleado'
             AND (axs.idSede = ? AND (axs.idArea IS NULL OR axs.idArea = ?)) AND us2.idpuesto = ?;", array($sede, $area, $beneficio)
         );
 
@@ -551,6 +554,19 @@ class CalendarioModel extends CI_Model
                 WHEN ct.estatusCita = 7 THEN '#ff0000'
                 WHEN ct.estatusCita = 10 THEN '#33105D'
             END AS color,
+            CASE
+                WHEN ct.estatusCita = 0 THEN '#ff0000'
+                WHEN ct.estatusCita = 1 AND ct.tipoCita = 1 THEN '#ffe800'
+                WHEN ct.estatusCita = 1 AND ct.tipoCita = 2 THEN '#0000ff'
+                WHEN ct.estatusCita = 1 AND ct.tipoCita = 3 THEN '#ffa500'
+                WHEN ct.estatusCita = 2 THEN '#ff0000'
+                WHEN ct.estatusCita = 3 THEN '#808080'
+                WHEN ct.estatusCita = 4 THEN '#008000'
+                WHEN ct.estatusCita = 5 THEN '#ff4d67'
+                WHEN ct.estatusCita = 6 THEN '#00ffff'
+                WHEN ct.estatusCita = 7 THEN '#ff0000'
+                WHEN ct.estatusCita = 10 THEN '#33105D'
+            END AS borderColor,
             CASE
             WHEN usEspCH.idPuesto = 537 THEN 'nutrición'
             WHEN usEspCH.idPuesto= 585 THEN 'psicología'
