@@ -762,9 +762,12 @@ class CalendarioController extends BaseController{
 		$sede = $this->input->post('dataValue[sede]');
 		$beneficio = $this->input->post('dataValue[beneficio]');
 
+		$token = $this->headers('Token');
+        $user = json_decode(base64_decode(explode(".", $token)[1]));
+
 		$response['result'] = isset($area, $sede, $beneficio);
 		if ($response['result']) {
-			$rs = $this->CalendarioModel->getEspecialistaPorBeneficioYSede($sede, $area, $beneficio)->result();
+			$rs = $this->CalendarioModel->getEspecialistaPorBeneficioYSede($sede, $area, $beneficio, $user->numEmpleado)->result();
 			$response['result'] = count($rs) > 0;
 			if ($response['result']) {
 				$response['msg'] = '¡Listado de especialistas cargado exitosamente!';

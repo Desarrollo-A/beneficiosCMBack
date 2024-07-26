@@ -85,7 +85,7 @@ class ReportesController extends BaseController {
 
 	public function getCierrePacientes(){
 		$dt = $this->input->post('dataValue', true);
-		$data['data'] = $this->ReportesModel->getCierrePacientes($dt)->result();
+		$data['data'] = $this->ReportesModel->getCierrePacientes($dt);
 		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 

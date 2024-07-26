@@ -123,189 +123,190 @@ class ReportesModel extends CI_Model {
 
 	public function getPacientes($dt){
 
-	$area = $dt["esp"];
-	$idRol = $dt["idRol"];
-	$idUs = $dt["idUs"];
-	$tipoUsuario = $dt["tipoUsuario"];
+		$area = $dt["esp"];
+		$idRol = $dt["idRol"];
+		$permisos = isset($dt["permisos"]) ? intval($dt["permisos"]) : 0;
+		$idUs = $dt["idUs"];
+		$tipoUsuario = $dt["tipoUsuario"];
 
-	$usuarioCond = $tipoUsuario != 2 ? "AND us.externo = $tipoUsuario" : "";
+		$usuarioCond = $tipoUsuario != 2 ? "AND us.externo = $tipoUsuario" : "";
 
-	if($idRol == 1 || $idRol == 4){
-		
-		switch($area){
-			case 537:
-				
-				$query = $this->ch-> query("SELECT DISTINCT dp.idDetallePaciente AS id, us.idUsuario, 
-				IFNULL (CONCAT((us2.nombre_persona), ' ',(us2.pri_apellido), ' ', (us2.sec_apellido)), ext.nombre) AS nombre, 
-				IFNULL(us2.ndepto, 'NO APLICA') AS depto, IFNULL(us2.nsede, 'QRO') AS sede, 
-				IFNULL(us2.npuesto, 'NO APLICA') AS puesto, IFNULL(c.correo, ext.correo) AS correo, op.nombre AS estNut,
-				CASE 
-				WHEN us.externo = 0 THEN 'Colaborador' 
-				WHEN us.externo = 1 THEN 'Externo' 
-				END AS usuario
-				FROM ". $this->schema_cm .".detallepaciente dp 
-				LEFT JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = dp.idUsuario 
-				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
-				LEFT JOIN ". $this->schema_cm .".usuariosexternos ext ON ext.idcontrato = us.idContrato
-				LEFT JOIN ". $this->schema_cm .".catalogos ct ON ct.idCatalogo = 13 
-				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us4 ON us4.idpuesto = 537 
-				LEFT JOIN ". $this->schema_cm .".usuarios us3 ON us3.idRol = 3 AND us3.idContrato = us4.idcontrato 
-				LEFT JOIN ". $this->schema_cm .".citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = us3.idUsuario 
-				LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = ct.idCatalogo AND op.idOpcion = dp.estatusNut 
-				LEFT JOIN ". $this->schema_cm .".correostemporales AS c ON c.idContrato = us2.idcontrato 
-				WHERE estatusNut IS NOT null AND ci.estatusCita = 4 $usuarioCond");
-				break;
+		if($idRol == 1 || $idRol == 4 || $permisos == 5){
+			
+			switch($area){
+				case 537:
+					
+					$query = $this->ch-> query("SELECT DISTINCT dp.idDetallePaciente AS id, us.idUsuario, 
+					IFNULL (CONCAT((us2.nombre_persona), ' ',(us2.pri_apellido), ' ', (us2.sec_apellido)), ext.nombre) AS nombre, 
+					IFNULL(us2.ndepto, 'NO APLICA') AS depto, IFNULL(us2.nsede, 'QRO') AS sede, 
+					IFNULL(us2.npuesto, 'NO APLICA') AS puesto, IFNULL(c.correo, ext.correo) AS correo, op.nombre AS estNut,
+					CASE 
+					WHEN us.externo = 0 THEN 'Colaborador' 
+					WHEN us.externo = 1 THEN 'Externo' 
+					END AS usuario
+					FROM ". $this->schema_cm .".detallepaciente dp 
+					LEFT JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = dp.idUsuario 
+					LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
+					LEFT JOIN ". $this->schema_cm .".usuariosexternos ext ON ext.idcontrato = us.idContrato
+					LEFT JOIN ". $this->schema_cm .".catalogos ct ON ct.idCatalogo = 13 
+					LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us4 ON us4.idpuesto = 537 
+					LEFT JOIN ". $this->schema_cm .".usuarios us3 ON us3.idRol = 3 AND us3.idContrato = us4.idcontrato 
+					LEFT JOIN ". $this->schema_cm .".citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = us3.idUsuario 
+					LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = ct.idCatalogo AND op.idOpcion = dp.estatusNut 
+					LEFT JOIN ". $this->schema_cm .".correostemporales AS c ON c.idContrato = us2.idcontrato 
+					WHERE estatusNut IS NOT null AND ci.estatusCita = 4 $usuarioCond");
+					break;
 
-			case 585:
-				
-				$query = $this->ch-> query("SELECT DISTINCT dp.idDetallePaciente AS id, us.idUsuario, 
-				IFNULL (CONCAT((us2.nombre_persona), ' ',(us2.pri_apellido), ' ', (us2.sec_apellido)), ext.nombre) AS nombre, 
-				IFNULL(us2.ndepto, 'NO APLICA') AS depto, IFNULL(us2.nsede, 'QRO') AS sede, 
-				IFNULL(us2.npuesto, 'NO APLICA') AS puesto, IFNULL(c.correo, ext.correo) AS correo, op.nombre AS estPsi,
-				CASE 
-				WHEN us.externo = 0 THEN 'Colaborador' 
-				WHEN us.externo = 1 THEN 'Externo' 
-				END AS usuario
-				FROM ". $this->schema_cm .".detallepaciente dp 
-				LEFT JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = dp.idUsuario 
-				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
-				LEFT JOIN ". $this->schema_cm .".usuariosexternos ext ON ext.idcontrato = us.idContrato
-				LEFT JOIN ". $this->schema_cm .".catalogos ct ON ct.idCatalogo = 13 
-				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us4 ON us4.idpuesto = 585
-				LEFT JOIN ". $this->schema_cm .".usuarios us3 ON us3.idRol = 3 AND us3.idContrato = us4.idcontrato 
-				LEFT JOIN ". $this->schema_cm .".citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = us3.idUsuario 
-				LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = ct.idCatalogo AND op.idOpcion = dp.estatusPsi
-				LEFT JOIN ". $this->schema_cm .".correostemporales AS c ON c.idContrato = us2.idcontrato 
-				WHERE estatusPsi IS NOT null AND ci.estatusCita = 4 $usuarioCond");
-				break;
-				
-			case 158:
+				case 585:
+					
+					$query = $this->ch-> query("SELECT DISTINCT dp.idDetallePaciente AS id, us.idUsuario, 
+					IFNULL (CONCAT((us2.nombre_persona), ' ',(us2.pri_apellido), ' ', (us2.sec_apellido)), ext.nombre) AS nombre, 
+					IFNULL(us2.ndepto, 'NO APLICA') AS depto, IFNULL(us2.nsede, 'QRO') AS sede, 
+					IFNULL(us2.npuesto, 'NO APLICA') AS puesto, IFNULL(c.correo, ext.correo) AS correo, op.nombre AS estPsi,
+					CASE 
+					WHEN us.externo = 0 THEN 'Colaborador' 
+					WHEN us.externo = 1 THEN 'Externo' 
+					END AS usuario
+					FROM ". $this->schema_cm .".detallepaciente dp 
+					LEFT JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = dp.idUsuario 
+					LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
+					LEFT JOIN ". $this->schema_cm .".usuariosexternos ext ON ext.idcontrato = us.idContrato
+					LEFT JOIN ". $this->schema_cm .".catalogos ct ON ct.idCatalogo = 13 
+					LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us4 ON us4.idpuesto = 585
+					LEFT JOIN ". $this->schema_cm .".usuarios us3 ON us3.idRol = 3 AND us3.idContrato = us4.idcontrato 
+					LEFT JOIN ". $this->schema_cm .".citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = us3.idUsuario 
+					LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = ct.idCatalogo AND op.idOpcion = dp.estatusPsi
+					LEFT JOIN ". $this->schema_cm .".correostemporales AS c ON c.idContrato = us2.idcontrato 
+					WHERE estatusPsi IS NOT null AND ci.estatusCita = 4 $usuarioCond");
+					break;
+					
+				case 158:
 
-				$query = $this->ch-> query("SELECT DISTINCT dp.idDetallePaciente AS id, us.idUsuario, 
-				IFNULL (CONCAT((us2.nombre_persona), ' ',(us2.pri_apellido), ' ', (us2.sec_apellido)), ext.nombre) AS nombre, 
-				IFNULL(us2.ndepto, 'NO APLICA') AS depto, IFNULL(us2.nsede, 'QRO') AS sede, 
-				IFNULL(us2.npuesto, 'NO APLICA') AS puesto, IFNULL(c.correo, ext.correo) AS correo, op.nombre AS estQB,
-				CASE 
-				WHEN us.externo = 0 THEN 'Colaborador' 
-				WHEN us.externo = 1 THEN 'Externo' 
-				END AS usuario
-				FROM ". $this->schema_cm .".detallepaciente dp 
-				LEFT JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = dp.idUsuario 
-				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
-				LEFT JOIN ". $this->schema_cm .".usuariosexternos ext ON ext.idcontrato = us.idContrato
-				LEFT JOIN ". $this->schema_cm .".catalogos ct ON ct.idCatalogo = 13 
-				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us4 ON us4.idpuesto = 158
-				LEFT JOIN ". $this->schema_cm .".usuarios us3 ON us3.idRol = 3 AND us3.idContrato = us4.idcontrato 
-				LEFT JOIN ". $this->schema_cm .".citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = us3.idUsuario 
-				LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = ct.idCatalogo AND op.idOpcion = dp.estatusQB 
-				LEFT JOIN ". $this->schema_cm .".correostemporales AS c ON c.idContrato = us2.idcontrato 
-				WHERE estatusQB IS NOT null AND ci.estatusCita = 4 $usuarioCond");
-				break;
+					$query = $this->ch-> query("SELECT DISTINCT dp.idDetallePaciente AS id, us.idUsuario, 
+					IFNULL (CONCAT((us2.nombre_persona), ' ',(us2.pri_apellido), ' ', (us2.sec_apellido)), ext.nombre) AS nombre, 
+					IFNULL(us2.ndepto, 'NO APLICA') AS depto, IFNULL(us2.nsede, 'QRO') AS sede, 
+					IFNULL(us2.npuesto, 'NO APLICA') AS puesto, IFNULL(c.correo, ext.correo) AS correo, op.nombre AS estQB,
+					CASE 
+					WHEN us.externo = 0 THEN 'Colaborador' 
+					WHEN us.externo = 1 THEN 'Externo' 
+					END AS usuario
+					FROM ". $this->schema_cm .".detallepaciente dp 
+					LEFT JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = dp.idUsuario 
+					LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
+					LEFT JOIN ". $this->schema_cm .".usuariosexternos ext ON ext.idcontrato = us.idContrato
+					LEFT JOIN ". $this->schema_cm .".catalogos ct ON ct.idCatalogo = 13 
+					LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us4 ON us4.idpuesto = 158
+					LEFT JOIN ". $this->schema_cm .".usuarios us3 ON us3.idRol = 3 AND us3.idContrato = us4.idcontrato 
+					LEFT JOIN ". $this->schema_cm .".citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = us3.idUsuario 
+					LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = ct.idCatalogo AND op.idOpcion = dp.estatusQB 
+					LEFT JOIN ". $this->schema_cm .".correostemporales AS c ON c.idContrato = us2.idcontrato 
+					WHERE estatusQB IS NOT null AND ci.estatusCita = 4 $usuarioCond");
+					break;
 
-			case 686:
+				case 686:
 
-				$query = $this->ch-> query("SELECT DISTINCT dp.idDetallePaciente AS id, us.idUsuario, 
-				IFNULL (CONCAT((us2.nombre_persona), ' ',(us2.pri_apellido), ' ', (us2.sec_apellido)), ext.nombre) AS nombre, 
-				IFNULL(us2.ndepto, 'NO APLICA') AS depto, IFNULL(us2.nsede, 'QRO') AS sede, 
-				IFNULL(us2.npuesto, 'NO APLICA') AS puesto, IFNULL(c.correo, ext.correo) AS correo, op.nombre AS estGE,
-				CASE 
-				WHEN us.externo = 0 THEN 'Colaborador' 
-				WHEN us.externo = 1 THEN 'Externo' 
-				END AS usuario
-				FROM ". $this->schema_cm .".detallepaciente dp 
-				LEFT JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = dp.idUsuario 
-				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
-				LEFT JOIN ". $this->schema_cm .".usuariosexternos ext ON ext.idcontrato = us.idContrato
-				LEFT JOIN ". $this->schema_cm .".catalogos ct ON ct.idCatalogo = 13 
-				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us4 ON us4.idpuesto = 686
-				LEFT JOIN ". $this->schema_cm .".usuarios us3 ON us3.idRol = 3 AND us3.idContrato = us4.idcontrato 
-				LEFT JOIN ". $this->schema_cm .".citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = us3.idUsuario 
-				LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = ct.idCatalogo AND op.idOpcion = dp.estatusGE
-				LEFT JOIN ". $this->schema_cm .".correostemporales AS c ON c.idContrato = us2.idcontrato 
-				WHERE estatusGE IS NOT null AND ci.estatusCita = 4 $usuarioCond");
-				break;
+					$query = $this->ch-> query("SELECT DISTINCT dp.idDetallePaciente AS id, us.idUsuario, 
+					IFNULL (CONCAT((us2.nombre_persona), ' ',(us2.pri_apellido), ' ', (us2.sec_apellido)), ext.nombre) AS nombre, 
+					IFNULL(us2.ndepto, 'NO APLICA') AS depto, IFNULL(us2.nsede, 'QRO') AS sede, 
+					IFNULL(us2.npuesto, 'NO APLICA') AS puesto, IFNULL(c.correo, ext.correo) AS correo, op.nombre AS estGE,
+					CASE 
+					WHEN us.externo = 0 THEN 'Colaborador' 
+					WHEN us.externo = 1 THEN 'Externo' 
+					END AS usuario
+					FROM ". $this->schema_cm .".detallepaciente dp 
+					LEFT JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = dp.idUsuario 
+					LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
+					LEFT JOIN ". $this->schema_cm .".usuariosexternos ext ON ext.idcontrato = us.idContrato
+					LEFT JOIN ". $this->schema_cm .".catalogos ct ON ct.idCatalogo = 13 
+					LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us4 ON us4.idpuesto = 686
+					LEFT JOIN ". $this->schema_cm .".usuarios us3 ON us3.idRol = 3 AND us3.idContrato = us4.idcontrato 
+					LEFT JOIN ". $this->schema_cm .".citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = us3.idUsuario 
+					LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = ct.idCatalogo AND op.idOpcion = dp.estatusGE
+					LEFT JOIN ". $this->schema_cm .".correostemporales AS c ON c.idContrato = us2.idcontrato 
+					WHERE estatusGE IS NOT null AND ci.estatusCita = 4 $usuarioCond");
+					break;
+			}
+		}else if($idRol == 3){
+
+			switch($area){
+				case 537:
+
+					$query = $this->ch-> query("SELECT DISTINCT us.idUsuario, IFNULL (CONCAT((us2.nombre_persona), ' ',(us2.pri_apellido), ' ', (us2.sec_apellido)), ext.nombre) AS nombre,   
+					IFNULL(us2.ndepto, 'NO APLICA') AS depto, IFNULL(us2.nsede, 'QRO') AS sede, IFNULL(us2.npuesto, 'NO APLICA') AS puesto, op.nombre AS estNut,
+					CASE 
+					WHEN us.externo = 0 THEN 'Colaborador' 
+					WHEN us.externo = 1 THEN 'Externo' 
+					END AS usuario
+					FROM ". $this->schema_cm .".citas ct 
+					LEFT JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idPaciente
+					LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
+					LEFT JOIN ". $this->schema_cm .".usuariosexternos ext ON ext.idcontrato = us.idContrato
+					LEFT JOIN ". $this->schema_cm .".detallepaciente dtp ON dtp.idUsuario = us.idUsuario
+					LEFT JOIN ". $this->schema_cm .".catalogos cat ON cat.idCatalogo = 13
+					LEFT JOIN ". $this->schema_cm .".citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = $idUs
+					LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = cat.idCatalogo AND  op.idOpcion = dtp.estatusNut
+					WHERE ct.idEspecialista = $idUs AND estatusNut IS NOT null AND ci.estatusCita = 4 $usuarioCond");
+					break;
+
+				case 585:
+
+					$query = $this->ch-> query("SELECT DISTINCT us.idUsuario, IFNULL (CONCAT((us2.nombre_persona), ' ',(us2.pri_apellido), ' ', (us2.sec_apellido)), ext.nombre) AS nombre,   
+					IFNULL(us2.ndepto, 'NO APLICA') AS depto, IFNULL(us2.nsede, 'QRO') AS sede, IFNULL(us2.npuesto, 'NO APLICA') AS puesto, op.nombre AS estPsi,
+					CASE 
+					WHEN us.externo = 0 THEN 'Colaborador' 
+					WHEN us.externo = 1 THEN 'Externo' 
+					END AS usuario
+					FROM ". $this->schema_cm .".citas ct 
+					LEFT JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idPaciente
+					LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
+					LEFT JOIN ". $this->schema_cm .".usuariosexternos ext ON ext.idcontrato = us.idContrato
+					LEFT JOIN ". $this->schema_cm .".detallepaciente dtp ON dtp.idUsuario = us.idUsuario
+					LEFT JOIN ". $this->schema_cm .".catalogos cat ON cat.idCatalogo = 13
+					LEFT JOIN ". $this->schema_cm .".citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = $idUs
+					LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = cat.idCatalogo AND  op.idOpcion = dtp.estatusPsi
+					WHERE ct.idEspecialista = $idUs AND estatusPsi IS NOT null AND ci.estatusCita = 4 $usuarioCond");
+					break;
+
+				case 158:
+
+					$query = $this->ch-> query("SELECT DISTINCT us.idUsuario, IFNULL (CONCAT((us2.nombre_persona), ' ',(us2.pri_apellido), ' ', (us2.sec_apellido)), ext.nombre) AS nombre,   
+					IFNULL(us2.ndepto, 'NO APLICA') AS depto, IFNULL(us2.nsede, 'QRO') AS sede, IFNULL(us2.npuesto, 'NO APLICA') AS puesto, op.nombre AS estQB,
+					CASE 
+					WHEN us.externo = 0 THEN 'Colaborador' 
+					WHEN us.externo = 1 THEN 'Externo' 
+					END AS usuario
+					FROM ". $this->schema_cm .".citas ct 
+					LEFT JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idPaciente
+					LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
+					LEFT JOIN ". $this->schema_cm .".usuariosexternos ext ON ext.idcontrato = us.idContrato
+					LEFT JOIN ". $this->schema_cm .".detallepaciente dtp ON dtp.idUsuario = us.idUsuario
+					LEFT JOIN ". $this->schema_cm .".catalogos cat ON cat.idCatalogo = 13
+					LEFT JOIN ". $this->schema_cm .".citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = $idUs
+					LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = cat.idCatalogo AND  op.idOpcion = dtp.estatusQB
+					WHERE ct.idEspecialista = $idUs AND estatusQB IS NOT null AND ci.estatusCita = 4 $usuarioCond");
+					break;
+
+				case 686:
+
+					$query = $this->ch-> query("SELECT DISTINCT us.idUsuario, IFNULL (CONCAT((us2.nombre_persona), ' ',(us2.pri_apellido), ' ', (us2.sec_apellido)), ext.nombre) AS nombre,   
+					IFNULL(us2.ndepto, 'NO APLICA') AS depto, IFNULL(us2.nsede, 'QRO') AS sede, IFNULL(us2.npuesto, 'NO APLICA') AS puesto, op.nombre AS estGE,
+					CASE 
+					WHEN us.externo = 0 THEN 'Colaborador' 
+					WHEN us.externo = 1 THEN 'Externo' 
+					END AS usuario
+					FROM ". $this->schema_cm .".citas ct 
+					LEFT JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idPaciente
+					LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
+					LEFT JOIN ". $this->schema_cm .".usuariosexternos ext ON ext.idcontrato = us.idContrato
+					LEFT JOIN ". $this->schema_cm .".detallepaciente dtp ON dtp.idUsuario = us.idUsuario
+					LEFT JOIN ". $this->schema_cm .".catalogos cat ON cat.idCatalogo = 13
+					LEFT JOIN ". $this->schema_cm .".citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = $idUs
+					LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = cat.idCatalogo AND  op.idOpcion = dtp.estatusGE
+					WHERE ct.idEspecialista = $idUs AND estatusGE IS NOT null AND ci.estatusCita = 4 $usuarioCond");
+					break;
+			}
+
 		}
-	}else if($idRol == 3){
-
-		switch($area){
-			case 537:
-
-				$query = $this->ch-> query("SELECT DISTINCT us.idUsuario, IFNULL (CONCAT((us2.nombre_persona), ' ',(us2.pri_apellido), ' ', (us2.sec_apellido)), ext.nombre) AS nombre,   
-				IFNULL(us2.ndepto, 'NO APLICA') AS depto, IFNULL(us2.nsede, 'QRO') AS sede, IFNULL(us2.npuesto, 'NO APLICA') AS puesto, op.nombre AS estNut,
-				CASE 
-				WHEN us.externo = 0 THEN 'Colaborador' 
-				WHEN us.externo = 1 THEN 'Externo' 
-				END AS usuario
-				FROM ". $this->schema_cm .".citas ct 
-				LEFT JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idPaciente
-				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
-				LEFT JOIN ". $this->schema_cm .".usuariosexternos ext ON ext.idcontrato = us.idContrato
-				LEFT JOIN ". $this->schema_cm .".detallepaciente dtp ON dtp.idUsuario = us.idUsuario
-				LEFT JOIN ". $this->schema_cm .".catalogos cat ON cat.idCatalogo = 13
-				LEFT JOIN ". $this->schema_cm .".citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = $idUs
-				LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = cat.idCatalogo AND  op.idOpcion = dtp.estatusNut
-				WHERE ct.idEspecialista = $idUs AND estatusNut IS NOT null AND ci.estatusCita = 4 $usuarioCond");
-				break;
-
-			case 585:
-
-				$query = $this->ch-> query("SELECT DISTINCT us.idUsuario, IFNULL (CONCAT((us2.nombre_persona), ' ',(us2.pri_apellido), ' ', (us2.sec_apellido)), ext.nombre) AS nombre,   
-				IFNULL(us2.ndepto, 'NO APLICA') AS depto, IFNULL(us2.nsede, 'QRO') AS sede, IFNULL(us2.npuesto, 'NO APLICA') AS puesto, op.nombre AS estPsi,
-				CASE 
-				WHEN us.externo = 0 THEN 'Colaborador' 
-				WHEN us.externo = 1 THEN 'Externo' 
-				END AS usuario
-				FROM ". $this->schema_cm .".citas ct 
-				LEFT JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idPaciente
-				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
-				LEFT JOIN ". $this->schema_cm .".usuariosexternos ext ON ext.idcontrato = us.idContrato
-				LEFT JOIN ". $this->schema_cm .".detallepaciente dtp ON dtp.idUsuario = us.idUsuario
-				LEFT JOIN ". $this->schema_cm .".catalogos cat ON cat.idCatalogo = 13
-				LEFT JOIN ". $this->schema_cm .".citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = $idUs
-				LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = cat.idCatalogo AND  op.idOpcion = dtp.estatusPsi
-				WHERE ct.idEspecialista = $idUs AND estatusPsi IS NOT null AND ci.estatusCita = 4 $usuarioCond");
-				break;
-
-			case 158:
-
-				$query = $this->ch-> query("SELECT DISTINCT us.idUsuario, IFNULL (CONCAT((us2.nombre_persona), ' ',(us2.pri_apellido), ' ', (us2.sec_apellido)), ext.nombre) AS nombre,   
-				IFNULL(us2.ndepto, 'NO APLICA') AS depto, IFNULL(us2.nsede, 'QRO') AS sede, IFNULL(us2.npuesto, 'NO APLICA') AS puesto, op.nombre AS estQB,
-				CASE 
-				WHEN us.externo = 0 THEN 'Colaborador' 
-				WHEN us.externo = 1 THEN 'Externo' 
-				END AS usuario
-				FROM ". $this->schema_cm .".citas ct 
-				LEFT JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idPaciente
-				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
-				LEFT JOIN ". $this->schema_cm .".usuariosexternos ext ON ext.idcontrato = us.idContrato
-				LEFT JOIN ". $this->schema_cm .".detallepaciente dtp ON dtp.idUsuario = us.idUsuario
-				LEFT JOIN ". $this->schema_cm .".catalogos cat ON cat.idCatalogo = 13
-				LEFT JOIN ". $this->schema_cm .".citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = $idUs
-				LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = cat.idCatalogo AND  op.idOpcion = dtp.estatusQB
-				WHERE ct.idEspecialista = $idUs AND estatusQB IS NOT null AND ci.estatusCita = 4 $usuarioCond");
-				break;
-
-			case 686:
-
-				$query = $this->ch-> query("SELECT DISTINCT us.idUsuario, IFNULL (CONCAT((us2.nombre_persona), ' ',(us2.pri_apellido), ' ', (us2.sec_apellido)), ext.nombre) AS nombre,   
-				IFNULL(us2.ndepto, 'NO APLICA') AS depto, IFNULL(us2.nsede, 'QRO') AS sede, IFNULL(us2.npuesto, 'NO APLICA') AS puesto, op.nombre AS estGE,
-				CASE 
-				WHEN us.externo = 0 THEN 'Colaborador' 
-				WHEN us.externo = 1 THEN 'Externo' 
-				END AS usuario
-				FROM ". $this->schema_cm .".citas ct 
-				LEFT JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idPaciente
-				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
-				LEFT JOIN ". $this->schema_cm .".usuariosexternos ext ON ext.idcontrato = us.idContrato
-				LEFT JOIN ". $this->schema_cm .".detallepaciente dtp ON dtp.idUsuario = us.idUsuario
-				LEFT JOIN ". $this->schema_cm .".catalogos cat ON cat.idCatalogo = 13
-				LEFT JOIN ". $this->schema_cm .".citas ci ON ci.idPaciente = us.idUsuario AND ci.idEspecialista = $idUs
-				LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = cat.idCatalogo AND  op.idOpcion = dtp.estatusGE
-				WHERE ct.idEspecialista = $idUs AND estatusGE IS NOT null AND ci.estatusCita = 4 $usuarioCond");
-				break;
-		}
-
-	}
 		
 		return $query;
 	}
@@ -320,6 +321,7 @@ class ReportesModel extends CI_Model {
 		$fechaFn = $dt["fhF"];
 		$mod = isset($dt["modalidad"][0]) ? $dt["modalidad"][0] : '0';
 		$tipo = $dt["tipo"];
+		$permisos = isset($dt["permisos"]) ? intval($dt["permisos"]) : 0;
 
 		$usuarioCond = $tipo != 2 ? "AND us.externo = $tipo" : "";
 		$usuarioCond2 = $tipo != 2 ? "AND us3.externo = $tipo" : "";
@@ -328,13 +330,13 @@ class ReportesModel extends CI_Model {
 		$fecha->modify('+1 day');
 		$fechaF = $fecha->format('Y-m-d');
 
-		if($area == "0" && $rol == 4 && $mod == "0"){
+		if($area == "0" && ($rol == 4 || $permisos == 5) && $mod == "0"){
 
 			$query = $this->ch-> query("SELECT COUNT(DISTINCT idPaciente) AS TotalPacientes
 			FROM ". $this->schema_cm .".citas ct
 			INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idPaciente 
 			WHERE ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF' AND ct.estatusCita = 4 $usuarioCond");
-			return $query;
+			return $query->result();
 
 		}else if($area != "0" && $rol == 4 && $idEsp == "0" && $mod == "0"){
 
@@ -347,9 +349,9 @@ class ReportesModel extends CI_Model {
 			INNER JOIN ". $this->schema_cm .".usuarios us3 ON us3.idUsuario = ct.idPaciente 
 			WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF') 
 			AND us2.npuesto IN ('$ar') AND ct.estatusCita = 4 $usuarioCond2");
-			return $query;
+			return $query->result();
 
-		}else if($area != "0" && $rol == 4 && $idEsp != "0" && $mod == "0"){
+		}else if($area != "0" && ($rol == 4 || $permisos == 5) && $idEsp != "0" && $mod == "0"){
 
 			$ar = implode("','", $dt["esp"]);
 			$nombres = implode("','", $dt["idEsp"]);
@@ -362,9 +364,9 @@ class ReportesModel extends CI_Model {
 			WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF') 
 			AND us2.npuesto IN ('$ar') AND ct.estatusCita = 4 
 			AND CONCAT(us2.nombre_persona,' ',us2.pri_apellido,' ',us2.sec_apellido) IN ('$nombres') $usuarioCond2");
-			return $query;
+			return $query->result();
 
-		}else if($area == "0" && $rol == 4 && $idEsp == "0" && $mod != "0"){
+		}else if($area == "0" && ($rol == 4 || $permisos == 5) && $idEsp == "0" && $mod != "0"){
 
 			$modalidad = implode("','", $dt["modalidad"]);
 
@@ -378,9 +380,9 @@ class ReportesModel extends CI_Model {
 			WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF') 
 			AND op2.nombre IN ('$modalidad')
 			AND ct.estatusCita = 4 $usuarioCond2");
-			return $query;
+			return $query->result();
 
-		}else if($area != "0" && $rol == 4 && $idEsp == "0" && $mod != "0"){
+		}else if($area != "0" && ($rol == 4 || $permisos == 5) && $idEsp == "0" && $mod != "0"){
 
 			$modalidad = implode("','", $dt["modalidad"]);
 			$ar = implode("','", $dt["esp"]);
@@ -395,9 +397,9 @@ class ReportesModel extends CI_Model {
 			WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF') 
 			AND op2.nombre IN ('$modalidad') AND us2.npuesto IN ('$ar')
 			AND ct.estatusCita = 4 $usuarioCond2");
-			return $query;	
+			return $query->result();	
 
-		}else if($area != "0" && $rol == 4 && $idEsp != "0" && $mod != "0"){
+		}else if($area != "0" && ($rol == 4 || $permisos == 5) && $idEsp != "0" && $mod != "0"){
 
 			$modalidad = implode("','", $dt["modalidad"]);
 			$nombres = implode("','", $dt["idEsp"]);
@@ -412,7 +414,7 @@ class ReportesModel extends CI_Model {
 			WHERE (ct.fechaModificacion >= '$fechaI' 
 			AND ct.fechaModificacion < '$fechaF') AND CONCAT(us2.nombre_persona,' ',us2.pri_apellido,' ',us2.sec_apellido) IN ('$nombres')
 			AND ct.estatusCita = 4 AND op2.nombre IN ('$modalidad') $usuarioCond2");
-			return $query;
+			return $query->result();
 
 		}else if($rol == 3 && $mod == "0"){
 
@@ -424,7 +426,7 @@ class ReportesModel extends CI_Model {
 			WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
 			AND us.idUsuario = $idUsr AND ct.estatusCita = 4 $usuarioCond2
 			");
-			return $query;
+			return $query->result();
 		
 		}else if($rol == 3 && $mod != "0"){
 
@@ -439,8 +441,7 @@ class ReportesModel extends CI_Model {
 			INNER JOIN ". $this->schema_cm .".usuarios us3 ON us3.idUsuario = ct.idPaciente 
 			WHERE (ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF')
 			AND us.idUsuario = $idUsr AND ct.estatusCita = 4 AND op2.nombre IN ('$modalidad') $usuarioCond2");
-			return $query;
-		
+			return $query->result();
 		}
 
 	}
@@ -454,6 +455,7 @@ class ReportesModel extends CI_Model {
 		$fechaI = $dt["fhI"];
 		$fechaFn = $dt["fhF"];
 		$reporte = $dt["reporte"];
+		$permisos = isset($dt["permisos"]) ? $dt["permisos"] : 2;
 
 		$mod = isset($dt["modalidad"][0]) ? $dt["modalidad"][0] : '0';
 
@@ -463,7 +465,7 @@ class ReportesModel extends CI_Model {
 
 	if($reporte == 0){
 
-		if($area == "0" && $mod == "0" && $rol == 4){
+		if($area == "0" && $mod == "0" && ($rol == 4 || $permisos == 5)){
 
 			$query = $this->ch-> query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
 			FROM (
@@ -475,7 +477,7 @@ class ReportesModel extends CI_Model {
 			) AS sub");
 			return $query;
 
-		}else if($area != "0" && $rol == 4 && $idEsp == "0" && $mod == "0"){
+		}else if($area != "0" && ($rol == 4 || $permisos == 5) && $idEsp == "0" && $mod == "0"){
 
 			$ar = implode("','", $dt["esp"]);
 
@@ -492,7 +494,7 @@ class ReportesModel extends CI_Model {
 			) AS sub");
 			return $query;
 
-		}else if($area != "0" && $rol == 4 && $idEsp != "0" && $mod == "0"){
+		}else if($area != "0" && ($rol == 4 || $permisos == 5) && $idEsp != "0" && $mod == "0"){
 
 			$nombres = implode("','", $dt["idEsp"]);
 			$ar = implode("','", $dt["esp"]);
@@ -511,7 +513,7 @@ class ReportesModel extends CI_Model {
 			) AS sub");
 			return $query;
 		
-		}else if($area == "0" && $rol == 4 && $idEsp == "0" && $mod != "0"){
+		}else if($area == "0" && ($rol == 4 || $permisos == 5) && $idEsp == "0" && $mod != "0"){
 
 			$modalidad = implode("','", $dt["modalidad"]);
 
@@ -529,7 +531,7 @@ class ReportesModel extends CI_Model {
 			) AS sub");
 			return $query;
 
-		}else if($area != "0" && $rol == 4 && $idEsp == "0" && $mod != "0"){
+		}else if($area != "0" && ($rol == 4 || $permisos == 5) && $idEsp == "0" && $mod != "0"){
 
 			$modalidad = implode("','", $dt["modalidad"]);
 			$ar = implode("','", $dt["esp"]);
@@ -549,7 +551,7 @@ class ReportesModel extends CI_Model {
 			) AS sub");
 			return $query;	
 		
-		}else if($area != "0" && $rol == 4 && $idEsp != "0" && $mod != "0"){
+		}else if($area != "0" && ($rol == 4 || $permisos == 5) && $idEsp != "0" && $mod != "0"){
 
 			$nombres = implode("','", $dt["idEsp"]);
 			$modalidad = implode("','", $dt["modalidad"]);
@@ -612,7 +614,7 @@ class ReportesModel extends CI_Model {
 	}else if($reporte !== 0 && $reporte !== 2)
 	{
 
-		if($area == "0" && $mod == "0" && $rol == 4){
+		if($area == "0" && $mod == "0" && ($rol == 4 || $permisos == 5)){
 
 			$query = $this->ch-> query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
 			FROM (
@@ -624,7 +626,7 @@ class ReportesModel extends CI_Model {
 			) AS sub");
 			return $query;
 
-		}else if($area != "0" && $rol == 4 && $idEsp == "0" && $mod == "0"){
+		}else if($area != "0" && ($rol == 4 || $permisos == 5) && $idEsp == "0" && $mod == "0"){
 
 			$ar = implode("','", $dt["esp"]);
 
@@ -640,7 +642,7 @@ class ReportesModel extends CI_Model {
 			) AS sub");
 			return $query;
 
-		}else if($area != "0" && $rol == 4 && $idEsp != "0" && $mod == "0"){
+		}else if($area != "0" && ($rol == 4 || $permisos == 5) && $idEsp != "0" && $mod == "0"){
 
 			$nombres = implode("','", $dt["idEsp"]);
 			$ar = implode("','", $dt["esp"]);
@@ -659,7 +661,7 @@ class ReportesModel extends CI_Model {
 			) AS sub");
 			return $query;
 		
-		}else if($area == "0" && $rol == 4 && $idEsp == "0" && $mod != "0"){
+		}else if($area == "0" && ($rol == 4 || $permisos == 5) && $idEsp == "0" && $mod != "0"){
 
 			$modalidad = implode("','", $dt["modalidad"]);
 
@@ -676,7 +678,7 @@ class ReportesModel extends CI_Model {
 			) AS sub");
 			return $query;
 		
-		}else if($area != "0" && $rol == 4 && $idEsp != "0" && $mod != "0"){
+		}else if($area != "0" && ($rol == 4 || $permisos == 5) && $idEsp != "0" && $mod != "0"){
 
 			$nombres = implode("','", $dt["idEsp"]);
 			$modalidad = implode("','", $dt["modalidad"]);
@@ -698,7 +700,7 @@ class ReportesModel extends CI_Model {
 			) AS sub");
 			return $query;
 
-		}else if($area != "0" && $rol == 4 && $idEsp == "0" && $mod != "0"){
+		}else if($area != "0" && ($rol == 4 || $permisos == 5) && $idEsp == "0" && $mod != "0"){
 
 			$modalidad = implode("','", $dt["modalidad"]);
 			$ar = implode("','", $dt["esp"]);
@@ -763,7 +765,7 @@ class ReportesModel extends CI_Model {
 	}else if($reporte == 2)
 	{
 
-		if($area == "0" && $mod == "0" && $rol == 4){
+		if($area == "0" && $mod == "0" && ($rol == 4 || $permisos == 5)){
 
 			$query = $this->ch-> query("SELECT SUM(sub.TotalCantidad) AS TotalIngreso
 			FROM ( SELECT DISTINCT ct.idDetalle, dp.cantidad AS TotalCantidad
@@ -773,7 +775,7 @@ class ReportesModel extends CI_Model {
 			) AS sub");
 			return $query;
 
-		}else if($area != "0" && $rol == 4 && $idEsp == "0" && $mod == "0"){
+		}else if($area != "0" && ($rol == 4 || $permisos == 5) && $idEsp == "0" && $mod == "0"){
 
 			$ar = implode("','", $dt["esp"]);
 
@@ -790,7 +792,7 @@ class ReportesModel extends CI_Model {
 			) AS sub");
 			return $query;
 		
-		}else if($area == "0" && $rol == 4 && $idEsp == "0" && $mod != "0"){
+		}else if($area == "0" && ($rol == 4 || $permisos == 5) && $idEsp == "0" && $mod != "0"){
 
 			$modalidad = implode("','", $dt["modalidad"]);
 
@@ -807,7 +809,7 @@ class ReportesModel extends CI_Model {
 			) AS sub");
 			return $query;
 
-		}else if($area != "0" && $rol == 4 && $idEsp != "0" && $mod == "0"){
+		}else if($area != "0" && ($rol == 4 || $permisos == 5) && $idEsp != "0" && $mod == "0"){
 
 			$nombres = implode("','", $dt["idEsp"]);
 			$ar = implode("','", $dt["esp"]);
@@ -825,7 +827,7 @@ class ReportesModel extends CI_Model {
 			) AS sub");
 			return $query;
 		
-		}else if($area != "0" && $rol == 4 && $idEsp != "0" && $mod != "0"){
+		}else if($area != "0" && ($rol == 4 || $permisos == 5) && $idEsp != "0" && $mod != "0"){
 
 			$nombres = implode("','", $dt["idEsp"]);
 			$modalidad = implode("','", $dt["modalidad"]);
@@ -846,7 +848,7 @@ class ReportesModel extends CI_Model {
 			) AS sub");
 			return $query;
 
-		}else if($area != "0" && $rol == 4 && $idEsp == "0" && $mod != "0"){
+		}else if($area != "0" && ($rol == 4 || $permisos == 5) && $idEsp == "0" && $mod != "0"){
 
 			$modalidad = implode("','", $dt["modalidad"]);
 			$ar = implode("','", $dt["esp"]);
