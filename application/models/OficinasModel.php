@@ -9,7 +9,7 @@ class OficinasModel extends CI_Model {
     }
 
     public function getOficinas($idsede){
-         $query = "SELECT * FROM ". $this->schema_ch .".beneficioscm_vista_oficinas WHERE idsede = $idsede ";
+         $query = "SELECT * FROM ". $this->schema_ch .".beneficioscm_vista_oficinas WHERE idsede = $idsede ORDER BY noficina";
 
         return $this->ch->query($query)->result();
     }

@@ -143,7 +143,7 @@ class Especialistas extends BaseController{
         $modalidad = $this->input->get('modalidad');
         $especialista = $this->input->get('especialista');
 
-        $sedes = $this->SedesModel->getAtencionXEspecialista($modalidad, $especialista);
+        $sedes = $this->SedesModel->getSedesActivasXEspecialista($modalidad, $especialista);
 
         $this->json($sedes);
     }

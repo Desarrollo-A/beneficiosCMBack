@@ -31,6 +31,17 @@ class Sedes extends BaseController{
 
         $this->json([]);
     }
+
+    public function oficina(){
+        $especialista = $this->input->get('especialista');
+        $modalidad = $this->input->get('modalidad');
+        $sede = $this->input->get('sede');
+        $oficina = $this->input->get('oficina');
+
+        $this->SedesModel->saveOficinaXSede($especialista, $modalidad, $sede, $oficina);
+
+        $this->json([]);
+    }
 }
 
 ?>
