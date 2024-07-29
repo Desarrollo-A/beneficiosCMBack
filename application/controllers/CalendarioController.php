@@ -1559,9 +1559,11 @@ class CalendarioController extends BaseController{
 				$response['data'] = $dias;
 				$response['msg'] = '¡Sedes de atención de especialista cargadas exitosamente!';
 			}else {
+				$response['data'] = [];
 				$response['msg'] = '¡No existen registros!';
 			}
 		}else {
+			$response['data'] = [];
 			$response['msg'] = "¡Parámetros inválidos!";
 		}
 
