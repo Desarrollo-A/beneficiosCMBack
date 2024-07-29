@@ -10,6 +10,8 @@ class Areas extends BaseController{
         $this->ch = $this->load->database('ch', TRUE);
         $this->schema_cm = $this->config->item('schema_cm');
         $this->schema_ch = $this->config->item('schema_ch');
+
+        $this->load->model('AreasModel');
     }
 
     public function citas(){
@@ -40,6 +42,12 @@ class Areas extends BaseController{
         }
 
         return $this->json($citas);
+    }
+
+    public function list(){
+        $areas = $this->AreasModel->getAreas();
+
+        $this->json($areas);
     }
 }
 
