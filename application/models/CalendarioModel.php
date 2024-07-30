@@ -218,7 +218,7 @@ class CalendarioModel extends CI_Model
             "SELECT *FROM ". $this->schema_cm .".citas AS ct 
             INNER JOIN ". $this->schema_cm .".usuarios as us ON us.idUsuario = ct.idEspecialista
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
-            WHERE ct.idPaciente = ? AND us2.idpuesto = ?;",
+            WHERE us2.activo = 1 AND ct.idPaciente = ? AND us2.idpuesto = ?;",
             array($usuario, $beneficio)
         );
 
