@@ -208,7 +208,7 @@ class CalendarioModel extends CI_Model
         INNER JOIN ". $this->schema_cm .".usuarios AS us ON us.idUsuario = ct.idEspecialista 
         INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
         INNER JOIN ". $this->schema_cm .".atencionxsede AS axs ON axs.idAtencionXSede = ct.idAtencionXSede 
-        WHERE ct.idPaciente = ? AND us2.idpuesto = ? ORDER BY idCita DESC LIMIT 1;", array($usuario, $beneficio));
+        WHERE ct.idPaciente = ? AND us2.idpuesto = ? AND us2.activo = 1 ORDER BY idCita DESC LIMIT 1;", array($usuario, $beneficio));
     
         return $query;
     }
@@ -230,7 +230,7 @@ class CalendarioModel extends CI_Model
         "SELECT axs.idSede as value, s.nsede AS label
         FROM ". $this->schema_cm .".atencionxsede AS axs
         LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_sedes AS s ON s.idsede = axs.idSede
-        WHERE axs.idEspecialista=?  AND axs.tipoCita = ?", array($idUsuario, 1));
+        WHERE axs.idEspecialista=?  AND axs.tipoCita = ? AND axs.estatus = 1", array($idUsuario, 1));
 
         return $query;
     }
