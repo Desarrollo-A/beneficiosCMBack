@@ -670,15 +670,17 @@ class GestorController extends BaseController {
 	}
 
 	public function savePermisos(){
-		$data = $this->input->post('dataValue');
 
-		if($data['permisos_id']){
-			$permisos = $data['permisos_id'];
+		$data = $this->input->post("dataValue", true);
+		$dataValue = json_decode($data, true);
+
+		if($dataValue['permisos_id']){
+			$permisos = $dataValue['permisos_id'];
 		}else{
 			$permisos = 'null';
 		}
 
-		$is_ok = $this->GestorModel->updatePermisosUsuarios($data['id'], $permisos);
+		$is_ok = $this->GestorModel->updatePermisosUsuarios($dataValue['id'], $permisos);
 
 		if($is_ok){
 			$response["status"] = 'success';
