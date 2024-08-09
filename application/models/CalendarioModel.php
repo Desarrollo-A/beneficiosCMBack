@@ -543,9 +543,8 @@ class CalendarioModel extends CI_Model
             tf.fechasFolio, idEventoGoogle, ct.tipoCita, aps.tipoCita as modalidad, aps.idSede, dp.estatusPago, us2.idsede AS idSedePaciente,
             CASE
                 WHEN ct.estatusCita = 0 THEN '#ff0000'
-                WHEN ct.estatusCita = 1 AND ct.tipoCita = 1 THEN '#ffe800'
-                WHEN ct.estatusCita = 1 AND ct.tipoCita = 2 THEN '#0000ff'
-                WHEN ct.estatusCita = 1 AND ct.tipoCita = 3 THEN '#ffa500'
+                WHEN ct.estatusCita = 1 AND aps.tipoCita = 1 THEN '#ffe800'
+                WHEN ct.estatusCita = 1 AND aps.tipoCita = 2 THEN '#0000ff'
                 WHEN ct.estatusCita = 2 THEN '#ff0000'
                 WHEN ct.estatusCita = 3 THEN '#808080'
                 WHEN ct.estatusCita = 4 THEN '#008000'
@@ -556,9 +555,8 @@ class CalendarioModel extends CI_Model
             END AS color,
             CASE
                 WHEN ct.estatusCita = 0 THEN '#ff0000'
-                WHEN ct.estatusCita = 1 AND ct.tipoCita = 1 THEN '#ffe800'
-                WHEN ct.estatusCita = 1 AND ct.tipoCita = 2 THEN '#0000ff'
-                WHEN ct.estatusCita = 1 AND ct.tipoCita = 3 THEN '#ffa500'
+                WHEN ct.estatusCita = 1 AND aps.tipoCita = 1 THEN '#ffe800'
+                WHEN ct.estatusCita = 1 AND aps.tipoCita = 2 THEN '#0000ff'
                 WHEN ct.estatusCita = 2 THEN '#ff0000'
                 WHEN ct.estatusCita = 3 THEN '#808080'
                 WHEN ct.estatusCita = 4 THEN '#008000'
@@ -602,9 +600,8 @@ class CalendarioModel extends CI_Model
             ct.idDetalle, ct.idAtencionXSede, us.externo, CONCAT(IFNULL(usEspCH.nombre_persona, ''), ' ', IFNULL(usEspCH.pri_apellido, ''), ' ', IFNULL(usEspCH.sec_apellido, '')) AS especialista, ct.fechaCreacion, usEspCH.tipo_puesto AS tipoPuesto,
             tf.fechasFolio, ct.idEventoGoogle, ct.tipoCita, aps.tipoCita as modalidad, aps.idSede, dp.estatusPago,
             CASE WHEN ct.estatusCita = 0 THEN '#ff0000'
-               WHEN ct.estatusCita = 1 AND ct.tipoCita = 1 THEN '#ffe800'
-               WHEN ct.estatusCita = 1 AND ct.tipoCita = 2 THEN '#0000ff'
-               WHEN ct.estatusCita = 1 AND ct.tipoCita = 3 THEN '#ffa500'
+               WHEN ct.estatusCita = 1 AND aps.tipoCita = 1 THEN '#ffe800'
+               WHEN ct.estatusCita = 1 AND aps.tipoCita = 2 THEN '#0000ff'
                WHEN ct.estatusCita = 2 THEN '#ff0000'
                WHEN ct.estatusCita = 3 THEN '#808080'
                WHEN ct.estatusCita = 4 THEN '#008000'
