@@ -171,6 +171,7 @@ class Api extends BaseController{
 		    $this->email->subject($subject);
 
             $response["result"] = $this->email->send();
+
 		    if ($response["result"]) {
 		    	$response["msg"] = "Se ha enviado el correo";
 		    }
