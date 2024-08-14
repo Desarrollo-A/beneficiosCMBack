@@ -416,7 +416,8 @@ class CalendarioModel extends CI_Model
     public function getOccupied($month, $idUsuario, $dates){
         $query = $this->ch->query(
             "SELECT idUnico as id, titulo as title, fechaInicio as 'start', fechaFinal as 'end',
-            'purple' AS 'color', estatus, 'cancel' AS 'type'
+            'purple' AS 'color', estatus, 'cancel' AS 'type',
+            '#00FF0000' AS borderColor
             FROM ". $this->schema_cm .".horariosocupados
             WHERE YEAR(fechaInicio) IN (?, ?)
             AND MONTH(fechaInicio) IN (?, ?, ?)
