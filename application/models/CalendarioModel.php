@@ -34,9 +34,19 @@ class CalendarioModel extends CI_Model
                 WHEN ct.estatusCita = 6 THEN '#00ffff' 
                 WHEN ct.estatusCita = 7 THEN '#ff0000' 
                 WHEN ct.estatusCita = 10 THEN '#33105D' 
+            END AS color,
+            CASE 
+                WHEN ct.estatusCita = 0 THEN '#ff0000'
+                WHEN ct.estatusCita = 1 AND atc.tipoCita = 1 THEN '#ffe800'
+                WHEN ct.estatusCita = 1 AND atc.tipoCita = 2 THEN '#0000ff'
+                WHEN ct.estatusCita = 2 THEN '#ff0000'
+                WHEN ct.estatusCita = 3 THEN '#808080'
+                WHEN ct.estatusCita = 4 THEN '#008000'
+                WHEN ct.estatusCita = 5 THEN '#ff4d67'
+                WHEN ct.estatusCita = 6 THEN '#00ffff'
+                WHEN ct.estatusCita = 7 THEN '#ff0000'
+                WHEN ct.estatusCita = 10 THEN '#33105D'
             END AS borderColor,
-            'transparent !important' AS color,
-
             CASE WHEN usEspe2.idpuesto = 537 THEN 'nutrición' WHEN usEspe2.idpuesto = 585 THEN 'psicología' WHEN usEspe2.idpuesto = 686 THEN 'guía espiritual' WHEN usEspe2.idpuesto = 158 THEN 'quantum balance' END AS 'beneficio',
             ct.fechaIntentoPago, 
 				CASE 
