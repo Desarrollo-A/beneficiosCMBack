@@ -87,7 +87,7 @@ class CalendarioModel extends CI_Model
     public function getBeneficiosPorSede($sede, $area)
 	{
         $query = $this->ch->query(
-            "SELECT DISTINCT us2.idpuesto as 'idPuesto', us2.npuesto as 'puesto'
+            "SELECT DISTINCT us2.idpuesto as idPuesto, us2.npuesto as 'puesto'
             FROM ". $this->schema_cm .".usuarios AS us 
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
             RIGHT JOIN ". $this->schema_cm .".atencionxsede AS axs ON axs.idEspecialista = us.idUsuario
@@ -548,7 +548,7 @@ class CalendarioModel extends CI_Model
         $query = $this->ch->query(
             "SELECT TRIM(CAST(ct.idCita AS CHAR(36))) AS id,  ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end',
             ct.fechaInicio AS occupied, 'date' AS 'type', ct.estatusCita AS estatus, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre, ct.idPaciente, us2.telefono_personal AS telPersonal,
-            c.correo AS correo,
+            c.correo AS correo, usEspe2.idarea AS idArea,
             se.nsede AS sede, ofi.noficina as oficina, ct.idDetalle, ct.idAtencionXSede, us.externo, CONCAT(IFNULL(usEspCH.nombre_persona, ''), ' ', IFNULL(usEspCH.pri_apellido, ''), ' ', IFNULL(usEspCH.sec_apellido, '')) AS especialista, ct.fechaCreacion, usEspCH.tipo_puesto AS tipoPuesto,
             tf.fechasFolio, idEventoGoogle, ct.tipoCita, aps.tipoCita as modalidad, aps.idSede, dp.estatusPago, us2.idsede AS idSedePaciente, ct.idEspecialista, usEspe2.telefono_personal as telefonoEspecialista,
             CASE 
@@ -585,7 +585,8 @@ class CalendarioModel extends CI_Model
             WHEN usEspCH.idPuesto= 585 THEN 'psicología'
             WHEN usEspCH.idPuesto = 686 THEN 'guía espiritual'
             WHEN usEspCH.idPuesto = 158 THEN 'quantum balance'
-            END AS beneficio, ct.fechaIntentoPago 
+            END AS beneficio, ct.fechaIntentoPago,
+            usEspCH.idPuesto AS idPuesto
             FROM ". $this->schema_cm .".citas AS ct
             INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idPaciente
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
