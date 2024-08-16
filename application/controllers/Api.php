@@ -213,7 +213,7 @@ class Api extends BaseController{
                     ),
                 ];
 
-                $this->googleapi->getAccessToken($data["email"]);
+                $apivalue = $this->googleapi->getAccessToken($data["email"]);
 
                 $data = json_encode(array(
                     'summary' => $data["title"],
@@ -245,24 +245,28 @@ class Api extends BaseController{
                     'colorId' => '07'
                 ), JSON_NUMERIC_CHECK);
 
-                $event = $this->googleapi->createCalendarEvent('primary', $data);
-                $response['result2'] = !isset($event->error); 
+                if ($apivalue == 1) {
+                    $event = $this->googleapi->createCalendarEvent('primary', $data);
+                    $response['result2'] = !isset($event->error);
 
-                if ($response['result2']) {
-                    $response['msg2'] = "¡Evento registrado en el calendario de google!";
-                    $upd = [
-                        "idEventoGoogle" => $event->id,
-                        "modificadoPor" => $rs[0]->idPaciente,
-                        "fechaModificacion" => $fecha,
-                    ];
-                    $response["result3"] = $this->GeneralModel->updateRecord($this->schema_cm .".citas", $upd, 'idCita', $idCita);
-					if ($response["result3"]) {
-						$response["msg3"] = "Evento de google creado exitosamente";
+                    if ($response['result2']) {
+                        $response['msg2'] = "¡Evento registrado en el calendario de google!";
+                        $upd = [
+                            "idEventoGoogle" => $event->id,
+                            "modificadoPor" => $rs[0]->idPaciente,
+                            "fechaModificacion" => $fecha,
+                        ];
+                        $response["result3"] = $this->GeneralModel->updateRecord($this->schema_cm .".citas", $upd, 'idCita', $idCita);
+				    	if ($response["result3"]) {
+				    		$response["msg3"] = "Evento de google creado exitosamente";
+                        }else {
+				    		$response["msg3"] = "¡Surgió un error al enlazar la cita con el pago!";
+				    	}
                     }else {
-						$response["msg3"] = "¡Surgió un error al enlazar la cita con el pago!";
-					}
+                        $response['msg2'] = "¡No se pudo insertar el evento en el calendario de google!"; 
+                    }
                 }else {
-                    $response['msg2'] = "¡No se pudo insertar el evento en el calendario de google!"; 
+                    $response['msg2'] = "¡No se pudo insertar el evento en el calendario de google debido a proveedor!"; 
                 }
             }else {
                 $response['msg2'] = "¡Evento con id listo!"; 
