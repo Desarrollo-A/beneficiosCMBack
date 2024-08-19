@@ -124,8 +124,6 @@ class Api extends BaseController{
     }
 
     public function creaEventoGoogleYNotifica($idCita){
-    // public function creaEventoGoogleYNotifica(){
-        // $idCita = 66; // 41 42
         $response['result'] = isset($idCita);
         if ($response['result']) {
             $rs = $this->CalendarioModel->getCitaById($idCita)->result();

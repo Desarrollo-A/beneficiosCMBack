@@ -86,7 +86,6 @@ class GoogleApi {
         else {
             return 0;
         }
-        // var_dump(json_decode($response->getParsedResponse())); exit;die;
         // $this->token = json_decode($response->getParsedResponse())->access_token;
 
     }
