@@ -77,7 +77,17 @@ class GoogleApi {
 
         $response = $request->getResponse();
 
-        $this->token = json_decode($response->getParsedResponse())->access_token;
+        $responseData = json_decode($response->getParsedResponse());
+
+        if (isset($responseData->access_token)) {
+            $this->token = json_decode($response->getParsedResponse())->access_token;
+            return 1;
+        }
+        else {
+            return 0;
+        }
+        // $this->token = json_decode($response->getParsedResponse())->access_token;
+
     }
 
     public function createCalendarEvent($calendar_name = 'primary', $data){
