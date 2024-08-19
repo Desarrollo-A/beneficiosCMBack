@@ -51,6 +51,7 @@ class CalendarioModel extends CI_Model
             ct.fechaIntentoPago, 
 				CASE 
         			WHEN ct.estatusCita IN (6, 10) AND ct.tipoCita IN (1, 2) THEN DATE_ADD(ct.fechaCreacion, INTERVAL 10 MINUTE)
+                    WHEN ct.estatusCita IN (6, 10) AND ct.tipoCita IN (3) THEN DATE_ADD(ct.fechaCreacion, INTERVAL 24 HOUR)
         			WHEN ct.estatusCita = 6 AND ct.tipoCita = 3 THEN DATE_ADD(ct.fechaCreacion, INTERVAL 24 HOUR)
         			WHEN ct.estatusCita = 10 AND ct.tipoCita = 3 AND ct.fechaIntentoPago IS NOT NULL THEN DATE_ADD(ct.fechaIntentoPago, INTERVAL 10 MINUTE)
         		ELSE NULL 
