@@ -24,9 +24,9 @@ class CalendarioModel extends CI_Model
             CASE WHEN ofi.noficina IS NULL THEN 'VIRTUAL' ELSE ofi.noficina END as 'oficina',
             CASE WHEN ofi.direccion IS NULL THEN 'VIRTUAL' ELSE ofi.direccion END as 'ubicación', 
             CASE 
-                WHEN ct.estatusCita = 1 AND ct.tipoCita = 1 THEN '#ffe800'
-                WHEN ct.estatusCita = 1 AND ct.tipoCita = 2 THEN '#0000ff'
-                WHEN ct.estatusCita = 1 AND ct.tipoCita = 3 THEN '#ffa500'
+                WHEN ct.estatusCita = 0 THEN '#ff0000'
+                WHEN ct.estatusCita = 1 AND atc.tipoCita = 1 THEN '#ffe800'
+                WHEN ct.estatusCita = 1 AND atc.tipoCita = 2 THEN '#0000ff'
                 WHEN ct.estatusCita = 2 THEN '#ff0000' 
                 WHEN ct.estatusCita = 3 THEN '#808080' 
                 WHEN ct.estatusCita = 4 THEN '#008000' 
@@ -34,13 +34,24 @@ class CalendarioModel extends CI_Model
                 WHEN ct.estatusCita = 6 THEN '#00ffff' 
                 WHEN ct.estatusCita = 7 THEN '#ff0000' 
                 WHEN ct.estatusCita = 10 THEN '#33105D' 
+            END AS color,
+            CASE 
+                WHEN ct.estatusCita = 0 THEN '#ff0000'
+                WHEN ct.estatusCita = 1 AND atc.tipoCita = 1 THEN '#ffe800'
+                WHEN ct.estatusCita = 1 AND atc.tipoCita = 2 THEN '#0000ff'
+                WHEN ct.estatusCita = 2 THEN '#ff0000'
+                WHEN ct.estatusCita = 3 THEN '#808080'
+                WHEN ct.estatusCita = 4 THEN '#008000'
+                WHEN ct.estatusCita = 5 THEN '#ff4d67'
+                WHEN ct.estatusCita = 6 THEN '#00ffff'
+                WHEN ct.estatusCita = 7 THEN '#ff0000'
+                WHEN ct.estatusCita = 10 THEN '#33105D'
             END AS borderColor,
-            'transparent !important' AS color,
-
             CASE WHEN usEspe2.idpuesto = 537 THEN 'nutrición' WHEN usEspe2.idpuesto = 585 THEN 'psicología' WHEN usEspe2.idpuesto = 686 THEN 'guía espiritual' WHEN usEspe2.idpuesto = 158 THEN 'quantum balance' END AS 'beneficio',
             ct.fechaIntentoPago, 
 				CASE 
         			WHEN ct.estatusCita IN (6, 10) AND ct.tipoCita IN (1, 2) THEN DATE_ADD(ct.fechaCreacion, INTERVAL 10 MINUTE)
+                    WHEN ct.estatusCita IN (6, 10) AND ct.tipoCita IN (3) THEN DATE_ADD(ct.fechaCreacion, INTERVAL 24 HOUR)
         			WHEN ct.estatusCita = 6 AND ct.tipoCita = 3 THEN DATE_ADD(ct.fechaCreacion, INTERVAL 24 HOUR)
         			WHEN ct.estatusCita = 10 AND ct.tipoCita = 3 AND ct.fechaIntentoPago IS NOT NULL THEN DATE_ADD(ct.fechaIntentoPago, INTERVAL 10 MINUTE)
         		ELSE NULL 
@@ -77,7 +88,7 @@ class CalendarioModel extends CI_Model
     public function getBeneficiosPorSede($sede, $area)
 	{
         $query = $this->ch->query(
-            "SELECT DISTINCT us2.idpuesto as 'idPuesto', us2.npuesto as 'puesto'
+            "SELECT DISTINCT us2.idpuesto as idPuesto, us2.npuesto as 'puesto'
             FROM ". $this->schema_cm .".usuarios AS us 
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
             RIGHT JOIN ". $this->schema_cm .".atencionxsede AS axs ON axs.idEspecialista = us.idUsuario
@@ -95,7 +106,8 @@ class CalendarioModel extends CI_Model
     public function getEspecialistaPorBeneficioYSede($sede, $area, $beneficio, $numEmpleado)
     {
         $query = $this->ch->query(
-            "SELECT DISTINCT us.idUsuario as id, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista
+            "SELECT DISTINCT us.idUsuario as id, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista,
+            us2.idsede
             FROM ". $this->schema_cm .".usuarios AS us
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato 
             RIGHT JOIN ". $this->schema_cm .".atencionxsede AS axs ON axs.idEspecialista = us.idUsuario 
@@ -127,7 +139,7 @@ class CalendarioModel extends CI_Model
         return $query;
     }
 
-    public function getModalidadesEspecialistaBene($sede, $especialista, $area)
+    public function getModalidadesEspecialistaBene($sede, $especialista, $area) // AND NOT (axs.tipoCita = 1 and axs.idOficina = 0) en caso de error en las modalidades
     {
         $query = $this->ch->query(
             "SELECT CASE WHEN tipoCita = 1 then CONCAT('PRESENCIAL - ', ofi.direccion) WHEN tipoCita = 2 THEN 'EN LÍNEA' END AS 'modalidad', us.idUsuario as id,
@@ -137,7 +149,7 @@ class CalendarioModel extends CI_Model
             INNER JOIN ". $this->schema_cm .".usuarios AS us ON us.idUsuario = axs.idEspecialista 
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
             LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_oficinas AS ofi ON ofi.idoficina = axs.idOficina 
-            WHERE axs.estatus = ? AND axs.idSede = ? AND ((axs.idEspecialista = ? AND axs.idArea is NULL ) OR (axs.idEspecialista = ? AND axs.idArea = ?));", 
+            WHERE axs.estatus = ? AND axs.idSede = ? AND NOT (axs.tipoCita = 1 and axs.idOficina = 0) AND ((axs.idEspecialista = ? AND axs.idArea is NULL ) OR (axs.idEspecialista = ? AND axs.idArea = ?));", 
             array(1, $sede, $especialista, $especialista, $area));
 
         return $query;
@@ -170,7 +182,9 @@ class CalendarioModel extends CI_Model
     public function getHorarioBeneficio($beneficio, $especialista){
 
         $queryEspecialistas = $this->ch->query(
-            "SELECT * FROM ". $this->schema_cm .".horariosespecificos WHERE idEspecialista = ? AND estatus = 1",
+            "SELECT idHorario, idEspecialista, CAST(FORMAT(horaInicio, 'HH:mm:ss') AS time(0)) AS horaInicio, CAST(FORMAT(horaFin, 'HH:mm:ss') AS time(0)) AS horaFin, sabados, 
+            CAST(FORMAT(horaInicioSabado, 'HH:mm:ss') AS time(0)) AS horaInicioSabado, CAST(FORMAT(horaFinSabado, 'HH:mm:ss') AS time(0)) AS horaFinSabado, estatus,
+            creadoPor, fechaCreacion, modificadoPor, fechaModificacion FROM ". $this->schema_cm .".horariosespecificos WHERE idEspecialista = ? AND estatus = 1",
             array($especialista)
         );
 
@@ -378,9 +392,8 @@ class CalendarioModel extends CI_Model
         CONCAT(IFNULL(usEspe2.nombre_persona, ''), ' ', IFNULL(usEspe2.pri_apellido, ''), ' ', IFNULL(usEspe2.sec_apellido, '')) as especialista,
         usEspe2.sexo as sexoEspecialista, tf.fechasFolio, ct.idEventoGoogle, ct.evaluacion, dp.estatusPago, ec.idEncuesta,
         CASE 
-        WHEN ct.estatusCita = 1 AND ct.tipoCita = 1 THEN '#ffe800'
-        WHEN ct.estatusCita = 1 AND ct.tipoCita = 2 THEN '#0000ff'
-        WHEN ct.estatusCita = 1 AND ct.tipoCita = 3 THEN '#ffa500'
+        WHEN ct.estatusCita = 1 AND atc.tipoCita = 1 THEN '#ffe800'
+        WHEN ct.estatusCita = 1 AND atc.tipoCita = 2 THEN '#0000ff'
         WHEN ct.estatusCita = 2 THEN '#ff0000'
         WHEN ct.estatusCita = 3 THEN '#808080'
         WHEN ct.estatusCita = 4 THEN '#008000'
@@ -417,7 +430,8 @@ class CalendarioModel extends CI_Model
     public function getOccupied($month, $idUsuario, $dates){
         $query = $this->ch->query(
             "SELECT idUnico as id, titulo as title, fechaInicio as 'start', fechaFinal as 'end',
-            'purple' AS 'color', estatus, 'cancel' AS 'type'
+            'purple' AS 'color', estatus, 'cancel' AS 'type',
+            '#00FF0000' AS borderColor
             FROM ". $this->schema_cm .".horariosocupados
             WHERE YEAR(fechaInicio) IN (?, ?)
             AND MONTH(fechaInicio) IN (?, ?, ?)
@@ -538,14 +552,30 @@ class CalendarioModel extends CI_Model
         $query = $this->ch->query(
             "SELECT TRIM(CAST(ct.idCita AS CHAR(36))) AS id,  ct.titulo AS title, ct.fechaInicio AS 'start', ct.fechaFinal AS 'end',
             ct.fechaInicio AS occupied, 'date' AS 'type', ct.estatusCita AS estatus, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre, ct.idPaciente, us2.telefono_personal AS telPersonal,
-            c.correo AS correo,
+            c.correo AS correo, usEspe2.idarea AS idArea,
             se.nsede AS sede, ofi.noficina as oficina, ct.idDetalle, ct.idAtencionXSede, us.externo, CONCAT(IFNULL(usEspCH.nombre_persona, ''), ' ', IFNULL(usEspCH.pri_apellido, ''), ' ', IFNULL(usEspCH.sec_apellido, '')) AS especialista, ct.fechaCreacion, usEspCH.tipo_puesto AS tipoPuesto,
-            tf.fechasFolio, idEventoGoogle, ct.tipoCita, aps.tipoCita as modalidad, aps.idSede, dp.estatusPago, us2.idsede AS idSedePaciente,
+            tf.fechasFolio, idEventoGoogle, ct.tipoCita, aps.tipoCita as modalidad, aps.idSede, dp.estatusPago, us2.idsede AS idSedePaciente, ct.idEspecialista, usEspe2.telefono_personal as telefonoEspecialista,
+            CASE 
+                WHEN $idUsuario != ct.idPaciente THEN '#00FF0000'
+                ELSE (
+                    CASE 
+                        WHEN ct.estatusCita = 0 THEN '#ff0000'
+                        WHEN ct.estatusCita = 1 AND aps.tipoCita = 1 THEN '#ffe800'
+                        WHEN ct.estatusCita = 1 AND aps.tipoCita = 2 THEN '#0000ff'
+                        WHEN ct.estatusCita = 2 THEN '#ff0000'
+                        WHEN ct.estatusCita = 3 THEN '#808080'
+                        WHEN ct.estatusCita = 4 THEN '#008000'
+                        WHEN ct.estatusCita = 5 THEN '#ff4d67'
+                        WHEN ct.estatusCita = 6 THEN '#00ffff'
+                        WHEN ct.estatusCita = 7 THEN '#ff0000'
+                        WHEN ct.estatusCita = 10 THEN '#33105D'
+                    END
+                )
+            END AS borderColor,
             CASE
                 WHEN ct.estatusCita = 0 THEN '#ff0000'
-                WHEN ct.estatusCita = 1 AND ct.tipoCita = 1 THEN '#ffe800'
-                WHEN ct.estatusCita = 1 AND ct.tipoCita = 2 THEN '#0000ff'
-                WHEN ct.estatusCita = 1 AND ct.tipoCita = 3 THEN '#ffa500'
+                WHEN ct.estatusCita = 1 AND aps.tipoCita = 1 THEN '#ffe800'
+                WHEN ct.estatusCita = 1 AND aps.tipoCita = 2 THEN '#0000ff'
                 WHEN ct.estatusCita = 2 THEN '#ff0000'
                 WHEN ct.estatusCita = 3 THEN '#808080'
                 WHEN ct.estatusCita = 4 THEN '#008000'
@@ -555,24 +585,12 @@ class CalendarioModel extends CI_Model
                 WHEN ct.estatusCita = 10 THEN '#33105D'
             END AS color,
             CASE
-                WHEN ct.estatusCita = 0 THEN '#ff0000'
-                WHEN ct.estatusCita = 1 AND ct.tipoCita = 1 THEN '#ffe800'
-                WHEN ct.estatusCita = 1 AND ct.tipoCita = 2 THEN '#0000ff'
-                WHEN ct.estatusCita = 1 AND ct.tipoCita = 3 THEN '#ffa500'
-                WHEN ct.estatusCita = 2 THEN '#ff0000'
-                WHEN ct.estatusCita = 3 THEN '#808080'
-                WHEN ct.estatusCita = 4 THEN '#008000'
-                WHEN ct.estatusCita = 5 THEN '#ff4d67'
-                WHEN ct.estatusCita = 6 THEN '#00ffff'
-                WHEN ct.estatusCita = 7 THEN '#ff0000'
-                WHEN ct.estatusCita = 10 THEN '#33105D'
-            END AS borderColor,
-            CASE
             WHEN usEspCH.idPuesto = 537 THEN 'nutrición'
             WHEN usEspCH.idPuesto= 585 THEN 'psicología'
             WHEN usEspCH.idPuesto = 686 THEN 'guía espiritual'
             WHEN usEspCH.idPuesto = 158 THEN 'quantum balance'
-            END AS beneficio, ct.fechaIntentoPago 
+            END AS beneficio, ct.fechaIntentoPago,
+            usEspCH.idPuesto AS idPuesto
             FROM ". $this->schema_cm .".citas AS ct
             INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idPaciente
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
@@ -584,12 +602,13 @@ class CalendarioModel extends CI_Model
             LEFT JOIN (SELECT idDetalle, GROUP_CONCAT(DATE_FORMAT(fechaInicio, '%d / %m / %Y A las %H:%i horas.'), '') AS fechasFolio FROM ". $this->schema_cm .".citas WHERE estatusCita IN( ? ) AND citas.idCita = idCita GROUP BY citas.idDetalle) AS tf ON tf.idDetalle = ct.idDetalle
             LEFT JOIN ". $this->schema_cm .".detallepagos as dp ON dp.idDetalle = ct.idDetalle
             LEFT JOIN ". $this->schema_cm .".correostemporales AS c ON c.idContrato = us2.idcontrato 
+            LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS usEspe2 ON usEspe2.idcontrato = usEspe.idContrato
             WHERE YEAR(fechaInicio) IN (?, ?)
             AND MONTH(fechaInicio) IN (?, ?, ?)
-            AND ct.idEspecialista = ?
+            AND (ct.idEspecialista = ? OR ct.idPaciente = ?)
             AND ct.estatus IN (1)
             AND ct.estatusCita IN(?, ?, ?, ?, ?, ?, ?, ?)",
-            array( 8, $dates["year1"], $dates["year2"], $dates["month1"], $month, $dates["month2"], $idUsuario, 1, 2, 3, 4, 5, 6, 7, 10 )
+            array( 8, $dates["year1"], $dates["year2"], $dates["month1"], $month, $dates["month2"], $idUsuario, $idUsuario, 1, 2, 3, 4, 5, 6, 7, 10 )
         );
 
         return $query;
@@ -602,9 +621,8 @@ class CalendarioModel extends CI_Model
             ct.idDetalle, ct.idAtencionXSede, us.externo, CONCAT(IFNULL(usEspCH.nombre_persona, ''), ' ', IFNULL(usEspCH.pri_apellido, ''), ' ', IFNULL(usEspCH.sec_apellido, '')) AS especialista, ct.fechaCreacion, usEspCH.tipo_puesto AS tipoPuesto,
             tf.fechasFolio, ct.idEventoGoogle, ct.tipoCita, aps.tipoCita as modalidad, aps.idSede, dp.estatusPago,
             CASE WHEN ct.estatusCita = 0 THEN '#ff0000'
-               WHEN ct.estatusCita = 1 AND ct.tipoCita = 1 THEN '#ffe800'
-               WHEN ct.estatusCita = 1 AND ct.tipoCita = 2 THEN '#0000ff'
-               WHEN ct.estatusCita = 1 AND ct.tipoCita = 3 THEN '#ffa500'
+               WHEN ct.estatusCita = 1 AND aps.tipoCita = 1 THEN '#ffe800'
+               WHEN ct.estatusCita = 1 AND aps.tipoCita = 2 THEN '#0000ff'
                WHEN ct.estatusCita = 2 THEN '#ff0000'
                WHEN ct.estatusCita = 3 THEN '#808080'
                WHEN ct.estatusCita = 4 THEN '#008000'
