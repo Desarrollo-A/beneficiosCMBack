@@ -138,7 +138,7 @@ class CalendarioModel extends CI_Model
         return $query;
     }
 
-    public function getModalidadesEspecialistaBene($sede, $especialista, $area)
+    public function getModalidadesEspecialistaBene($sede, $especialista, $area) // AND NOT (axs.tipoCita = 1 and axs.idOficina = 0) en caso de error en las modalidades
     {
         $query = $this->ch->query(
             "SELECT CASE WHEN tipoCita = 1 then CONCAT('PRESENCIAL - ', ofi.direccion) WHEN tipoCita = 2 THEN 'EN LÍNEA' END AS 'modalidad', us.idUsuario as id,
@@ -148,7 +148,7 @@ class CalendarioModel extends CI_Model
             INNER JOIN ". $this->schema_cm .".usuarios AS us ON us.idUsuario = axs.idEspecialista 
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
             LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_oficinas AS ofi ON ofi.idoficina = axs.idOficina 
-            WHERE axs.estatus = ? AND axs.idSede = ? AND ((axs.idEspecialista = ? AND axs.idArea is NULL ) OR (axs.idEspecialista = ? AND axs.idArea = ?));", 
+            WHERE axs.estatus = ? AND axs.idSede = ? AND NOT (axs.tipoCita = 1 and axs.idOficina = 0) AND ((axs.idEspecialista = ? AND axs.idArea is NULL ) OR (axs.idEspecialista = ? AND axs.idArea = ?));", 
             array(1, $sede, $especialista, $especialista, $area));
 
         return $query;
@@ -181,7 +181,9 @@ class CalendarioModel extends CI_Model
     public function getHorarioBeneficio($beneficio, $especialista){
 
         $queryEspecialistas = $this->ch->query(
-            "SELECT * FROM ". $this->schema_cm .".horariosespecificos WHERE idEspecialista = ? AND estatus = 1",
+            "SELECT idHorario, idEspecialista, CAST(FORMAT(horaInicio, 'HH:mm:ss') AS time(0)) AS horaInicio, CAST(FORMAT(horaFin, 'HH:mm:ss') AS time(0)) AS horaFin, sabados, 
+            CAST(FORMAT(horaInicioSabado, 'HH:mm:ss') AS time(0)) AS horaInicioSabado, CAST(FORMAT(horaFinSabado, 'HH:mm:ss') AS time(0)) AS horaFinSabado, estatus,
+            creadoPor, fechaCreacion, modificadoPor, fechaModificacion FROM ". $this->schema_cm .".horariosespecificos WHERE idEspecialista = ? AND estatus = 1",
             array($especialista)
         );
 
