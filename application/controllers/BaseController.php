@@ -159,10 +159,10 @@ abstract class BaseController extends CI_Controller{
         print_r($token);
         exit();
 
-        //$this->googleapi->editEvent($token, $id_event, $data);
+        // $this->googleapi->editEvent($token, $id_event, $data);
     }
 
-    /* public function upload($path, $filename){
+    public function upload($path, $filename){
         $file = $this->bucket->upload(
             fopen($path, 'r'),
             [
@@ -211,8 +211,7 @@ abstract class BaseController extends CI_Controller{
         }
 
         return $data;
-    } */
-
+    }
 }
 
 ?>
