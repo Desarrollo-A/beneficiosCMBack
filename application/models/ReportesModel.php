@@ -43,7 +43,7 @@ class ReportesModel extends CI_Model {
 			END AS numCita, 
 			QUERY1.* 
 			FROM(
-				SELECT ps.idpuesto, ct.idCita, pa.idUsuario AS idColab, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista, 
+				SELECT ps.idpuesto, ops3.nombre AS nombreEstatusCita, ct.idCita, pa.idUsuario AS idColab, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista, 
 				us3.num_empleado AS numEmpleado, IFNULL (CONCAT (us3.nombre_persona,' ',us3.pri_apellido,' ',us3.sec_apellido), ext.nombre) AS paciente, 
 				ps.nom_puesto AS area, IFNULL(sd.nsede, 'QRO') AS sede,ct.titulo, us3.narea, us3.npuesto, ct.archivoObservacion AS archivo,
 				CONCAT(DATE_FORMAT(ct.fechaInicio, '%Y-%m-%d'), ' ', DATE_FORMAT(ct.fechaInicio, '%H:%i'), ' - ', DATE_FORMAT(ct.fechaFinal, '%H:%i')) AS horario, observaciones, IFNULL(us3.sexo, ext.sexo) AS sexo, 
@@ -112,7 +112,8 @@ class ReportesModel extends CI_Model {
 				LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo oxc ON oxc.idOpcion = dp.metodoPago AND oxc.idCatalogo = 11
 				LEFT JOIN ". $this->schema_cm .".motivosporcita mpc ON mpc.idCita = ct.idCita
 				LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo ops ON ops.idCatalogo = cat.idCatalogo AND ops.idOpcion = mpc.idMotivo
-				LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo ops2 ON ops2.idCatalogo = 10	
+				LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo ops2 ON ops2.idCatalogo = 10
+				LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo ops3 ON ops3.idOpcion = ct.estatusCita AND ops3.idCatalogo = 2
 				WHERE op.idCatalogo = 2 $usuarioCond $tipoReporte
 				GROUP BY 
 					ct.idCita, 
@@ -138,7 +139,7 @@ class ReportesModel extends CI_Model {
 					dep.ndepto,
 					op2.nombre,
 					axs.tipoCita
-					ORDER BY fechaCreacion) AS QUERY1
+					ORDER BY pa.idUsuario, ps.idPuesto, fechaCreacion) AS QUERY1
 			");
 			return $query;
 	}
