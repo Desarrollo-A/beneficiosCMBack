@@ -1658,4 +1658,13 @@ class CalendarioController extends BaseController{
 		$this->output->set_output(json_encode($rs, JSON_NUMERIC_CHECK));
 	}
 
+	public function getAtencionesPresenciales(){
+
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->CalendarioModel->getAtencionesPresenciales($dt)->result();
+
+		$this->output->set_content_type("application/json");
+		$this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
+
 }
