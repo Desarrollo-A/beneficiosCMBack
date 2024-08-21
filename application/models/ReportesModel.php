@@ -29,21 +29,18 @@ class ReportesModel extends CI_Model {
 
 		$usuarioCond = $tipoUsuario != 2 ? "AND pa.externo = $tipoUsuario" : "";
 
-			$this->ch->query("SET @numPsi = 0;");
-			$this->ch->query("SET @numSci = 0;");
-			$this->ch->query("SET @numNut = 0;");
-			$this->ch->query("SET @numEsp = 0;");
-			$this->ch->query("SET @curRow = 0;");
+			$this->ch->query("SET @row_number = 0;");
+			$this->ch->query("SET @current_idP = NULL;");
 
-			$query = $this->ch->query("SELECT CASE
-				WHEN QUERY1.idPuesto = 585 THEN @numPsi := @numPsi + 1
-				WHEN QUERY1.idPuesto = 537 THEN @numNut := @numNut + 1 
-				WHEN QUERY1.idPuesto = 686 THEN @numEsp := @numEsp + 1
-				WHEN QUERY1.idPuesto = 158 THEN @numSci := @numSci + 1
-			END AS numCita, 
-			QUERY1.* 
-			FROM(
-				SELECT ps.idpuesto, ops3.nombre AS nombreEstatusCita, ct.idCita, pa.idUsuario AS idColab, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista, 
+			$query = $this->ch->query("SELECT 
+			CASE 
+				WHEN @current_idP = QUERY1.idPaciente THEN @row_number := @row_number + 1
+        		ELSE @row_number := 1 AND @current_idP := QUERY1.idPaciente
+    		END AS numCita,
+	 		QUERY1.*    
+			FROM 
+    		(
+				SELECT ps.idpuesto, ct.idPaciente, ops3.nombre AS nombreEstatusCita, ct.idCita, pa.idUsuario AS idColab, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista, 
 				us3.num_empleado AS numEmpleado, IFNULL (CONCAT (us3.nombre_persona,' ',us3.pri_apellido,' ',us3.sec_apellido), ext.nombre) AS paciente, 
 				ps.nom_puesto AS area, IFNULL(sd.nsede, 'QRO') AS sede,ct.titulo, us3.narea, us3.npuesto, ct.archivoObservacion AS archivo,
 				CONCAT(DATE_FORMAT(ct.fechaInicio, '%Y-%m-%d'), ' ', DATE_FORMAT(ct.fechaInicio, '%H:%i'), ' - ', DATE_FORMAT(ct.fechaFinal, '%H:%i')) AS horario, observaciones, IFNULL(us3.sexo, ext.sexo) AS sexo, 
@@ -139,7 +136,7 @@ class ReportesModel extends CI_Model {
 					dep.ndepto,
 					op2.nombre,
 					axs.tipoCita
-					ORDER BY pa.idUsuario, ps.idPuesto, fechaCreacion) AS QUERY1
+					ORDER BY ct.idPaciente, ps.idPuesto, fechaCreacion) AS QUERY1
 			");
 			return $query;
 	}
