@@ -810,5 +810,12 @@ class CalendarioModel extends CI_Model
             
         return $query;
     }
+
+    public function getAtencionesPresenciales($idUsr){
+        $query = $this->ch->query("SELECT COUNT(idAtencionXSede) AS atenciones FROM ". $this->schema_cm .".atencionxsede 
+        WHERE idOficina != 0 AND estatus = 1 AND idEspecialista = ?", $idUsr);
+
+       return $query;
+    }
     
 }
