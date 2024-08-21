@@ -923,10 +923,11 @@ class CalendarioController extends BaseController{
 	{
 		$usuario   = $this->input->post('dataValue[usuario]');
 		$beneficio = $this->input->post('dataValue[beneficio]');
+		$eventId = $this->input->post('dataValue[eventId]');
 
 		$response['result'] = isset($usuario, $beneficio);
 		if ($response['result']) {
-			$rs = $this->CalendarioModel->getCitasSinFinalizarUsuario($usuario, $beneficio)->result();
+			$rs = $this->CalendarioModel->getCitasSinFinalizarUsuario($usuario, $beneficio, $eventId)->result();
 			$response['result'] = count($rs) > 0;
 			if ($response['result']) {
 				$response['msg'] = '¡Usuario con citas sin finalizar!';
@@ -1658,6 +1659,7 @@ class CalendarioController extends BaseController{
 		$this->output->set_output(json_encode($rs, JSON_NUMERIC_CHECK));
 	}
 
+
 	public function getAtencionesPresenciales(){
 
 		$dt = $this->input->post('dataValue', true);
@@ -1665,6 +1667,30 @@ class CalendarioController extends BaseController{
 
 		$this->output->set_content_type("application/json");
 		$this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+}
+	public function retrieveCancelAppointment()
+	{
+		$dataValue = $this->input->post("dataValue", true);
+		$estatus = intval($dataValue["estats"]);
+
+		$values = [
+			"estatusCita" => $estatus,
+			"fechaModificacion" => date('Y-m-d H:i:s'),
+			"modificadoPor" => $dataValue["modificadoPor"],
+		];
+
+		$updateRecord = $this->GeneralModel->updateRecord($this->schema_cm .".citas", $values, "idCita", $dataValue["idCita"]);
+
+		if ($updateRecord) {
+			$response["result"] = true;
+			$response["msg"] = "La cita no se ha cancaledo";	
+		} else {
+			$response["result"] = false;
+			$response["msg"] = "Error al regresar la cita a su estatus anterior";
+		}
+
+		$this->output->set_content_type("application/json");
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
 }
