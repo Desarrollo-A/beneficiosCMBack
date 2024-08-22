@@ -13,7 +13,6 @@ class ReportesModel extends CI_Model {
 
     public function citas($data)
 	{
-
 		$dt = $data["reporte"];
 		$tipoUsuario = $data["tipoUsuario"];
 
@@ -136,7 +135,7 @@ class ReportesModel extends CI_Model {
 					dep.ndepto,
 					op2.nombre,
 					axs.tipoCita
-					ORDER BY ct.idPaciente, ps.idPuesto, fechaCreacion) AS QUERY1
+					ORDER BY ps.idPuesto, fechaCreacion) AS QUERY1
 			");
 			return $query;
 	}
