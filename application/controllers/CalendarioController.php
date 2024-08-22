@@ -925,6 +925,10 @@ class CalendarioController extends BaseController{
 		$beneficio = $this->input->post('dataValue[beneficio]');
 		$eventId = $this->input->post('dataValue[eventId]');
 
+		if(!isset($eventId)){
+			$eventId = 0;
+		}
+
 		$response['result'] = isset($usuario, $beneficio);
 		if ($response['result']) {
 			$rs = $this->CalendarioModel->getCitasSinFinalizarUsuario($usuario, $beneficio, $eventId)->result();
