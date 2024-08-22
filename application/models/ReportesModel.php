@@ -13,7 +13,6 @@ class ReportesModel extends CI_Model {
 
     public function citas($data)
 	{
-
 		$dt = $data["reporte"];
 		$tipoUsuario = $data["tipoUsuario"];
 
@@ -29,94 +28,114 @@ class ReportesModel extends CI_Model {
 
 		$usuarioCond = $tipoUsuario != 2 ? "AND pa.externo = $tipoUsuario" : "";
 
-			$query = $this->ch->query("SELECT ct.idCita, pa.idUsuario AS idColab, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista, 
-			us3.num_empleado AS numEmpleado, IFNULL (CONCAT (us3.nombre_persona,' ',us3.pri_apellido,' ',us3.sec_apellido), ext.nombre) AS paciente, 
-			ps.nom_puesto AS area, IFNULL(sd.nsede, 'QRO') AS sede,ct.titulo, us3.narea, us3.npuesto, ct.archivoObservacion AS archivo,
-			CONCAT(DATE_FORMAT(ct.fechaInicio, '%Y-%m-%d'), ' ', DATE_FORMAT(ct.fechaInicio, '%H:%i'), ' - ', DATE_FORMAT(ct.fechaFinal, '%H:%i')) AS horario, observaciones, IFNULL(us3.sexo, ext.sexo) AS sexo, 
-			estatusCita, ct.fechaInicio, ct.fechaFinal, IFNULL(dep.ndepto, 'NO APLICA') AS depto, IFNULL(op2.nombre, 'Presencial') AS modalidad,  CONCAT('$', ' ',dp.cantidad) AS monto, ops2.nombre AS tipoCita,
-			IFNULL(GROUP_CONCAT(ops.nombre SEPARATOR ', '), 'SIN MOTIVOS DE CITA') AS motivoCita, IFNULL(oxc.nombre, 'Pendiente de pago') AS metodoPago, ct.fechaCreacion,
+			$this->ch->query("SET @row_number = 0;");
+			$this->ch->query("SET @current_idP = NULL;");
+
+			$query = $this->ch->query("SELECT 
 			CASE 
-				WHEN $tipoUsuario = 1 THEN 'RIO DE LA LOZA' 
-				WHEN ofi.noficina IS NULL THEN 'VIRTUAL' 
-				WHEN ofi.noficina IS NOT NULL THEN ofi.noficina 
-			END AS oficina,
-			CASE 
-				WHEN pa.externo = 0 THEN 'Colaborador' 
-				WHEN pa.externo = 1 THEN 'Externo' 
-			END AS usuario,
-			CASE 
-				WHEN ct.estatusCita = 1 AND ct.tipoCita = 1 THEN '#ffe800'
-				WHEN ct.estatusCita = 1 AND ct.tipoCita = 2 THEN '#0000ff' 
-                WHEN ct.estatusCita = 1 AND ct.tipoCita = 3 THEN '#ffa500'
-				WHEN ct.estatusCita = 2 THEN '#ff0000' 
-				WHEN ct.estatusCita = 3 THEN '#808080' 
-				WHEN ct.estatusCita = 4 THEN '#008000' 
-				WHEN ct.estatusCita = 5 THEN '#ff4d67' 
-				WHEN ct.estatusCita = 6 THEN '#00ffff' 
-				WHEN ct.estatusCita = 7 THEN '#ff0000' 
-				WHEN ct.estatusCita = 10 THEN '#33105D'
-				WHEN ct.estatusCita = 11 THEN '#ff0000' 
-			END AS color, 
-			CASE
-				WHEN ct.estatusCita = 1 AND ct.tipoCita = 1 THEN 'Por Asistir - Primera cita'
-				WHEN ct.estatusCita = 1 AND ct.tipoCita = 2 THEN 'Por Asistir - En línea'  
-				ELSE op.nombre
-			END AS estatus, 
-			CASE 
-				WHEN ct.estatusCita IN (2, 7, 8) THEN 'Cancelado' 
-				ELSE 'Exitoso' 
-			END AS pagoGenerado
-			FROM ". $this->schema_cm .".citas ct
-			LEFT JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idEspecialista
-			LEFT JOIN ". $this->schema_cm .".usuarios pa ON pa.idUsuario = ct.idPaciente
-			LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
-			LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us3 ON us3.idcontrato = pa.idContrato
-			LEFT JOIN ". $this->schema_cm .".usuariosexternos ext ON ext.idcontrato = pa.idContrato
-			LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_puestos ps ON ps.idpuesto = us2.idpuesto
-			LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idOpcion = ct.estatusCita
-			LEFT JOIN ". $this->schema_cm .".atencionxsede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
-			LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
-			LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_sedes sd ON sd.idsede = axs.idSede
-			LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_oficinas ofi ON ofi.idoficina = axs.idOficina
-			LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_puestos ps2 ON ps2.idpuesto = us3.idpuesto
-			LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_area ar ON ar.idsubarea = ps2.idArea
-			LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_departamento dep ON dep.idDepto = ar.idDepto
-			LEFT JOIN ". $this->schema_cm .".catalogos cat ON cat.idCatalogo = CASE 
-			WHEN ps.idpuesto = 537 THEN 8
-			WHEN ps.idpuesto = 585 THEN 7
-			WHEN ps.idpuesto = 686 THEN 9 
-			WHEN ps.idpuesto = 158 THEN 6
-			ELSE ps.idpuesto END 
-			LEFT JOIN ". $this->schema_cm .".detallepagos dp ON dp.idDetalle = ct.idDetalle
-			LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo oxc ON oxc.idOpcion = dp.metodoPago AND oxc.idCatalogo = 11
-			LEFT JOIN ". $this->schema_cm .".motivosporcita mpc ON mpc.idCita = ct.idCita
-  			LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo ops ON ops.idCatalogo = cat.idCatalogo AND ops.idOpcion = mpc.idMotivo
-			LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo ops2 ON ops2.idCatalogo = 10	
-			WHERE op.idCatalogo = 2 $usuarioCond $tipoReporte
-			GROUP BY 
-  				ct.idCita, 
-  				pa.idUsuario, 
-  				us2.nombre_persona, 
-  				us2.pri_apellido,    
-  				us2.sec_apellido,
-  				us3.nombre_persona,  
-  				us3.pri_apellido, 
-  				us3.sec_apellido,
-  				ps.nom_puesto,
-  				sd.nsede,
-  				ct.titulo, 
-  				op.nombre, 
-  				ct.fechaInicio, 
-  				ct.fechaFinal, 
-  				observaciones, 
-  				us2.sexo, 
-  				ofi.noficina,
-  				oxc.nombre, 
-  				ct.estatusCita, 
-  				ct.fechaModificacion,
-				dep.ndepto,
-				op2.nombre,
-				axs.tipoCita
+				WHEN @current_idP = QUERY1.idPaciente THEN @row_number := @row_number + 1
+        		ELSE @row_number := 1 AND @current_idP := QUERY1.idPaciente
+    		END AS numCita,
+	 		QUERY1.*    
+			FROM 
+    		(
+				SELECT ps.idpuesto, ct.idPaciente, ops3.nombre AS nombreEstatusCita, ct.idCita, pa.idUsuario AS idColab, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista, 
+				us3.num_empleado AS numEmpleado, IFNULL (CONCAT (us3.nombre_persona,' ',us3.pri_apellido,' ',us3.sec_apellido), ext.nombre) AS paciente, 
+				ps.nom_puesto AS area, IFNULL(sd.nsede, 'QRO') AS sede,ct.titulo, us3.narea, us3.npuesto, ct.archivoObservacion AS archivo,
+				CONCAT(DATE_FORMAT(ct.fechaInicio, '%Y-%m-%d'), ' ', DATE_FORMAT(ct.fechaInicio, '%H:%i'), ' - ', DATE_FORMAT(ct.fechaFinal, '%H:%i')) AS horario, observaciones, IFNULL(us3.sexo, ext.sexo) AS sexo, 
+				estatusCita, ct.fechaInicio, ct.fechaFinal, IFNULL(dep.ndepto, 'NO APLICA') AS depto, IFNULL(op2.nombre, 'Presencial') AS modalidad,  
+				CASE 
+					WHEN dp.cantidad IS NULL THEN 'SIN PAGO' ELSE CONCAT('$', ' ',dp.cantidad) 
+				END AS monto, ops2.nombre AS tipoCita, IFNULL(GROUP_CONCAT(ops.nombre SEPARATOR ', '), 'SIN MOTIVOS DE CITA') AS motivoCita, 
+				IFNULL(oxc.nombre, 'Pendiente de pago') AS metodoPago, ct.fechaCreacion,
+				CASE 
+					WHEN $tipoUsuario = 1 THEN 'RIO DE LA LOZA'
+					WHEN ofi.noficina IS NULL THEN 'VIRTUAL' 
+					WHEN ofi.noficina IS NOT NULL THEN ofi.noficina 
+				END AS oficina,
+				CASE 
+					WHEN pa.externo = 0 THEN 'Colaborador' 
+					WHEN pa.externo = 1 THEN 'Externo' 
+				END AS usuario,
+				CASE 
+					WHEN ct.estatusCita = 1 AND ct.tipoCita = 1 THEN '#ffe800'
+					WHEN ct.estatusCita = 1 AND ct.tipoCita = 2 THEN '#0000ff' 
+					WHEN ct.estatusCita = 1 AND ct.tipoCita = 3 THEN '#ffa500'
+					WHEN ct.estatusCita = 2 THEN '#ff0000' 
+					WHEN ct.estatusCita = 3 THEN '#808080' 
+					WHEN ct.estatusCita = 4 THEN '#008000' 
+					WHEN ct.estatusCita = 5 THEN '#ff4d67' 
+					WHEN ct.estatusCita = 6 THEN '#00ffff' 
+					WHEN ct.estatusCita = 7 THEN '#ff0000' 
+					WHEN ct.estatusCita = 10 THEN '#33105D'
+					WHEN ct.estatusCita = 11 THEN '#ff0000' 
+				END AS color, 
+				CASE
+					WHEN ct.estatusCita = 1 AND ct.tipoCita = 1 THEN 'Por Asistir - Primera cita'
+					WHEN ct.estatusCita = 1 AND ct.tipoCita = 2 THEN 'Por Asistir - En línea'  
+					ELSE op.nombre
+				END AS estatus, 
+				CASE 
+					WHEN ct.estatusCita IN (2, 7, 8) THEN 'Cancelado' 
+					ELSE 'Exitoso' 
+				END AS pagoGenerado,
+				CASE 
+					WHEN dp.fechaPago IS NULL THEN 'SIN FECHA DE PAGO' ELSE dp.fechaPago
+				END AS fechaPago,
+				us2.num_empleado AS numEspecialista
+				FROM ". $this->schema_cm .".citas ct
+				LEFT JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idEspecialista
+				LEFT JOIN ". $this->schema_cm .".usuarios pa ON pa.idUsuario = ct.idPaciente
+				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
+				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us3 ON us3.idcontrato = pa.idContrato
+				LEFT JOIN ". $this->schema_cm .".usuariosexternos ext ON ext.idcontrato = pa.idContrato
+				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_puestos ps ON ps.idpuesto = us2.idpuesto
+				LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idOpcion = ct.estatusCita
+				LEFT JOIN ". $this->schema_cm .".atencionxsede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
+				LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita
+				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_sedes sd ON sd.idsede = axs.idSede
+				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_oficinas ofi ON ofi.idoficina = axs.idOficina
+				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_puestos ps2 ON ps2.idpuesto = us3.idpuesto
+				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_area ar ON ar.idsubarea = ps2.idArea
+				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_departamento dep ON dep.idDepto = ar.idDepto
+				LEFT JOIN ". $this->schema_cm .".catalogos cat ON cat.idCatalogo = CASE 
+				WHEN ps.idpuesto = 537 THEN 8
+				WHEN ps.idpuesto = 585 THEN 7
+				WHEN ps.idpuesto = 686 THEN 9 
+				WHEN ps.idpuesto = 158 THEN 6
+				ELSE ps.idpuesto END 
+				LEFT JOIN ". $this->schema_cm .".detallepagos dp ON dp.idDetalle = ct.idDetalle
+				LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo oxc ON oxc.idOpcion = dp.metodoPago AND oxc.idCatalogo = 11
+				LEFT JOIN ". $this->schema_cm .".motivosporcita mpc ON mpc.idCita = ct.idCita
+				LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo ops ON ops.idCatalogo = cat.idCatalogo AND ops.idOpcion = mpc.idMotivo
+				LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo ops2 ON ops2.idCatalogo = 10
+				LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo ops3 ON ops3.idOpcion = ct.estatusCita AND ops3.idCatalogo = 2
+				WHERE op.idCatalogo = 2 $usuarioCond $tipoReporte
+				GROUP BY 
+					ct.idCita, 
+					pa.idUsuario, 
+					us2.nombre_persona, 
+					us2.pri_apellido,    
+					us2.sec_apellido,
+					us3.nombre_persona,  
+					us3.pri_apellido, 
+					us3.sec_apellido,
+					ps.nom_puesto,
+					sd.nsede,
+					ct.titulo, 
+					op.nombre, 
+					ct.fechaInicio, 
+					ct.fechaFinal, 
+					observaciones, 
+					us2.sexo, 
+					ofi.noficina,
+					oxc.nombre, 
+					ct.estatusCita, 
+					ct.fechaModificacion,
+					dep.ndepto,
+					op2.nombre,
+					axs.tipoCita
+					ORDER BY ps.idPuesto, fechaCreacion) AS QUERY1
 			");
 			return $query;
 	}
