@@ -49,8 +49,7 @@ class EspecialistasModel extends CI_Model {
     		FROM ". $this->schema_cm .".usuarios us
     		INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
     		WHERE
-    			(us.idAreaBeneficio=$idAreaBeneficio
-			OR us2.idpuesto = $idAreaBeneficio)
+    			(us.idAreaBeneficio = $idAreaBeneficio OR us2.idpuesto = $idAreaBeneficio)
     		AND us.idRol = 3";
 
     	return $this->ch->query($query)->result();
