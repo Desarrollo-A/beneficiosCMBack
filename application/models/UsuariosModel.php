@@ -93,13 +93,14 @@ class UsuariosModel extends CI_Model {
 			FROM ". $this->schema_cm .".usuarios US 
 			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = US.idContrato 
 			LEFT JOIN ". $this->schema_cm .".correostemporales AS c ON c.idContrato = us2.idcontrato 
-			WHERE US.idRol = ? AND US.estatus = ? AND us2.idsede IN ( SELECT DISTINCT idSede FROM ". $this->schema_cm .".atencionxsede WHERE idEspecialista = ? )
+			WHERE US.idRol = ? AND US.estatus = ? AND us2.idsede IN (SELECT axs.idSede FROM ". $this->schema_cm .".atencionxsede as axs INNER JOIN PRUEBA_CH.beneficioscm_vista_sedes AS s ON axs.idSede = s.idsede
+			WHERE idEspecialista = ? AND estatus = 1)			
 			UNION ( SELECT u.idUsuario AS idUsuario, u.idContrato, u.password, us2.idRol, u.externo, u.idAreaBeneficio, us2.estatus, us2.creadoPor, us2.fechaCreacion,
 			 us2.modificadoPor, us2.fechaModificacion, 1 AS idSede, 0 AS idarea, 0 tipoPuesto, 0 AS fechaIngreso, CONCAT('(Lamat)', ' ', CONCAT(IFNULL(us2.nombre, ''))) AS nombreCompleto,
 			0 AS nombrePuesto, 0 AS tipo_puesto, us2.correo
 			FROM ". $this->schema_cm .".usuarios as u 
 			INNER JOIN ". $this->schema_cm .".usuariosexternos AS us2 ON us2.idContrato = u.idContrato 
-			WHERE u.externo = ? )",
+			WHERE u.externo = ?)",
 			array( 2, 1, $idEspecialista, 1 )
 		);
 		
@@ -267,6 +268,12 @@ class UsuariosModel extends CI_Model {
 
 	public function saveToken($mailUsuario, $token){
 		$query = $this->ch->query("INSERT INTO ". $this->schema_cm .".tokenregistro (correo, token, fechaCreacion) VALUES(?, ?, NOW())", array($mailUsuario, $token));
+
+		return $query;
+	}
+
+	public function getSedesActivo($idUsuario){
+		$query = $this->ch->query("SELECT idSede FROM ". $this->schema_cm .".atencionxsede WHERE idEspecialista = 8 AND estatus = 1");
 
 		return $query;
 	}
