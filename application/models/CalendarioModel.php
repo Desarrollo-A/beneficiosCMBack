@@ -285,12 +285,16 @@ class CalendarioModel extends CI_Model
             OR (? BETWEEN fechaInicio AND fechaFinal))
             AND ((idPaciente = ?
             AND estatusCita IN (?, ?, ?))
-            OR (idEspecialista = ? and estatusCita IN (?, ?, ?)))",
+            OR (idEspecialista = ? and estatusCita IN (?, ?, ?))
+            OR (idPaciente = ? and estatusCita IN (?, ?, ?))
+            )",
             array(
                 $fechaInicioSuma, $fechaFinalResta,
                 $fechaInicioSuma, $fechaFinalResta,
                 $fechaInicioSuma, $fechaFinalResta,
                 $dataValue["idPaciente"],
+                1, 6, 10,
+                $dataValue["idUsuario"],
                 1, 6, 10,
                 $dataValue["idUsuario"],
                 1, 6, 10
@@ -443,7 +447,7 @@ class CalendarioModel extends CI_Model
     }
 
     public function checkInvoice($idDetalle){
-        $query = $this->ch->query("SELECT idDetalle FROM ". $this->schema_cm .".citas WHERE idDetalle = ? GROUP BY idDetalle HAVING COUNT(idDetalle) > ?", array($idDetalle, 2));
+        $query = $this->ch->query("SELECT idDetalle FROM ". $this->schema_cm .".citas WHERE idDetalle = ? AND estatus = 1 GROUP BY idDetalle HAVING COUNT(idDetalle) > ?", array($idDetalle, 2));
 
         return $query;
     }
