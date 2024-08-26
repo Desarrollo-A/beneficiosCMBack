@@ -397,7 +397,7 @@ class CalendarioController extends BaseController{
 				"idAtencionXSede" => intval($dataValue["idCatalogo"]),
 				"tipoCita" => $reagenda == 1 ? $dataValue['oldEventTipo'] : 3,
 				"idDetalle" => $dataValue["idDetalle"] == 0 ? NULL : $dataValue["idDetalle"],
-				"idEventoGoogle" => $reagenda == 1 ? $dataValue["idEventoGoogle"] : ''
+				"idEventoGoogle" => $reagenda == 1 && isset($dataValue["idEventoGoogle"]) ? $dataValue["idEventoGoogle"] : ''
 			];
 
 			$checkModalitie = $this->EspecialistasModel->checkModalitie($dataValue["idUsuario"], $fechaCheck);
