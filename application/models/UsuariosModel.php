@@ -94,12 +94,12 @@ class UsuariosModel extends CI_Model {
 			FROM ". $this->schema_cm .".usuarios US 
 			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = US.idContrato 
 			LEFT JOIN ". $this->schema_cm .".correostemporales AS c ON c.idContrato = us2.idcontrato 
-			WHERE US.idRol IN (?, ?) AND US.estatus = ? 
+			WHERE US.idRol IN (?, ?, ?) AND US.estatus = ? 
 				AND us2.idsede IN 
 					(SELECT axs.idSede 
 					FROM ". $this->schema_cm .".atencionxsede as axs 
 					INNER JOIN PRUEBA_CH.beneficioscm_vista_sedes AS s ON axs.idSede = s.idsede
-					WHERE idEspecialista = ? AND estatus = 1)", array( 2, 3, 1, $idEspecialista )
+					WHERE idEspecialista = ? AND estatus = 1)", array( 2, 3, 4, 1, $idEspecialista )
 		);
 		
 		return $query;
