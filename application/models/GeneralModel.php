@@ -270,7 +270,7 @@ class GeneralModel extends CI_Model {
         $query = "SELECT
             idOpcion as value,
             nombre as label 
-        FROM opcionesporcatalogo 
+        FROM ". $this->schema_cm .".opcionesporcatalogo 
         WHERE idCatalogo = 3";
 
         return $this->ch->query($query)->result();
