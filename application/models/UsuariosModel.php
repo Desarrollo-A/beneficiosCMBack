@@ -98,7 +98,7 @@ class UsuariosModel extends CI_Model {
 				AND us2.idsede IN 
 					(SELECT axs.idSede 
 					FROM ". $this->schema_cm .".atencionxsede as axs 
-					INNER JOIN PRUEBA_CH.beneficioscm_vista_sedes AS s ON axs.idSede = s.idsede
+					INNER JOIN ". $this->schema_cm .".beneficioscm_vista_sedes AS s ON axs.idSede = s.idsede
 					WHERE idEspecialista = ? AND estatus = 1)", array( 2, 3, 4, 1, $idEspecialista )
 		);
 		
