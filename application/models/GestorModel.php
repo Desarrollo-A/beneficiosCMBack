@@ -344,7 +344,7 @@ class GestorModel extends CI_Model {
         LEFT JOIN ". $this->schema_cm .".correostemporales AS c ON c.idContrato = us.idContrato
         LEFT JOIN ". $this->schema_cm .".usuariosexternos us3 ON us3.idcontrato = us.idContrato
         LEFT JOIN ". $this->schema_cm .".detallepaciente dt ON dt.idUsuario = us.idUsuario
-        LEFT JOIN opcionesporcatalogo permisos ON permisos.idCatalogo = 3 AND permisos.idOpcion = us.permisos
+        LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo permisos ON permisos.idCatalogo = 3 AND permisos.idOpcion = us.permisos
         WHERE us.idUsuario != 1
         GROUP BY
             us.idUsuario,
