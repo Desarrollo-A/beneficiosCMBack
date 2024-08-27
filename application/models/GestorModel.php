@@ -381,7 +381,7 @@ class GestorModel extends CI_Model {
 	}
 
     public function updatePermisosUsuarios($idUsuario, $permisos){
-        $query = "UPDATE usuarios
+        $query = "UPDATE ". $this->schema_cm .".usuarios
         SET
             permisos = $permisos
         WHERE
