@@ -147,7 +147,7 @@ class ReportesModel extends CI_Model {
 		$permisos = isset($dt["permisos"]) ? intval($dt["permisos"]) : 0;
 		$idUs = $dt["idUs"];
 		$tipoUsuario = $dt["tipoUsuario"];
-
+		$query = '';
 		$usuarioCond = $tipoUsuario != 2 ? "AND us.externo = $tipoUsuario" : "";
 
 		if($idRol == 1 || $idRol == 4 || $permisos == 5){
