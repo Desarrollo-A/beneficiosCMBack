@@ -311,14 +311,14 @@ class CalendarioModel extends CI_Model
             OR (fechaFinal BETWEEN ? AND ?)
             OR (? BETWEEN fechaInicio AND fechaFinal) 
             OR (? BETWEEN fechaInicio AND fechaFinal))
-            AND idEspecialista = ?
+            AND idEspecialista IN (?, ?)
             AND estatus = ?",
             array(
                 $fechaInicioSuma, $fechaFinalResta,
                 $fechaInicioSuma, $fechaFinalResta,
                 $fechaInicioSuma,
                 $fechaFinalResta,
-                $dataValue["idUsuario"],
+                $dataValue["idUsuario"], $dataValue["idPaciente"],
                 1
             )
         );

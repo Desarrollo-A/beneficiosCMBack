@@ -353,7 +353,6 @@ class CalendarioController extends BaseController{
 	{
 		$dataValue = $this->input->post("dataValue", true);
 		$fundacion = $dataValue["fundacion"];
-		$tipoPuesto = $dataValue["tipoPuesto"];
 		$now = date('Y/m/d H:i:s', time());
 
 		$fechaFinalResta = date('Y/m/d H:i:s', strtotime($dataValue["fechaFinal"] . '-1 minute'));
