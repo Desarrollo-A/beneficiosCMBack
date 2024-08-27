@@ -1,22 +1,22 @@
 <?php
-require 'vendor/autoload.php';
+// require 'vendor/autoload.php';
 
-use Google\Cloud\Storage\StorageClient;
+// use Google\Cloud\Storage\StorageClient;
 abstract class BaseController extends CI_Controller{
 
     public function __construct(){
         parent::__construct();
         $this->load->database('default');
 
-        $storage = new StorageClient([
-            'keyFilePath' => APPPATH . 'config/google.json'
-        ]);
+        // $storage = new StorageClient([
+        //     'keyFilePath' => APPPATH . 'config/google.json'
+        // ]);
 
         $this->config->load("google_api");
 
-        $bucket = $this->config->item("bucket");
+        // $bucket = $this->config->item("bucket");
 
-        $this->bucket = $storage->bucket($bucket);
+        // $this->bucket = $storage->bucket($bucket);
 
         $this->load->model('UsuariosModel');
 
