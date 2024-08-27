@@ -48,6 +48,7 @@ class Especialistas extends BaseController{
 
         foreach ($period as $date) {
             $today = new DateTime();
+            $banderaSuccess = true;
 
             if($date < $today){
 
@@ -59,14 +60,16 @@ class Especialistas extends BaseController{
             $end_day = $date->format("Y-m-d 23:59:59");
 
             $has_citas = $this->CitasModel->getCitasPendientes($especialista, $sede, $start_day, $end_day);
-            
-            if($has_citas){
+
+            if(!empty($has_citas)){ // si se encuentran citas en esas fechas
                 $day = $date->format("Y-m-d");
                 $data["result"] = false;
-                $data["msg"] = 'No puedes cambiar el horario el'. $day .', por que tienes citas pendientes.';
+                $data["msg"] = 'No puedes cambiar el horario del dia '. $day .', por que tienes citas pendientes.';
+                $banderaSuccess = false;
+                $is_ok = false;
             }
 
-            if($sede != 0){
+            if($sede != 0 && $banderaSuccess){
                 $check_exist = $this->SedesModel->checkExist($date->format("Y-m-d"), $sede, $especialista);
                 if($check_exist->num_rows() > 0){
                     $id = $check_exist->result();
@@ -81,7 +84,7 @@ class Especialistas extends BaseController{
                 else{
                     $is_ok = $this->SedesModel->addHorarioPresencial($date->format("Y-m-d"), $sede, $especialista);
                 }
-            }else{
+            }else if($sede == 0 && $banderaSuccess){
                 $is_ok = $this->SedesModel->deleteHorarioPresencial($date->format("Y-m-d"), $sede, $especialista);
             }
         }
@@ -129,5 +132,22 @@ class Especialistas extends BaseController{
         ];
 
         $this->json($result);
+    }
+
+    public function area(){
+        $area = $this->input->get('area');
+
+        $especialistas = $this->EspecialistasModel->getEspecialistasPorArea($area);
+
+        $this->json($especialistas);
+    }
+
+    public function active(){
+        $modalidad = $this->input->get('modalidad');
+        $especialista = $this->input->get('especialista');
+
+        $sedes = $this->SedesModel->getSedesActivasXEspecialista($modalidad, $especialista);
+
+        $this->json($sedes);
     }
 }

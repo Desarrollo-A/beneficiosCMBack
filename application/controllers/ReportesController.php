@@ -34,8 +34,7 @@ class ReportesController extends BaseController {
 		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 
-	public function observacion(){
-
+	public function observacion(){		
 		$idCita= $this->form('idCita');
 		$descripcion= $this->form('descripcion');
 		$estatus= $this->form('ests');
@@ -85,7 +84,7 @@ class ReportesController extends BaseController {
 
 	public function getCierrePacientes(){
 		$dt = $this->input->post('dataValue', true);
-		$data['data'] = $this->ReportesModel->getCierrePacientes($dt)->result();
+		$data['data'] = $this->ReportesModel->getCierrePacientes($dt);
 		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
 

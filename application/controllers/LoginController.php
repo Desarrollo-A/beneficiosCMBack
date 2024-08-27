@@ -36,10 +36,6 @@ class LoginController extends BaseController {
         $mailCh = $this->input->post('dataValue[params][mail_emp]');
 
         switch ($datosEmpleado['idpuesto']){
-            case "158": // QB
-                $idRol = 3;
-                $areaBeneficio = 1;
-                break;
             case "585": // Psicologia
                 $idRol = 3;
                 $areaBeneficio = 4;
@@ -205,6 +201,7 @@ class LoginController extends BaseController {
                 'idPuesto'              =>      $data[0]->idPuesto,
                 'sede'                  =>      $data[0]->idSede,
                 'idArea'                =>      $data[0]->idArea,
+                'permisos'              =>      $data[0]->permisos,
             );
             date_default_timezone_set('America/Mexico_City');
             $time = time();

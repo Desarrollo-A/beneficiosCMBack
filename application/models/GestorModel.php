@@ -336,12 +336,15 @@ class GestorModel extends CI_Model {
             CASE WHEN dt.estatusPsi = 1 THEN 'Psicología' END,
             CASE WHEN dt.estatusGE = 1 THEN 'Guía espiritual' END
         )) AS servicios,
-        DATE_FORMAT(us.fechaCreacion, '%Y-%m-%d') AS fechaCreacion
+        DATE_FORMAT(us.fechaCreacion, '%Y-%m-%d') AS fechaCreacion,
+        permisos.idOpcion as permisos_id,
+        permisos.nombre as permisos_name
         FROM ". $this->schema_cm .".usuarios us
         LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
         LEFT JOIN ". $this->schema_cm .".correostemporales AS c ON c.idContrato = us.idContrato
         LEFT JOIN ". $this->schema_cm .".usuariosexternos us3 ON us3.idcontrato = us.idContrato
         LEFT JOIN ". $this->schema_cm .".detallepaciente dt ON dt.idUsuario = us.idUsuario
+        LEFT JOIN opcionesporcatalogo permisos ON permisos.idCatalogo = 3 AND permisos.idOpcion = us.permisos
         WHERE us.idUsuario != 1
         GROUP BY
             us.idUsuario,
@@ -376,4 +379,14 @@ class GestorModel extends CI_Model {
 		ORDER BY ar.narea ASC");
         return $query;
 	}
+
+    public function updatePermisosUsuarios($idUsuario, $permisos){
+        $query = "UPDATE usuarios
+        SET
+            permisos = $permisos
+        WHERE
+            idUsuario=$idUsuario";
+
+        return $this->ch->query($query);
+    }
 }
