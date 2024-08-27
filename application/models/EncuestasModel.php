@@ -294,7 +294,7 @@ class EncuestasModel extends CI_Model {
     public function evaluacionEncuesta($idUsuario)
 	{
         $query = $this->ch->query("SELECT enc.idCita, enc.primeraSesion, enc.satisfaccion, enc.reagenda, enc.cancelacion, ps.nom_puesto AS especialidad, 
-        DATE(ct.fechaModificacion) AS fecha, ct.idEspecialista, ps.idpuesto
+        ct.fechaInicio AS fecha, ct.idEspecialista, ps.idpuesto
         FROM ". $this->schema_cm .".citas ct
         INNER JOIN ". $this->schema_cm .".evaluacionencuestas enc ON enc.idCita = ct.idCita
         INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idEspecialista 
