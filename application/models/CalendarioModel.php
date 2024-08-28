@@ -540,13 +540,13 @@ class CalendarioModel extends CI_Model
         return $query;
     }
 
-    public function getCitasSinFinalizarUsuario($usuario, $beneficio, $eventId)
+    public function getCitasSinFinalizarUsuario($usuario, $beneficio)
     {
         $query = $this->ch->query(
             "SELECT ct.idCita FROM ". $this->schema_cm .".citas AS ct
             INNER JOIN ". $this->schema_cm .".usuarios as us ON ct.idEspecialista = us.idUsuario
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato 
-            WHERE ct.estatus = 1 AND idCita NOT IN($eventId) AND ct.idPaciente = ? AND us2.idpuesto = ? AND ct.estatusCita IN (1, 6, 10);",array($usuario, $beneficio)
+            WHERE ct.estatus = 1 AND ct.idPaciente = ? AND us2.idpuesto = ? AND ct.estatusCita IN (1, 6, 10);",array($usuario, $beneficio)
         );
 
         return $query;
