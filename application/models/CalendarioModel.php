@@ -306,7 +306,7 @@ class CalendarioModel extends CI_Model
         return $query;
     }
 
-    public function checkOccupied($dataValue, $fechaInicioSuma, $fechaFinalResta){
+    public function checkOccupied($dataValue, $fechaInicioSuma, $fechaFinalResta, $idPaciente){
         $query = $this->ch->query(
             "SELECT *FROM ". $this->schema_cm .".horariosocupados WHERE 
             ((fechaInicio BETWEEN ? AND ?) 
@@ -320,7 +320,7 @@ class CalendarioModel extends CI_Model
                 $fechaInicioSuma, $fechaFinalResta,
                 $fechaInicioSuma,
                 $fechaFinalResta,
-                $dataValue["idUsuario"], $dataValue["idPaciente"],
+                $dataValue["idUsuario"], $idPaciente,
                 1
             )
         );
