@@ -226,9 +226,9 @@ class CalendarioModel extends CI_Model
             LEFT JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idPaciente
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
             WHERE (ct.idEspecialista = ? OR ct.idPaciente = ?) AND ct.estatusCita IN (?, ?, ?)
-            AND ((fechaInicio BETWEEN ? AND ? ) OR 
-            (fechaFinal BETWEEN ? AND ?) OR 
-            (fechaInicio >= ? AND fechaFinal <= ?))",
+            AND ((DATE(fechaInicio) BETWEEN ? AND ? ) OR 
+            (DATE(fechaFinal) BETWEEN ? AND ?) OR 
+            (DATE(fechaInicio) >= ? AND DATE(fechaFinal) <= ?))",
             array( $especialista, $usuario, 1, 6, 10,  $fechaInicio, $fechaFin, $fechaInicio, $fechaFin, $fechaInicio, $fechaFin)
         );
 
