@@ -208,9 +208,11 @@ class CalendarioModel extends CI_Model
             "SELECT idOcupado as id, titulo as title, fechaInicio as occupied, fechaInicio, fechaFinal 
             FROM ". $this->schema_cm .".horariosocupados 
             WHERE idEspecialista = ? AND estatus = ? AND 
-            ((fechaInicio BETWEEN ? AND ?) OR 
-            (fechaFinal BETWEEN ? AND ?) OR 
-            (fechaInicio >= ? AND fechaFinal <= ?));",
+            (
+                (DATE(fechaInicio) BETWEEN ? AND ?) OR 
+                (DATE(fechaFinal) BETWEEN ? AND ?) OR 
+                (DATE(fechaInicio) >= ? AND DATE(fechaFinal) <= ?)
+            );",
             array( $idUsuario, 1, $fechaInicio, $fechaFin, $fechaInicio, $fechaFin, $fechaInicio, $fechaFin)
         );
         return $query;
