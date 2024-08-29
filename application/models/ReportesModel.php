@@ -462,6 +462,13 @@ class ReportesModel extends CI_Model {
 			AND us.idUsuario = $idUsr AND ct.estatusCita = 4 AND op2.nombre IN ('$modalidad') $usuarioCond2");
 			return $query->result();
 		}
+		else if($rol == 2 && $permisos == 1){
+			$query = $this->ch-> query("SELECT COUNT(DISTINCT idPaciente) AS TotalPacientes
+			FROM ". $this->schema_cm .".citas ct
+			INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idPaciente 
+			WHERE ct.fechaModificacion >= '$fechaI' AND ct.fechaModificacion < '$fechaF' AND ct.estatusCita = 4 $usuarioCond");
+			return $query->result();
+		}
 
 	}
 
