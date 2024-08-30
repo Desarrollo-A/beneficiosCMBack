@@ -252,7 +252,6 @@ class CalendarioController extends BaseController{
         $detalle = $this->input->post('dataValue[detallePago]');
         $idGoogleEvent = $this->input->post('dataValue[idGoogleEvent]');
         $fecha = date('Y-m-d H:i:s');
-		$idPaciente = isset($dataValue["idPaciente"]) ? '$dataValue[idPaciente]' : '$dataValue[idUsuario]';
 
         $response['result'] = isset(
             $titulo,
