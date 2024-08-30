@@ -365,7 +365,7 @@ class CalendarioController extends BaseController{
 		$year = date('Y', strtotime($dataValue["fechaInicio"]));
 		$month = date('m', strtotime($dataValue["fechaInicio"]));
 
-		$idPaciente = isset($dataValueP["idPaciente"]) ? '$dataValue[idPaciente]' : '$dataValue[idUsuario]';
+		$idPaciente = isset($dataValueP["idPaciente"]) ? $this->input->post('$dataValue[idPaciente]') : $this->input->post('$dataValue[idUsuario]');
 
 		$fechaActual = new DateTime(); // Obtén la fecha actual
 		$fechaActual->modify('+3 hours');
@@ -457,7 +457,7 @@ class CalendarioController extends BaseController{
 		$fechaFinalResta = date('Y/m/d H:i:s', strtotime($dataValue["fechaFinal"] . '-1 minute'));
 		$fechaInicioSuma = date('Y/m/d H:i:s', strtotime($dataValue["fechaInicio"] . '+1 minute'));
 
-		$idPaciente = isset($dataValue["idPaciente"]) ? '$dataValue[idPaciente]' : '$dataValue[idUsuario]';
+		$idPaciente = isset($dataValue["idPaciente"]) ? $this->input->post('$dataValue[idPaciente]') : $this->input->post('$dataValue[idUsuario]') ;
 
 		if ($start < $now) {
 			$reponse["result"] = false;
@@ -555,7 +555,7 @@ class CalendarioController extends BaseController{
 
 		$fechaFinalResta = date('Y/m/d H:i:s', strtotime($dataValue["fechaFinal"] . '-1 minute'));
 		$fechaInicioSuma = date('Y/m/d H:i:s', strtotime($dataValue["fechaInicio"] . '+1 minute'));
-		$idPaciente = isset($dataValue["idPaciente"]) ? '$dataValue[idPaciente]' : '$dataValue[idUsuario]';
+		$idPaciente = isset($dataValue["idPaciente"]) ? $this->input->post('$dataValue[idPaciente]') : $this->input->post('$dataValue[idUsuario]');
 
 		if ($start < $now) {
 			$reponse["result"] = false;
