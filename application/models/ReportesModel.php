@@ -58,8 +58,9 @@ class ReportesModel extends CI_Model {
 					WHEN pa.externo = 1 THEN 'Externo' 
 				END AS usuario,
 				CASE 
-					WHEN ct.estatusCita = 1 AND ct.tipoCita = 1 THEN '#ffe800'
-					WHEN ct.estatusCita = 1 AND ct.tipoCita = 2 THEN '#0000ff' 
+					WHEN ct.estatusCita = 1 AND ct.tipoCita = 1 AND axs.tipoCita IN(1, 2) THEN '#ffe800'
+					WHEN ct.estatusCita = 1 AND ct.tipoCita = 2 AND axs.tipoCita IN (2) THEN '#0000ff'
+					WHEN ct.estatusCita = 1 AND ct.tipoCita = 2 AND axs.tipoCita IN (1) THEN '#ffe800'
 					WHEN ct.estatusCita = 1 AND ct.tipoCita = 3 THEN '#ffa500'
 					WHEN ct.estatusCita = 2 THEN '#ff0000' 
 					WHEN ct.estatusCita = 3 THEN '#808080' 
@@ -71,8 +72,9 @@ class ReportesModel extends CI_Model {
 					WHEN ct.estatusCita = 11 THEN '#ff0000' 
 				END AS color, 
 				CASE
-					WHEN ct.estatusCita = 1 AND ct.tipoCita = 1 THEN 'Por Asistir - Primera cita'
-					WHEN ct.estatusCita = 1 AND ct.tipoCita = 2 THEN 'Por Asistir - En línea'  
+					WHEN ct.estatusCita = 1 AND ct.tipoCita = 1 AND axs.tipoCita IN(1, 2) THEN 'Por Asistir - Primera cita'
+					WHEN ct.estatusCita = 1 AND ct.tipoCita = 2 AND axs.tipoCita IN (2) THEN 'Por Asistir - En línea'
+					WHEN ct.estatusCita = 1 AND ct.tipoCita = 2 AND axs.tipoCita IN (1) THEN 'Por Asistir - Presencial'
 					ELSE op.nombre
 				END AS estatus, 
 				CASE 
