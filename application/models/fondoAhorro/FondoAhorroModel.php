@@ -11,14 +11,14 @@ class FondoAhorroModel extends CI_Model {
 		parent::__construct();
 	}
 
-    public function getInformacion()
+    public function getFondo($id)
 	{
 
-        $query = $this->ch->query("SELECT idOpcion AS id, nombre 
-        FROM opcionesporcatalogo 
-        WHERE opcionesporcatalogo.idCatalogo = 20 ORDER  BY idOpcion ASC");
+        $query = $this->ch->query("SELECT *
+        FROM fondosahorros 
+        WHERE idContrato = $id AND estatusFondo IN(1,2,3,4,5)
+		ORDER BY fechaCreacion DESC
+		LIMIT 1;");
 		return $query;
-
 	}
-
 }
