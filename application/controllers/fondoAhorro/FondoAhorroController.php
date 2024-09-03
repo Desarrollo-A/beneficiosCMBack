@@ -80,4 +80,19 @@ class FondoAhorroController extends BaseController {
 		}
 
 	}
+
+	public function getSolicitudes(){
+		$data = $this->FondoAhorroModel->getSolicitudes()->result();
+
+		$rs['result'] = count($data) > 0; 
+		if ($rs['result']) {
+			$rs['msg'] = '¡Listado de usuarios cargado exitosamente!';
+			$rs['data'] = $data; 
+		}else {
+			$rs['msg'] = '¡No existen registros!';
+		}
+
+		$this->output->set_content_type("application/json");
+        $this->output->set_output(json_encode($rs, JSON_NUMERIC_CHECK));
+	}
 }
