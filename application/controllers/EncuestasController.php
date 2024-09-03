@@ -271,7 +271,7 @@ class EncuestasController extends BaseController {
 
 	public function evaluacionEncuesta()
 	{
-		$dt = $this->input->post('dataValue', true);
+		$dt = $this->input->post('dataValue[idUsuario]', true);
 		$data['data'] = $this->EncuestasModel->evaluacionEncuesta($dt)->result();
 		$this->output->set_content_type('application/json');
         $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));

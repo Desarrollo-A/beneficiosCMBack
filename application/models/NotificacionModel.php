@@ -12,6 +12,8 @@ class NotificacionModel extends CI_Model{
 
     public function getNotificacion($idUsuario){
 
+        $usr = isset($idUsuario) ? $idUsuario : 0;
+
         $query = $this->ch->query(
             "SELECT
             nt.idNotificacion AS id,
@@ -46,7 +48,7 @@ class NotificacionModel extends CI_Model{
             LEFT JOIN ". $this->schema_cm .".detallepagos dp ON dp.idDetalle = ct.idDetalle AND dp.estatusPago = 1
             LEFT JOIN ". $this->schema_cm .".usuarios us3 ON us3.idUsuario = nt.idUsuario
             LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us4 ON us4.idcontrato = us3.idContrato 
-            WHERE nt.idUsuario = $idUsuario");
+            WHERE nt.idUsuario = $usr");
 
         return $query;
     }

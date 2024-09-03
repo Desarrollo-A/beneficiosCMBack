@@ -293,6 +293,7 @@ class Usuario extends BaseController {
 
 	public function getNameUser(){
 		$idEspecialista = $this->input->post("dataValue", true);
+		
 
 		$getNameUser = $this->UsuariosModel->getNameUser($idEspecialista)->result();
 		$response['result'] = count($getNameUser) > 0;

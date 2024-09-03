@@ -27,9 +27,9 @@ class Sedes extends BaseController{
         $sede = $this->input->get('sede');
         $checked = $this->input->get('checked') === 'true' ? 1 : 0;
 
-        $this->SedesModel->saveAtencionXEspecialista($area, $especialista, $modalidad, $sede, $checked);
+        $sede = $this->SedesModel->saveAtencionXEspecialista($area, $especialista, $modalidad, $sede, $checked);
 
-        $this->json([]);
+        $this->json($sede);
     }
 
     public function oficina(){
@@ -38,9 +38,19 @@ class Sedes extends BaseController{
         $sede = $this->input->get('sede');
         $oficina = $this->input->get('oficina');
 
-        $this->SedesModel->saveOficinaXSede($especialista, $modalidad, $sede, $oficina);
+        $save = $this->SedesModel->saveOficinaXSede($especialista, $modalidad, $sede, $oficina);
 
-        $this->json([]);
+        if($save){
+            $response["result"] = true;
+            $response["message"] = "Se ha asignado la oficina correctamente";
+        }
+        else{
+            $response["result"] = false;
+            $response["message"] = "Error al asignar la oficina";
+        }
+
+        $this->output->set_content_type("application/json");
+        $this->output->set_output(json_encode($response));
     }
 }
 

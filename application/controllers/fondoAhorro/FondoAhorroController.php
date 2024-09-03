@@ -16,9 +16,11 @@ class FondoAhorroController extends BaseController {
         $this->schema_ch = $this->config->item('schema_ch');
 	}
 
-	public function getInformacion(){
-		$data['data'] = $this->FondoAhorroModel->getInformacion()->result();
-		echo json_encode($data, JSON_NUMERIC_CHECK);
+	public function getFondo(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->FondoAhorroModel->getFondo($dt)->result();
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
 	}
 
 	public function sendMail() {

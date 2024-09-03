@@ -35,21 +35,16 @@ class ReportesController extends BaseController {
 	}
 
 	public function observacion(){
-
 		$idCita= $this->form('idCita');
 		$descripcion= $this->form('descripcion');
 		$estatus= $this->form('ests');
 		$modificadoPor= $this->form('modificadoPor');
 		$archivo= $this->file('archivo');
+		$file_ext = "";
+		$file_name =  "";
 
 		if( !empty($idCita) && !empty($descripcion) )
 		{
-			$data = array(
-				"observaciones" => $descripcion,
-				"estatusCita" => $estatus,
-				"modificadoPor" => $modificadoPor,
-			);
-
 			if($archivo){
 				$file_ext = pathinfo($archivo->name, PATHINFO_EXTENSION);
 				$file_name =  "justificacion-$idCita.$file_ext";
@@ -60,6 +55,13 @@ class ReportesController extends BaseController {
 					$data['archivoObservacion'] = $file_name;
 				}
 			}
+
+			$data = array(
+				"observaciones" => $descripcion,
+				"archivoObservacion" => $file_name,
+				// "estatusCita" => 3 // $estatus, // se ha removido esta funcion ya que el administrador es quien dara cambio a estatus 5 de justificado
+				"modificadoPor" => $modificadoPor,
+			);
 			
 			$this->GeneralModel->updateRecord($this->schema_cm.'.citas', $data, 'idCita', $idCita);
 			echo json_encode(array("estatus" => true, "msj" => "Observación registrada" ), JSON_NUMERIC_CHECK);
@@ -141,5 +143,29 @@ class ReportesController extends BaseController {
 		$data['data'] = $this->ReportesModel->demandaPuestos($dt)->result();
 		$this->output->set_content_type('application/json');
         $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
+
+	public function aceptarJustificacion(){
+		$idCita = $this->form('idCita');
+		$tipo = $this->form('tipo');
+
+		$updateData = array(
+			"estatusCita" => $tipo == 1 ? 5 : 3,
+			"justificado" => $tipo == 1 ? 1 : 2
+		);
+
+		$update = $this->GeneralModel->updateRecord($this->schema_cm . ".citas", $updateData, "idCita", $idCita);
+
+		if($update){
+			$response["result"] = true;
+			$response["msg"] = $tipo == 1 ? "Se ha justificado la falta" : "Se ha rechazado la justificación";
+		}
+		else{
+			$response["result"] = false;
+			$response["msg"] = "Error al enviar la justificación";
+		}
+
+		$this->output->set_content_type('application/json');
+		$this->output->set_output(json_encode($response));
 	}
 }

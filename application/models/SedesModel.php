@@ -109,7 +109,8 @@ class SedesModel extends CI_Model {
 
         if($exist){
             $this->ch->query("UPDATE ". $this->schema_cm .".atencionxsede
-                SET estatus = $estatus
+                SET estatus = $estatus,
+                idOficina = 0
                 WHERE idEspecialista = $idEspecialista
                 AND idSede = $idSede
                 AND tipoCita = $tipoCita");
@@ -117,6 +118,11 @@ class SedesModel extends CI_Model {
             $this->ch->query("INSERT INTO ". $this->schema_cm .".atencionxsede (idEspecialista, idSede, tipoCita, estatus)
                 VALUES ($idEspecialista, $idSede, $tipoCita, $estatus)");
         }
+
+        return $this->ch->query("SELECT * FROM ". $this->schema_cm .".atencionxsede
+            WHERE idEspecialista = $idEspecialista
+            AND idSede = $idSede
+            AND tipoCita = $tipoCita")->row();
     }
 
     public function getSedesActivasXEspecialista($tipoCita, $idEspecialista){
@@ -129,17 +135,21 @@ class SedesModel extends CI_Model {
     }
 
     public function saveOficinaXSede($idEspecialista, $tipoCita, $idSede, $idOficina){
+        $query = '';
+
         $exist = $this->ch->query("SELECT * FROM ". $this->schema_cm .".atencionxsede
             WHERE idEspecialista = $idEspecialista
             AND idSede = $idSede
             AND tipoCita = $tipoCita")->result();
 
         if($exist){
-            $this->ch->query("UPDATE ". $this->schema_cm .".atencionxsede
+            $query = $this->ch->query("UPDATE ". $this->schema_cm .".atencionxsede
                 SET idOficina = $idOficina
                 WHERE idEspecialista = $idEspecialista
                 AND idSede = $idSede
                 AND tipoCita = $tipoCita");
         }
+
+        return $query;
     }
 }

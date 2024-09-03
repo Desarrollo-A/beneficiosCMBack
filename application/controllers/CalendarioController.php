@@ -97,6 +97,8 @@ class CalendarioController extends BaseController{
 
 		$fechaFinalResta = date('Y/m/d H:i:s', strtotime($dataValue["fechaFinal"] . '-1 minute'));
 		$fechaInicioSuma = date('Y/m/d H:i:s', strtotime($dataValue["fechaInicio"] . '+1 minute'));
+		
+		$idPaciente = isset($dataValue["idPaciente"]) ? $dataValue["idPaciente"] : $dataValue["idUsuario"];
 
 		$values = [
 			"idEspecialista" => $dataValue["idUsuario"],
@@ -114,7 +116,7 @@ class CalendarioController extends BaseController{
 			$pass = true;
 
 		try {
-			$checkOccupied = $this->CalendarioModel->checkOccupied($dataValue, $fechaInicioSuma, $fechaFinalResta);
+			$checkOccupied = $this->CalendarioModel->checkOccupied($dataValue, $fechaInicioSuma, $fechaFinalResta, $idPaciente);
 			$checkAppointment = $this->CalendarioModel->checkAppointmentNormal($dataValue, $fechaInicioSuma, $fechaFinalResta);
 
 			if ($checkOccupied->num_rows() < 1 && $checkAppointment->num_rows() < 1 && isset($pass)) {
@@ -235,6 +237,7 @@ class CalendarioController extends BaseController{
 
 	public function createAppointmentByColaborator()
     {
+		$dataValue = $this->input->post("dataValue", true);
         $titulo = $this->input->post('dataValue[titulo]');
         $idEspecialista = $this->input->post('dataValue[idEspecialista]');
         $idPaciente = $this->input->post('dataValue[idPaciente]');
@@ -304,7 +307,7 @@ class CalendarioController extends BaseController{
                 $fechaFinalResta = date('Y/m/d H:i:s', strtotime($fechaFinal . '-1 minute'));
                 $fechaInicioSuma = date('Y/m/d H:i:s', strtotime($fechaInicio . '+1 minute'));
                 $checkAppointment = $this->CalendarioModel->checkAppointment($dataValue, $fechaInicioSuma, $fechaFinalResta);
-                $checkOccupied = $this->CalendarioModel->checkOccupied($dataValue, $fechaInicioSuma, $fechaFinalResta);
+                $checkOccupied = $this->CalendarioModel->checkOccupied($dataValue, $fechaInicioSuma, $fechaFinalResta, $idPaciente);
                 $response['result'] = $checkAppointment->num_rows() === 0 && $checkOccupied->num_rows() === 0;
                 if ($response['result']) { // Validamos que no tenga registros con horarios repetidos
                     // Obtén la fecha actual
@@ -351,9 +354,9 @@ class CalendarioController extends BaseController{
 
 	public function createAppointment()
 	{
+		$dataValueP = $this->input->post("dataValue", true);
 		$dataValue = $this->input->post("dataValue", true);
 		$fundacion = $dataValue["fundacion"];
-		$tipoPuesto = $dataValue["tipoPuesto"];
 		$now = date('Y/m/d H:i:s', time());
 
 		$fechaFinalResta = date('Y/m/d H:i:s', strtotime($dataValue["fechaFinal"] . '-1 minute'));
@@ -361,6 +364,8 @@ class CalendarioController extends BaseController{
 
 		$year = date('Y', strtotime($dataValue["fechaInicio"]));
 		$month = date('m', strtotime($dataValue["fechaInicio"]));
+
+		$idPaciente = isset($dataValueP["idPaciente"]) ? $this->input->post('$dataValue[idPaciente]') : $this->input->post('$dataValue[idUsuario]');
 
 		$fechaActual = new DateTime(); // Obtén la fecha actual
 		$fechaActual->modify('+3 hours');
@@ -386,7 +391,7 @@ class CalendarioController extends BaseController{
 			$values = [
 				"idEspecialista" => $dataValue["idUsuario"],
 				"idPaciente" => $dataValue["idPaciente"],
-				"estatusCita" => ($fundacion == 1 || $reagenda == 1 || $tipoPuesto == 'Operativa') ? 1 : 6,
+				"estatusCita" => ($fundacion == 1 || $reagenda == 1) ? 1 : 6,
 				"fechaInicio" => $dataValue["fechaInicio"],
 				"fechaFinal" => $dataValue["fechaFinal"],
 				"creadoPor" => $dataValue["creadoPor"],
@@ -397,13 +402,13 @@ class CalendarioController extends BaseController{
 				"idAtencionXSede" => intval($dataValue["idCatalogo"]),
 				"tipoCita" => $reagenda == 1 ? $dataValue['oldEventTipo'] : 3,
 				"idDetalle" => $dataValue["idDetalle"] == 0 ? NULL : $dataValue["idDetalle"],
-				"idEventoGoogle" => $reagenda == 1 ? $dataValue["idEventoGoogle"] : ''
+				"idEventoGoogle" => $reagenda == 1 && isset($dataValue["idEventoGoogle"]) ? $dataValue["idEventoGoogle"] : ''
 			];
 
 			$checkModalitie = $this->EspecialistasModel->checkModalitie($dataValue["idUsuario"], $fechaCheck);
 			$checkUser = $this->UsuariosModel->checkUser($dataValue["idPaciente"], $year, $month);
 			$checkAppointment = $this->CalendarioModel->checkAppointment($dataValue, $fechaInicioSuma, $fechaFinalResta);
-			$checkOccupied = $this->CalendarioModel->checkOccupied($dataValue, $fechaInicioSuma, $fechaFinalResta);
+			$checkOccupied = $this->CalendarioModel->checkOccupied($dataValue, $fechaInicioSuma, $fechaFinalResta, $idPaciente);
 			
 			if ($checkAppointment->num_rows() > 0) {
 				$response["result"] = false;
@@ -452,6 +457,8 @@ class CalendarioController extends BaseController{
 		$fechaFinalResta = date('Y/m/d H:i:s', strtotime($dataValue["fechaFinal"] . '-1 minute'));
 		$fechaInicioSuma = date('Y/m/d H:i:s', strtotime($dataValue["fechaInicio"] . '+1 minute'));
 
+		$idPaciente = isset($dataValue["idPaciente"]) ? $this->input->post('$dataValue[idPaciente]') : $this->input->post('$dataValue[idUsuario]') ;
+
 		if ($start < $now) {
 			$reponse["result"] = false;
 			$response["msg"] = "No se pueden mover las fechas a un dia anterior o actual";
@@ -469,7 +476,7 @@ class CalendarioController extends BaseController{
 				"titulo" => $dataValue["titulo"]
 			];
 
-			$checkOccupied = $this->CalendarioModel->checkOccupied($dataValue, $fechaInicioSuma, $fechaFinalResta);
+			$checkOccupied = $this->CalendarioModel->checkOccupied($dataValue, $fechaInicioSuma, $fechaFinalResta, $idPaciente);
 			$checkAppointmentId = $this->CalendarioModel->checkAppointmentId($dataValue, $fechaInicioSuma, $fechaFinalResta);
 
 			if ($checkOccupied->num_rows() > 0 || $checkAppointmentId->num_rows() > 0) {
@@ -548,6 +555,7 @@ class CalendarioController extends BaseController{
 
 		$fechaFinalResta = date('Y/m/d H:i:s', strtotime($dataValue["fechaFinal"] . '-1 minute'));
 		$fechaInicioSuma = date('Y/m/d H:i:s', strtotime($dataValue["fechaInicio"] . '+1 minute'));
+		$idPaciente = isset($dataValue["idPaciente"]) ? $this->input->post('$dataValue[idPaciente]') : $this->input->post('$dataValue[idUsuario]');
 
 		if ($start < $now) {
 			$reponse["result"] = false;
@@ -569,7 +577,7 @@ class CalendarioController extends BaseController{
 				"modificadoPor" => $dataValue["idUsuario"]
 			];
 
-			$checkOccupied = $this->CalendarioModel->checkOccupied($dataValue, $fechaInicioSuma, $fechaFinalResta);
+			$checkOccupied = $this->CalendarioModel->checkOccupied($dataValue, $fechaInicioSuma, $fechaFinalResta, $idPaciente);
 			$checkAppointment = $this->CalendarioModel->checkAppointment($dataValue, $fechaInicioSuma, $fechaFinalResta);
 
 			if ($checkOccupied->num_rows() > 0 || $checkAppointment->num_rows() > 0) {
@@ -923,10 +931,15 @@ class CalendarioController extends BaseController{
 	{
 		$usuario   = $this->input->post('dataValue[usuario]');
 		$beneficio = $this->input->post('dataValue[beneficio]');
+		$eventId = $this->input->post('dataValue[eventId]');
+
+		if(!isset($eventId)){
+			$eventId = 0;
+		}
 
 		$response['result'] = isset($usuario, $beneficio);
 		if ($response['result']) {
-			$rs = $this->CalendarioModel->getCitasSinFinalizarUsuario($usuario, $beneficio)->result();
+			$rs = $this->CalendarioModel->getCitasSinFinalizarUsuario($usuario, $beneficio, $eventId)->result();
 			$response['result'] = count($rs) > 0;
 			if ($response['result']) {
 				$response['msg'] = '¡Usuario con citas sin finalizar!';
@@ -1656,6 +1669,40 @@ class CalendarioController extends BaseController{
 
 		$this->output->set_content_type("application/json");
 		$this->output->set_output(json_encode($rs, JSON_NUMERIC_CHECK));
+	}
+
+
+	public function getAtencionesPresenciales(){
+
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->CalendarioModel->getAtencionesPresenciales($dt)->result();
+
+		$this->output->set_content_type("application/json");
+		$this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+}
+	public function retrieveCancelAppointment()
+	{
+		$dataValue = $this->input->post("dataValue", true);
+		$estatus = intval($dataValue["estats"]);
+
+		$values = [
+			"estatusCita" => $estatus,
+			"fechaModificacion" => date('Y-m-d H:i:s'),
+			"modificadoPor" => $dataValue["modificadoPor"],
+		];
+
+		$updateRecord = $this->GeneralModel->updateRecord($this->schema_cm .".citas", $values, "idCita", $dataValue["idCita"]);
+
+		if ($updateRecord) {
+			$response["result"] = true;
+			$response["msg"] = "La cita no se ha cancaledo";	
+		} else {
+			$response["result"] = false;
+			$response["msg"] = "Error al regresar la cita a su estatus anterior";
+		}
+
+		$this->output->set_content_type("application/json");
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
 	}
 
 }

@@ -208,9 +208,11 @@ class CalendarioModel extends CI_Model
             "SELECT idOcupado as id, titulo as title, fechaInicio as occupied, fechaInicio, fechaFinal 
             FROM ". $this->schema_cm .".horariosocupados 
             WHERE idEspecialista = ? AND estatus = ? AND 
-            ((fechaInicio BETWEEN ? AND ?) OR 
-            (fechaFinal BETWEEN ? AND ?) OR 
-            (fechaInicio >= ? AND fechaFinal <= ?));",
+            (
+                (DATE(fechaInicio) BETWEEN ? AND ?) OR 
+                (DATE(fechaFinal) BETWEEN ? AND ?) OR 
+                (DATE(fechaInicio) >= ? AND DATE(fechaFinal) <= ?)
+            );",
             array( $idUsuario, 1, $fechaInicio, $fechaFin, $fechaInicio, $fechaFin, $fechaInicio, $fechaFin)
         );
         return $query;
@@ -224,9 +226,9 @@ class CalendarioModel extends CI_Model
             LEFT JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idPaciente
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
             WHERE (ct.idEspecialista = ? OR ct.idPaciente = ?) AND ct.estatusCita IN (?, ?, ?)
-            AND ((fechaInicio BETWEEN ? AND ? ) OR 
-            (fechaFinal BETWEEN ? AND ?) OR 
-            (fechaInicio >= ? AND fechaFinal <= ?))",
+            AND ((DATE(fechaInicio) BETWEEN ? AND ? ) OR 
+            (DATE(fechaFinal) BETWEEN ? AND ?) OR 
+            (DATE(fechaInicio) >= ? AND DATE(fechaFinal) <= ?))",
             array( $especialista, $usuario, 1, 6, 10,  $fechaInicio, $fechaFin, $fechaInicio, $fechaFin, $fechaInicio, $fechaFin)
         );
 
@@ -285,12 +287,16 @@ class CalendarioModel extends CI_Model
             OR (? BETWEEN fechaInicio AND fechaFinal))
             AND ((idPaciente = ?
             AND estatusCita IN (?, ?, ?))
-            OR (idEspecialista = ? and estatusCita IN (?, ?, ?)))",
+            OR (idEspecialista = ? and estatusCita IN (?, ?, ?))
+            OR (idPaciente = ? and estatusCita IN (?, ?, ?))
+            )",
             array(
                 $fechaInicioSuma, $fechaFinalResta,
                 $fechaInicioSuma, $fechaFinalResta,
                 $fechaInicioSuma, $fechaFinalResta,
                 $dataValue["idPaciente"],
+                1, 6, 10,
+                $dataValue["idUsuario"],
                 1, 6, 10,
                 $dataValue["idUsuario"],
                 1, 6, 10
@@ -300,21 +306,21 @@ class CalendarioModel extends CI_Model
         return $query;
     }
 
-    public function checkOccupied($dataValue, $fechaInicioSuma, $fechaFinalResta){
+    public function checkOccupied($dataValue, $fechaInicioSuma, $fechaFinalResta, $idPaciente){
         $query = $this->ch->query(
             "SELECT *FROM ". $this->schema_cm .".horariosocupados WHERE 
             ((fechaInicio BETWEEN ? AND ?) 
             OR (fechaFinal BETWEEN ? AND ?)
             OR (? BETWEEN fechaInicio AND fechaFinal) 
             OR (? BETWEEN fechaInicio AND fechaFinal))
-            AND idEspecialista = ?
+            AND idEspecialista IN (?, ?)
             AND estatus = ?",
             array(
                 $fechaInicioSuma, $fechaFinalResta,
                 $fechaInicioSuma, $fechaFinalResta,
                 $fechaInicioSuma,
                 $fechaFinalResta,
-                $dataValue["idUsuario"],
+                $dataValue["idUsuario"], $idPaciente,
                 1
             )
         );
@@ -443,7 +449,7 @@ class CalendarioModel extends CI_Model
     }
 
     public function checkInvoice($idDetalle){
-        $query = $this->ch->query("SELECT idDetalle FROM ". $this->schema_cm .".citas WHERE idDetalle = ? GROUP BY idDetalle HAVING COUNT(idDetalle) > ?", array($idDetalle, 2));
+        $query = $this->ch->query("SELECT idDetalle FROM ". $this->schema_cm .".citas WHERE idDetalle = ? AND estatus = 1 GROUP BY idDetalle HAVING COUNT(idDetalle) > ?", array($idDetalle, 2));
 
         return $query;
     }
@@ -809,6 +815,13 @@ class CalendarioModel extends CI_Model
             )");
             
         return $query;
+    }
+
+    public function getAtencionesPresenciales($idUsr){
+        $query = $this->ch->query("SELECT COUNT(idAtencionXSede) AS atenciones FROM ". $this->schema_cm .".atencionxsede 
+        WHERE idOficina != 0 AND estatus = 1 AND idEspecialista = ?", $idUsr);
+
+       return $query;
     }
     
 }
