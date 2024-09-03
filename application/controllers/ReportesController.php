@@ -59,7 +59,6 @@ class ReportesController extends BaseController {
 			$data = array(
 				"observaciones" => $descripcion,
 				"archivoObservacion" => $file_name,
-				// "estatusCita" => 3 // $estatus, // se ha removido esta funcion ya que el administrador es quien dara cambio a estatus 5 de justificado
 				"modificadoPor" => $modificadoPor,
 			);
 			
