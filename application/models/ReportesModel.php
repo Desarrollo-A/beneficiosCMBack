@@ -19,7 +19,7 @@ class ReportesModel extends CI_Model {
 		$tipoReporte = "";
 
 		if($dt == '0'){
-			$tipoReporte  = "AND ct.estatusCita < 9";
+			$tipoReporte  = "AND ct.estatusCita NOT IN(10, 11)";
 		}else if($dt == '2'){
 			$tipoReporte = "AND ct.estatusCita IN (2, 7)";
 		}else{
@@ -63,13 +63,13 @@ class ReportesModel extends CI_Model {
 					WHEN ct.estatusCita = 1 AND ct.tipoCita = 2 AND axs.tipoCita IN (1) THEN '#ffe800'
 					WHEN ct.estatusCita = 1 AND ct.tipoCita = 3 THEN '#ffa500'
 					WHEN ct.estatusCita = 2 THEN '#ff0000' 
-					WHEN ct.estatusCita = 3 THEN '#808080' 
+					WHEN ct.estatusCita IN (3, 12) THEN '#808080' 
 					WHEN ct.estatusCita = 4 THEN '#008000' 
 					WHEN ct.estatusCita = 5 THEN '#ff4d67' 
 					WHEN ct.estatusCita = 6 THEN '#00ffff' 
 					WHEN ct.estatusCita = 7 THEN '#ff0000' 
 					WHEN ct.estatusCita = 10 THEN '#33105D'
-					WHEN ct.estatusCita = 11 THEN '#ff0000' 
+					WHEN ct.estatusCita = 11 THEN '#ff0000'
 				END AS color, 
 				CASE
 					WHEN ct.estatusCita = 1 AND ct.tipoCita = 1 AND axs.tipoCita IN(1, 2) THEN 'Por Asistir - Primera cita'
