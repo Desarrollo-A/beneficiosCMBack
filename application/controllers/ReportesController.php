@@ -150,7 +150,8 @@ class ReportesController extends BaseController {
 		$tipo = $this->form('tipo');
 
 		$updateData = array(
-			"estatusCita" => $tipo == 1 ? 5 : 12
+			"estatusCita" => $tipo == 1 ? 5 : 3,
+			"justificado" => $tipo == 1 ? 1 : 2
 		);
 
 		$update = $this->GeneralModel->updateRecord($this->schema_cm . ".citas", $updateData, "idCita", $idCita);
