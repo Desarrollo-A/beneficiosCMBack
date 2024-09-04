@@ -45,12 +45,12 @@ class EspecialistasModel extends CI_Model {
 
     public function getEspecialistasPorArea($idAreaBeneficio){
     	
-		$query = "SELECT CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre, us.idUsuario
+		$query = "SELECT CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre, us.idUsuario, us2.activo
     		FROM ". $this->schema_cm .".usuarios us
     		INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
     		WHERE
     			(us.idAreaBeneficio = $idAreaBeneficio OR us2.idpuesto = $idAreaBeneficio)
-    		AND us.idRol = 3";
+    		AND us.idRol = 3 AND us2.activo = 1";
 
     	return $this->ch->query($query)->result();
     }
