@@ -109,7 +109,8 @@ class SedesModel extends CI_Model {
 
         if($exist){
             $this->ch->query("UPDATE ". $this->schema_cm .".atencionxsede
-                SET estatus = $estatus
+                SET estatus = $estatus,
+                idOficina = 0
                 WHERE idEspecialista = $idEspecialista
                 AND idSede = $idSede
                 AND tipoCita = $tipoCita");
