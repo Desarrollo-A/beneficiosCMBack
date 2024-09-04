@@ -19,7 +19,7 @@ class AreasModel extends CI_Model{
         LEFT JOIN (SELECT idAreaBeneficio, COUNT(idAreaBeneficio) AS especialistas FROM usuarios GROUP BY idAreaBeneficio) es ON es.idAreaBeneficio = area.idAreaBeneficio
         ";
 
-        return $this->schema_cm->query($query)->result();
+        return $this->schema_ch->query($query)->result();
     }
 
 }
