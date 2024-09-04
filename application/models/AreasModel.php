@@ -21,7 +21,6 @@ class AreasModel extends CI_Model{
 
         return $query->result();
     }
-
 }
 
 ?>
