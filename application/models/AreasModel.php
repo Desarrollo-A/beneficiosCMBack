@@ -12,12 +12,12 @@ class AreasModel extends CI_Model{
     }
 
     public function getAreas(){
-    	$query = "SELECT
+    	$query = $this->ch->query("SELECT
             area.*,
             es.*
         FROM ". $this->schema_cm .".areasbeneficios area
         LEFT JOIN (SELECT idAreaBeneficio, COUNT(idAreaBeneficio) AS especialistas FROM usuarios GROUP BY idAreaBeneficio) es ON es.idAreaBeneficio = area.idAreaBeneficio
-        ";
+        ");
 
         return $query->result();
     }
