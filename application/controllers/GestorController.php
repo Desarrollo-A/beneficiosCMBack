@@ -1,5 +1,7 @@
 <?php
 
+use function PHPUnit\Framework\isEmpty;
+
 defined('BASEPATH') or exit('No direct script access allowed');
 
 require_once(APPPATH . "/controllers/BaseController.php");
@@ -692,4 +694,112 @@ class GestorController extends BaseController {
 
 		$this->json($response);
 	}
+
+	public function getFaqsCh(){
+		$data['data'] = $this->GestorModel->getFaqsCh();
+
+		if(empty($data['data']) ){
+			$data['data'] = 2;
+		}
+		
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
+
+	public function getFaqsChAll(){
+		$data['data'] = $this->GestorModel->getFaqsChAll();
+
+		if(empty($data['data']) ){
+			$data['data'] = 2;
+		}
+		
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
+
+	public function savePreguntaCh(){
+		$dataValue = $this->input->post("dataValue", true);
+		$modificadoPor = $dataValue["modificadoPor"];
+		$pregunta = $dataValue["pregunta"];
+		$respuesta = $dataValue["respuesta"];
+		$dataInsert = array(
+			"pregunta" => $pregunta,
+			"respuesta" => $respuesta,
+			"estatus" => 1,
+			"fechaCreacion" => date('Y-m-d h:i:s'),
+			"creadoPor" => $modificadoPor,
+			"fechaModificacion" => date('Y-m-d h:i:s'),
+			"modificadoPor" => $modificadoPor,
+		);
+
+		$save = $this->GeneralModel->addRecord("preguntasFrecuentes", $dataInsert);
+
+		if($save){
+			$response["result"] = true;
+			$response["msg"] = "Se ha guardado la pregunta"; 
+		}
+		else{
+			$response["result"] = false;
+			$response["msg"] = "Error al guarda la pregunta";
+		}
+
+		$this->output->set_content_type('application/json');
+		$this->output->set_output(json_encode($response));
+    }
+
+	public function updatePreguntaCh(){
+		$dataValue = $this->input->post("dataValue", true);
+		$modificadoPor = $dataValue["idUsuario"];
+		$pregunta = $dataValue["pregunta"];
+		$respuesta = $dataValue["respuesta"];
+		$idPregunta = $dataValue["idPregunta"];
+
+		$dataUpdate = array(
+			"pregunta" => $pregunta,
+			"respuesta" => $respuesta,
+			"fechaModificacion" => date('Y-m-d h:i:s'),
+			"modificadoPor" => $modificadoPor
+		);
+
+		$save = $this->GeneralModel->updateRecord("preguntasFrecuentes", $dataUpdate, "idPregunta", $idPregunta);
+
+		if($save){
+			$response["result"] = true;
+			$response["msg"] = "Se ha guardado la pregunta"; 
+		}
+		else{
+			$response["result"] = false;
+			$response["msg"] = "Error al guarda la pregunta";
+		}
+
+		$this->output->set_content_type('application/json');
+		$this->output->set_output(json_encode($response));
+    }
+
+	public function habilitarPreguntaCh(){
+		$dataValue = $this->input->post("dataValue", true);
+		$idPregunta = $dataValue["idPregunta"];
+		$idUsuario = $dataValue["idUsuario"];
+		$estatus = $dataValue["newStatus"];
+
+		$dataUpdate = array(
+			"estatus" => $estatus,
+			"fechaModificacion" => date('Y-m-d h:i:s'),
+			"modificadoPor" => $idUsuario
+		);
+
+		$save = $this->GeneralModel->updateRecord("preguntasFrecuentes", $dataUpdate, "idPregunta", $idPregunta);
+
+		if($save){
+			$response["result"] = true;
+			$response["msg"] = "Se ha guardado la pregunta"; 
+		}
+		else{
+			$response["result"] = false;
+			$response["msg"] = "Error al guarda la pregunta";
+		}
+
+		$this->output->set_content_type('application/json');
+		$this->output->set_output(json_encode($response));
+    }
 }
