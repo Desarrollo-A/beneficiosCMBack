@@ -319,7 +319,7 @@ class CalendarioController extends BaseController{
 					if ($response['result']) {
                         $values = [
                             "titulo" => $titulo, "idEspecialista" => $idEspecialista,
-                            "idPaciente" => $idPaciente, "observaciones" => $observaciones,
+                            "idPaciente" => $idPaciente, "observaciones" => NULL,
                             "fechaInicio" => $fechaInicio, "fechaFinal" => $fechaFinal,
                             "tipoCita" => $tipoCita, "idAtencionXSede" => $idAtencionXSede,
                             "estatusCita" => $estatusCita, "creadoPor" => $idPaciente,
