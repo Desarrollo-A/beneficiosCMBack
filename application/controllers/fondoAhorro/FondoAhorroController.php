@@ -88,7 +88,7 @@ class FondoAhorroController extends BaseController {
 
 		$rs['result'] = count($data) > 0; 
 		if ($rs['result']) {
-			$rs['msg'] = '¡Listado de usuarios cargado exitosamente!';
+			$rs['msg'] = '¡Listado de solicitudes cargado exitosamente!';
 			$rs['data'] = $data; 
 		}else {
 			$rs['msg'] = '¡No existen registros!';
