@@ -26,4 +26,12 @@ class EventosModel extends CI_Model {
             AND (NOW() > ev.inicioPublicacion AND NOW() < ev.finPublicacion);", array($idContrato));
        	return $query;
     }
+
+    public function getAsistenciaEvento($idContrato, $idEvento){
+        $query = $this->ch->query(
+			"SELECT ev.idEvento, asis.* FROM PRUEBA_beneficiosCM.eventos AS ev
+            LEFT JOIN PRUEBA_beneficiosCM.asistenciasEventos AS asis ON asis.idEvento = ev.idEvento AND asis.idContrato = ?
+            WHERE ev.idEvento = ? AND ev.estatus = 1 AND (asis.estatus IS NULL OR asis.estatus=1);", array($idContrato, $idEvento));
+       	return $query;
+    }
 }

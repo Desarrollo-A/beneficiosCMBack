@@ -163,13 +163,26 @@ class EventosController extends BaseController {
     }
 
     public function actualizarAsistencia() {
-        $idDepto = $this->input->post('dataValue[idUsuario]');
         $idContrato = $this->input->post('dataValue[idContrato]');
         $idEvento = $this->input->post('dataValue[idEvento]');
+        $estatus = $this->input->post('dataValue[estatus]');
+
+        $rs1 = $this->EventosModel->getAsistenciaEvento($idContrato, $idEvento)->result();
+
+        if ($rs1[0]->confirmacion == NULL){
+            $values = [
+                'estatus' => $estatus  
+            ];
+            $updateRecord = $this->GeneralModel->updateRecord($this->schema_cm .".horariosocupados", $values, "idUnico", $dataValue["id"]);
+            var_dump(0); exit; die;
+        }else {
+            $updateRecord = $this->GeneralModel->updateRecord($this->schema_cm .".horariosocupados", $values, "idUnico", $dataValue["id"]);
+            var_dump(1); exit; die;
+        }
 
         // Devolver la respuesta como JSON
         $this->output->set_content_type("application/json");
-        $this->output->set_output(json_encode($rs, JSON_NUMERIC_CHECK));
+        $this->output->set_output(json_encode($rs1, JSON_NUMERIC_CHECK));
     }
     
 }
