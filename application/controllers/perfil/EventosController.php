@@ -34,68 +34,8 @@ class EventosController extends BaseController {
         $this->output->set_output(json_encode($rs, JSON_NUMERIC_CHECK));
 	}
 
-    // public function nuevoEvento(){
-    //     $titulo            = $this->form('titulo');
-    //     $descripcion       = $this->form('descripcion');
-    //     $fechaEvento       = $this->form('fechaEvento');
-    //     $inicioPublicacion = $this->form('inicioPublicacion');
-    //     $finPublicacion    = $this->form('finPublicacion');
-    //     $limiteRecepcion   = $this->form('limiteRecepcion');
-    //     $ubicacion         = $this->form('ubicacion');
-    //     $imagen            = $this->file('imagen');
-    //     $idUsuario         = $this->form('idUsuario');
-
-    //     // var_dump($imagen);
-    //     $fecha = date("Y-m-d H:i:s");
-
-    //     $upload = false;
-    //     if($imagen){
-    //         $file_ext = pathinfo($imagen->name, PATHINFO_EXTENSION);
-    //         // $file_name =  "Evento_".$titulo."_".$fechaEvento.".".$file_ext."";
-    //         $file_name =  "Evento_$titulo.$file_ext";
-    //         // $file_name =  "justificacion-$idCita.$file_ext";
-
-    //         $upload = $this->upload($imagen->tmp_name, $file_name);
-            
-    //         if($upload){
-    //             $evento['imagen'] = $file_name;
-    //         }
-    //     }
-        
-    //     $evento = [
-    //         "titulo" => $titulo,
-	// 		"descripcion" => $descripcion,
-	// 		"fechaEvento" => $fechaEvento,
-    //         "inicioPublicacion" => $inicioPublicacion,
-    //         "finPublicacion" => $finPublicacion,
-    //         "limiteRecepcion" => $limiteRecepcion,
-    //         "ubicacion" => $ubicacion,
-    //         "imagen" => $file_name,
-	// 		"creadoPor" => $idUsuario,
-	// 		"modificadoPor" => $idUsuario,
-	// 		"fechaModificacion" => $fecha,
-	// 		"fechaCreacion" => $fecha,
-	// 	];
-
-    //     var_dump($evento['imagen']); exit; die;
-
-    //     if($upload){
-    //         $rs["result"] = $this->GeneralModel->addRecord( $this->schema_cm.".eventos", $evento);
-    //     }else {
-    //         $rs["result"] = false;
-    //     }
-
-	// 	if ($rs["result"]) {
-	// 		$response["msg"] = "Se ha creado el evento";
-	// 	} else {
-	// 		$rs["msg"] = "No se ha podído crear el evento";
-	// 	}
-
-	// 	$this->output->set_content_type("application/json");
-    //     $this->output->set_output(json_encode($rs, JSON_NUMERIC_CHECK));
-	// }
-
     public function nuevoEvento() {
+        // Obtener y sanitizar inputs
         $titulo            = trim($this->form('titulo'));
         $descripcion       = trim($this->form('descripcion'));
         $fechaEvento       = $this->form('fechaEvento');
@@ -103,12 +43,18 @@ class EventosController extends BaseController {
         $finPublicacion    = $this->form('finPublicacion');
         $limiteRecepcion   = $this->form('limiteRecepcion');
         $ubicacion         = trim($this->form('ubicacion'));
+        $sedes             = json_decode($this->form('sedes'), true);
+        $departamentos     = json_decode($this->form('departamentos'), true);
         $imagen            = $this->file('imagen');
         $idUsuario         = (int) $this->form('idUsuario');
+        $fecha             = date("Y-m-d H:i:s");
     
-        $fecha = date("Y-m-d H:i:s");
+        // Validar JSON de sedes y departamentos
+        if (json_last_error() !== JSON_ERROR_NONE || !is_array($sedes) || !is_array($departamentos)) {
+            return $this->errorResponse("Error al decodificar las sedes o departamentos.");
+        }
     
-        // Preparar el array de evento
+        // Preparar array para el evento
         $evento = [
             "titulo"            => $titulo,
             "descripcion"       => $descripcion,
@@ -123,60 +69,89 @@ class EventosController extends BaseController {
             "fechaCreacion"     => $fecha,
         ];
     
-        // Procesar imagen
+        // Procesar la imagen (si existe)
         if ($imagen) {
             $file_ext = strtolower(pathinfo($imagen->name, PATHINFO_EXTENSION));
-            $valid_ext = ['jpg', 'jpeg', 'png', 'gif']; // Extensiones válidas
-            if (in_array($file_ext, $valid_ext)) {
-                $file_name = "Evento_" . uniqid() . ".$file_ext"; // Nombre único
-                $upload = $this->upload($imagen->tmp_name, $file_name);
+            $valid_ext = ['jpg', 'jpeg', 'png', 'gif'];
     
-                if ($upload) {
-                    $evento['imagen'] = $file_name; // Añadir la imagen al array si la carga es exitosa
-                } else {
-                    $rs["msg"] = "Error al subir la imagen.";
-                    $this->output->set_content_type("application/json");
-                    $this->output->set_output(json_encode($rs, JSON_NUMERIC_CHECK));
-                    return;
-                }
-            } else {
-                $rs["msg"] = "Formato de imagen no permitido.";
-                $this->output->set_content_type("application/json");
-                $this->output->set_output(json_encode($rs, JSON_NUMERIC_CHECK));
-                return;
+            if (!in_array($file_ext, $valid_ext)) {
+                return $this->errorResponse("Formato de imagen no permitido.");
             }
+    
+            $file_name = "Evento_" . uniqid() . ".$file_ext";
+            if (!$this->upload($imagen->tmp_name, $file_name)) {
+                return $this->errorResponse("Error al subir la imagen.");
+            }
+    
+            $evento['imagen'] = $file_name;
         }
     
         // Insertar el evento en la base de datos
-        $rs["result"] = $this->GeneralModel->addRecord($this->schema_cm . ".eventos", $evento);
-    
-        // Respuesta según el resultado
-        if ($rs["result"]) {
-            $rs["msg"] = "Se ha creado el evento.";
-        } else {
-            $rs["msg"] = "No se ha podido crear el evento.";
+        if (!$this->GeneralModel->addRecord($this->schema_cm . ".eventos", $evento)) {
+            return $this->errorResponse("No se ha podido crear el evento.");
         }
     
-        // Devolver la respuesta como JSON
+        // Preparar las filas de alcanceEvento
+        $rows = [];
+        foreach ($sedes as $sede) {
+            foreach ($departamentos as $departamento) {
+                $rows[] = [
+                    'idEvento'          => null,
+                    'idDepartamento'    => $departamento['iddepto'],
+                    'idSede'            => $sede['idsede'],
+                    'estatus'           => 1,
+                    'creadoPor'         => $idUsuario,
+                    'fechaCreacion'     => $fecha,
+                    'modificadoPor'     => $idUsuario,
+                    'fechaModificacion' => $fecha,
+                ];
+            }
+        }
+    
+        // Insertar en alcanceEvento
+        $this->GeneralModel->insertBatch($this->schema_cm . '.alcanceEvento', $rows);
+    
+        // Respuesta de éxito
+        return $this->successResponse("Se ha creado el evento.");
+    }
+    
+    // Funciones auxiliares para simplificar respuestas
+    private function errorResponse($message) {
         $this->output->set_content_type("application/json");
-        $this->output->set_output(json_encode($rs, JSON_NUMERIC_CHECK));
+        $this->output->set_output(json_encode(["result" => true, "msg" => $message], JSON_NUMERIC_CHECK));
+    }
+    
+    private function successResponse($message) {
+        $this->output->set_content_type("application/json");
+        $this->output->set_output(json_encode(["result" => false, "msg" => $message], JSON_NUMERIC_CHECK));
     }
 
     public function actualizarAsistencia() {
         $idContrato = $this->input->post('dataValue[idContrato]');
         $idEvento = $this->input->post('dataValue[idEvento]');
         $estatus = $this->input->post('dataValue[estatus]');
+        $idUsuario = $this->input->post('dataValue[idUsuario]');
+
+        $fecha = date("Y-m-d H:i:s");
 
         $rs1 = $this->EventosModel->getAsistenciaEvento($idContrato, $idEvento)->result();
 
         if ($rs1[0]->confirmacion == NULL){
             $values = [
-                'estatus' => $estatus  
-            ];
-            $updateRecord = $this->GeneralModel->updateRecord($this->schema_cm .".horariosocupados", $values, "idUnico", $dataValue["id"]);
+                "idEvento" => $estatus,
+				"idContrato" => $estatus,
+                "confirmacion" => $estatus,
+                "asistencia" => $estatus,
+                "estatus" => $estatus,
+				"creadoPor" => $idUsuario,
+				"fechaCreacion" => $fecha,
+				"modificadoPor" => $idUsuario,
+				"fechaModificacion" => $fecha
+			];
+			$response["result"] = $this->GeneralModel->addRecord( $this->schema_cm.".eventos", $values);
             var_dump(0); exit; die;
         }else {
-            $updateRecord = $this->GeneralModel->updateRecord($this->schema_cm .".horariosocupados", $values, "idUnico", $dataValue["id"]);
+            // $updateRecord = $this->GeneralModel->updateRecord($this->schema_cm .".horariosocupados", $values, "idUnico", $dataValue["id"]);
             var_dump(1); exit; die;
         }
 

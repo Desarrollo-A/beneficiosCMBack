@@ -14,9 +14,9 @@ class EventosModel extends CI_Model {
 	public function getEventos($idContrato, $idSede, $idDepto){
         $query = $this->ch->query(
 			"SELECT ev.idEvento, ev.titulo, ev.descripcion, ev.fechaEvento, ev.inicioPublicacion, ev.finPublicacion, ev.imagen, ev.horaEvento, ev.limiteRecepcion, ev.ubicacion,
-            asis.idAsistenciaEv, asis.idContrato, asis.confirmacion, asis.asistencia, 
-            (SELECT COUNT(*) FROM PRUEBA_beneficiosCM.asistenciasEventos WHERE idEvento = ev.idEvento AND confirmacion = 1) AS confirmados,
-            (SELECT COUNT(*) FROM PRUEBA_beneficiosCM.asistenciasEventos WHERE idEvento = ev.idEvento AND asistencia = 1) AS asistidos,
+            asis.idAsistenciaEv, asis.idContrato, -- asis.confirmacion, asis.asistencia, 
+            -- (SELECT COUNT(*) FROM PRUEBA_beneficiosCM.asistenciasEventos WHERE idEvento = ev.idEvento AND confirmacion = 1) AS confirmados,
+            -- (SELECT COUNT(*) FROM PRUEBA_beneficiosCM.asistenciasEventos WHERE idEvento = ev.idEvento AND asistencia = 1) AS asistidos,
             ev.estatus, ev.creadoPor, ev.fechaCreacion, ev.modificadoPor, ev.fechaModificacion
             FROM PRUEBA_beneficiosCM.eventos AS ev
             LEFT JOIN PRUEBA_beneficiosCM.asistenciasEventos AS asis ON asis.idEvento = ev.idEvento AND asis.idContrato = ?
