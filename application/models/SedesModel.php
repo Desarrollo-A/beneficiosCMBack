@@ -83,7 +83,7 @@ class SedesModel extends CI_Model {
     }
 
     public function getSedes(){
-        $query = "SELECT * FROM ". $this->schema_ch .".beneficioscm_vista_sedes";
+        $query = "SELECT * FROM ". $this->schema_ch .".beneficioscm_vista_sedes WHERE estatus_sede = 1;";
 
         return $this->ch->query($query)->result();
     }
