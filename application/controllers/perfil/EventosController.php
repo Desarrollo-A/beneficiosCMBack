@@ -63,6 +63,8 @@ class EventosController extends BaseController {
             "finPublicacion"    => $finPublicacion,
             "limiteRecepcion"   => $limiteRecepcion,
             "ubicacion"         => $ubicacion,
+            "estatusEvento"     => 1,
+            "estatus"           => 1,
             "creadoPor"         => $idUsuario,
             "modificadoPor"     => $idUsuario,
             "fechaModificacion" => $fecha,
@@ -87,7 +89,9 @@ class EventosController extends BaseController {
         }
     
         // Insertar el evento en la base de datos
-        if (!$this->GeneralModel->addRecord($this->schema_cm . ".eventos", $evento)) {
+        $res = $this->GeneralModel->addRecordReturnId($this->schema_cm . ".eventos", $evento);
+
+        if (!$res) {
             return $this->errorResponse("No se ha podido crear el evento.");
         }
     
@@ -96,7 +100,7 @@ class EventosController extends BaseController {
         foreach ($sedes as $sede) {
             foreach ($departamentos as $departamento) {
                 $rows[] = [
-                    'idEvento'          => null,
+                    'idEvento'          => $res,
                     'idDepartamento'    => $departamento['iddepto'],
                     'idSede'            => $sede['idsede'],
                     'estatus'           => 1,
@@ -118,12 +122,12 @@ class EventosController extends BaseController {
     // Funciones auxiliares para simplificar respuestas
     private function errorResponse($message) {
         $this->output->set_content_type("application/json");
-        $this->output->set_output(json_encode(["result" => true, "msg" => $message], JSON_NUMERIC_CHECK));
+        $this->output->set_output(json_encode(["result" => false, "msg" => $message], JSON_NUMERIC_CHECK));
     }
     
     private function successResponse($message) {
         $this->output->set_content_type("application/json");
-        $this->output->set_output(json_encode(["result" => false, "msg" => $message], JSON_NUMERIC_CHECK));
+        $this->output->set_output(json_encode(["result" => true, "msg" => $message], JSON_NUMERIC_CHECK));
     }
 
     public function actualizarAsistencia() {
