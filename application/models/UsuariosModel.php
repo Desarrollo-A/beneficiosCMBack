@@ -213,7 +213,7 @@ class UsuariosModel extends CI_Model {
 			FROM ". $this->schema_ch .".beneficioscm_vista_usuarios AS us
 			LEFT JOIN ". $this->schema_cm .".correostemporales c ON c.idContrato = us.idcontrato 
 			WHERE us.num_empleado = ?
-			ORDER BY us.idcontrato DESC
+			ORDER BY us.activo DESC
 			LIMIT 1;", array( $numEmpleado ));
 
         return $query;
