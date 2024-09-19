@@ -10,7 +10,7 @@ class asistenciaEvModel extends CI_Model
         $this->ch = $this->load->database('ch', TRUE);
         parent::__construct();
     }
-    public function getasistenciaEv()
+    public function getasistenciaEvento()
     {
         $query = $this->ch->query("SELECT ae.idEvento, opc.nombre AS estatusAsistentes,ev.titulo, ev.fechaEvento, ev.horaEvento, 
             ev.limiteRecepcion,us2.num_empleado,
@@ -24,11 +24,19 @@ class asistenciaEvModel extends CI_Model
              
               return $query->result();
     }
-/*
-    public function gettitulosEv(){
 
-        $query = $this->ch->query("SELECT titulo FROM " . $this->schema_cm . ".eventos");
-         
-          return $query->result();
-    }*/
+    public function getasistenciaEventoUser($idUsuario)
+    {
+       $query = $this->ch->query("SELECT ae.idEvento, opc.nombre AS estatusAsistentes,ev.titulo, ev.fechaEvento, ev.horaEvento, 
+            ev.limiteRecepcion,us2.num_empleado,
+            CONCAT(us2.nombre_persona, ' ', us2.pri_apellido, ' ', us2.sec_apellido) AS nombreCompleto,us2.nsede, us2.ndepto 
+            FROM " . $this->schema_cm . ".asistenciasEventos AS ae 
+            INNER JOIN " . $this->schema_cm . ".eventos AS ev  ON ae.idEvento = ev.idEvento
+            INNER JOIN " . $this->schema_cm . ".usuarios AS us ON ae.idContrato = us.idContrato
+            INNER JOIN " . $this->schema_ch . ".beneficioscm_vista_usuarios AS us2  ON us2.idContrato = us.idContrato
+            INNER JOIN " . $this->schema_cm . ".opcionesporcatalogo AS opc  ON ae.estatusAsistencia = opc.idOpcion 
+            AND opc.idCatalogo = 42  WHERE us.idUsuario = ?", $idUsuario);
+             
+              return $query->result();
+    }
 }    

@@ -15,18 +15,18 @@ class AsistenciaEvController extends BaseController
         $this->schema_cm = $this->config->item('schema_cm');
     }
 
-    public function getasistenciaEv()
+    public function getasistenciaEvento()
     {
-        $data['data'] = $this->AsistenciaEvModel->getasistenciaEv();
+        $data['data'] = $this->AsistenciaEvModel->getasistenciaEvento();
         $this->output->set_content_type('application/json');
         $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
     }
-/*
-    public function gettitulosEv()
+    
+    public function getasistenciaEventoUser($idUsuario)
     {
-        $data['data'] = $this->AsistenciaEvModel->gettitulosEv();
+        $data['data'] = $this->AsistenciaEvModel->getasistenciaEventoUser($idUsuario);
         $this->output->set_content_type('application/json');
         $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
     }
-*/
+        
 }
