@@ -12,16 +12,19 @@ class AreasModel extends CI_Model{
     }
 
     public function getAreas(){
-    	$query = "SELECT
+    	$query = $this->ch->query("SELECT
             area.*,
             es.*
         FROM ". $this->schema_cm .".areasbeneficios area
-        LEFT JOIN (SELECT idAreaBeneficio, COUNT(idAreaBeneficio) AS especialistas FROM usuarios GROUP BY idAreaBeneficio) es ON es.idAreaBeneficio = area.idAreaBeneficio
-        ";
+        LEFT JOIN (SELECT 
+                    idAreaBeneficio, 
+			        COUNT(idAreaBeneficio) AS especialistas 
+				    FROM ". $this->schema_cm .".usuarios us 
+				    INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios rhus ON us.idContrato = rhus.idContrato AND rhus.activo = 1 GROUP BY idAreaBeneficio) es ON es.idAreaBeneficio = area.idAreaBeneficio 
+        WHERE area.estatus = 1");
 
-        return $this->ch->query($query)->result();
+        return $query->result();
     }
-
 }
 
 ?>

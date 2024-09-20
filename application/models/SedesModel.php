@@ -83,7 +83,7 @@ class SedesModel extends CI_Model {
     }
 
     public function getSedes(){
-        $query = "SELECT * FROM ". $this->schema_ch .".beneficioscm_vista_sedes";
+        $query = "SELECT * FROM ". $this->schema_ch .".beneficioscm_vista_sedes WHERE estatus_sede = 1;";
 
         return $this->ch->query($query)->result();
     }
@@ -126,7 +126,9 @@ class SedesModel extends CI_Model {
     }
 
     public function getSedesActivasXEspecialista($tipoCita, $idEspecialista){
-        $query = "SELECT * FROM ". $this->schema_cm .".atencionxsede ate
+        $query = 
+        "SELECT * FROM ". $this->schema_cm .".atencionxsede ate
+        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_sedes AS se ON se.idsede = ate.idSede AND estatus_sede = 1
         WHERE ate.idEspecialista=$idEspecialista AND ate.tipoCita=$tipoCita AND ate.estatus = 1";
 
         $sedes = $this->ch->query($query)->result_array();
