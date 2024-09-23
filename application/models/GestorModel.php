@@ -389,4 +389,20 @@ class GestorModel extends CI_Model {
 
         return $this->ch->query($query);
     }
+
+    public function getFaqsCh(){
+        $query = $this->ch->query(
+            "SELECT *, idPregunta AS id FROM ". $this->schema_cm .".preguntasFrecuentes WHERE estatus = 1"
+        );
+
+        return $query->result();
+    }
+
+    public function getFaqsChAll(){
+        $query = $this->ch->query(
+            "SELECT *, idPregunta AS id FROM ". $this->schema_cm .".preguntasFrecuentes"
+        );
+
+        return $query->result();
+    }
 }
