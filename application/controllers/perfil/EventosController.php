@@ -135,6 +135,18 @@ class EventosController extends BaseController {
         $idEvento      = $this->input->post('dataValue[idEvento]');
         $estatus       = $this->input->post('dataValue[estatusAsistencia]');
         $idUsuario     = $this->input->post('dataValue[idUsuario]');
+        $today         = strtotime($this->input->post('dataValue[today]'));
+        $eventDate     = strtotime($this->input->post('dataValue[eventDate]')); 
+        $flagSuccess = true;
+
+        $this->db->trans_begin();
+
+        $hoy = date('d/M/Y H:i:s', $today);
+        $fechaEvento = date('d/M/Y H:i:s', $eventDate);
+
+        if($hoy > $fechaEvento){
+            $flagSuccess = false;
+        }
 
         $fecha = date("Y-m-d H:i:s");
 
@@ -158,13 +170,20 @@ class EventosController extends BaseController {
 				"modificadoPor" => $idUsuario,
 				"fechaModificacion" => $fecha
 			];
-            $response["result"] = $this->GeneralModel->updateRecord($this->schema_cm .".asistenciasEventos", $values, "idAsistenciaEv", $rs[0]->idAsistenciaEv);
+            if($flagSuccess){
+                $response["result"] = $this->GeneralModel->updateRecord($this->schema_cm .".asistenciasEventos", $values, "idAsistenciaEv", $rs[0]->idAsistenciaEv);
+            }
+            else{
+                $response["result"] = false;
+            }
         }
 
-        if ($response["result"]) {
+        if ($response["result"] && $flagSuccess) {
+            $this->db->trans_commit();
             $response["msg"] = "Se ha actualizado tu asistencia de manera exitosa";
         }else {
-            $response["msg"] = "Surgió un error al actualizar la asistencia del evento";
+            $this->db->trans_rollback();
+            $response["msg"] = $flagSuccess ? "Surgió un error al actualizar la asistencia del evento" : "Error, el evento ya ha pasado";
         }
 
         $this->output->set_content_type("application/json");
@@ -255,6 +274,8 @@ class EventosController extends BaseController {
         $idEvento      = $this->input->post('dataValue[idEvento]');
         $estatus       = $this->input->post('dataValue[estatusEvento]');
         $idUsuario     = $this->input->post('dataValue[idUsuario]');
+        
+        $resultMessage = $estatus == 1 ? "Se ha activado el evento" : "Se ha desactivado el evento";
 
         $fecha = date("Y-m-d H:i:s");
        
@@ -263,10 +284,11 @@ class EventosController extends BaseController {
 			"modificadoPor" => $idUsuario,
 			"fechaModificacion" => $fecha
 		];
+
         $response["result"] = $this->GeneralModel->updateRecord($this->schema_cm .".eventos", $values, "idEvento", $idEvento);
 
         if ($response["result"]) {
-            $response["msg"] = "Se ha actualizado tu asistencia de manera exitosa";
+            $response["msg"] = $resultMessage;
         }else {
             $response["msg"] = "Surgió un error al actualizar la asistencia del evento";
         }

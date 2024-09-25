@@ -27,8 +27,8 @@ class EventosModel extends CI_Model {
              FROM ". $this->schema_cm .".alcanceEvento AS a
              JOIN ". $this->schema_ch .".beneficioscm_vista_departamento AS d ON a.idDepartamento = d.iddepto
              WHERE a.idEvento = ev.idEvento) AS departamentos,
-            (SELECT COUNT(*) FROM PRUEBA_beneficiosCM.asistenciasEventos WHERE idEvento = ev.idEvento AND estatusEvento = 1) AS confirmados,
-            (SELECT COUNT(*) FROM PRUEBA_beneficiosCM.asistenciasEventos WHERE idEvento = ev.idEvento AND estatusEvento = 3) AS asistidos
+            (SELECT COUNT(*) FROM PRUEBA_beneficiosCM.asistenciasEventos WHERE idEvento = ev.idEvento AND estatusAsistencia = 1 AND estatusEvento = 1) AS confirmados,
+            (SELECT COUNT(*) FROM PRUEBA_beneficiosCM.asistenciasEventos WHERE idEvento = ev.idEvento AND estatusAsistencia = 3 AND estatusEvento = 1) AS asistidos
             FROM ". $this->schema_cm .".eventos AS ev
             LEFT JOIN ". $this->schema_cm .".asistenciasEventos AS asis ON asis.idEvento = ev.idEvento AND asis.idContrato = ?
             LEFT JOIN ". $this->schema_cm .".alcanceEvento AS alc ON alc.idEvento = ev.idEvento
