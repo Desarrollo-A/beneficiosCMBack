@@ -291,4 +291,13 @@ class Api extends BaseController{
             $response['msg'] = "¡Parámetros inválidos!";
         }
     }
+
+    public function decode(){
+        $datos = $this->input->post('dataValue[datos]');
+
+        $response["msg"] = base64_decode($datos);
+
+        $this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($response));
+    }
 }
