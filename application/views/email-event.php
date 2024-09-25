@@ -323,6 +323,10 @@
         .no-margin {
             margin: 0%;
             padding: 0%;
+            justify-content: center;
+            display: flex;
+            align-items: center;
+            margin-bottom: 1em
         }
 
         .custom-margin1 {
@@ -345,6 +349,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;500&display=swap" rel="stylesheet">
 </head>
+
 <body width="100%" style="margin: 0; padding: 0 !important; mso-line-height-rule: exactly; background-color: #f1f1f1;">
     <center style=" width: 100%; background-color: #f1f1f1;">
         <div style="display: none; font-size: 1px;max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden; mso-hide: all; font-family: sans-serif;">
@@ -353,20 +358,25 @@
         <div style="max-width: 600px; margin: 0 auto;" class="email-container">
             <table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                 <tr>
+                    <td class="logo" style="text-align: center; padding: 1em;">
+                        <img src="<?= base_url() ?>dist/img/maderasConecta.svg" alt="" style="width: 110px; max-width: 110px; height: auto; margin: auto; display: block;">
+                    </td>
+                </tr>
+                <tr>
                     <td valign="middle" class="hero">
                         <div class="text" style="padding: 0 3.5em; text-align: center; padding-bottom: 10%">
-                         <h3 style="color:#003360">Listo para asistir a <?= $titulo ?></h3>
-                            <h4 class="custom-font2">¡HOLA, ESTIMADO COLABORADOR <?= $nombreCompleto?>!</h4>
-                            <h4 class='no-margin custom-font2'><img src="<?= base_url() ?>dist/img/map-marked-alt-solid.png" class="icon"> Número de empleado: <?= $num_empleado?></h4>
+                            <h3 style="color:#003360">Listo para asistir a <?= $titulo ?></h3>
+                            <h4 class="custom-font2">¡HOLA, ESTIMADO COLABORADOR <?= $nombreCompleto ?>!</h4>
+                            <h4 class='no-margin custom-font2'><img style="margin-right: 0.5em" src="<?= base_url() ?>dist/img/map-marked-alt-solid.png" class="icon"> Número de empleado: <?= $num_empleado ?></h4>
                             <div class="qr-container">
                                 <h4 class="custom-font1">QR de asistencia:</h4>
                                 <img src="<?= $qrFilePath ?>" alt="Código QR" class="qr-image">
                             </div>
                             <h4 class="custom-font1">Detalles del evento</h4>
-                            <h5 class='no-margin custom-font2'><img src="<?= base_url() ?>dist/img/empleado.png" class="icon"> Ubicación: <?= $ubicacion ?></h5>
-                            <h5 class='no-margin custom-font2'><img src="<?= base_url() ?>dist/img/calendar-alt-solid.png" class="icon"> Fecha del evento: <?= $fechaEvento ?></h5>
-                            <h5 class='no-margin custom-font2'><img src="<?= base_url() ?>dist/img/clock-regular.png" class="icon"> Hora del evento: <?= $horaEvento ?></h5>
-                            <h5 class='no-margin custom-font2'><img src="<?= base_url() ?>dist/img/limiteRecepcion.png" class="icon"> Límite de recepción: <?= $limiteRecepcion ?></h5>
+                            <h5 class='no-margin custom-font2'><img style="margin-right: 0.5em" src="<?= base_url() ?>dist/img/empleado.png" class="icon"> Ubicación: <?= $ubicacion ?></h5>
+                            <h5 class='no-margin custom-font2'><img style="margin-right: 0.5em" src="<?= base_url() ?>dist/img/calendar-alt-solid.png" class="icon"> Fecha del evento: <?= $fechaEvento ?></h5>
+                            <h5 class='no-margin custom-font2'><img style="margin-right: 0.5em" src="<?= base_url() ?>dist/img/clock-regular.png" class="icon"> Hora del evento: <?= $horaEvento ?></h5>
+                            <h5 class='no-margin custom-font2'><img style="margin-right: 0.5em" src="<?= base_url() ?>dist/img/limiteRecepcion.png" class="icon"> Límite de recepción: <?= $limiteRecepcion ?></h5>
                         </div>
                     </td>
                 </tr>
