@@ -367,22 +367,22 @@
                         <div class="text" style="padding: 0 3.5em; text-align: center; padding-bottom: 10%">
                             <h3 style="color:#003360">Listo para asistir a <?= $titulo ?></h3>
                             <h4 class="custom-font2">¡HOLA, ESTIMADO COLABORADOR <?= $nombreCompleto ?>!</h4>
-                            <h4 class='no-margin custom-font2'><img style="margin-right: 0.5em" src="<?= base_url() ?>dist/img/map-marked-alt-solid.png" class="icon"> Número de empleado: <?= $num_empleado ?></h4>
+                            <h4 class='no-margin custom-font2'><img style="margin-right: 0.5em" src="https://ff906c58c03bc1e1fe0e79d3e23028e98d4904defd4b2c90c0cb8a1-apidata.googleusercontent.com/download/storage/v1/b/pruebas-conecta-maderas/o/map-marked-alt-solid.png?jk=AdvOr8uZ3PBstiBXlRDX57kcENylPmMuXTPtA0bFAtt1lC-OkjIOPDEiHsJioUv0Hp9Cv6n1jjAD6lfg9HT6UarMENFnd-yKJc65CRHxC1VGmLzFWv0MPXtZJTKB98yjLCUX7KfmTVtrquIX25QOYiAIeaT0jp0QVde6axQKpItrhM75Ia85CgfFKibot4Q_4bi6LqrTJPx8dXjY169JO2rrOm9iUZoK0sdfk852A724cXbvL4fCik3URO_-N-Qwm8DT1Qi8h17lOYSgi_lhLh6fuxB_3iU0RLr--7tMd_fPu9S9zOvYflxIL3webtrNApbCPH2rfd5Qw4AUrKyprXZpclabsP8rm557O8DaWAgCksV9C4-HstjjipwEZCoY76A4EC9ZgkRyLtBlPzx3qSUEwyUJkhNPweljy0chIoExZXCmfDCYGsTZNbfP_M6krbi8c7yxAzsKb848IimVeA4oK4WXynp0Eq5ugi_2NYlKPjCIgdIhWrZuXdXK1dUcAHSw22FeOFXCxJNGjMe7Dj_t1t5NUWqiKTXOnJemy_aInpNSOZCjqB-T-rn6gKBVvd6k7yXIi9QbewGo3wm6uszNIYbcSSaUOJpOd3tdu7Ou0SFjhF9jcyFPcY7lnYYjhodRcmazXYcvQObVv5oWprAk_KPyQc-GS-OhyS667MPr7B5kp5aXS2xzwBMy1hwD1pf-QaaryTHjjZRo7vo9v-b-FekeAGLgjL-OM8WoS_x2et1mR6bwnenLHra2qP9KBj0H-pbbnygdjRQppq7kByfpUNonGDgqAfgQVUxsnNXyZA2z-ARkjj6hDwgRX5KB1JJ9bkEb91CZx8wHAscVCTK9oK5U01XWLKfTnN6sjJdmfoiV384GXba9nIXbqWq02stGq3YMBj7cpjX07w4y1g_1HjK64kn3CJroVx9ozyhU_aTzmaCJiwZZgydeVkq-27Qi7DMqu-200krew_aZsUmpgljht0iyAUkkxhA2-0lXkdORD1uaMzomXzTqr-tTASNLASPoewCbRCGEPUYCofQoK2d1N_VmWXdIoYOYE67Fa_nbLtlaIyjGU1Kt9tCQ02x5h2FCNz7ZvPSgevkaIe4OUakX0RvJLKnb4EbhfjaCIVcr87O6_DRrgtFbsvIbHC2vFHPD03FBAjlI0tOWYcQsl8P_dmXBsObGYfMhPbm8TCVfag&isca=1" class="icon"> Número de empleado: <?= $num_empleado ?></h4>
                             <div class="qr-container">
                                 <h4 class="custom-font1">QR de asistencia:</h4>
                                 <img src="<?= $qrFilePath ?>" alt="Código QR" class="qr-image">
                             </div>
                             <h4 class="custom-font1">Detalles del evento</h4>
-                            <h5 class='no-margin custom-font2'><img style="margin-right: 0.5em" src="<?= base_url() ?>dist/img/empleado.png" class="icon"> Ubicación: <?= $ubicacion ?></h5>
-                            <h5 class='no-margin custom-font2'><img style="margin-right: 0.5em" src="<?= base_url() ?>dist/img/calendar-alt-solid.png" class="icon"> Fecha del evento: <?= $fechaEvento ?></h5>
-                            <h5 class='no-margin custom-font2'><img style="margin-right: 0.5em" src="<?= base_url() ?>dist/img/clock-regular.png" class="icon"> Hora del evento: <?= $horaEvento ?></h5>
-                            <h5 class='no-margin custom-font2'><img style="margin-right: 0.5em" src="<?= base_url() ?>dist/img/limiteRecepcion.png" class="icon"> Límite de recepción: <?= $limiteRecepcion ?></h5>
+                            <h5 class='no-margin custom-font2'><img style="margin-right: 0.5em" src="https://storage.cloud.google.com/pruebas-conecta-maderas/user-solid.png?authuser=1" class="icon"> Ubicación: <?= $ubicacion ?></h5>
+                            <h5 class='no-margin custom-font2'><img style="margin-right: 0.5em" src="https://storage.cloud.google.com/pruebas-conecta-maderas/calendar-alt-solid.png?authuser=1" class="icon"> Fecha del evento: <?= $fechaEvento ?></h5>
+                            <h5 class='no-margin custom-font2'><img style="margin-right: 0.5em" src="https://storage.cloud.google.com/pruebas-conecta-maderas/clock-regular.png?authuser=1" class="icon"> Hora del evento: <?= $horaEvento ?></h5>
+                            <h5 class='no-margin custom-font2'><img style="margin-right: 0.5em" src="https://storage.cloud.google.com/pruebas-conecta-maderas/clock-regular.png?authuser=1" class="icon"> Límite de recepción: <?= $limiteRecepcion ?></h5>
                         </div>
                     </td>
                 </tr>
-                <tr>
+                <tr>    
                     <td class="logo" style="text-align: center; padding: 1em;">
-                        <img src="<?= base_url() ?>dist/img/Logo_CM2.png" alt="" style="width: 110px; max-width: 110px; height: auto; margin: auto; display: block;">
+                        <img src="https://storage.cloud.google.com/pruebas-conecta-maderas/Logo_CM2.png?authuser=1" alt="" style="width: 110px; max-width: 110px; height: auto; margin: auto; display: block;">
                     </td>
                 </tr>
             </table>
