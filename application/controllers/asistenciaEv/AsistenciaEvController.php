@@ -53,13 +53,13 @@ class AsistenciaEvController extends BaseController
                 ];
                 $jsonData = json_encode($dataQr);
                 $base64Data = base64_encode($jsonData);
-                $qrCode = QrCode::create($base64Data) 
+                $qrCode = QrCode::create($base64Data)
                     ->setEncoding(new Encoding('UTF-8'))
                     ->setErrorCorrectionLevel(new ErrorCorrectionLevelLow())
                     ->setSize(300)
                     ->setMargin(10)
                     ->setRoundBlockSizeMode(new RoundBlockSizeModeMargin())
-                    ->setForegroundColor(new Color(0, 55, 100)); 
+                    ->setForegroundColor(new Color(0, 55, 100));
     
                 $writer = new PngWriter();
                 $logoPath = 'C:/xampp/htdocs/beneficiosCMBack/pruebas/logo.png'; 
@@ -70,26 +70,25 @@ class AsistenciaEvController extends BaseController
                     $logo = null;
                 }
     
-                $outputFile = 'C:/xampp/htdocs/beneficiosCMBack/pruebas/qr_Evento_' . $idContrato . '.png';
-    
-                if (!file_exists('C:/xampp/htdocs/beneficiosCMBack/pruebas')) {
-                    mkdir('C:/xampp/htdocs/beneficiosCMBack/pruebas', 0755, true);
+                $tempDir = 'C:/xampp/htdocs/beneficiosCMBack/pruebas/temp/';
+                if (!file_exists($tempDir)) {
+                    mkdir($tempDir, 0755, true);
                 }
-    
+                $outputFile = $tempDir . 'qr_Evento_' . $idContrato . '.png';
                 $result = $writer->write($qrCode, $logo);
                 $result->saveToFile($outputFile);
     
                 $this->sendMail($dataEvento[0], $outputFile);
     
-                echo json_encode(array("estatus" => true, "msj" => "QR generado correctamente.|Datos enviados a sendMail"));
+                echo json_encode(array("estatus" => true, "msj" => "QR generado correctamente. Datos enviados a sendMail."));
             } else {
-                echo json_encode(array("estatus" => false, "msj" => "Error al obtener los datos del evento"));
+                echo json_encode(array("estatus" => false, "msj" => "Error al obtener los datos del evento."));
             }
         } else {
-            echo json_encode(array("estatus" => false, "msj" => "Error al recibir datos (ID's)"));
+            echo json_encode(array("estatus" => false, "msj" => "Error al recibir datos (ID's)."));
         }
     }
-    public function sendMail($dataValue, $qrFilePath)
+    public function sendMail($dataValue,$qrFilePath)
     {
         // var_dump($dataValue, $qrFilePath); exit; die;
         $num_empleado = $dataValue->num_empleado;
@@ -137,9 +136,14 @@ class AsistenciaEvController extends BaseController
         $this->email->to($correo);
         $this->email->message($html_message);
         $this->email->subject("Confirmación de asistencia a evento");
+        $this->email->attach($qrFilePath); 
 
         if ($this->email->send()) {
             echo json_encode(array("estatus" => true, "msj" => "Envío exitoso"), JSON_NUMERIC_CHECK);
+            
+            if (file_exists($qrFilePath)) {
+                unlink($qrFilePath); 
+            }
         } else {
             echo json_encode(array("estatus" => false, "msj" => "Ocurrió un error al enviar el correo"), JSON_NUMERIC_CHECK);
         }

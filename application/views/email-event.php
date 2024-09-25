@@ -360,6 +360,7 @@
                             <h4 class='no-margin custom-font2'><img src="<?= base_url() ?>dist/img/map-marked-alt-solid.png" class="icon"> Número de empleado: <?= $num_empleado?></h4>
                             <div class="qr-container">
                                 <h4 class="custom-font1">QR de asistencia:</h4>
+                                <img src="cid:qrFilePath" alt="QR Code" />
                                 <img src="<?= $qrFilePath ?>" alt="Código QR" class="qr-image">
                             </div>
                             <h4 class="custom-font1">Detalles del evento</h4>
