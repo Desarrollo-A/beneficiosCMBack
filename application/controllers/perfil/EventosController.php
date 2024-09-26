@@ -221,11 +221,11 @@ class EventosController extends BaseController {
 
         $data = [
             'num_empleado' => $num_empleado,
-            'nombreCompleto' => $nombreCompleto,
-            'titulo' => $titulo,
+            'nombreCompleto' => ucwords(strtolower($nombreCompleto)),
+            'titulo' => strtoupper($titulo),
             'fechaEvento' => date('d/m/Y', strtotime($fechaEvento)),
             'horaEvento' => date('h:i A', strtotime($horaEvento)),
-            'limiteRecepcion' => date ('h:i:A',strtotime($limiteRecepcion)),
+            'limiteRecepcion' => date ('h:i A',strtotime($limiteRecepcion)),
             'ubicacion' => $ubicacion,  
             'idContrato' => $idContrato,
             'idEvento' => $idEvento,
