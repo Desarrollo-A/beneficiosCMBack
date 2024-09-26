@@ -43,6 +43,52 @@ class EventosModel extends CI_Model {
        	return $query;
     }
 
+    public function getasistenciaEventoUsers()
+    {
+        $query = $this->ch->query("SELECT ae.idEvento, opc.nombre AS estatusAsistentes,ev.titulo, ev.fechaEvento, ev.horaEvento, 
+            ev.limiteRecepcion,us2.num_empleado,
+            CONCAT(us2.nombre_persona, ' ', us2.pri_apellido, ' ', us2.sec_apellido) AS nombreCompleto,us2.nsede, us2.ndepto 
+            FROM " . $this->schema_cm . ".asistenciasEventos AS ae 
+            INNER JOIN " . $this->schema_cm . ".eventos AS ev  ON ae.idEvento = ev.idEvento
+            INNER JOIN " . $this->schema_cm . ".usuarios AS us ON ae.idContrato = us.idContrato
+            INNER JOIN " . $this->schema_ch . ".beneficioscm_vista_usuarios AS us2  ON us2.idContrato = us.idContrato
+            INNER JOIN " . $this->schema_cm . ".opcionesporcatalogo AS opc  ON ae.estatusAsistencia = opc.idOpcion 
+            AND opc.idCatalogo = 42  WHERE ae.idContrato IS NOT NULL");
+             
+              return $query->result();
+    }
+
+    public function getasistenciaEventoUser($idUsuario)
+    {
+       $query = $this->ch->query("SELECT ae.idEvento, opc.nombre AS estatusAsistentes,ev.titulo, ev.fechaEvento, ev.horaEvento, 
+            ev.limiteRecepcion,us2.num_empleado,
+            CONCAT(us2.nombre_persona, ' ', us2.pri_apellido, ' ', us2.sec_apellido) AS nombreCompleto,us2.nsede, us2.ndepto 
+            FROM " . $this->schema_cm . ".asistenciasEventos AS ae 
+            INNER JOIN " . $this->schema_cm . ".eventos AS ev  ON ae.idEvento = ev.idEvento
+            INNER JOIN " . $this->schema_cm . ".usuarios AS us ON ae.idContrato = us.idContrato
+            INNER JOIN " . $this->schema_ch . ".beneficioscm_vista_usuarios AS us2  ON us2.idContrato = us.idContrato
+            INNER JOIN " . $this->schema_cm . ".opcionesporcatalogo AS opc  ON ae.estatusAsistencia = opc.idOpcion 
+            AND opc.idCatalogo = 42  WHERE us.idUsuario = ?", $idUsuario);
+
+              return $query->result();
+             
+    }
+
+    public function getEventoUser($idContrato, $idEvento)
+    {
+        $query = $this->ch->query("SELECT ae.idEvento,us.idContrato, opc.nombre AS estatusAsistentes,ev.titulo, ev.fechaEvento, ev.horaEvento, ev.limiteRecepcion,ev.ubicacion, us2.num_empleado,
+        CONCAT(us2.nombre_persona, ' ', us2.pri_apellido, ' ', us2.sec_apellido) AS nombreCompleto
+        FROM " . $this->schema_cm . ".asistenciasEventos AS ae 
+        INNER JOIN " . $this->schema_cm . ".eventos AS ev  ON ae.idEvento = ev.idEvento
+        INNER JOIN " . $this->schema_cm . ".usuarios AS us ON ae.idContrato = us.idContrato
+        INNER JOIN " . $this->schema_ch . ".beneficioscm_vista_usuarios AS us2  ON us2.idContrato = us.idContrato
+        INNER JOIN " . $this->schema_cm . ".opcionesporcatalogo AS opc  ON ae.estatusAsistencia = opc.idOpcion 
+        AND opc.idCatalogo = 42  WHERE us.idContrato = '$idContrato' AND  ae.idEvento = '$idEvento' ");
+         
+        return $query->result();
+
+    }
+    
     public function getAsistenciaEvento($idContrato, $idEvento){
         $query = $this->ch->query(
 			"SELECT ev.idEvento, asis.* FROM PRUEBA_beneficiosCM.eventos AS ev
@@ -57,5 +103,24 @@ class EventosModel extends CI_Model {
             SET estatus = 0
             WHERE idEvento = ?;", $idEvento);
        	return $query;
+    }
+
+    public function getDatosAsistenciaEvento($idEvento, $idContrato) // AND NOT (axs.tipoCita = 1 and axs.idOficina = 0) en caso de error en las modalidades
+    {
+        $query = $this->ch->query(
+            "SELECT 
+            ae.estatusAsistencia, oxc.nombre,
+            ev.idEvento, ev.titulo, ev.fechaEvento,
+            us2.idcontrato, us2.nombre_persona, us2.pri_apellido, us2.sec_apellido, us2.num_empleado
+            FROM PRUEBA_beneficiosCM.asistenciasEventos AS ae
+            INNER JOIN PRUEBA_beneficiosCM.eventos AS ev ON ae.idEvento = ev.idEvento
+            INNER JOIN PRUEBA_beneficiosCM.usuarios AS us ON us.idContrato = ae.idContrato
+            INNER JOIN PRUEBA_CH.beneficioscm_vista_usuarios AS us2 ON us.idContrato = us2.idcontrato
+            INNER JOIN PRUEBA_beneficiosCM.opcionesporcatalogo AS oxc ON oxc.idOpcion = ae.estatusAsistencia AND oxc.idCatalogo = 42
+            WHERE ae.estatus = 1 AND ev.estatus = 1 AND us.estatus = 1 AND us2.activo = 1 AND 
+            ae.idEvento = ? AND ae.idContrato = ?;", 
+            array($idEvento, $idContrato));
+
+        return $query;
     }
 }

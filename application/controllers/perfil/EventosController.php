@@ -2,15 +2,27 @@
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 require_once(APPPATH . "/controllers/BaseController.php");
+require 'vendor/autoload.php';
+
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Writer\PngWriter;
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelLow;
+use Endroid\QrCode\RoundBlockSizeMode\RoundBlockSizeModeMargin;
+use Endroid\QrCode\Color\Color;
+
 
 class EventosController extends BaseController {
 	public function __construct()
 	{
 		parent::__construct();
 		$this->ch = $this->load->database('ch', TRUE);
+        date_default_timezone_set('America/Mexico_City');
 		$this->load->database('default');
 		$this->load->model('perfil/EventosModel');
 		$this->load->model('GeneralModel');
+        $this->load->library("email");
+        $this->load->library('GoogleApi');
 		$this->schema_cm = $this->config->item('schema_cm');
         $this->schema_ch = $this->config->item('schema_ch');
 	}
@@ -44,6 +56,20 @@ class EventosController extends BaseController {
 		$this->output->set_content_type("application/json");
         $this->output->set_output(json_encode($rs, JSON_NUMERIC_CHECK));
 	}
+     //Funcion para obtener la lista de colaboradores en eventos 
+    public function getasistenciaEventoUsers()
+    {
+        $data['data'] = $this->EventosModel->getasistenciaEventoUsers();
+        $this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+    }
+      //Funcion para que el colaborador obtenga su lista de eventos
+    public function getasistenciaEventoUser($idUsuario)
+    {
+        $data['data'] = $this->EventosModel->getasistenciaEventoUser($idUsuario);
+        $this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+    }
 
     public function nuevoEvento() {
         // Obtener y sanitizar inputs
@@ -128,6 +154,118 @@ class EventosController extends BaseController {
     
         // Respuesta de éxito
         return $this->successResponse("Se ha creado el evento.");
+    }
+    
+    // Funcion para generar QR asistencia 
+    public function postGenerarQr()
+    {
+        $idContrato = $this->input->post('dataValue[idContrato]');
+        $idEvento = $this->input->post('dataValue[idEvento]');
+        if ($idContrato !== null && $idEvento !== null) {
+            $dataEvento = $this->EventosModel->getEventoUser($idContrato, $idEvento);
+        
+         if (!empty($dataEvento)) {
+            $dataQr = [
+                "idContrato" => $idContrato,
+                "idEvento" => $idEvento,
+                "estatusAsistencia" => '3'
+                ];
+                $jsonData = json_encode($dataQr);
+                $base64Data = base64_encode($jsonData);
+                $qrCode = QrCode::create($base64Data)
+                ->setEncoding(new Encoding('UTF-8'))
+                ->setErrorCorrectionLevel(new ErrorCorrectionLevelLow())
+                ->setSize(300)
+                ->setMargin(10)
+                ->setRoundBlockSizeMode(new RoundBlockSizeModeMargin())
+                ->setForegroundColor(new Color(0, 55, 100));
+
+                $writer = new PngWriter();
+                $logoPath = 'C:/xampp/htdocs/beneficiosCMBack/qrCode/Eventos/logo.png'; 
+    
+                if (file_exists($logoPath)) {
+                    $logo = new \Endroid\QrCode\Logo\Logo($logoPath, 60, 42); 
+                } else {
+                    $logo = null;
+                }
+                $tempDir = 'C:/xampp/htdocs/beneficiosCMBack/qrCode/Eventos/temp/';
+                if (!file_exists($tempDir)) {
+                    mkdir($tempDir, 0755, true);
+                }
+                $outputFile = $tempDir . 'Ev' . $idEvento . 'CM' . $idContrato . '.png';
+                $result = $writer->write($qrCode, $logo);
+                $result->saveToFile($outputFile);
+    
+                $this->sendMail($dataEvento[0], $outputFile);
+                echo json_encode(array("estatus" => true, "msj" => "QR generado correctamente. Datos enviados a sendMail."));
+            } else {
+                echo json_encode(array("estatus" => false, "msj" => "Error al obtener los datos del evento."));
+            }
+        } else {
+            echo json_encode(array("estatus" => false, "msj" => "Error al recibir datos (ID's)."));
+        }
+    }
+    
+    // Funcion para enviar correo de asistencia 
+    public function sendMail($dataValue,$qrFilePath)
+    {
+        // var_dump($dataValue, $qrFilePath); exit; die;
+        $num_empleado = $dataValue->num_empleado;
+        $nombreCompleto = $dataValue->nombreCompleto;
+        $titulo = $dataValue->titulo;
+        $fechaEvento = $dataValue->fechaEvento;
+        $horaEvento = $dataValue->horaEvento;
+        $limiteRecepcion = $dataValue->limiteRecepcion;
+        $ubicacion = $dataValue->ubicacion;
+        $idContrato = $dataValue->idContrato;
+        $idEvento = $dataValue->idEvento;
+        $estatusAsistencia = $dataValue->estatusAsistentes;
+
+        $data = [
+            'num_empleado' => $num_empleado,
+            'nombreCompleto' => $nombreCompleto,
+            'titulo' => $titulo,
+            'fechaEvento' => date('d/m/Y', strtotime($fechaEvento)),
+            'horaEvento' => date('h:i A', strtotime($horaEvento)),
+            'limiteRecepcion' => date ('h:i:A',strtotime($limiteRecepcion)),
+            'ubicacion' => $ubicacion,  
+            'idContrato' => $idContrato,
+            'idEvento' => $idEvento,
+            'estatusAsistencia' => $estatusAsistencia,
+            'qrFilePath' => $qrFilePath
+        ];
+
+        $correo = ['programador.analista47@ciudadmaderas.com'];
+
+        $config['protocol'] = 'smtp';
+        $config['smtp_host'] = 'smtp.gmail.com';
+        $config['smtp_user'] = 'programador.analista47@ciudadmaderas.com';  
+        $config['smtp_pass'] = 'oeix zkyh axmj tbrv';  
+        $config['smtp_port'] = 465;
+        $config['charset'] = 'utf-8';
+        $config['mailtype'] = 'html';
+        $config['newline'] = "\r\n";
+        $config['smtp_crypto'] = 'ssl';
+
+        $html_message = $this->load->view("email-event", $data, true);
+
+        $this->load->library("email");
+        $this->email->initialize($config);
+        $this->email->from("programador.analista47@ciudadmaderas.com");  
+        $this->email->to($correo);
+        $this->email->message($html_message);
+        $this->email->subject("Confirmación de asistencia a evento");
+        $this->email->attach($qrFilePath); 
+
+        if ($this->email->send()) {
+            echo json_encode(array("estatus" => true, "msj" => "Envío exitoso"), JSON_NUMERIC_CHECK);
+            
+        if (file_exists($qrFilePath)) {
+            unlink($qrFilePath); 
+        }
+        } else {
+            echo json_encode(array("estatus" => false, "msj" => "Ocurrió un error al enviar el correo"), JSON_NUMERIC_CHECK);
+        }
     }
 
     public function actualizarAsistencia() {
@@ -295,5 +433,54 @@ class EventosController extends BaseController {
 
         $this->output->set_content_type("application/json");
         $this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
+    }
+
+    public function decodeDatosEvento(){
+        // Obtener datos en base64 desde el request
+        $base64 = $this->input->post('dataValue[base64]'); // es base64 de {"idContrato":"1473","idEvento":"1","estatusAsistencia":"3"}
+        $decodedDatos = base64_decode($base64);
+        
+        // Decodificar el JSON
+        $datos = json_decode($decodedDatos, true); // true para obtener un array asociativo
+        $response['result'] = isset($datos);
+    
+        if ($response['result']) {
+            // Consulta a la base de datos
+            $event = $this->AsistenciaEvModel->getDatosAsistenciaEvento($datos['idEvento'], $datos['idContrato'])->row(); // row() para obtener un solo registro
+    
+            if ($event) {
+                // Verificar el estatus de asistencia
+                switch ($event->estatusAsistencia) {
+                    case 1:
+                        $response['result'] = false;
+                        $response['msg'] = "¡Error al consultar la información!";
+                        break;
+                    case 2:
+                        $response['result'] = false;
+                        $response['msg'] = "¡El colaborador canceló su confirmación!";
+                        break;
+                    case 3:
+                        $response['result'] = false;
+                        $response['msg'] = "¡El colaborador ya ha asistido!";
+                        break;
+                    default:
+                        $response['result'] = false;
+                        $response['msg'] = "¡Existe un error con la información del colaborador!";
+                        break;
+                }
+            } else {
+                // Caso en que no se encuentre un evento
+                $response['result'] = false;
+                $response['msg'] = "¡Error al consultar la información! Evento no encontrado.";
+            }
+        } else {
+            // Caso de que los datos no se puedan decodificar correctamente
+            $response['result'] = false;
+            $response['msg'] = "¡Consulta fallida! Datos inválidos.";
+        }
+    
+        // Devolver respuesta en formato JSON
+        $this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($response));
     }
 }
