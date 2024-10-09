@@ -51,7 +51,7 @@ class EventosModel extends CI_Model {
             FROM " . $this->schema_cm . ".asistenciasEventos AS ae 
             INNER JOIN " . $this->schema_cm . ".eventos AS ev  ON ae.idEvento = ev.idEvento
             INNER JOIN " . $this->schema_cm . ".usuarios AS us ON ae.idContrato = us.idContrato
-            INNER JOIN " . $this->schema_ch . ".beneficioscm_vista_usuarios AS us2  ON us2.idContrato = us.idContrato
+            INNER JOIN " . $this->schema_ch . ".beneficioscm_vista_usuarios_dos AS us2  ON us2.idContrato = us.idContrato
             INNER JOIN " . $this->schema_cm . ".opcionesporcatalogo AS opc  ON ae.estatusAsistencia = opc.idOpcion 
             AND opc.idCatalogo = 42  WHERE ae.idContrato IS NOT NULL");
              
@@ -66,7 +66,7 @@ class EventosModel extends CI_Model {
             FROM " . $this->schema_cm . ".asistenciasEventos AS ae 
             INNER JOIN " . $this->schema_cm . ".eventos AS ev  ON ae.idEvento = ev.idEvento
             INNER JOIN " . $this->schema_cm . ".usuarios AS us ON ae.idContrato = us.idContrato
-            INNER JOIN " . $this->schema_ch . ".beneficioscm_vista_usuarios AS us2  ON us2.idContrato = us.idContrato
+            INNER JOIN " . $this->schema_ch . ".beneficioscm_vista_usuarios_dos AS us2  ON us2.idContrato = us.idContrato
             INNER JOIN " . $this->schema_cm . ".opcionesporcatalogo AS opc  ON ae.estatusAsistencia = opc.idOpcion 
             AND opc.idCatalogo = 42  WHERE us.idUsuario = ?", $idUsuario);
 
@@ -80,7 +80,7 @@ class EventosModel extends CI_Model {
         FROM " . $this->schema_cm . ".asistenciasEventos AS ae 
         INNER JOIN " . $this->schema_cm . ".eventos AS ev  ON ae.idEvento = ev.idEvento
         INNER JOIN " . $this->schema_cm . ".usuarios AS us ON ae.idContrato = us.idContrato
-        INNER JOIN " . $this->schema_ch . ".beneficioscm_vista_usuarios AS us2  ON us2.idContrato = us.idContrato
+        INNER JOIN " . $this->schema_ch . ".beneficioscm_vista_usuarios_dos AS us2  ON us2.idContrato = us.idContrato
         INNER JOIN " . $this->schema_cm . ".opcionesporcatalogo AS opc  ON ae.estatusAsistencia = opc.idOpcion 
         AND opc.idCatalogo = 42  WHERE us.idContrato = '$idContrato' AND  ae.idEvento = '$idEvento' ");
          
@@ -113,7 +113,7 @@ class EventosModel extends CI_Model {
             FROM PRUEBA_beneficiosCM.asistenciasEventos AS ae
             INNER JOIN PRUEBA_beneficiosCM.eventos AS ev ON ae.idEvento = ev.idEvento
             INNER JOIN PRUEBA_beneficiosCM.usuarios AS us ON us.idContrato = ae.idContrato
-            INNER JOIN PRUEBA_CH.beneficioscm_vista_usuarios AS us2 ON us.idContrato = us2.idcontrato
+            INNER JOIN PRUEBA_CH.beneficioscm_vista_usuarios_dos AS us2 ON us.idContrato = us2.idcontrato
             INNER JOIN PRUEBA_beneficiosCM.opcionesporcatalogo AS oxc ON oxc.idOpcion = ae.estatusAsistencia AND oxc.idCatalogo = 42
             WHERE ae.estatus = 1 AND ev.estatus = 1 AND us.estatus = 1 AND us2.activo = 1 AND 
             ae.idEvento = ? AND ae.idContrato = ?;", 

@@ -379,7 +379,7 @@ class CalendarioController extends BaseController{
 
 		if (!$valid) {
 			$response["result"] = false;
-			$response["msg"] = "¡Horario de cita dentro del limite de horarios no permitidos!";
+			$response["msg"] = "¡Horario de cita dentro del limite de horarios no permitidosasdasdasd!";
 			
 			$this->output->set_content_type("application/json");
 			$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
