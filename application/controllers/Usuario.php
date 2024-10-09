@@ -582,7 +582,7 @@ class Usuario extends BaseController {
 			$config['protocol']  = 'smtp';
 			$config['smtp_host'] = 'smtp.gmail.com';
 			$config['smtp_user'] = 'no-reply@ciudadmaderas.com'; // testemail@ciudadmaderas.com // no-reply@ciudadmaderas.com
-			$config['smtp_pass'] = 'JDe64%8q5D'; // Feb2024@Te# // JDe64%8q5D
+			$config['smtp_pass'] = '';
 			$config['smtp_port'] = 465;
 			$config['charset']   = 'utf-8';
 			$config['mailtype']  = 'html';
