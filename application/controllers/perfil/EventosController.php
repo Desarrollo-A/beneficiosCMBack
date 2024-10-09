@@ -238,7 +238,7 @@ class EventosController extends BaseController {
         $config['protocol'] = 'smtp';
         $config['smtp_host'] = 'smtp.gmail.com';
         $config['smtp_user'] = 'programador.analista47@ciudadmaderas.com';  
-        $config['smtp_pass'] = 'oeix zkyh axmj tbrv';  
+        $config['smtp_pass'] = '';  
         $config['smtp_port'] = 465;
         $config['charset'] = 'utf-8';
         $config['mailtype'] = 'html';
