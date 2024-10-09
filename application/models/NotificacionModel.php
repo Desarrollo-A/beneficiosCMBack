@@ -44,10 +44,10 @@ class NotificacionModel extends CI_Model{
             INNER JOIN ". $this->schema_cm .".opcionesporcatalogo oxc ON oxc.idOpcion = nt.mensaje AND oxc.idCatalogo = 18
             LEFT JOIN ". $this->schema_cm .".citas ct ON ct.idCita = nt.idCita
             LEFT JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idEspecialista
-            LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
+            LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos us2 ON us2.idcontrato = us.idContrato
             LEFT JOIN ". $this->schema_cm .".detallepagos dp ON dp.idDetalle = ct.idDetalle AND dp.estatusPago = 1
             LEFT JOIN ". $this->schema_cm .".usuarios us3 ON us3.idUsuario = nt.idUsuario
-            LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us4 ON us4.idcontrato = us3.idContrato 
+            LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos us4 ON us4.idcontrato = us3.idContrato 
             WHERE nt.idUsuario = $usr");
 
         return $query;

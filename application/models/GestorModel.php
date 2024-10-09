@@ -35,7 +35,7 @@ class GestorModel extends CI_Model {
 
         $query = $this->ch-> query("SELECT us.idUsuario, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre
         FROM ". $this->schema_cm .".usuarios us
-        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
+        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos us2 ON us2.idcontrato = us.idContrato
         WHERE idRol = 3 AND idPuesto = $idPuesto");
 
         if($query->num_rows() > 0){
@@ -51,7 +51,7 @@ class GestorModel extends CI_Model {
 
         $query = $this->ch-> query("SELECT us.idUsuario, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre
         FROM ". $this->schema_cm .".usuarios us
-        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
+        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos us2 ON us2.idcontrato = us.idContrato
         WHERE us.idRol = 3 AND us2.idpuesto = $dt");
         return $query->result();
     }
@@ -64,7 +64,7 @@ class GestorModel extends CI_Model {
                 (SELECT axs.idSede
                 FROM ". $this->schema_cm .".atencionxsede AS axs
                 INNER JOIN ". $this->schema_cm .".usuarios AS us ON us.idUsuario = axs.idEspecialista
-                INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS usCh ON usCh.idContrato = us.idContrato
+                INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos AS usCh ON usCh.idContrato = us.idContrato
                 WHERE usCh.idpuesto = $dt)");
         
         return $query->result();
@@ -80,7 +80,7 @@ class GestorModel extends CI_Model {
         (SELECT axs.idSede
         FROM ". $this->schema_cm .".atencionxsede AS axs
         INNER JOIN ". $this->schema_cm .".usuarios AS us ON us.idUsuario = axs.idEspecialista
-        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS usCh ON usCh.idContrato = us.idContrato
+        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos AS usCh ON usCh.idContrato = us.idContrato
         WHERE usCh.idpuesto = $dt)");
         
         return $query->result();
@@ -101,7 +101,7 @@ class GestorModel extends CI_Model {
         LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_sedes sd ON sd.idsede = axs.idSede
         LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_oficinas o ON o.idoficina = axs.idOficina
         LEFT JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = axs.idEspecialista
-        LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
+        LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos us2 ON us2.idcontrato = us.idContrato
         LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_puestos ps ON ps.idpuesto = us2.idpuesto
         LEFT JOIN ". $this->schema_cm .".catalogos ct ON ct.idCatalogo = 5
         LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idCatalogo = ct.idCatalogo AND op.idOpcion = axs.tipoCita
@@ -201,7 +201,7 @@ class GestorModel extends CI_Model {
                 he.estatus, he.horaInicio, he.horaFin, he.sabados, he.horaInicioSabado, he.horaFinSabado
                 FROM ". $this->schema_cm .".horariosespecificos he
                 INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = he.idEspecialista 
-                INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato");
+                INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos us2 ON us2.idcontrato = us.idContrato");
 
         return $query;
     }
@@ -209,7 +209,7 @@ class GestorModel extends CI_Model {
     public function especialistas(){
         $query = $this->ch-> query("SELECT us.idUsuario, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, ''), ' (', IFNULL(us2.npuesto , ''), ')') AS especialista 
         FROM ". $this->schema_cm .".usuarios us
-        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
+        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos us2 ON us2.idcontrato = us.idContrato 
         WHERE us.idRol  = 3
         AND NOT EXISTS (
             SELECT 1 
@@ -340,7 +340,7 @@ class GestorModel extends CI_Model {
         permisos.idOpcion as permisos_id,
         permisos.nombre as permisos_name
         FROM ". $this->schema_cm .".usuarios us
-        LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
+        LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos us2 ON us2.idcontrato = us.idContrato
         LEFT JOIN ". $this->schema_cm .".correostemporales AS c ON c.idContrato = us.idContrato
         LEFT JOIN ". $this->schema_cm .".usuariosexternos us3 ON us3.idcontrato = us.idContrato
         LEFT JOIN ". $this->schema_cm .".detallepaciente dt ON dt.idUsuario = us.idUsuario

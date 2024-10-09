@@ -13,7 +13,7 @@ class Test extends CI_Controller {
 
     public function database(){
         $citas = $this->ch->query("SELECT * 
-		FROM ". $this->schema_ch .".beneficioscm_vista_usuarios")->result();
+		FROM ". $this->schema_ch .".beneficioscm_vista_usuarios_dos")->result();
 
         // $citas = $this->ch->query($query)
 

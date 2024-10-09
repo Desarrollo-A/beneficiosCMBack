@@ -33,7 +33,7 @@ class FondoAhorroModel extends CI_Model {
 			ct.correo AS correo -- correos temporales
 			FROM ". $this->schema_cm .".fondosahorros AS fa
 			INNER JOIN ". $this->schema_cm .".usuarios AS us ON fa.idContrato = us.idContrato
-			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us.idContrato = us2.idcontrato
+			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos AS us2 ON us.idContrato = us2.idcontrato
 			INNER JOIN ". $this->schema_cm .".opcionesporcatalogo as oxc1 ON oxc1.idOpcion = fa.estatusFondo AND oxc1.idCatalogo = 21
 			INNER JOIN ". $this->schema_cm .".correostemporales AS ct ON ct.idContrato = us.idContrato AND ct.estatus = 1
 			WHERE fa.estatus = 1 AND us.estatus = 1"
