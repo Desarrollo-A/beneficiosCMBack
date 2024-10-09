@@ -196,6 +196,7 @@ class CalendarioModel extends CI_Model
 
             $queryBeneficio = $this->ch->query(
                 "SELECT idHorario, idBeneficio, horaInicio, horaFin, FROM_UNIXTIME(TRUNCATE(UNIX_TIMESTAMP(horaInicio), 0)) AS inicioComparacion, FROM_UNIXTIME(TRUNCATE(UNIX_TIMESTAMP(horaFin), 0)) AS finComparacion, 
+
                 sabados, horaInicioSabado, horaFinSabado, estatus, creadoPor, fechaCreacion, modificadoPor, fechaModificacion
                 FROM ". $this->schema_cm .".horariosporbeneficio WHERE idBeneficio = ?",
                 array($beneficio)
