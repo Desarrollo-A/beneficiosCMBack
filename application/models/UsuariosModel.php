@@ -85,7 +85,7 @@ class UsuariosModel extends CI_Model {
 	public function getNameUser($idEspecialista)
 	{
 		$query = $this->ch->query(
-			"SELECT US.idUsuario, US.idContrato, US.password, US.idRol, US.externo, US.idAreaBeneficio,
+			"SELECT DISTINCT US.idUsuario, US.idContrato, US.password, US.idRol, US.externo, US.idAreaBeneficio,
  			US.estatus, US.creadoPor, US.fechaCreacion, US.modificadoPor, US.fechaModificacion,
 			us2.idsede AS idSede, us2.idArea, us2.tipo_puesto AS tipoPuesto, us2.fingreso AS fechaIngreso,
 			TRIM(CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), 
