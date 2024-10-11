@@ -183,7 +183,7 @@ class CalendarioModel extends CI_Model
 
         $queryEspecialistas = $this->ch->query(
             "SELECT idHorario, idEspecialista, CAST(FORMAT(horaInicio, 'HH:mm:ss') AS time(0)) AS horaInicio, CAST(FORMAT(horaFin, 'HH:mm:ss') AS time(0)) AS horaFin, sabados,
-            FROM_UNIXTIME(TRUNCATE(UNIX_TIMESTAMP(horaInicio), 0)) AS inicioComparacion, FROM_UNIXTIME(TRUNCATE(UNIX_TIMESTAMP(horaFin), 0)) AS finComparacion 
+            FROM_UNIXTIME(TRUNCATE(UNIX_TIMESTAMP(horaInicio), 0)) AS inicioComparacion, FROM_UNIXTIME(TRUNCATE(UNIX_TIMESTAMP(horaFin), 0)) AS finComparacion,
             CAST(FORMAT(horaInicioSabado, 'HH:mm:ss') AS time(0)) AS horaInicioSabado, CAST(FORMAT(horaFinSabado, 'HH:mm:ss') AS time(0)) AS horaFinSabado, estatus,
             creadoPor, fechaCreacion, modificadoPor, fechaModificacion FROM ". $this->schema_cm .".horariosespecificos WHERE idEspecialista = ? AND estatus = 1",
             array($especialista)
@@ -194,9 +194,9 @@ class CalendarioModel extends CI_Model
             return $queryEspecialistas;
             
         }else{
-
             $queryBeneficio = $this->ch->query(
-                "SELECT *FROM ". $this->schema_cm .".horariosporbeneficio WHERE idBeneficio = ?",
+                "SELECT *, FROM_UNIXTIME(TRUNCATE(UNIX_TIMESTAMP(horaInicio), 0)) AS inicioComparacion, FROM_UNIXTIME(TRUNCATE(UNIX_TIMESTAMP(horaFin), 0)) AS finComparacion 
+                FROM ". $this->schema_cm .".horariosporbeneficio WHERE idBeneficio = ?",
                 array($beneficio)
             );
 
