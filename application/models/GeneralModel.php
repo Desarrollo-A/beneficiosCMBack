@@ -21,7 +21,7 @@ class GeneralModel extends CI_Model {
         
         $query = $this->ch-> query("SELECT ps.idpuesto AS idPuesto, ps.nom_puesto AS puesto, ps.tipo_puesto AS tipoPuesto,  
         ps.idarea AS idArea, us.fingreso, ps.estatus_puesto AS estatus, dp.canRegister 
-        FROM ". $this->schema_ch .".beneficioscm_vista_usuarios_dos AS us
+        FROM ". $this->schema_ch .".beneficioscm_vista_usuarios AS us
         INNER JOIN ". $this->schema_ch .".beneficioscm_vista_puestos ps ON ps.idpuesto = us.idpuesto
         LEFT JOIN ". $this->schema_cm .".datopuesto dp ON dp.idPuesto = ps.idpuesto 
         WHERE us.idcontrato = ?", $contrato);
@@ -111,7 +111,7 @@ class GeneralModel extends CI_Model {
         INNER JOIN ". $this->schema_ch .".beneficioscm_vista_sedes sd ON sd.idsede = axs.idSede
         LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_oficinas o ON o.idoficina = axs.idOficina
         INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = axs.idEspecialista
-        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos us2 ON us2.idcontrato = us.idContrato
+        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
         INNER JOIN ". $this->schema_ch .".beneficioscm_vista_puestos ps ON ps.idpuesto = us2.idpuesto 
         INNER JOIN ". $this->schema_cm .".catalogos ct ON ct.idCatalogo = 5
         LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_area ar ON ar.idsubarea = axs.idArea
@@ -197,9 +197,9 @@ class GeneralModel extends CI_Model {
 		END AS pagoGenerado
 		FROM ". $this->schema_cm .".citas ct
 		LEFT JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idEspecialista
-		LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos us2 ON us2.idcontrato = us.idContrato
+		LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
 		LEFT JOIN ". $this->schema_cm .".usuarios pa ON pa.idUsuario = ct.idPaciente
-		LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos us3 ON us3.idcontrato = pa.idContrato
+		LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us3 ON us3.idcontrato = pa.idContrato
 		LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op ON op.idOpcion = ct.estatusCita
 		LEFT JOIN ". $this->schema_cm .".atencionxsede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
 		LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_sedes sd ON sd.idsede = axs.idSede

@@ -233,7 +233,7 @@ class EventosController extends BaseController {
             'qrFilePath' => $qrFilePath
         ];
 
-        $correo = ['programador.analista47@ciudadmaderas.com'];
+        $correo = ['programador.analista47@ciudadmaderas.com'/*,'coordinador1.desarrollo@ciudadmaderas.com'*/];
 
         $config['protocol'] = 'smtp';
         $config['smtp_host'] = 'smtp.gmail.com';
@@ -436,22 +436,28 @@ class EventosController extends BaseController {
     public function decodeDatosEvento(){
         // Obtener datos en base64 desde el request
         $base64 = $this->input->post('dataValue[base64]'); // es base64 de {"idContrato":"1473","idEvento":"1","estatusAsistencia":"3"}
-        $decodedDatos = base64_decode($base64);
-        
+        $decodedDatos = base64_decode($base64);        
         // Decodificar el JSON
         $datos = json_decode($decodedDatos, true); // true para obtener un array asociativo
         $response['result'] = isset($datos);
     
         if ($response['result']) {
             // Consulta a la base de datos
-            $event = $this->AsistenciaEvModel->getDatosAsistenciaEvento($datos['idEvento'], $datos['idContrato'])->row(); // row() para obtener un solo registro
-    
+            $event = $this->EventosModel->getDatosAsistenciaEvento($datos['idEvento'], $datos['idContrato'])->row(); // row() para obtener un solo registro
+
             if ($event) {
-                // Verificar el estatus de asistencia
+                // Verificar el estatus de assisntecia
                 switch ($event->estatusAsistencia) {
                     case 1:
-                        $response['result'] = false;
-                        $response['msg'] = "¡Error al consultar la información!";
+                        $response['result'] = true;
+                        $response['data'] = [
+                            [
+                                'nombreCompleto' => $event->nombreCompleto,  
+                                'titulo' => $event->titulo,
+                                'idEvento' => $event->idEvento,
+                                'idcontrato' => $event->idcontrato  
+                            ]
+                        ];
                         break;
                     case 2:
                         $response['result'] = false;
@@ -463,7 +469,7 @@ class EventosController extends BaseController {
                         break;
                     default:
                         $response['result'] = false;
-                        $response['msg'] = "¡Existe un error con la información del colaborador!";
+                        $response['msg'] = "¡Existen errores con la información del colaborador!";
                         break;
                 }
             } else {
@@ -481,4 +487,23 @@ class EventosController extends BaseController {
         $this->output->set_content_type('application/json');
         $this->output->set_output(json_encode($response));
     }
+
+    public function updateAsistenciaEvento() {
+        $idcontrato = $this->input->post('dataValue[idcontrato]');
+        $idEvento = $this->input->post('dataValue[idEvento]');
+    
+        if (isset($idcontrato, $idEvento)) {
+            $dataAsistenciaEvento = $this->EventosModel->updateAsistenciaEvento($idcontrato, $idEvento);
+    
+            if ($dataAsistenciaEvento) {
+                $response = ['status' => 'success', 'message' => 'Asistencia actualizada correctamente'];
+            } else {
+                $response = ['status' => 'error', 'message' => 'Error al actualizar la asistencia'];
+            }
+        } else {
+            $response = ['status' => 'error', 'message' => 'Ocurrio un error interno'];
+        }
+            $this->json($response);
+    }
+
 }

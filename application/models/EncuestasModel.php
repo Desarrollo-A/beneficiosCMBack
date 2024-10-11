@@ -298,7 +298,7 @@ class EncuestasModel extends CI_Model {
         FROM ". $this->schema_cm .".citas ct
         INNER JOIN ". $this->schema_cm .".evaluacionencuestas enc ON enc.idCita = ct.idCita
         INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idEspecialista 
-        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos us2 ON us2.idcontrato = us.idContrato
+        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
         INNER JOIN ". $this->schema_ch .".beneficioscm_vista_puestos ps ON ps.idpuesto = us2.idpuesto 
         WHERE ct.idPaciente = $idUsuario
         AND (enc.primeraSesion IS NOT NULL OR enc.satisfaccion IS NOT NULL

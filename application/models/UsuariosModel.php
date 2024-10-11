@@ -58,7 +58,7 @@ class UsuariosModel extends CI_Model {
 				us.estatus, us.creadoPor, us.fechaCreacion, us.modificadoPor, us.fechaModificacion, c.correo AS correo,
 				us2.activo, us.password, us.permisos
 				FROM ". $this->schema_cm .".usuarios AS us 
-				INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos AS us2 ON us2.idcontrato = us.idContrato
+				INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
 				LEFT JOIN ". $this->schema_cm .".correostemporales c ON c.idContrato = us.idcontrato 
 				WHERE us2.num_empleado = ?", array( $numEmpleado ));
 		}
@@ -77,7 +77,7 @@ class UsuariosModel extends CI_Model {
 	public function getAreas()
 	{
 		$query = $this->ch->query("SELECT * FROM ". $this->schema_cm .".usuarios AS us
-		LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos us2 ON us2.idcontrato = us.idContrato");
+		LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato");
 
         return $query;
 	}
@@ -92,7 +92,7 @@ class UsuariosModel extends CI_Model {
          	' ', IFNULL(us2.sec_apellido, ''), ' (', IFNULL(us2.nsede, ''), ')')) AS nombreCompleto,
 			us2.npuesto as nombrePuesto, us2.tipo_puesto, c.correo AS correo 
 			FROM ". $this->schema_cm .".usuarios US 
-			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos us2 ON us2.idcontrato = US.idContrato 
+			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = US.idContrato 
 			LEFT JOIN ". $this->schema_cm .".correostemporales AS c ON c.idContrato = us2.idcontrato 
 			WHERE US.idRol IN (?, ?, ?) AND US.estatus = ? AND US.idUsuario <> (?)
 				AND us2.idsede IN 
@@ -125,7 +125,7 @@ class UsuariosModel extends CI_Model {
 				WHERE idUsuario = ?", 1);
 			}else{
 				$query = $this->ch-> query("SELECT password 
-				FROM ". $this->schema_ch .".beneficioscm_vista_usuarios_dos us2 
+				FROM ". $this->schema_ch .".beneficioscm_vista_usuarios us2 
 				INNER JOIN ". $this->schema_cm .".usuarios us ON us.idContrato = us2.idcontrato
 				WHERE us2.num_empleado = ?", $dt);
 			}
@@ -183,7 +183,7 @@ class UsuariosModel extends CI_Model {
 	public function getUserByNumEmpleado($numEmpleado){
 		$query = $this->ch->query(
 			"SELECT * FROM ". $this->schema_cm .".usuarios AS us
-			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos AS usCH ON usCH.idcontrato = us.idContrato
+			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS usCH ON usCH.idcontrato = us.idContrato
 			WHERE usCH.num_empleado = ?;", $numEmpleado);
 
 		return $query;
@@ -210,7 +210,7 @@ class UsuariosModel extends CI_Model {
     {
         $query = $this->ch->query(
         "SELECT *, c.correo AS correo
-			FROM ". $this->schema_ch .".beneficioscm_vista_usuarios_dos AS us
+			FROM ". $this->schema_ch .".beneficioscm_vista_usuarios AS us
 			LEFT JOIN ". $this->schema_cm .".correostemporales c ON c.idContrato = us.idcontrato 
 			WHERE us.num_empleado = ?
 			ORDER BY us.idcontrato DESC
@@ -229,7 +229,7 @@ class UsuariosModel extends CI_Model {
 		$query = $this->ch->query("SELECT idUsuario, us1.idContrato, us1.idRol, us1.estatus, c.correo AS mail_emp, num_empleado, 
 		CONCAT(nombre_persona, ' ', pri_apellido, ' ', sec_apellido) AS nombreUsuario
 			FROM ". $this->schema_cm .".usuarios us1 
-			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos us2 ON us1.idContrato = us2.idContrato
+			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us1.idContrato = us2.idContrato
 			INNER JOIN ". $this->schema_cm .".correostemporales c ON c.idContrato = us2.idcontrato 
 			WHERE num_empleado = ? AND us1.estatus = ?", array($noEmp, 1));
 
