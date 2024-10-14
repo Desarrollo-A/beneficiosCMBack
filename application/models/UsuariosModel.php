@@ -36,7 +36,7 @@ class UsuariosModel extends CI_Model {
 
 		if($numEmpleado == 'admin99'){
 			$query = $this->ch->query(
-				"SELECT us.idUsuario, us.idContrato, us.idAreaBeneficio,'admin99' AS numEmpleado,
+				"SELECT us.idUsuario, us.idContrato,us2.NSS,us2.RFC,us2.direccion,us2.razon_social,us2.sueldo_neto,us.idAreaBeneficio,'admin99' AS numEmpleado,
 				'SUPER ADMIN' AS nombre, 000000000 AS telPersonal, 'Programador Analista' AS tipoPuesto,
 				1 AS idSede, 'QRO' AS sede, 19 AS idPuesto, 'Programador Analista' AS puesto, 
 				24 AS idArea, 'Desarrollo' AS area, 7 AS idDepto, 'TI' AS departamento,
@@ -49,7 +49,7 @@ class UsuariosModel extends CI_Model {
 				WHERE us.idUsuario = 1;");
 		}else{
 			$query = $this->ch->query(
-				"SELECT us.idUsuario, us.idContrato, us2.num_empleado AS 'numEmpleado',
+				"SELECT us.idUsuario, us.idContrato, us2.NSS AS 'nss' ,us2.RFC AS 'rfc',us2.direccion,us2.razon_social AS 'razonSocial',us2.sueldo_neto AS 'sueldoNeto',us2.num_empleado AS 'numEmpleado',
 				CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre,
 				us2.telefono_personal AS telPersonal, us.password, us2.sexo, us.externo, us.idRol, 
 				us2.fingreso AS 'fechaIngreso', us2.tipo_puesto AS 'tipoPuesto',

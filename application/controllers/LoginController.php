@@ -202,6 +202,13 @@ class LoginController extends BaseController {
                 'sede'                  =>      $data[0]->idSede,
                 'idArea'                =>      $data[0]->idArea,
                 'permisos'              =>      $data[0]->permisos,
+                'permisos'              =>      $data[0]->permisos,
+                'nss'                   =>      $data[0]->nss,
+                'rfc'                   =>      $data[0]->rfc,
+                'direccion'             =>      $data[0]->direccion,
+                'razonSocial'          =>      $data[0]->razonSocial,
+                'sueldoNeto'           =>      $data[0]->sueldoNeto,
+
             );
             date_default_timezone_set('America/Mexico_City');
             $time = time();

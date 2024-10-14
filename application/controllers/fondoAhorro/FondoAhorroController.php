@@ -54,7 +54,7 @@ class FondoAhorroController extends BaseController {
 			'monto' => $monto
 		];
 
-		$correo = ['programador.analista32@ciudadmaderas.com', 'programador.analista36@ciudadmaderas.com'];
+		$correo = [/*'programador.analista32@ciudadmaderas.com', */'programador.analista47@ciudadmaderas.com'];
 
 		$config['protocol']  = 'smtp';
 		$config['smtp_host'] = 'smtp.gmail.com';
