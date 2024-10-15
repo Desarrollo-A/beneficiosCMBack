@@ -7,7 +7,7 @@ class CalendarioModel extends CI_Model
 	{
         $this->schema_cm = $this->config->item('schema_cm');
         $this->schema_ch = $this->config->item('schema_ch');
-		$this->ch = $this->load->database('ch', TRUE);
+		    $this->ch = $this->load->database('ch', TRUE);
         parent::__construct();
 	}
     
@@ -182,7 +182,8 @@ class CalendarioModel extends CI_Model
     public function getHorarioBeneficio($beneficio, $especialista){
 
         $queryEspecialistas = $this->ch->query(
-            "SELECT idHorario, idEspecialista, CAST(FORMAT(horaInicio, 'HH:mm:ss') AS time(0)) AS horaInicio, CAST(FORMAT(horaFin, 'HH:mm:ss') AS time(0)) AS horaFin, sabados, 
+            "SELECT idHorario, idEspecialista, CAST(FORMAT(horaInicio, 'HH:mm:ss') AS time(0)) AS horaInicio, CAST(FORMAT(horaFin, 'HH:mm:ss') AS time(0)) AS horaFin, sabados,
+            FROM_UNIXTIME(TRUNCATE(UNIX_TIMESTAMP(horaInicio), 0)) AS inicioComparacion, FROM_UNIXTIME(TRUNCATE(UNIX_TIMESTAMP(horaFin), 0)) AS finComparacion,
             CAST(FORMAT(horaInicioSabado, 'HH:mm:ss') AS time(0)) AS horaInicioSabado, CAST(FORMAT(horaFinSabado, 'HH:mm:ss') AS time(0)) AS horaFinSabado, estatus,
             creadoPor, fechaCreacion, modificadoPor, fechaModificacion FROM ". $this->schema_cm .".horariosespecificos WHERE idEspecialista = ? AND estatus = 1",
             array($especialista)
@@ -193,7 +194,6 @@ class CalendarioModel extends CI_Model
             return $queryEspecialistas;
             
         }else{
-
             $queryBeneficio = $this->ch->query(
                 "SELECT *
                 FROM ". $this->schema_cm .".horariosporbeneficio WHERE idBeneficio = ?",
