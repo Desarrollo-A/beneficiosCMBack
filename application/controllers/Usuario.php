@@ -642,4 +642,51 @@ class Usuario extends BaseController {
         $this->output->set_content_type("application/json");
         $this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
     }
+
+	public function authenticateUser(){
+		$auth = $this->headers('Authorization');
+		$token = null;
+
+		$result = (object) [
+			'result' => 'error',
+			'msg' => 'Error'
+		];
+
+		if(!isset($auth)){
+			$result->msg = 'Falta header de autorización';
+			$this->json($result, JSON_NUMERIC_CHECK);
+		}
+
+		$matches = array();
+	    if (preg_match('/Basic (.+)/', $auth, $matches)) {
+	        if (isset($matches[1])) {
+	            $token = $matches[1];
+	        }
+	    }
+
+	    if(!isset($token)){
+			$result->msg = 'Falta token de autorización';
+			$this->json($result, JSON_NUMERIC_CHECK);
+		}
+
+		$decoded = base64_decode($token);
+
+		list($username, $password) = explode(":", $decoded);
+		$usuario = $this->UsuariosModel->loginAPI($username, encriptar(trim($password)))->row();
+		
+		if(!isset($usuario)){
+			$result->msg = 'No existe el usuario';
+			$this->json($result, JSON_NUMERIC_CHECK);
+		}
+
+		$accessToken = $this->token->generateToken($usuario);
+
+		$result = (object) [
+			'result' => true,
+			'msg' => '¡Inicio de sesión exitoso!',
+			'accessToken' => $accessToken,
+		];
+
+		$this->json($result, JSON_NUMERIC_CHECK);
+	}
 }

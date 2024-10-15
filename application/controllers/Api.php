@@ -289,6 +289,73 @@ class Api extends BaseController{
 
         }else {
             $response['msg'] = "¡Parámetros inválidos!";
-        }
+         }
     }
+
+    public function notificacionesLegalario(){
+		$auth = $this->headers('Authorization');
+		$token = null;
+        $json = file_get_contents('php://input');
+        $data = json_decode($json, true);
+
+		$fecha = date('Y-m-d H:i:s');
+
+		$result = (object) [
+			'result' => false,
+			'msg' => 'Error'
+		];
+
+		if(!isset($auth)){
+			$result->msg = 'Falta el header de Authorization';
+			$this->json($result, JSON_NUMERIC_CHECK);
+		}
+
+		$matches = array();
+	    if (preg_match('/Bearer (.+)/', $auth, $matches)) {
+	        if (isset($matches[1])) {
+	            $token = $matches[1];
+	        }
+	    }
+
+	    if(!isset($token)){
+			$result->msg = 'Falta token de Authorization';
+			$this->json($result, JSON_NUMERIC_CHECK);
+		}
+
+		$decoded = (object) $this->token->validateToken($token);
+
+		if(!$decoded->status){
+			$result->msg = $decoded->message;
+			$this->json($result, JSON_NUMERIC_CHECK);
+		}
+
+		$usuario = $decoded->data;
+
+		if($usuario->status != 1){
+			$result->msg = 'No tiene permisos para esta acción';
+			$this->json($result, JSON_NUMERIC_CHECK);
+		}
+
+		// if(!isset($data)){
+		// 	$result->msg = 'No hay datos';
+		// 	$this->json($result, JSON_NUMERIC_CHECK);
+		// }
+
+		$response["result"] = true;
+		$response["msg"] = "¡Datos recibidos!";
+		// $response["data"] = $data;
+
+		// $updated = $this->GeneralModel->updateRecord($this->schema_cm .".usuarios", $data, "idContrato", $idContrato);
+		// $cancela = $this->CalendarioModel->cancelaCitasPorBajaUsuario($idContrato);
+
+		// if($updated && $cancela){
+		// 	$result->result = true;
+		// 	$result->msg = 'Proceso completo exitoso';
+		// }else{
+		// 	$result->msg = 'No se pudo dar de baja el empleado';
+		// }
+
+		$this->output->set_content_type('application/json');
+		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
+	}
 }

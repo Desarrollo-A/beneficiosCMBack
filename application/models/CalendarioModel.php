@@ -7,7 +7,7 @@ class CalendarioModel extends CI_Model
 	{
         $this->schema_cm = $this->config->item('schema_cm');
         $this->schema_ch = $this->config->item('schema_ch');
-		$this->ch = $this->load->database('ch', TRUE);
+		    $this->ch = $this->load->database('ch', TRUE);
         parent::__construct();
 	}
     
@@ -195,7 +195,7 @@ class CalendarioModel extends CI_Model
             
         }else{
             $queryBeneficio = $this->ch->query(
-                "SELECT *, FROM_UNIXTIME(TRUNCATE(UNIX_TIMESTAMP(horaInicio), 0)) AS inicioComparacion, FROM_UNIXTIME(TRUNCATE(UNIX_TIMESTAMP(horaFin), 0)) AS finComparacion 
+                "SELECT *
                 FROM ". $this->schema_cm .".horariosporbeneficio WHERE idBeneficio = ?",
                 array($beneficio)
             );
