@@ -184,7 +184,7 @@ class DashModel extends CI_Model
 
 		$query = $this->ch-> query("SELECT idUsuario, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS nombre
 		FROM ". $this->schema_cm .".usuarios us
-		INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos us2 ON us2.idcontrato = us.idContrato
+		INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato
 		WHERE idRol = 3 AND us2.idpuesto = $dt");
         
         return $query->result();
@@ -253,7 +253,7 @@ class DashModel extends CI_Model
 
                 $query = $this->ch->query("SELECT COUNT(DISTINCT ct.idPaciente) AS `pacientes` FROM ". $this->schema_cm .".usuarios us
                 INNER JOIN ". $this->schema_cm .".citas ct ON ct.idEspecialista = us.idUsuario
-                INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos us2 ON us2.idcontrato = us.idContrato 
+                INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
                 WHERE us2.idpuesto = $idData AND ct.estatusCita = 4 AND 
 				(ct.fechaModificacion >= '$fhI' AND ct.fechaModificacion <= '$fhF')");
 
@@ -262,7 +262,7 @@ class DashModel extends CI_Model
 
                 $query = $this->ch-> query("SELECT COUNT(DISTINCT ct.idPaciente) AS `pacientes` FROM usuarios us
                 INNER JOIN ". $this->schema_cm .".citas ct ON ct.idEspecialista = us.idUsuario
-                INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos us2 ON us2.idcontrato = us.idContrato 
+                INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
                 WHERE us2.idpuesto = 158 AND ct.estatusCita = 4 AND ct.idEspecialista = $slEs AND 
 				(ct.fechaModificacion >= '$fhI' AND ct.fechaModificacion <= '$fhF')");
             }
@@ -302,7 +302,7 @@ class DashModel extends CI_Model
 		FROM ". $this->schema_cm .".citas ct
 		INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idPaciente 
 		INNER JOIN ". $this->schema_cm .".usuarios us2 ON us2.idUsuario = ct.idEspecialista 
-		INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos us3 ON us3.idcontrato = us2.idContrato
+		INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us3 ON us3.idcontrato = us2.idContrato
 		LEFT JOIN ". $this->schema_cm .".atencionxsede axs ON axs.idAtencionXSede = ct.idAtencionXSede 
 		LEFT JOIN ". $this->schema_cm .".opcionesporcatalogo op2 ON op2.idCatalogo = 5 AND op2.idOpcion = axs.tipoCita 
 		WHERE us3.idpuesto = $area $usuarioCond AND ct.estatusCita IN(4)
@@ -339,7 +339,7 @@ class DashModel extends CI_Model
 			FROM ". $this->schema_cm .".citas ct
 			INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idPaciente 
 			INNER JOIN ". $this->schema_cm .".usuarios us2 ON us2.idUsuario = ct.idEspecialista 
-			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos us3 ON us3.idcontrato = us2.idContrato
+			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us3 ON us3.idcontrato = us2.idContrato
 			WHERE us3.idpuesto = $area AND ct.estatusCita IN (1, 2, 3, 4, 5, 6, 7, 10) $usuarioCond $especialidadCond
             AND (ct.fechaFinal >= '$fhI' AND ct.fechaFinal <= '$fhF')");
         
@@ -386,7 +386,7 @@ class DashModel extends CI_Model
 			LEFT JOIN ". $this->schema_cm .".usuarios usCO ON usCO.idUsuario = ct.idPaciente AND usCO.externo  = 0
 			LEFT JOIN ". $this->schema_cm .".usuarios usEX ON usEX.idUsuario = ct.idPaciente AND usEX.externo  = 1
 			INNER JOIN ". $this->schema_cm .".usuarios us2 ON us2.idUsuario = ct.idEspecialista 
-			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos us3 ON us3.idcontrato = us2.idContrato
+			INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us3 ON us3.idcontrato = us2.idContrato
 			WHERE ct.estatusCita = 4 AND us3.idpuesto = $area AND (ct.fechaFinal >= '$fhI' 
 			AND ct.fechaFinal <= '$fhF')");
 
@@ -477,11 +477,11 @@ class DashModel extends CI_Model
 				us2.ndepto AS label,
 				COUNT(CASE WHEN ct.estatusCita = 4 THEN 1 END) AS value
 			FROM ". $this->schema_cm .".usuarios us
-			LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos us2 ON us2.idcontrato = us.idContrato 
+			LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
 			LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_departamento dep ON dep.iddepto = us2.idpuesto   
 			LEFT JOIN ". $this->schema_cm .".citas ct ON ct.idPaciente = us.idUsuario 
 			LEFT JOIN ". $this->schema_cm .".usuarios us3 ON us3.idUsuario = ct.idEspecialista
-			LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos us4 ON us4.idcontrato = us3.idContrato
+			LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us4 ON us4.idcontrato = us3.idContrato
 			WHERE us4.idpuesto = $beneficio
 			GROUP BY us2.ndepto
 		) AS subquery
@@ -498,11 +498,11 @@ class DashModel extends CI_Model
 					us2.ndepto AS label,
 					COUNT(CASE WHEN ct.estatusCita = 4 AND us2.iddepto = $depa THEN 1 END) AS value
 				FROM ". $this->schema_cm .".usuarios us
-				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos us2 ON us2.idcontrato = us.idContrato 
+				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
 				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_departamento dep ON dep.iddepto = us2.idpuesto 
 				LEFT JOIN ". $this->schema_cm .".citas ct ON ct.idPaciente = us.idUsuario 
 				LEFT JOIN ". $this->schema_cm .".usuarios us3 ON us3.idUsuario = ct.idEspecialista
-				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos us4 ON us4.idcontrato = us3.idContrato
+				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us4 ON us4.idcontrato = us3.idContrato
 				WHERE us4.idpuesto = $beneficio AND us2.iddepto = $depa
 				GROUP BY us2.ndepto
 			) AS subquery");
@@ -517,10 +517,10 @@ class DashModel extends CI_Model
 					us2.narea AS label,
 					COUNT(CASE WHEN ct.estatusCita = 4 AND us2.idarea = $area THEN 1 END) AS value
 				FROM ". $this->schema_cm .".usuarios us
-				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos us2 ON us2.idcontrato = us.idContrato 
+				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
 				LEFT JOIN ". $this->schema_cm .".citas ct ON ct.idPaciente = us.idUsuario 
 				LEFT JOIN ". $this->schema_cm .".usuarios us3 ON us3.idUsuario = ct.idEspecialista
-				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos us4 ON us4.idcontrato = us3.idContrato
+				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us4 ON us4.idcontrato = us3.idContrato
 				WHERE us4.idpuesto = $beneficio AND us2.idarea = $area
 				GROUP BY us2.narea
 			) AS subquery");
@@ -535,10 +535,10 @@ class DashModel extends CI_Model
 					us2.npuesto AS label,
 					COUNT(CASE WHEN ct.estatusCita = 4 AND us2.idpuesto = $puesto THEN 1 END) AS value
 				FROM ". $this->schema_cm .".usuarios us
-				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos us2 ON us2.idcontrato = us.idContrato 
+				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
 				LEFT JOIN ". $this->schema_cm .".citas ct ON ct.idPaciente = us.idUsuario 
 				LEFT JOIN ". $this->schema_cm .".usuarios us3 ON us3.idUsuario = ct.idEspecialista
-				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos us4 ON us4.idcontrato = us3.idContrato
+				LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us4 ON us4.idcontrato = us3.idContrato
 				WHERE us4.idpuesto = $beneficio AND us2.idpuesto = $puesto
 				GROUP BY us2.npuesto
 			) AS subquery");

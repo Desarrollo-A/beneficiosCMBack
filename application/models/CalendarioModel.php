@@ -66,9 +66,9 @@ class CalendarioModel extends CI_Model
         			ELSE 0 END AS diferenciaEnMs
             FROM ". $this->schema_cm .".citas AS ct 
             INNER JOIN ". $this->schema_cm .".usuarios AS us ON us.idUsuario = ct.idPaciente 
-            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos AS us2 ON us2.idcontrato = us.idContrato
+            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
             INNER JOIN ". $this->schema_cm .".usuarios AS usEspe ON usEspe.idUsuario = ct.idEspecialista 
-            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos AS usEspe2 ON usEspe2.idcontrato = usEspe.idContrato
+            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS usEspe2 ON usEspe2.idcontrato = usEspe.idContrato
             INNER JOIN ". $this->schema_cm .".atencionxsede AS atc ON atc.idAtencionXSede = ct.idAtencionXSede 
             LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_oficinas AS ofi ON ofi.idoficina = atc.idOficina 
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_sedes AS sed ON sed.idsede = atc.idSede 
@@ -90,7 +90,7 @@ class CalendarioModel extends CI_Model
         $query = $this->ch->query(
             "SELECT DISTINCT us2.idpuesto as idPuesto, us2.npuesto as 'puesto'
             FROM ". $this->schema_cm .".usuarios AS us 
-            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos AS us2 ON us2.idcontrato = us.idContrato
+            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
             RIGHT JOIN ". $this->schema_cm .".atencionxsede AS axs ON axs.idEspecialista = us.idUsuario
             INNER JOIN ". $this->schema_cm .".opcionesporcatalogo AS opc ON opc.idOpcion= axs.tipoCita
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_sedes AS s ON s.idsede = us2.idsede
@@ -109,7 +109,7 @@ class CalendarioModel extends CI_Model
             "SELECT DISTINCT us.idUsuario as id, CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS especialista,
             us2.idsede
             FROM ". $this->schema_cm .".usuarios AS us
-            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos AS us2 ON us2.idcontrato = us.idContrato 
+            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato 
             RIGHT JOIN ". $this->schema_cm .".atencionxsede AS axs ON axs.idEspecialista = us.idUsuario 
             INNER JOIN ". $this->schema_cm .".opcionesporcatalogo AS opc ON opc.idOpcion= axs.tipoCita 
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_sedes AS s ON s.idsede = us2.idsede 
@@ -131,7 +131,7 @@ class CalendarioModel extends CI_Model
             ofi.direccion as ubicacionOficina, axs.tipoCita, axs.idAtencionXSede, us2.nsede as lugarAtiende 
             FROM ". $this->schema_cm .".atencionxsede AS axs
             INNER JOIN ". $this->schema_cm .".usuarios AS us ON us.idUsuario = axs.idEspecialista 
-            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos AS us2 ON us2.idcontrato = us.idContrato
+            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
             LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_oficinas AS ofi ON ofi.idoficina = axs.idOficina 
             WHERE axs.estatus = ? AND axs.idSede = ? AND ((axs.idEspecialista = ? AND axs.idArea is NULL ) OR (axs.idEspecialista = ? AND axs.idArea = ?));", 
             array(1, $sede, $especialista, $especialista, $area));
@@ -147,7 +147,7 @@ class CalendarioModel extends CI_Model
             ofi.direccion as ubicacionOficina, axs.tipoCita, axs.idAtencionXSede, us2.nsede as lugarAtiende 
             FROM ". $this->schema_cm .".atencionxsede AS axs
             INNER JOIN ". $this->schema_cm .".usuarios AS us ON us.idUsuario = axs.idEspecialista 
-            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos AS us2 ON us2.idcontrato = us.idContrato
+            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
             LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_oficinas AS ofi ON ofi.idoficina = axs.idOficina 
             WHERE axs.estatus = ? AND axs.idSede = ? AND NOT (axs.tipoCita = 1 and axs.idOficina = 0) AND ((axs.idEspecialista = ? AND axs.idArea is NULL ) OR (axs.idEspecialista = ? AND axs.idArea = ?));", 
             array(1, $sede, $especialista, $especialista, $area));
@@ -182,7 +182,8 @@ class CalendarioModel extends CI_Model
     public function getHorarioBeneficio($beneficio, $especialista){
 
         $queryEspecialistas = $this->ch->query(
-            "SELECT idHorario, idEspecialista, CAST(FORMAT(horaInicio, 'HH:mm:ss') AS time(0)) AS horaInicio, CAST(FORMAT(horaFin, 'HH:mm:ss') AS time(0)) AS horaFin, sabados, 
+            "SELECT idHorario, idEspecialista, CAST(FORMAT(horaInicio, 'HH:mm:ss') AS time(0)) AS horaInicio, CAST(FORMAT(horaFin, 'HH:mm:ss') AS time(0)) AS horaFin, sabados,
+            FROM_UNIXTIME(TRUNCATE(UNIX_TIMESTAMP(horaInicio), 0)) AS inicioComparacion, FROM_UNIXTIME(TRUNCATE(UNIX_TIMESTAMP(horaFin), 0)) AS finComparacion,
             CAST(FORMAT(horaInicioSabado, 'HH:mm:ss') AS time(0)) AS horaInicioSabado, CAST(FORMAT(horaFinSabado, 'HH:mm:ss') AS time(0)) AS horaFinSabado, estatus,
             creadoPor, fechaCreacion, modificadoPor, fechaModificacion FROM ". $this->schema_cm .".horariosespecificos WHERE idEspecialista = ? AND estatus = 1",
             array($especialista)
@@ -193,9 +194,8 @@ class CalendarioModel extends CI_Model
             return $queryEspecialistas;
             
         }else{
-
             $queryBeneficio = $this->ch->query(
-                "SELECT *
+                "SELECT *, FROM_UNIXTIME(TRUNCATE(UNIX_TIMESTAMP(horaInicio), 0)) AS inicioComparacion, FROM_UNIXTIME(TRUNCATE(UNIX_TIMESTAMP(horaFin), 0)) AS finComparacion 
                 FROM ". $this->schema_cm .".horariosporbeneficio WHERE idBeneficio = ?",
                 array($beneficio)
             );
@@ -225,7 +225,7 @@ class CalendarioModel extends CI_Model
             ct.estatusCita, ct.idPaciente, ct.idEspecialista
             FROM ". $this->schema_cm .".citas ct
             LEFT JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idPaciente
-            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos AS us2 ON us2.idcontrato = us.idContrato
+            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
             WHERE (ct.idEspecialista = ? OR ct.idPaciente = ?) AND ct.estatusCita IN (?, ?, ?)
             AND ((DATE(fechaInicio) BETWEEN ? AND ? ) OR 
             (DATE(fechaFinal) BETWEEN ? AND ?) OR 
@@ -240,7 +240,7 @@ class CalendarioModel extends CI_Model
         $query = $this->ch->query("SELECT ct.*, us2.idPuesto AS 'idPuesto', axs.tipoCita 
         FROM ". $this->schema_cm .".citas AS ct 
         INNER JOIN ". $this->schema_cm .".usuarios AS us ON us.idUsuario = ct.idEspecialista 
-        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos AS us2 ON us2.idcontrato = us.idContrato
+        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
         INNER JOIN ". $this->schema_cm .".atencionxsede AS axs ON axs.idAtencionXSede = ct.idAtencionXSede 
         WHERE ct.idPaciente = ? AND us2.idpuesto = ? AND us2.activo = 1 ORDER BY idCita DESC LIMIT 1;", array($usuario, $beneficio));
     
@@ -251,7 +251,7 @@ class CalendarioModel extends CI_Model
         $query = $this->ch->query(
             "SELECT *FROM ". $this->schema_cm .".citas AS ct 
             INNER JOIN ". $this->schema_cm .".usuarios as us ON us.idUsuario = ct.idEspecialista
-            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos AS us2 ON us2.idcontrato = us.idContrato
+            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
             WHERE us2.activo = 1 AND ct.idPaciente = ? AND us2.idpuesto = ?;",
             array($usuario, $beneficio)
         );
@@ -418,8 +418,8 @@ class CalendarioModel extends CI_Model
         FROM ". $this->schema_cm .".citas ct
         INNER JOIN ". $this->schema_cm .".usuarios AS us ON us.idUsuario = ct.idPaciente
         INNER JOIN ". $this->schema_cm .".usuarios AS usEspe ON usEspe.idUsuario = ct.idEspecialista
-        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos AS us2 ON us2.idcontrato = us.idContrato
-        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos AS usEspe2 ON usEspe2.idcontrato = usEspe.idContrato
+        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
+        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS usEspe2 ON usEspe2.idcontrato = usEspe.idContrato
         INNER JOIN ". $this->schema_cm .".atencionxsede AS atc  ON atc.idAtencionXSede = ct.idAtencionXSede  
         LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_oficinas AS ofi ON ofi.idoficina = atc.idOficina
         INNER JOIN ". $this->schema_ch .".beneficioscm_vista_sedes AS s ON s.idsede = atc.idSede
@@ -467,7 +467,7 @@ class CalendarioModel extends CI_Model
         INNER JOIN ". $this->schema_cm .".opcionesporcatalogo AS oxc ON oxc.idOpcion = mpc.idMotivo
         INNER JOIN ". $this->schema_cm .".citas AS ct ON ct.idCita = mpc.idCita
         INNER JOIN ". $this->schema_cm .".usuarios AS us ON us.idUsuario = ct.idEspecialista
-        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos AS us2 ON us2.idcontrato = us.idContrato
+        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
         WHERE ct.idCita = ? AND idCatalogo = 
         CASE us2.idpuesto
         WHEN 537 THEN 8
@@ -504,7 +504,7 @@ class CalendarioModel extends CI_Model
             WHERE idEspecialista = ?
             AND idSede = ( 
                 SELECT idSede FROM ". $this->schema_cm .".usuarios AS us 
-				INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos AS us2 ON us2.idcontrato = us.idContrato 
+				INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato 
 				WHERE idUsuario = ? ) AND estatus = ?", 
             array($dataValue["idUsuario"], $dataValue["idUsuario"], 1)
         );
@@ -548,7 +548,7 @@ class CalendarioModel extends CI_Model
         $query = $this->ch->query(
             "SELECT ct.idCita FROM ". $this->schema_cm .".citas AS ct
             INNER JOIN ". $this->schema_cm .".usuarios as us ON ct.idEspecialista = us.idUsuario
-            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos AS us2 ON us2.idcontrato = us.idContrato 
+            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato 
             WHERE ct.estatus = 1 AND ct.idPaciente = ? AND us2.idpuesto = ? AND ct.estatusCita IN (1, 6, 10);",array($usuario, $beneficio)
         );
 
@@ -600,16 +600,16 @@ class CalendarioModel extends CI_Model
             usEspCH.idPuesto AS idPuesto
             FROM ". $this->schema_cm .".citas AS ct
             INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ct.idPaciente
-            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos AS us2 ON us2.idcontrato = us.idContrato
+            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
             INNER JOIN ". $this->schema_cm .".usuarios AS usEspe ON usEspe.idUsuario = ct.idEspecialista
-            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos AS usEspCH ON usEspCH.idcontrato = usEspe.idContrato
+            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS usEspCH ON usEspCH.idcontrato = usEspe.idContrato
             INNER JOIN ". $this->schema_cm .".atencionxsede AS aps ON ct.idAtencionXSede = aps.idAtencionXSede
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_sedes AS se ON se.idsede = aps.idSede
             LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_oficinas AS ofi ON ofi.idoficina = aps.idOficina
             LEFT JOIN (SELECT idDetalle, GROUP_CONCAT(DATE_FORMAT(fechaInicio, '%d / %m / %Y A las %H:%i horas.'), '') AS fechasFolio FROM ". $this->schema_cm .".citas WHERE estatusCita IN( ? ) AND citas.idCita = idCita GROUP BY citas.idDetalle) AS tf ON tf.idDetalle = ct.idDetalle
             LEFT JOIN ". $this->schema_cm .".detallepagos as dp ON dp.idDetalle = ct.idDetalle
             LEFT JOIN ". $this->schema_cm .".correostemporales AS c ON c.idContrato = us2.idcontrato 
-            LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos AS usEspe2 ON usEspe2.idcontrato = usEspe.idContrato
+            LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS usEspe2 ON usEspe2.idcontrato = usEspe.idContrato
             WHERE YEAR(fechaInicio) IN (?, ?)
             AND MONTH(fechaInicio) IN (?, ?, ?)
             AND (ct.idEspecialista = ? OR ct.idPaciente = ?)
@@ -649,7 +649,7 @@ class CalendarioModel extends CI_Model
             LEFT JOIN (SELECT idDetalle, GROUP_CONCAT(DATE_FORMAT(fechaInicio, '%d / %m / %Y A las %H:%i horas.'), '') AS fechasFolio FROM 
                 ".$this->schema_cm .".citas WHERE estatusCita IN( ? ) AND citas.idCita = idCita GROUP BY citas.idDetalle) AS tf ON tf.idDetalle = ct.idDetalle
             LEFT JOIN ".$this->schema_cm .".usuarios AS usEspe ON usEspe.idUsuario = ct.idEspecialista
-            LEFT JOIN ".$this->schema_ch .".beneficioscm_vista_usuarios_dos AS usEspCH ON usEspCH.idcontrato = usEspe.idContrato
+            LEFT JOIN ".$this->schema_ch .".beneficioscm_vista_usuarios AS usEspCH ON usEspCH.idcontrato = usEspe.idContrato
             LEFT JOIN ".$this->schema_cm .".atencionxsede AS aps ON ct.idAtencionXSede = aps.idAtencionXSede
             LEFT JOIN ".$this->schema_cm .".detallepagos AS dp ON dp.idDetalle = ct.idDetalle
             WHERE YEAR(fechaInicio) IN (?, ?) AND MONTH(fechaInicio) IN (?, ?, ?)   
@@ -696,9 +696,9 @@ class CalendarioModel extends CI_Model
             END AS 'beneficio'
             FROM ". $this->schema_cm .".citas AS ct
             INNER JOIN ". $this->schema_cm .".usuarios AS us ON us.idUsuario = ct.idPaciente
-            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos AS us2 ON us2.idcontrato = us.idContrato
+            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
             INNER JOIN ". $this->schema_cm .".usuarios AS usEsp ON usEsp.idUsuario = ct.idEspecialista
-            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos AS usEsp2 ON usEsp2.idcontrato = usEsp.idContrato
+            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS usEsp2 ON usEsp2.idcontrato = usEsp.idContrato
             INNER JOIN ". $this->schema_cm .".atencionxsede AS ats ON ats.idAtencionXSede = ct.idAtencionXSede
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_sedes AS sed ON sed.idsede = ats.idSede
             LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_oficinas AS ofi ON ofi.idoficina = ats.idOficina
@@ -722,9 +722,9 @@ class CalendarioModel extends CI_Model
         END AS beneficio, ct.fechaIntentoPago 
         FROM ". $this->schema_cm .".citas AS ct
         INNER JOIN ". $this->schema_cm .".usuarios AS us ON us.idUsuario = ct.idPaciente
-        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos AS us2 ON us2.idcontrato = us.idContrato
+        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
         INNER JOIN ". $this->schema_cm .".usuarios AS usEspe ON usEspe.idUsuario = ct.idEspecialista
-        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos AS usEspe2 ON usEspe2.idcontrato = usEspe.idContrato
+        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS usEspe2 ON usEspe2.idcontrato = usEspe.idContrato
         INNER JOIN ". $this->schema_cm .".atencionxsede AS atc ON atc.idAtencionXSede = ct.idAtencionXSede
         LEFT join ". $this->schema_ch .".beneficioscm_vista_oficinas AS ofi ON ofi.idoficina = atc.idOficina
         INNER join ". $this->schema_ch .".beneficioscm_vista_sedes AS sed ON sed.idSede = atc.idSede
@@ -753,9 +753,9 @@ class CalendarioModel extends CI_Model
             END AS beneficio, ct.fechaIntentoPago 
             FROM ". $this->schema_cm .".citas AS ct
             INNER JOIN ". $this->schema_cm .".usuarios AS us ON us.idUsuario = ct.idPaciente
-            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos AS us2 ON us2.idcontrato = us.idContrato
+            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS us2 ON us2.idcontrato = us.idContrato
             INNER JOIN ". $this->schema_cm .".usuarios AS usEspe ON usEspe.idUsuario = ct.idEspecialista
-            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos AS usEspe2 ON usEspe2.idcontrato = usEspe.idContrato
+            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios AS usEspe2 ON usEspe2.idcontrato = usEspe.idContrato
             INNER JOIN ". $this->schema_cm .".atencionxsede AS atc ON atc.idAtencionXSede = ct.idAtencionXSede  
             LEFT JOIN ". $this->schema_ch .".beneficioscm_vista_oficinas AS ofi ON ofi.idoficina = atc.idOficina
             INNER JOIN ". $this->schema_ch .".beneficioscm_vista_sedes AS sed ON sed.idSede = atc.idSede
@@ -795,7 +795,7 @@ class CalendarioModel extends CI_Model
 
     public function getSedeEsp($idEsp){
         $query = $this->ch->query("SELECT us2.idsede FROM ". $this->schema_cm .".usuarios us
-        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos us2 ON us2.idcontrato = us.idContrato 
+        INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
         WHERE us.idUsuario = $idEsp");
        return $query;
     }
