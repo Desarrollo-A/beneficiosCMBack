@@ -1,7 +1,9 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
-
 require_once(APPPATH . "/controllers/BaseController.php");
+
+require_once './vendor/autoload.php';  // Incluye el autoload de Composer
+use Firebase\JWT\JWT;  // Usa la clase JWT de Firebase
 
 class Api extends BaseController{
     public function __construct(){
@@ -10,6 +12,7 @@ class Api extends BaseController{
 		$this->load->model('CalendarioModel');
         $this->load->library("email");
         $this->load->library('GoogleApi');
+        $this->load->library('jwt_actions');
 		$this->load->helper(array('form','funciones'));
 		$this->ch = $this->load->database('ch', TRUE);
 		$this->schema_cm = $this->config->item('schema_cm');
@@ -20,6 +23,39 @@ class Api extends BaseController{
 	{
 		$this->load->view('welcome_message');
 	}
+
+    /* AUTHENTIFICACIÓN DE CRM */
+
+    function getToken() {
+        $data = json_decode(file_get_contents("php://input"));
+        if (!isset($data->id))
+            echo json_encode(array("status" => -1, "message" => "Algún parámetro no viene informado."), JSON_UNESCAPED_UNICODE);
+        else {
+            if ($data->id == "")
+                echo json_encode(array("status" => -1, "message" => "Algún parámetro no tiene un valor especificado."), JSON_UNESCAPED_UNICODE);
+            else {
+                if (!in_array($data->id, array(9860, 2000)))
+                    echo json_encode(array("status" => -1, "message" => "Sistema no reconocido."), JSON_UNESCAPED_UNICODE);
+                else {
+                    if ($data->id == 9860) // EJEMPLO
+                        $arrayData = array("username" => "ojqd58DY3@", "password" => "I2503^831NQqHWxr");
+                    else if ($data->id == 2000) // LEGALARIO
+                        $arrayData = array("username" => "legalario", "password" => "JExFR0FMQVJJTzIwMDAk");
+                    $time = time();
+                    $JwtSecretKey = $this->jwt_actions->getSecretKey($data->id);
+                    $data = array(
+                        "iat" => $time, // Tiempo en que inició el token
+                        "exp" => $time + (24 * 60 * 60), // Tiempo en el que expirará el token (24 horas)
+                        "data" => $arrayData,
+                    );
+                    $token = JWT::encode($data, $JwtSecretKey);
+                    echo json_encode(array("id_token" => $token));
+                }
+            }
+        }
+    }
+
+    /* FIN AUTHENTIFICACIÓN DE CRM */
 
 	public function encodedHash()
 	{
@@ -292,70 +328,128 @@ class Api extends BaseController{
          }
     }
 
-    public function notificacionesLegalario(){
-		$auth = $this->headers('Authorization');
-		$token = null;
-        $json = file_get_contents('php://input');
-        $data = json_decode($json, true);
+    // public function notificacionesLegalario(){
+	// 	$auth = $this->headers('Authorization');
+	// 	$token = null;
+    //     $json = file_get_contents('php://input');
+    //     $data = json_decode($json, true);
 
-		$fecha = date('Y-m-d H:i:s');
+	// 	$fecha = date('Y-m-d H:i:s');
 
-		$result = (object) [
-			'result' => false,
-			'msg' => 'Error'
-		];
+	// 	$result = (object) [
+	// 		'result' => false,
+	// 		'msg' => 'Error'
+	// 	];
 
-		if(!isset($auth)){
-			$result->msg = 'Falta el header de Authorization';
-			$this->json($result, JSON_NUMERIC_CHECK);
-		}
+	// 	if(!isset($auth)){
+	// 		$result->msg = 'Falta el header de Authorization';
+	// 		$this->json($result, JSON_NUMERIC_CHECK);
+	// 	}
 
-		$matches = array();
-	    if (preg_match('/Bearer (.+)/', $auth, $matches)) {
-	        if (isset($matches[1])) {
-	            $token = $matches[1];
-	        }
-	    }
+	// 	$matches = array();
+	//     if (preg_match('/Bearer (.+)/', $auth, $matches)) {
+	//         if (isset($matches[1])) {
+	//             $token = $matches[1];
+	//         }
+	//     }
 
-	    if(!isset($token)){
-			$result->msg = 'Falta token de Authorization';
-			$this->json($result, JSON_NUMERIC_CHECK);
-		}
+	//     if(!isset($token)){
+	// 		$result->msg = 'Falta token de Authorization';
+	// 		$this->json($result, JSON_NUMERIC_CHECK);
+	// 	}
 
-		$decoded = (object) $this->token->validateToken($token);
+	// 	$decoded = (object) $this->token->validateToken($token);
 
-		if(!$decoded->status){
-			$result->msg = $decoded->message;
-			$this->json($result, JSON_NUMERIC_CHECK);
-		}
+	// 	if(!$decoded->status){
+	// 		$result->msg = $decoded->message;
+	// 		$this->json($result, JSON_NUMERIC_CHECK);
+	// 	}
 
-		$usuario = $decoded->data;
+	// 	$usuario = $decoded->data;
 
-		if($usuario->status != 1){
-			$result->msg = 'No tiene permisos para esta acción';
-			$this->json($result, JSON_NUMERIC_CHECK);
-		}
+	// 	if($usuario->status != 1){
+	// 		$result->msg = 'No tiene permisos para esta acción';
+	// 		$this->json($result, JSON_NUMERIC_CHECK);
+	// 	}
 
-		// if(!isset($data)){
-		// 	$result->msg = 'No hay datos';
-		// 	$this->json($result, JSON_NUMERIC_CHECK);
-		// }
+	// 	// if(!isset($data)){
+	// 	// 	$result->msg = 'No hay datos';
+	// 	// 	$this->json($result, JSON_NUMERIC_CHECK);
+	// 	// }
 
-		$response["result"] = true;
-		$response["msg"] = "¡Datos recibidos!";
-		// $response["data"] = $data;
+	// 	$response["result"] = true;
+	// 	$response["msg"] = "¡Datos recibidos!";
+	// 	// $response["data"] = $data;
 
-		// $updated = $this->GeneralModel->updateRecord($this->schema_cm .".usuarios", $data, "idContrato", $idContrato);
-		// $cancela = $this->CalendarioModel->cancelaCitasPorBajaUsuario($idContrato);
+	// 	// $updated = $this->GeneralModel->updateRecord($this->schema_cm .".usuarios", $data, "idContrato", $idContrato);
+	// 	// $cancela = $this->CalendarioModel->cancelaCitasPorBajaUsuario($idContrato);
 
-		// if($updated && $cancela){
-		// 	$result->result = true;
-		// 	$result->msg = 'Proceso completo exitoso';
-		// }else{
-		// 	$result->msg = 'No se pudo dar de baja el empleado';
-		// }
+	// 	// if($updated && $cancela){
+	// 	// 	$result->result = true;
+	// 	// 	$result->msg = 'Proceso completo exitoso';
+	// 	// }else{
+	// 	// 	$result->msg = 'No se pudo dar de baja el empleado';
+	// 	// }
 
-		$this->output->set_content_type('application/json');
-		$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
-	}
+	// 	$this->output->set_content_type('application/json');
+	// 	$this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
+	// }
+
+    function notificacionesLegalario() { 
+        if (!isset(apache_request_headers()["Authorization"])){
+            echo json_encode(array("status" => -1, "message" => "La petición no cuenta con el encabezado Authorization."), JSON_UNESCAPED_UNICODE);
+        }else{
+            if (apache_request_headers()["Authorization"] == ""){
+                echo json_encode(array("status" => -1, "message" => "Token no especificado dentro del encabezado Authorization."), JSON_UNESCAPED_UNICODE);
+            }else{
+                $token = apache_request_headers()["Authorization"];
+                $JwtSecretKey = $this->jwt_actions->getSecretKey(2000); 
+                $valida_token = json_decode($this->validateToken($token, 2000));
+                if ($valida_token->status !== 200){
+                    echo json_encode($valida_token);
+                }else {
+                    $result = JWT::decode($token, $JwtSecretKey, array('HS256'));
+                    $valida_token = Null;
+                    foreach ($result->data as $key => $value) {
+                        if(($key == "username" || $key == "password") && (is_null($value) || str_replace(" ","",$value) == '' || empty($value)))
+                            $valida_token = false;
+                    }
+                    if(is_null($valida_token)){
+                        $valida_token = true;
+                    }
+                    if(!empty($result->data) && $valida_token){
+                        $checkSingup = $this->jwt_actions->validateUserPass($result->data->username, $result->data->password);
+                    }else{
+                        $checkSingup = null;
+                        echo json_encode(array("status" => -1, "message" => "Algún parámetro (usuario y/o contraseña) no vienen informados. Verifique que ambos parámetros sean incluidos."), JSON_UNESCAPED_UNICODE);
+                    }
+                    if(!empty($checkSingup) && json_decode($checkSingup)->status == 200){
+                        echo json_encode(array("status" => 1, "message" => "Registro guardado con éxito"), JSON_UNESCAPED_UNICODE);
+                    } else
+                        echo json_encode($checkSingup);
+                }
+            }
+        }
+    }
+
+    function validateToken($token, $controller = null)
+    {
+        $time = time();
+        if (is_null($controller))
+            $JwtSecretKey = $this->jwt_key->getSecretKey();
+        else
+            $JwtSecretKey = $this->jwt_actions->getSecretKey($controller);
+            $result = JWT::decode($token, $JwtSecretKey, array('HS256'));
+        if (in_array($result, array('ALR001', 'ALR003', 'ALR004', 'ALR005', 'ALR006', 'ALR007', 'ALR008', 'ALR009', 'ALR010', 'ALR012', 'ALR013'))) {
+            return json_encode(array("timestamp" => $time, "status" => 503, "error" => "Servicio no disponible", "exception" => "Servicio no disponible", "message" => "El servidor no está listo para manejar la solicitud. Por favor, inténtelo de nuevo más tarde."));
+        } else if ($result == 'ALR002') {
+            return json_encode(array("timestamp" => $time, "status" => 400, "error" => "Solicitud incorrecta", "exception" => "Número incorrecto de parámetros", "message" => "Verifique la estructura del token enviado."));
+        } else if ($result == 'ALR011') {
+            return json_encode(array("timestamp" => $time, "status" => 401, "error" => "No autorizado", "exception" => "Verificación de firma fallida", "message" => "Estructura no válida del token enviado."));
+        } else if ($result == 'ALR014') {
+            return json_encode(array("timestamp" => $time, "status" => 401, "error" => "No autorizado", "exception" => "Token caducado", "message" => "El tiempo de vida del token ha expirado."));
+        } else {
+            return json_encode(array("status" => 200, "message" => "Autenticado con éxito."));
+        }
+    }
 }
