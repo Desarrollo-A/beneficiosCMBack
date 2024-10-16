@@ -20,7 +20,7 @@ class AreasModel extends CI_Model{
                     idAreaBeneficio, 
 			        COUNT(idAreaBeneficio) AS especialistas 
 				    FROM ". $this->schema_cm .".usuarios us 
-				    INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios_dos rhus ON us.idContrato = rhus.idContrato AND rhus.activo = 1 GROUP BY idAreaBeneficio) es ON es.idAreaBeneficio = area.idAreaBeneficio 
+				    INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios rhus ON us.idContrato = rhus.idContrato AND rhus.activo = 1 GROUP BY idAreaBeneficio) es ON es.idAreaBeneficio = area.idAreaBeneficio 
         WHERE area.estatus = 1");
 
         return $query->result();

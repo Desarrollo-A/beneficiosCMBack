@@ -33,7 +33,7 @@ abstract class BaseController extends CI_Controller{
         // Lineas para la verificación de 
         $allowed_routes = ['logincontroller/login', 'usuario/getuserbynumemp', 'usuario/sendmail', 'usuario/gettoken', 'logincontroller/addregistroempleado', 'logincontroller/recuperarpassword', 'logincontroller/validarnumemp', 'logincontroller/guardarnuevapassword',
             "usuario/authorized", "api/confirmarpago", "api/encodedhash", "usuario/loginch", "usuario/updatech", "usuario/bajach", "api/tareacancelacitassinpago",
-            "api/creaeventogoogleynotifica", "documentos/archivo", "api/notificacioneslegalario", "usuario/authenticateuser"];
+            "api/creaeventogoogleynotifica", "documentos/archivo", "api/notificacioneslegalario", "usuario/authenticateuser", "api/gettoken"];
 
         $uri = strtolower($this->uri->uri_string());
 
