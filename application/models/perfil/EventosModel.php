@@ -89,10 +89,10 @@ class EventosModel extends CI_Model {
     }
     public function getAsistenciaEvento($idContrato, $idEvento){
         $query = $this->ch->query(
-			"SELECT ev.idEvento, asis.* FROM". $this->schema_cm .".eventos AS ev
+            "SELECT ev.idEvento, asis.* FROM " . $this->schema_cm . ".eventos AS ev
             LEFT JOIN ". $this->schema_cm .".asistenciasEventos AS asis ON asis.idEvento = ev.idEvento AND asis.idContrato = ?
             WHERE ev.idEvento = ? AND ev.estatus = 1 AND (asis.estatus IS NULL OR asis.estatus=1);", array($idContrato, $idEvento));
-       	return $query;
+       	    return $query;
     }
 
     public function inhabilitaAlanceEvento($idEvento){
@@ -102,6 +102,42 @@ class EventosModel extends CI_Model {
             WHERE idEvento = ?;", $idEvento);
        	return $query;
     }
+     // Funciones para Token
+    public function deleteToken($mailUsuario){
+		$query = $this->ch->query("DELETE t1 FROM ". $this->schema_cm .".tokenregistro t1
+			JOIN ". $this->schema_cm .".tokenregistro t2 ON t1.idTokenRegistro = t2.idTokenRegistro
+			WHERE t2.correo = ?", $mailUsuario);
+
+		return $query;
+	}
+
+	public function checkToken($code){
+		$query = $this->ch->query("SELECT *FROM ". $this->schema_cm .".tokenregistro WHERE token = ?", $code);
+
+		return $query;
+	}
+
+	public function checkTokenByMail($mailEmp){
+		$query = $this->ch->query("SELECT *FROM ". $this->schema_cm .".tokenregistro WHERE correo = ?", $mailEmp);
+
+		return $query;
+	}
+
+	public function deleteOldToken($mailEmp){
+		$query = $this->ch->query("DELETE t1 FROM ". $this->schema_cm .".tokenregistro t1
+			JOIN ". $this->schema_cm .".tokenregistro t2 ON t1.idTokenRegistro = t2.idTokenRegistro
+			WHERE t2.correo = ? AND t2.fechaCreacion < DATE_SUB(NOW(), INTERVAL 5 MINUTE)", $mailEmp);
+
+			return $query;
+	}
+
+	public function saveToken($mailUsuario, $token){
+		$query = $this->ch->query("INSERT INTO ". $this->schema_cm .".tokenregistro (correo, token, fechaCreacion) VALUES(?, ?, NOW())", array($mailUsuario, $token));
+
+		return $query;
+	}
+
+    //terminan funciones para token
 
     public function getDatosAsistenciaEvento($idEvento, $idContrato) // AND NOT (axs.tipoCita = 1 and axs.idOficina = 0) en caso de error en las modalidades
     {
@@ -111,7 +147,7 @@ class EventosModel extends CI_Model {
             ev.idEvento, ev.titulo,
             us2.idcontrato,
             CONCAT(us2.nombre_persona, ' ', us2.pri_apellido, ' ', us2.sec_apellido) AS nombreCompleto
-            FROM PRUEBA_beneficiosCM.asistenciasEventos AS ae
+            FROM " . $this->schema_cm . ".asistenciasEventos AS ae
             INNER JOIN " . $this->schema_cm . ".eventos AS ev ON ae.idEvento = ev.idEvento
             INNER JOIN " . $this->schema_cm . ".usuarios AS us ON us.idContrato = ae.idContrato
             INNER JOIN " . $this->schema_ch . ".beneficioscm_vista_usuarios AS us2 ON us.idContrato = us2.idcontrato
@@ -121,13 +157,18 @@ class EventosModel extends CI_Model {
 
         return $query;
     }
+    public function verificacioncodigo($correo, $codigo) {
+        $sql = "SELECT * FROM " . $this->schema_cm . ".tokenregistro 
+                WHERE correo = ? AND token = ?";
+        return $this->ch->query($sql, array($correo, $codigo));
+    }
+    
     public function updateAsistenciaEvento($idcontrato, $idEvento) {
         $sql = "UPDATE " . $this->schema_cm . ".asistenciasEventos 
                 SET estatusAsistencia = 3
                 WHERE idContrato = ? 
                 AND idEvento = ?";
         
-        // Ejecuta la consulta con binding
         return $this->ch->query($sql, array($idcontrato, $idEvento));
     }
     

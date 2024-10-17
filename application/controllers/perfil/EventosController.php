@@ -155,117 +155,7 @@ class EventosController extends BaseController {
         // Respuesta de éxito
         return $this->successResponse("Se ha creado el evento.");
     }
-    // Funcion para generar QR asistencia 
-    public function postGenerarQr()
-    {
-        $idContrato = $this->input->post('dataValue[idContrato]');
-        $idEvento = $this->input->post('dataValue[idEvento]');
-        if ($idContrato !== null && $idEvento !== null) {
-            $dataEvento = $this->EventosModel->getEventoUser($idContrato, $idEvento);
-        
-         if (!empty($dataEvento)) {
-            $dataQr = [
-                "idContrato" => $idContrato,
-                "idEvento" => $idEvento,
-                "estatusAsistencia" => '3'
-                ];
-                $jsonData = json_encode($dataQr);
-                $base64Data = base64_encode($jsonData);
-                $qrCode = QrCode::create($base64Data)
-                ->setEncoding(new Encoding('UTF-8'))
-                ->setErrorCorrectionLevel(new ErrorCorrectionLevelLow())
-                ->setSize(300)
-                ->setMargin(10)
-                ->setRoundBlockSizeMode(new RoundBlockSizeModeMargin())
-                ->setForegroundColor(new Color(0, 55, 100));
-
-                $writer = new PngWriter();
-                $logoPath = 'C:/xampp/htdocs/beneficiosCMBack/qrCode/Eventos/logo.png'; 
-    
-                if (file_exists($logoPath)) {
-                    $logo = new \Endroid\QrCode\Logo\Logo($logoPath, 60, 42); 
-                } else {
-                    $logo = null;
-                }
-                $tempDir = 'C:/xampp/htdocs/beneficiosCMBack/qrCode/Eventos/temp/';
-                if (!file_exists($tempDir)) {
-                    mkdir($tempDir, 0755, true);
-                }
-                $outputFile = $tempDir . 'Ev' . $idEvento . 'CM' . $idContrato . '.png';
-                $result = $writer->write($qrCode, $logo);
-                $result->saveToFile($outputFile);
-    
-                $this->sendMail($dataEvento[0], $outputFile);
-                echo json_encode(array("estatus" => true, "msj" => "QR generado correctamente. Datos enviados a sendMail."));
-            } else {
-                echo json_encode(array("estatus" => false, "msj" => "Error al obtener los datos del evento."));
-            }
-        } else {
-            echo json_encode(array("estatus" => false, "msj" => "Error al recibir datos (ID's)."));
-        }
-    }
-         // Funcion para enviar correo de asistencia 
-    public function sendMail($dataValue,$qrFilePath)
-    {
-        // var_dump($dataValue, $qrFilePath); exit; die;
-        $num_empleado = $dataValue->num_empleado;
-        $nombreCompleto = $dataValue->nombreCompleto;
-        $titulo = $dataValue->titulo;
-        $fechaEvento = $dataValue->fechaEvento;
-        $horaEvento = $dataValue->horaEvento;
-        $limiteRecepcion = $dataValue->limiteRecepcion;
-        $ubicacion = $dataValue->ubicacion;
-        $idContrato = $dataValue->idContrato;
-        $idEvento = $dataValue->idEvento;
-        $estatusAsistencia = $dataValue->estatusAsistentes;
-
-        $data = [
-            'num_empleado' => $num_empleado,
-            'nombreCompleto' => ucwords(strtolower($nombreCompleto)),
-            'titulo' => strtoupper($titulo),
-            'fechaEvento' => date('d/m/Y', strtotime($fechaEvento)),
-            'horaEvento' => date('h:i A', strtotime($horaEvento)),
-            'limiteRecepcion' => date ('h:i A',strtotime($limiteRecepcion)),
-            'ubicacion' => $ubicacion,  
-            'idContrato' => $idContrato,
-            'idEvento' => $idEvento,
-            'estatusAsistencia' => $estatusAsistencia,
-            'qrFilePath' => $qrFilePath
-        ];
-
-        $correo = ['programador.analista47@ciudadmaderas.com'/*,'coordinador1.desarrollo@ciudadmaderas.com'*/];
-
-        $config['protocol'] = 'smtp';
-        $config['smtp_host'] = 'smtp.gmail.com';
-        $config['smtp_user'] = 'programador.analista47@ciudadmaderas.com';  
-        $config['smtp_pass'] = 'oeix zkyh axmj tbrv';  
-        $config['smtp_port'] = 465;
-        $config['charset'] = 'utf-8';
-        $config['mailtype'] = 'html';
-        $config['newline'] = "\r\n";
-        $config['smtp_crypto'] = 'ssl';
-
-        $html_message = $this->load->view("email-event", $data, true);
-
-        $this->load->library("email");
-        $this->email->initialize($config);
-        $this->email->from("programador.analista47@ciudadmaderas.com");  
-        $this->email->to($correo);
-        $this->email->message($html_message);
-        $this->email->subject("Confirmación de asistencia a evento");
-        $this->email->attach($qrFilePath); 
-
-        if ($this->email->send()) {
-            echo json_encode(array("estatus" => true, "msj" => "Envío exitoso"), JSON_NUMERIC_CHECK);
-            
-        if (file_exists($qrFilePath)) {
-            unlink($qrFilePath); 
-        }
-    } else {
-            echo json_encode(array("estatus" => false, "msj" => "Ocurrió un error al enviar el correo"), JSON_NUMERIC_CHECK);
-        }
-    }
-
+  
     public function actualizarAsistencia() {
         $idContrato    = $this->input->post('dataValue[idContrato]');
         $idEvento      = $this->input->post('dataValue[idEvento]');
@@ -286,46 +176,222 @@ class EventosController extends BaseController {
 
         $fecha = date("Y-m-d H:i:s");
 
-        $rs = $this->EventosModel->getAsistenciaEvento($idContrato, $idEvento)->result();
+    $rs = $this->EventosModel->getAsistenciaEvento($idContrato, $idEvento)->result();
 
-        if ($rs[0]->idAsistenciaEv == NULL){
-            $values = [
-                "idEvento" => $idEvento,
-				"idContrato" => $idContrato,
-                "estatusAsistencia" => $estatus,
-                "estatus" => $estatus,
-				"creadoPor" => $idUsuario,
-				"fechaCreacion" => $fecha,
-				"modificadoPor" => $idUsuario,
-				"fechaModificacion" => $fecha
-			];
-			$response["result"] = $this->GeneralModel->addRecord( $this->schema_cm.".asistenciasEventos", $values);
-        }else {
-            $values = [
-                "estatusAsistencia" => $estatus,
-				"modificadoPor" => $idUsuario,
-				"fechaModificacion" => $fecha
-			];
-            if($flagSuccess){
-                $response["result"] = $this->GeneralModel->updateRecord($this->schema_cm .".asistenciasEventos", $values, "idAsistenciaEv", $rs[0]->idAsistenciaEv);
-            }
-            else{
-                $response["result"] = false;
-            }
+    if ($rs[0]->idAsistenciaEv == NULL){
+        $values = [
+            "idEvento" => $idEvento,
+            "idContrato" => $idContrato,
+            "estatusAsistencia" => $estatus,
+            "estatus" => $estatus,
+            "creadoPor" => $idUsuario,
+            "fechaCreacion" => $fecha,
+            "modificadoPor" => $idUsuario,
+            "fechaModificacion" => $fecha
+        ];
+        $response["result"] = $this->GeneralModel->addRecord($this->schema_cm.".asistenciasEventos", $values);
+    } else {
+        $values = [
+            "estatusAsistencia" => $estatus,
+            "modificadoPor" => $idUsuario,
+            "fechaModificacion" => $fecha
+        ];
+        if($flagSuccess){
+            $response["result"] = $this->GeneralModel->updateRecord($this->schema_cm.".asistenciasEventos", $values, "idAsistenciaEv", $rs[0]->idAsistenciaEv);
+        } else {
+            $response["result"] = false;
         }
-
-        if ($response["result"] && $flagSuccess) {
-            $this->db->trans_commit();
-            $response["msg"] = "Se ha actualizado tu asistencia de manera exitosa";
-        }else {
-            $this->db->trans_rollback();
-            $response["msg"] = $flagSuccess ? "Surgió un error al actualizar la asistencia del evento" : "Error, el evento ya ha pasado";
-        }
-
-        $this->output->set_content_type("application/json");
-        $this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
     }
-    
+    if ($response["result"] && $flagSuccess) {
+        $this->db->trans_commit();
+        $response['result'] = true;
+        $response["msg"] = "Se ha actualizado tu asistencia de manera exitosa";
+        $this->postGenerarQr($idContrato, $idEvento);
+
+    } else {
+        $this->db->trans_rollback();
+        $response['result'] = false;
+        $response["msg"] = $flagSuccess ? "Surgió un error al actualizar la asistencia del evento" : "Error, el evento ya ha pasado";
+    }
+
+    $this->output->set_content_type("application/json");
+    $this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
+}
+
+public function tokenConfirmacionCorreo(){
+    $correo = $this->input->post('dataValue[correo]');
+
+    $fecha = date('Y-m-d H:i:s');
+
+    $this->ch->trans_begin();
+
+    if(!empty($correo)){ 
+        $mailUsuario = $correo;
+        $token = $data["data"] = substr(md5(time()), 0, 6);
+        $deleteToken = $this->EventosModel->deleteToken($mailUsuario);
+
+        $datatoken = [
+            'token' => $token,
+        ];
+        $data["mail"] = $mailUsuario;
+        
+        // Configuración de correo electrónico
+        $config['protocol']  = 'smtp';
+        $config['smtp_host'] = 'smtp.gmail.com';
+        $config['smtp_user'] = 'programador.analista47@ciudadmaderas.com';
+        $config['smtp_pass'] = 'oeix zkyh axmj tbrv';
+        $config['smtp_port'] = 465;
+        $config['charset']   = 'utf-8';
+        $config['mailtype']  = 'html';
+        $config['newline']   = "\r\n";
+        $config['smtp_crypto']   = 'ssl';
+
+        // Cargar y preparar el mensaje de correo
+        $html_message = $this->load->view("email-tokenAsistencia", $datatoken, true); 
+        $this->email->initialize($config);
+        $this->email->from("testemail@ciudadmaderas.com"); 
+        $this->email->to($data["mail"]);
+        $this->email->message($html_message);
+        $subject = "Beneficios CM | Verificación de colaborador " . $fecha;
+        $this->email->subject($subject);
+
+        // Enviar el correo
+        if ($this->email->send()) {
+            // Guardar el token generado
+            $saveToken = $this->EventosModel->saveToken($mailUsuario, $token);
+
+            $this->ch->trans_commit();
+            $response["result"] = true;
+            $response["msg"] = "Se ha enviado el correo";
+            $response["mailEmp"] = $mailUsuario;
+        }
+        else {
+            $this->ch->trans_rollback();
+            $response["result"] = false;
+            $response["msg"] = "Error al enviar el correo";                
+        }
+    }
+    else{
+        $this->ch->trans_rollback();
+        $response["result"] = false;
+        $response["msg"] = "No se recibió un correo electrónico válido.";
+    }
+
+    // Respuesta en formato JSON
+    $this->output->set_content_type("application/json");
+    $this->output->set_output(json_encode($response, JSON_NUMERIC_CHECK));
+}
+
+  // Funcion para generar QR asistencia 
+  public function postGenerarQr()
+  {
+      $idContrato = $this->input->post('dataValue[idContrato]');
+      $idEvento = $this->input->post('dataValue[idEvento]');
+      if ($idContrato !== null && $idEvento !== null) {
+          $dataEvento = $this->EventosModel->getEventoUser($idContrato, $idEvento);
+      
+       if (!empty($dataEvento)) {
+          $dataQr = [
+              "idContrato" => $idContrato,
+              "idEvento" => $idEvento,
+              "estatusAsistencia" => '3'
+              ];
+              $jsonData = json_encode($dataQr);
+              $base64Data = base64_encode($jsonData);
+              $qrCode = QrCode::create($base64Data)
+              ->setEncoding(new Encoding('UTF-8'))
+              ->setErrorCorrectionLevel(new ErrorCorrectionLevelLow())
+              ->setSize(300)
+              ->setMargin(10)
+              ->setRoundBlockSizeMode(new RoundBlockSizeModeMargin())
+              ->setForegroundColor(new Color(0, 55, 100));
+
+              $writer = new PngWriter();
+              $logoPath = 'C:/xampp/htdocs/beneficiosCMBack/qrCode/Eventos/logo.png'; 
+  
+              if (file_exists($logoPath)) {
+                  $logo = new \Endroid\QrCode\Logo\Logo($logoPath, 60, 42); 
+              } else {
+                  $logo = null;
+              }
+              $tempDir = 'C:/xampp/htdocs/beneficiosCMBack/qrCode/Eventos/temp/';
+              if (!file_exists($tempDir)) {
+                  mkdir($tempDir, 0755, true);
+              }
+              $outputFile = $tempDir . 'Ev' . $idEvento . 'CM' . $idContrato . '.png';
+              $result = $writer->write($qrCode, $logo);
+              $result->saveToFile($outputFile);
+  
+              $this->sendMail($dataEvento[0], $outputFile);
+              echo json_encode(array("estatus" => true, "msj" => "QR generado correctamente. Datos enviados a sendMail."));
+          } else {
+              echo json_encode(array("estatus" => false, "msj" => "Error al obtener los datos del evento."));
+          }
+      } else {
+          echo json_encode(array("estatus" => false, "msj" => "Error al recibir datos (ID's)."));
+      }
+  }
+       // Funcion para enviar correo de asistencia 
+  public function sendMail($dataValue,$qrFilePath)
+  {
+      // var_dump($dataValue, $qrFilePath); exit; die;
+      $num_empleado = $dataValue->num_empleado;
+      $nombreCompleto = $dataValue->nombreCompleto;
+      $titulo = $dataValue->titulo;
+      $fechaEvento = $dataValue->fechaEvento;
+      $horaEvento = $dataValue->horaEvento;
+      $limiteRecepcion = $dataValue->limiteRecepcion;
+      $ubicacion = $dataValue->ubicacion;
+      $idContrato = $dataValue->idContrato;
+      $idEvento = $dataValue->idEvento;
+      $estatusAsistencia = $dataValue->estatusAsistentes;
+
+      $data = [
+          'num_empleado' => $num_empleado,
+          'nombreCompleto' => ucwords(strtolower($nombreCompleto)),
+          'titulo' => strtoupper($titulo),
+          'fechaEvento' => date('d/m/Y', strtotime($fechaEvento)),
+          'horaEvento' => date('h:i A', strtotime($horaEvento)),
+          'limiteRecepcion' => date ('h:i A',strtotime($limiteRecepcion)),
+          'ubicacion' => $ubicacion,  
+          'idContrato' => $idContrato,
+          'idEvento' => $idEvento,
+          'estatusAsistencia' => $estatusAsistencia,
+          'qrFilePath' => $qrFilePath
+      ];
+
+      $correo = ['programador.analista47@ciudadmaderas.com'/*,'coordinador1.desarrollo@ciudadmaderas.com'*/];
+
+      $config['protocol'] = 'smtp';
+      $config['smtp_host'] = 'smtp.gmail.com';
+      $config['smtp_user'] = 'programador.analista47@ciudadmaderas.com';  
+      $config['smtp_pass'] = 'oeix zkyh axmj tbrv';  
+      $config['smtp_port'] = 465;
+      $config['charset'] = 'utf-8';
+      $config['mailtype'] = 'html';
+      $config['newline'] = "\r\n";
+      $config['smtp_crypto'] = 'ssl';
+
+      $html_message = $this->load->view("email-event", $data, true);
+
+      $this->load->library("email");
+      $this->email->initialize($config);
+      $this->email->from("programador.analista47@ciudadmaderas.com");  
+      $this->email->to($correo);
+      $this->email->message($html_message);
+      $this->email->subject("Confirmación de asistencia a evento");
+      $this->email->attach($qrFilePath); 
+
+      if ($this->email->send()) {
+          echo json_encode(array("estatus" => true, "msj" => "Envío exitoso"), JSON_NUMERIC_CHECK);
+          
+      if (file_exists($qrFilePath)) {
+          unlink($qrFilePath); 
+      }
+  } else {
+          echo json_encode(array("estatus" => false, "msj" => "Ocurrió un error al enviar el correo"), JSON_NUMERIC_CHECK);
+      }
+  }
     public function actualizarEvento() {
         // Obtener y sanitizar inputs
         $idEvento          = (int) $this->form('idEvento');
@@ -506,4 +572,26 @@ class EventosController extends BaseController {
             $this->json($response);
     }
 
+    public function verificacioncodigo() 
+    {        
+        $correo = $this->input->post('dataValue[correo]');
+        $codigo = $this->input->post('dataValue[codigo]');
+     
+        $data['data'] = $this->EventosModel->verificacioncodigo($correo, $codigo);
+    
+        // Verifica si se encontró registro o token
+        if ($data['data'] && $data['data']->num_rows() > 0) {
+            // Si existe el registro, devuelve un mensaje de éxito
+            $response = ['status' => 'success', 'message' => 'Token verificado correctamente'];
+            $this->output->set_content_type('application/json');
+            $this->output->set_output(json_encode(['success' => 'Token verificado correctamente'], JSON_NUMERIC_CHECK));
+        } else {
+            $response = ['status' => 'error', 'message' => 'Token incorrecto, verifique y vuelva a intentarlo'];
+            $this->output->set_content_type('application/json');
+            $this->output->set_output(json_encode(['error' => 'Token incorrecto, verifique y vuelva a intentarlo'], JSON_NUMERIC_CHECK));
+        }
+        $this->json($response);
+
+    }
+    
 }
