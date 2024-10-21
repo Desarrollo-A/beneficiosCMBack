@@ -100,15 +100,16 @@ class FondoAhorroController extends BaseController {
         $this->output->set_output(json_encode($rs, JSON_NUMERIC_CHECK));
 	}
 
-	public function cancelarFondoAhorro(){
+	public function actualizarFondoAhorro(){
 		$fecha = date('Y-m-d H:i:s');
 		$idFondo = $this->input->post('dataValue[idFondo]');
+		$estatusFA = $this->input->post('dataValue[idEstatusFA]');
 
-		$response['result'] = isset($idFondo) && !empty($idFondo);
+		$response['result'] = isset($idFondo) && !empty($idFondo) && isset($estatusFA) && !empty($estatusFA);
 		
 		if ($response['result']) {  
 			$data['fechaModificacion'] = $fecha;
-			$data['estatusFondo'] = 6;
+			$data['estatusFondo'] = $estatusFA;
 			$response['result'] = $this->GeneralModel->updateRecord($this->schema_cm .'.fondosahorros', $data, 'idFondo', $idFondo);
 	
 			if ($response['result']) {
@@ -123,6 +124,4 @@ class FondoAhorroController extends BaseController {
 		$this->output->set_content_type("application/json");
 		$this->output->set_output(json_encode($response));
 	}
-
-	
 }
