@@ -53,10 +53,12 @@ class FondoAhorroController extends BaseController {
 		$data = [
 			'nombre' => $nombre,
 			'numEmpleado' => $numEmpleado,
-			'monto' => $monto
-		];
-
+            'monto' => number_format($monto, 2, '.', ',')
+		  		];
+		
+		// $correo = ['programador.analista47@ciudadmaderas.com'];
 		$correo = [$correo];
+
 
 		$config['protocol']  = 'smtp';
 		$config['smtp_host'] = 'smtp.gmail.com';
