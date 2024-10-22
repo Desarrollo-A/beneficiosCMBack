@@ -30,6 +30,7 @@ class FondoAhorroController extends BaseController {
 		$idUsuario = $this->input->post('dataValue[idUsuario]');
 		$nombre = $this->input->post('dataValue[nombre]');
 		$numEmpleado = $this->input->post('dataValue[numEmpleado]');
+		$correo = $this->input->post('dataValue[correo]');
 		$idContrato = $this->input->post('dataValue[idContrato]');
 		$monto = $this->input->post('dataValue[ahorroFinal]');
 		$FirstDay = $this->input->post('dataValue[FirstDay]');
@@ -38,9 +39,10 @@ class FondoAhorroController extends BaseController {
 		$fechaInicio = DateTime::createFromFormat('d-m-Y', $FirstDay);
 		$fechaFin = DateTime::createFromFormat('d-m-Y', $dateNext);
 
-		$this->ch->query("INSERT INTO ". $this->schema_cm .".fondosahorros (idContrato, fechaInicio, fechaFin, monto, esReinversion, estatusFondo, creadoPor, fechaCreacion, modificadoPor, fechaModificacion ) 
-					VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), ?, NOW())", 
-					array($idContrato, $fechaInicio->format('Y-m-d'), $fechaFin->format('Y-m-d'), $monto, 0, 1, $idUsuario, $idUsuario ));
+		$this->ch->query(
+			"INSERT INTO ". $this->schema_cm .".fondosahorros (idContrato, fechaInicio, fechaFin, monto, esReinversion, estatusFondo, creadoPor, fechaCreacion, modificadoPor, fechaModificacion, estatus ) 
+			VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), ?, NOW(), 1)", 
+			array($idContrato, $fechaInicio->format('Y-m-d'), $fechaFin->format('Y-m-d'), $monto, 0, 1, $idUsuario, $idUsuario ));
 				
 		$this->ch->trans_complete();
 
@@ -51,10 +53,12 @@ class FondoAhorroController extends BaseController {
 		$data = [
 			'nombre' => $nombre,
 			'numEmpleado' => $numEmpleado,
-			'monto' => $monto
-		];
+            'monto' => number_format($monto, 2, '.', ',')
+		  		];
+		
+		// $correo = ['programador.analista47@ciudadmaderas.com'];
+		$correo = [$correo];
 
-		$correo = ['programador.analista32@ciudadmaderas.com', 'programador.analista36@ciudadmaderas.com'];
 
 		$config['protocol']  = 'smtp';
 		$config['smtp_host'] = 'smtp.gmail.com';
@@ -76,7 +80,7 @@ class FondoAhorroController extends BaseController {
 		$this->email->subject("Solicitud fondo de ahorro");
 
 		if ($this->email->send()) {
-			echo json_encode(array("estatus" => true, "msj" => "Envío exitoso" ), JSON_NUMERIC_CHECK); 
+			echo json_encode(array("estatus" => true, "msj" => "¡Se ha registrado la solicitud de adhesión al fondo de ahorro!" ), JSON_NUMERIC_CHECK); 
 		} else {
 			echo json_encode(array("estatus" => false, "msj" => "Ocurrió un error"), JSON_NUMERIC_CHECK);
 		}
@@ -96,5 +100,30 @@ class FondoAhorroController extends BaseController {
 
 		$this->output->set_content_type("application/json");
         $this->output->set_output(json_encode($rs, JSON_NUMERIC_CHECK));
+	}
+
+	public function actualizarFondoAhorro(){
+		$fecha = date('Y-m-d H:i:s');
+		$idFondo = $this->input->post('dataValue[idFondo]');
+		$estatusFA = $this->input->post('dataValue[idEstatusFA]');
+
+		$response['result'] = isset($idFondo) && !empty($idFondo) && isset($estatusFA) && !empty($estatusFA);
+		
+		if ($response['result']) {  
+			$data['fechaModificacion'] = $fecha;
+			$data['estatusFondo'] = $estatusFA;
+			$response['result'] = $this->GeneralModel->updateRecord($this->schema_cm .'.fondosahorros', $data, 'idFondo', $idFondo);
+	
+			if ($response['result']) {
+				$response['msg'] = "¡Fondo de ahorro actualizado exitosamente!";
+			} else {
+				$response['msg'] = "¡Ocurrió un error!";
+			}
+		} else {
+			$response['msg'] = "¡Parámetros inválidos!";
+		}
+	
+		$this->output->set_content_type("application/json");
+		$this->output->set_output(json_encode($response));
 	}
 }
