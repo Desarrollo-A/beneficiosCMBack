@@ -527,26 +527,26 @@ public function tokenConfirmacionCorreo(){
                         break;
                     case 2:
                         $response['result'] = false;
-                        $response['msg'] = "¡El colaborador canceló su confirmación!";
+                        $response['msg'] = "El colaborador ha cancelado su asistencia, por lo que este código QR es inválido o ha vencido.";
                         break;
                     case 3:
                         $response['result'] = false;
-                        $response['msg'] = "¡El colaborador ya ha asistido!";
+                        $response['msg'] = "El código QR ya ha sido utilizado. El colaborador ya ha asistido al evento.";
                         break;
                     default:
                         $response['result'] = false;
-                        $response['msg'] = "¡Existen errores con la información del colaborador!";
+                        $response['msg'] = "La información del colaborador contiene errores.";
                         break;
                 }
             } else {
                 // Caso en que no se encuentre un evento
                 $response['result'] = false;
-                $response['msg'] = "¡Error al consultar la información! Evento no encontrado.";
+                $response['msg'] = "Error al consultar la información. Evento no encontrado.";
             }
         } else {
             // Caso de que los datos no se puedan decodificar correctamente
             $response['result'] = false;
-            $response['msg'] = "¡Consulta fallida! Datos inválidos.";
+            $response['msg'] = "Consulta fallida. Datos inválidos.";
         }
     
         // Devolver respuesta en formato JSON
