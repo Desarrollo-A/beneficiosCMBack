@@ -307,4 +307,47 @@ class EncuestasModel extends CI_Model {
 
        return $query;
 	}
+
+    public function getEncuestasContestadas()
+    {
+        $query = $this->ch-> query("SELECT ops.nombre AS tipoEncuesta, pg.pregunta, IFNULL(rg.respuesta, ec.idRespuesta) AS respuesta,
+            CONCAT(IFNULL(us2.nombre_persona, ''), ' ', IFNULL(us2.pri_apellido, ''), ' ', IFNULL(us2.sec_apellido, '')) AS paciente,
+            ct.correo, dp.ndepto AS depto, us2.narea AS area, us2.nsede AS sede, pt.nom_puesto AS beneficio, DATE_FORMAT(ec.fechaCreacion, '%d/%m/%Y') AS fecha
+            FROM ". $this->schema_cm .".encuestascontestadas ec
+            INNER JOIN ". $this->schema_cm .".preguntasgeneradas pg ON pg.idPregunta = ec.idPregunta AND pg.idEncuesta = ec.idEncuesta 
+            LEFT JOIN ". $this->schema_cm .".respuestasgenerales rg ON rg.idRespuestaGeneral = ec.idRespuesta
+            INNER JOIN ". $this->schema_cm .".usuarios us ON us.idUsuario = ec.idUsuario 
+            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_usuarios us2 ON us2.idcontrato = us.idContrato 
+            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_puestos pt ON pt.idpuesto = ec.idArea 
+            INNER JOIN ". $this->schema_ch .".beneficioscm_vista_departamento dp ON dp.iddepto = us2.iddepto 
+            INNER JOIN ". $this->schema_cm .".correostemporales ct ON ct.idContrato = us.idContrato 
+            INNER JOIN ". $this->schema_cm .".encuestascreadas ecr ON ecr.idPregunta = ec.idPregunta AND ecr.idEncuesta = ec.idEncuesta 
+            INNER JOIN ". $this->schema_cm .".opcionesporcatalogo ops ON ops.idCatalogo = 16 AND ops.idOpcion = ecr.tipoEncuesta
+            ORDER BY ec.idEncuestaContestada ");
+		return $query;
+    }
+
+    public function getPreguntas($dt)
+	{
+		$tipoEnc = $dt ? $dt : 0;
+        $condition = "";
+
+        if($tipoEnc !== 0){
+            $condition = "AND ops.nombre = '$tipoEnc'";
+        }
+
+		$query = $this->ch->query("SELECT DISTINCT ec.idPregunta, pg.pregunta, ec.tipoEncuesta, ec.respuestas, pg.idPregunta, ec.idEncuesta, ec.idEncuestaCreada, ec.idArea, ec.idPregunta
+		FROM ". $this->schema_cm .".encuestascreadas ec
+		INNER JOIN ". $this->schema_cm .".preguntasgeneradas pg ON pg.idPregunta = ec.idPregunta AND pg.idEncuesta = ec.idEncuesta
+        INNER JOIN ". $this->schema_cm .".opcionesporcatalogo ops ON ops.idCatalogo = 16 AND ops.idOpcion = ec.tipoEncuesta 
+		WHERE ec.estatus = 1 $condition");
+
+		$result = $query->result();
+
+		if (!empty($result))
+			return $result;
+		else {
+			return false;
+		}
+	}
 }

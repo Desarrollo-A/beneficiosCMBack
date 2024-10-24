@@ -131,6 +131,20 @@ class GeneralModel extends CI_Model {
 
     }
 
+    public function getDepartamentos(){
+
+        $query = $this->ch->query("SELECT * FROM ". $this->schema_ch .".beneficioscm_vista_departamento WHERE estatus_depto = 1 ORDER BY ndepto ASC");
+        return $query;
+
+    }
+
+    public function getAreas(){
+
+        $query = $this->ch->query("SELECT * FROM ". $this->schema_ch .".beneficioscm_vista_area WHERE estatus_area = 1 ORDER BY narea ASC");
+        return $query;
+
+    }
+
     public function getOficinas(){
 
         $query = $this->ch->query("SELECT idoficina AS idOficina, noficina AS oficina, direccion AS ubicación, 

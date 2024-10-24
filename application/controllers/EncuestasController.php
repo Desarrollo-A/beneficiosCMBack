@@ -366,4 +366,17 @@ class EncuestasController extends BaseController {
             $response['msg'] = "¡Parámetros inválidos!";
         }
     }
+
+	public function getEncuestasContestadas(){
+		$data['data'] = $this->EncuestasModel->getEncuestasContestadas()->result();
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
+
+	public function getPreguntas(){
+		$dt = $this->input->post('dataValue', true);
+		$data['data'] = $this->EncuestasModel->getPreguntas($dt);
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
 }
