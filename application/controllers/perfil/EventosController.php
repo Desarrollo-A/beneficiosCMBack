@@ -161,6 +161,7 @@ class EventosController extends BaseController {
         $idEvento      = $this->input->post('dataValue[idEvento]');
         $estatus       = $this->input->post('dataValue[estatusAsistencia]');
         $idUsuario     = $this->input->post('dataValue[idUsuario]');
+        $correo     = $this->input->post('dataValue[correo]');
         $today         = strtotime($this->input->post('dataValue[today]'));
         $eventDate     = strtotime($this->input->post('dataValue[eventDate]')); 
         $flagSuccess = true;
@@ -206,7 +207,7 @@ class EventosController extends BaseController {
         $this->db->trans_commit();
         $response['result'] = true;
         $response["msg"] = "Se ha actualizado tu asistencia de manera exitosa";
-        $this->postGenerarQr($idContrato, $idEvento);
+        $this->postGenerarQr($idContrato, $idEvento,$correo);
 
     } else {
         $this->db->trans_rollback();
@@ -287,6 +288,8 @@ public function tokenConfirmacionCorreo(){
   {
       $idContrato = $this->input->post('dataValue[idContrato]');
       $idEvento = $this->input->post('dataValue[idEvento]');
+      $correo = $this->input->post('dataValue[correo]');
+
       if ($idContrato !== null && $idEvento !== null) {
           $dataEvento = $this->EventosModel->getEventoUser($idContrato, $idEvento);
       
@@ -322,7 +325,7 @@ public function tokenConfirmacionCorreo(){
               $result = $writer->write($qrCode, $logo);
               $result->saveToFile($outputFile);
   
-              $this->sendMail($dataEvento[0], $outputFile);
+              $this->sendMail($dataEvento[0], $outputFile,$correo);
               echo json_encode(array("estatus" => true, "msj" => "QR generado correctamente. Datos enviados a sendMail."));
           } else {
               echo json_encode(array("estatus" => false, "msj" => "Error al obtener los datos del evento."));
@@ -332,7 +335,7 @@ public function tokenConfirmacionCorreo(){
       }
   }
        // Funcion para enviar correo de asistencia 
-  public function sendMail($dataValue,$qrFilePath)
+  public function sendMail($dataValue,$qrFilePath,$correo)
   {
       // var_dump($dataValue, $qrFilePath); exit; die;
       $num_empleado = $dataValue->num_empleado;
@@ -360,7 +363,7 @@ public function tokenConfirmacionCorreo(){
           'qrFilePath' => $qrFilePath
       ];
 
-      $correo = ['programador.analista47@ciudadmaderas.com'/*,'coordinador1.desarrollo@ciudadmaderas.com'*/];
+     // $correo = ['programador.analista47@ciudadmaderas.com'/*,'coordinador1.desarrollo@ciudadmaderas.com'*/];
 
       $config['protocol'] = 'smtp';
       $config['smtp_host'] = 'smtp.gmail.com';
