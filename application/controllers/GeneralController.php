@@ -184,6 +184,18 @@ class GeneralController extends BaseController {
         $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
 	}
 
+	public function getDepartamentos(){
+		$data['data'] = $this->GeneralModel->getDepartamentos()->result();
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
+
+	public function getAreas(){
+		$data['data'] = $this->GeneralModel->getAreas()->result();
+		$this->output->set_content_type('application/json');
+        $this->output->set_output(json_encode($data, JSON_NUMERIC_CHECK));
+	}
+
 	public function getOficinas(){
 		$data['data'] = $this->GeneralModel->getOficinas()->result();
 		$this->output->set_content_type('application/json');
